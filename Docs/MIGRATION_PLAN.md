@@ -7,6 +7,8 @@
 - auth UI shell, but no backend dependency yet
 - guest local mode as the default first-run path
 - dashboard with local sample data and clear empty states
+- tab-based centers for expenses, insights, premium, and settings
+- route placeholders for remaining hybrid surfaces so parity can be tracked explicitly
 
 ### Phase 1 exit criteria
 

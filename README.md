@@ -11,6 +11,8 @@ This repo starts as a SwiftUI, local-first migration track that runs in parallel
 - local guest mode
 - local finance dashboard
 - add-expense flow with on-device persistence
+- native app shell with tabs for dashboard, expenses, insights, premium, and settings
+- stubbed parity centers for support, legal, profile, rules, bills, accounts, scan, csv import, trophies, and brand gallery
 - design system and app state foundation
 
 ## Why a separate repo

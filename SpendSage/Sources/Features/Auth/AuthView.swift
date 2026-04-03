@@ -121,6 +121,34 @@ struct AuthView: View {
                         .foregroundStyle(BrandTheme.muted)
                 }
 
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Other auth surfaces from the hybrid app")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        NavigationLink("Confirm account") {
+                            FeatureStubView(
+                                title: "Confirm Account",
+                                summary: "Native replacement for `/confirm-account`.",
+                                readiness: "Phase 2",
+                                bullets: ["Verification code entry", "Resend confirmation", "Cognito confirmation state"],
+                                systemImage: "checkmark.shield.fill"
+                            )
+                        }
+
+                        NavigationLink("Reset password") {
+                            FeatureStubView(
+                                title: "Reset Password",
+                                summary: "Native replacement for `/reset-password` and `/reset-password/confirm`.",
+                                readiness: "Phase 2",
+                                bullets: ["Forgot password request", "Confirmation code", "New password entry"],
+                                systemImage: "key.fill"
+                            )
+                        }
+                    }
+                }
+
                 if viewModel.authConfiguration.allowsGuestAccess {
                     Button("Continue in local free mode") {
                         Task { await continueAsGuest() }

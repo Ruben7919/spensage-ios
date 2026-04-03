@@ -25,12 +25,8 @@ struct DashboardView: View {
             }
             .padding(24)
         }
-        .sheet(isPresented: Binding(
-            get: { viewModel.isPresentingAddExpense },
-            set: { viewModel.isPresentingAddExpense = $0 }
-        )) {
-            AddExpenseView(viewModel: viewModel)
-        }
+        .navigationTitle("Dashboard")
+        .navigationBarTitleDisplayMode(.large)
         .task {
             if viewModel.dashboardState == nil {
                 await viewModel.refreshDashboard()
@@ -70,6 +66,11 @@ struct DashboardView: View {
                 viewModel.presentAddExpense()
             }
             .buttonStyle(PrimaryCTAStyle())
+
+            Button("Open budget wizard") {
+                viewModel.presentBudgetWizard()
+            }
+            .buttonStyle(SecondaryCTAStyle())
         }
     }
 

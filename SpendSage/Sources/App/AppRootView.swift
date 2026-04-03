@@ -18,11 +18,12 @@ struct AppRootView: View {
                     viewModel.completeOnboarding()
                 }
             case .auth:
-                AuthView(viewModel: viewModel)
-            case .dashboard:
-                DashboardView(viewModel: viewModel)
+                NavigationStack {
+                    AuthView(viewModel: viewModel)
+                }
+            case .app:
+                NativeAppShellView(viewModel: viewModel)
             }
         }
     }
 }
-

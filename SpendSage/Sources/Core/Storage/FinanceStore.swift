@@ -3,7 +3,9 @@ import Foundation
 @MainActor
 protocol FinanceDashboardStoring {
     func loadDashboardState(for session: SessionState) async -> FinanceDashboardState
+    func loadLedger(for session: SessionState) async -> LocalFinanceLedger
     func saveExpense(_ draft: ExpenseDraft, for session: SessionState) async
+    func saveBudget(monthlyIncome: Decimal, monthlyBudget: Decimal, for session: SessionState) async
 }
 
 @MainActor
@@ -34,9 +36,21 @@ final class LocalFinanceStore: FinanceDashboardStoring {
         loadLedger().dashboardState()
     }
 
+    func loadLedger(for session: SessionState) async -> LocalFinanceLedger {
+        loadLedger()
+    }
+
     func saveExpense(_ draft: ExpenseDraft, for session: SessionState) async {
         var ledger = loadLedger()
         ledger.appendExpense(draft)
+        saveLedger(ledger)
+    }
+
+    func saveBudget(monthlyIncome: Decimal, monthlyBudget: Decimal, for session: SessionState) async {
+        var ledger = loadLedger()
+        ledger.monthlyIncome = monthlyIncome
+        ledger.monthlyBudget = monthlyBudget
+        ledger.updatedAt = .now
         saveLedger(ledger)
     }
 
@@ -60,5 +74,11 @@ struct PreviewFinanceStore: FinanceDashboardStoring {
         PreviewFinanceData.seedLedger.dashboardState()
     }
 
+    func loadLedger(for session: SessionState) async -> LocalFinanceLedger {
+        PreviewFinanceData.seedLedger
+    }
+
     func saveExpense(_ draft: ExpenseDraft, for session: SessionState) async {}
+
+    func saveBudget(monthlyIncome: Decimal, monthlyBudget: Decimal, for session: SessionState) async {}
 }

@@ -5,13 +5,46 @@ final class AppViewModel: ObservableObject {
     enum Screen {
         case onboarding
         case auth
+        case app
+    }
+
+    enum AppTab: String, CaseIterable, Identifiable {
         case dashboard
+        case expenses
+        case insights
+        case premium
+        case settings
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .dashboard: return "Dashboard"
+            case .expenses: return "Expenses"
+            case .insights: return "Insights"
+            case .premium: return "Premium"
+            case .settings: return "Settings"
+            }
+        }
+
+        var systemImage: String {
+            switch self {
+            case .dashboard: return "house.fill"
+            case .expenses: return "list.bullet.rectangle.portrait.fill"
+            case .insights: return "chart.xyaxis.line"
+            case .premium: return "sparkles"
+            case .settings: return "gearshape.fill"
+            }
+        }
     }
 
     @Published var session: SessionState
     @Published var hasCompletedOnboarding: Bool
+    @Published var selectedTab: AppTab
     @Published var dashboardState: FinanceDashboardState?
+    @Published var ledger: LocalFinanceLedger?
     @Published var isPresentingAddExpense = false
+    @Published var isPresentingBudgetWizard = false
     @Published var notice: String?
 
     private let authService: AuthServicing
@@ -26,6 +59,7 @@ final class AppViewModel: ObservableObject {
         self.financeStore = financeStore
         self.session = .signedOut
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: onboardingKey)
+        self.selectedTab = .dashboard
     }
 
     var authConfiguration: AuthConfiguration {
@@ -40,7 +74,7 @@ final class AppViewModel: ObservableObject {
         case .signedOut:
             return .auth
         case .guest, .signedIn:
-            return .dashboard
+            return .app
         }
     }
 
@@ -76,11 +110,16 @@ final class AppViewModel: ObservableObject {
     func signOut() {
         session = .signedOut
         dashboardState = nil
+        ledger = nil
         isPresentingAddExpense = false
+        isPresentingBudgetWizard = false
+        selectedTab = .dashboard
     }
 
     func refreshDashboard() async {
-        dashboardState = await financeStore.loadDashboardState(for: session)
+        let ledger = await financeStore.loadLedger(for: session)
+        self.ledger = ledger
+        dashboardState = ledger.dashboardState()
     }
 
     func presentAddExpense() {
@@ -89,6 +128,14 @@ final class AppViewModel: ObservableObject {
 
     func dismissAddExpense() {
         isPresentingAddExpense = false
+    }
+
+    func presentBudgetWizard() {
+        isPresentingBudgetWizard = true
+    }
+
+    func dismissBudgetWizard() {
+        isPresentingBudgetWizard = false
     }
 
     func addExpense(_ draft: ExpenseDraft) async {
@@ -100,6 +147,18 @@ final class AppViewModel: ObservableObject {
         await financeStore.saveExpense(draft, for: session)
         notice = "Expense saved locally on this device."
         isPresentingAddExpense = false
+        await refreshDashboard()
+    }
+
+    func saveBudget(monthlyIncome: Decimal, monthlyBudget: Decimal) async {
+        guard monthlyIncome > 0, monthlyBudget > 0 else {
+            notice = "Income and budget must be positive values."
+            return
+        }
+
+        await financeStore.saveBudget(monthlyIncome: monthlyIncome, monthlyBudget: monthlyBudget, for: session)
+        notice = "Budget updated locally on this device."
+        isPresentingBudgetWizard = false
         await refreshDashboard()
     }
 }
