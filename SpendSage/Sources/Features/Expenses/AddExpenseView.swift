@@ -81,7 +81,7 @@ struct AddExpenseView: View {
     private var previewCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Live preview")
+                Text("Summary")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.muted)
 

@@ -8,14 +8,14 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 22) {
                 Spacer(minLength: 6)
 
-                BrandBadge(text: "Phase 1 local-first shell", systemImage: "sparkles")
+                BrandBadge(text: "Smart budgeting, simplified", systemImage: "sparkles")
 
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Know your safe budget in under a minute")
                         .font(.system(size: 38, weight: .bold, design: .rounded))
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text("This native track is intentionally narrow: make the shell feel premium, prove guest mode, and move the migration forward without waiting on backend work.")
+                    Text("Set up your budget, track your spending, and stay on top of your goals from day one.")
                         .font(.title3)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -24,10 +24,10 @@ struct OnboardingView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .top) {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Native first. Local by default.")
+                                Text("Clear plan. Calm money decisions.")
                                     .font(.headline)
                                     .foregroundStyle(BrandTheme.ink)
-                                Text("The first app shell keeps the highest-value flows fast and simple while the hybrid app continues shipping.")
+                                Text("Get started quickly, keep your essentials in one place, and build better money habits with a setup that feels simple from the first screen.")
                                     .font(.subheadline)
                                     .foregroundStyle(BrandTheme.muted)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -46,18 +46,18 @@ struct OnboardingView: View {
                         }
 
                         HStack(spacing: 12) {
-                            BrandMetricTile(title: "Mode", value: "Guest local", systemImage: "person.crop.circle")
-                            BrandMetricTile(title: "Budget", value: "Preview data", systemImage: "chart.bar.xaxis")
-                            BrandMetricTile(title: "Speed", value: "SwiftUI", systemImage: "bolt.fill")
+                            BrandMetricTile(title: "Access", value: "Flexible", systemImage: "person.crop.circle")
+                            BrandMetricTile(title: "Budget", value: "Personalized", systemImage: "chart.bar.xaxis")
+                            BrandMetricTile(title: "Setup", value: "Fast", systemImage: "bolt.fill")
                         }
 
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
-                                Text("Shell readiness")
+                                Text("Set up in a minute")
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundStyle(BrandTheme.muted)
                                 Spacer()
-                                Text("Phase 1")
+                                Text("Quick start")
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundStyle(BrandTheme.primary)
                             }
@@ -71,45 +71,45 @@ struct OnboardingView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("What this track is for")
+                        Text("What you get")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
                         BrandFeatureRow(
                             systemImage: "house.fill",
-                            title: "Local-first onboarding",
-                            detail: "Keep the first-run experience crisp, grounded, and usable without account setup."
+                            title: "Guided setup",
+                            detail: "Get started with a simple flow that helps you build a clear budget quickly."
                         )
 
                         BrandFeatureRow(
                             systemImage: "rectangle.stack.fill",
-                            title: "Reusable shell components",
-                            detail: "Capture cards, badges, and CTA styles once so later native screens stay consistent."
+                            title: "Clean money overview",
+                            detail: "See your key numbers, recent activity, and budget progress in one place."
                         )
 
                         BrandFeatureRow(
                             systemImage: "arrow.triangle.branch",
-                            title: "Parallel migration",
-                            detail: "Ship native screens in slices while the existing app keeps serving production traffic."
+                            title: "Room to grow",
+                            detail: "Start with the essentials and unlock deeper tools as you go."
                         )
                     }
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Phase 1 guardrails")
+                        Text("Why it feels simple")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Do not introduce backend dependency, purchase wiring, or auth complexity before the shell feels intentional and fast.")
+                        Text("The experience is designed to stay clear, quick, and focused on the money moves that matter most every day.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
 
                         HStack(spacing: 8) {
-                            Label("Guest mode", systemImage: "checkmark.circle.fill")
-                            Label("Dashboard stub", systemImage: "checkmark.circle.fill")
-                            Label("No backend lock", systemImage: "checkmark.circle.fill")
+                            Label("Quick setup", systemImage: "checkmark.circle.fill")
+                            Label("Expense tracking", systemImage: "checkmark.circle.fill")
+                            Label("Private start", systemImage: "checkmark.circle.fill")
                         }
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(BrandTheme.primary)
@@ -119,10 +119,10 @@ struct OnboardingView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Button("Start native migration", action: onContinue)
+                    Button("Get started", action: onContinue)
                         .buttonStyle(PrimaryCTAStyle())
 
-                    Text("This keeps the first native pass focused on polish, speed, and a clear migration path.")
+                    Text("You can create an account later if you want access across devices.")
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }

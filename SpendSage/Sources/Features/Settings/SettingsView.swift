@@ -35,8 +35,8 @@ struct SettingsView: View {
                 NavigationLink("Profile") {
                     FeatureStubView(
                         title: "Profile",
-                        summary: "Native replacement for `/app/profile`.",
-                        readiness: "Phase 3",
+                        summary: "Manage your personal details, household setup, and account status.",
+                        readiness: "Available soon",
                         bullets: ["Identity", "Household state", "Access status"],
                         systemImage: "person.crop.circle.fill"
                     )
@@ -45,8 +45,8 @@ struct SettingsView: View {
                 NavigationLink("Advanced settings") {
                     FeatureStubView(
                         title: "Advanced Settings",
-                        summary: "Native replacement for `/app/settings/advanced`.",
-                        readiness: "Phase 4",
+                        summary: "Fine-tune diagnostics, exports, and advanced app controls.",
+                        readiness: "Available soon",
                         bullets: ["Diagnostics", "Data export", "Developer toggles"],
                         systemImage: "switch.2"
                     )
@@ -62,8 +62,8 @@ struct SettingsView: View {
                 NavigationLink("Help Center") {
                     FeatureStubView(
                         title: "Help Center",
-                        summary: "Native replacement for `/app/help`.",
-                        readiness: "Phase 3",
+                        summary: "Browse quick answers and practical guidance for common tasks.",
+                        readiness: "Available soon",
                         bullets: ["FAQ", "Guided walkthroughs", "Feature explanations"],
                         systemImage: "questionmark.circle.fill"
                     )
@@ -72,8 +72,8 @@ struct SettingsView: View {
                 NavigationLink("Support Center") {
                     FeatureStubView(
                         title: "Support Center",
-                        summary: "Native replacement for `/app/support`.",
-                        readiness: "Phase 3",
+                        summary: "Reach support, follow up on requests, and manage help tickets.",
+                        readiness: "Available soon",
                         bullets: ["Ticket creation", "Status tracking", "Account deletion handoff"],
                         systemImage: "bubble.left.and.bubble.right.fill"
                     )
@@ -82,8 +82,8 @@ struct SettingsView: View {
                 NavigationLink("Legal Center") {
                     FeatureStubView(
                         title: "Legal Center",
-                        summary: "Native replacement for `/app/legal`.",
-                        readiness: "Phase 3",
+                        summary: "Review terms, privacy information, and support contact details.",
+                        readiness: "Available soon",
                         bullets: ["Terms", "Privacy", "Support contact"],
                         systemImage: "doc.text.fill"
                     )

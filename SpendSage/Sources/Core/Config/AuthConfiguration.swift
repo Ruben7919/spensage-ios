@@ -61,8 +61,8 @@ struct AuthConfiguration: Equatable {
         supportedSocialProviders: SocialProvider.allCases,
         hostedUI: nil,
         previewEmailDomain: "spendsage.preview",
-        localPreviewFootnote: "Preview mode keeps auth local today and leaves room for Cognito Hosted UI later.",
-        hostedUIFootnote: "Hosted UI is ready to be wired once Cognito and ASWebAuthenticationSession are added."
+        localPreviewFootnote: "Sign in to keep your plan, access, and progress connected to your account.",
+        hostedUIFootnote: "Apple and Google sign in are available on supported accounts."
     )
 
     var isHostedUIReady: Bool {
@@ -84,4 +84,3 @@ struct AuthConfiguration: Equatable {
         )
     }
 }
-

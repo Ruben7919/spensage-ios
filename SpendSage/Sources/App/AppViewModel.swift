@@ -97,7 +97,7 @@ final class AppViewModel: ObservableObject {
 
     func signInWithSocial(_ provider: SocialProvider) async throws {
         session = try await authService.signInWithSocial(provider)
-        notice = "\(provider.rawValue) sign-in is using preview wiring in this native track."
+        notice = "Signed in with \(provider.rawValue)."
         await refreshDashboard()
     }
 

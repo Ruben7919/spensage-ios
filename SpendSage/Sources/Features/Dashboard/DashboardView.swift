@@ -14,10 +14,10 @@ struct DashboardView: View {
                 } else {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Loading local finance data...")
+                            Text("Loading your dashboard...")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
-                            Text("Your seeded preview ledger and on-device persistence will appear here.")
+                            Text("Your budget and recent activity will appear here.")
                                 .foregroundStyle(BrandTheme.muted)
                         }
                     }
@@ -38,13 +38,13 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Local finance")
+                    Text("Your money")
                         .font(.system(size: 34, weight: .bold, design: .rounded))
                         .foregroundStyle(BrandTheme.ink)
 
                     switch viewModel.session {
                     case .guest:
-                        Text("Guest local mode with on-device persistence.")
+                        Text("Your data stays on this device.")
                             .foregroundStyle(BrandTheme.muted)
                     case let .signedIn(email, provider):
                         Text(provider.map { "\(email) via \($0)" } ?? email)
@@ -112,7 +112,7 @@ struct DashboardView: View {
                 }
 
                 if state.categoryBreakdown.isEmpty {
-                    Text("Add a local expense to see category trends.")
+                    Text("Add an expense to see category trends.")
                         .foregroundStyle(BrandTheme.muted)
                 } else {
                     ForEach(state.categoryBreakdown) { category in
@@ -160,7 +160,7 @@ struct DashboardView: View {
                 }
 
                 if state.recentExpenses.isEmpty {
-                    Text("Your saved local ledger will show up here.")
+                    Text("Your recent activity will show up here.")
                         .foregroundStyle(BrandTheme.muted)
                 } else {
                     ForEach(state.recentExpenses) { expense in

@@ -17,7 +17,7 @@ struct BudgetWizardView: View {
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(BrandTheme.ink)
 
-                            Text("Native replacement for `/app/budget-wizard`. Keep the logic simple first: monthly income and a safe monthly budget.")
+                            Text("Set your monthly income and target budget to keep your spending plan realistic.")
                                 .foregroundStyle(BrandTheme.muted)
 
                             budgetField(title: "Monthly income", value: $income)

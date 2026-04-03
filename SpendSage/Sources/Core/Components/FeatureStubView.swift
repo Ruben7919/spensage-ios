@@ -30,7 +30,7 @@ struct FeatureStubView: View {
                         }
 
                         HStack {
-                            Text("Native parity status")
+                            Text("Availability")
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(BrandTheme.muted)
                             Spacer()
@@ -43,7 +43,7 @@ struct FeatureStubView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("What is planned here")
+                        Text("What to expect")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 

@@ -9,11 +9,11 @@ struct InsightsView: View {
                 if let state = viewModel.dashboardState {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Local insights")
+                            Text("Insights")
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(BrandTheme.ink)
 
-                            Text("This tab replaces `/app/insights` and `/app/budget-wizard` in the native track.")
+                            Text("See where your money is going and adjust your plan when needed.")
                                 .foregroundStyle(BrandTheme.muted)
 
                             HStack(spacing: 12) {
@@ -52,38 +52,38 @@ struct InsightsView: View {
 
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Finance controls still to port")
+                            Text("More money tools")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
 
                             NavigationLink("Bills") {
                                 FeatureStubView(
-                                    title: "Bills",
-                                    summary: "Native replacement for `/app/bills`.",
-                                    readiness: "Phase 3",
-                                    bullets: ["Recurring bills", "Upcoming due dates", "Safe-to-spend impact"],
-                                    systemImage: "calendar.badge.clock"
-                                )
+                                title: "Bills",
+                                summary: "Track recurring bills and upcoming due dates.",
+                                readiness: "Available soon",
+                                bullets: ["Recurring bills", "Upcoming due dates", "Safe-to-spend impact"],
+                                systemImage: "calendar.badge.clock"
+                            )
                             }
 
                             NavigationLink("Accounts") {
                                 FeatureStubView(
-                                    title: "Accounts",
-                                    summary: "Native replacement for `/app/accounts`.",
-                                    readiness: "Phase 3",
-                                    bullets: ["Cash accounts", "Cards", "Manual balances"],
-                                    systemImage: "creditcard.fill"
-                                )
+                                title: "Accounts",
+                                summary: "Organize cash, cards, and balances in one place.",
+                                readiness: "Available soon",
+                                bullets: ["Cash accounts", "Cards", "Manual balances"],
+                                systemImage: "creditcard.fill"
+                            )
                             }
 
                             NavigationLink("Rules") {
                                 FeatureStubView(
-                                    title: "Rules",
-                                    summary: "Native replacement for `/app/rules`.",
-                                    readiness: "Phase 3",
-                                    bullets: ["Auto-categorization", "Merchant patterns", "Ledger cleanup"],
-                                    systemImage: "slider.horizontal.3"
-                                )
+                                title: "Rules",
+                                summary: "Automate how transactions are categorized and cleaned up.",
+                                readiness: "Available soon",
+                                bullets: ["Auto-categorization", "Merchant patterns", "Ledger cleanup"],
+                                systemImage: "slider.horizontal.3"
+                            )
                             }
                         }
                     }

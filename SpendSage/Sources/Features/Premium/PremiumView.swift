@@ -11,20 +11,20 @@ struct PremiumView: View {
                         Text("Premium")
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundStyle(BrandTheme.ink)
-                        Text("This tab mirrors `/app/premium` from the hybrid app. RevenueCat and AdMob are still phase-3 integrations in the native repo, but the surface is now in place.")
+                        Text("Upgrade for an ad-free experience and more advanced planning tools.")
                             .foregroundStyle(BrandTheme.muted)
 
-                        BrandBadge(text: viewModel.session.isAuthenticated ? "Signed-in preview" : "Guest preview", systemImage: "star.fill")
+                        BrandBadge(text: viewModel.session.isAuthenticated ? "Signed in" : "On this device", systemImage: "star.fill")
 
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Remove ads on dashboard and expenses", systemImage: "checkmark.circle.fill")
                             Label("Unlock insights, bills, accounts, and rules", systemImage: "checkmark.circle.fill")
-                            Label("Keep parity with RevenueCat + Cognito entitlements", systemImage: "checkmark.circle.fill")
+                            Label("Keep your access in sync across devices", systemImage: "checkmark.circle.fill")
                         }
                         .foregroundStyle(BrandTheme.ink)
                         .font(.subheadline)
 
-                        Button("Open customer center later") {}
+                        Button("Explore premium options") {}
                             .buttonStyle(PrimaryCTAStyle())
                     }
                 }
@@ -38,8 +38,8 @@ struct PremiumView: View {
                         NavigationLink("Trophies") {
                             FeatureStubView(
                                 title: "Trophies",
-                                summary: "Native replacement for `/app/trophies`.",
-                                readiness: "Phase 4",
+                                summary: "Celebrate milestones, streaks, and financial wins.",
+                                readiness: "Available soon",
                                 bullets: ["Milestones", "Review loops", "Habit streaks"],
                                 systemImage: "trophy.fill"
                             )
@@ -48,8 +48,8 @@ struct PremiumView: View {
                         NavigationLink("Brand Gallery") {
                             FeatureStubView(
                                 title: "Brand Gallery",
-                                summary: "Native replacement for `/app/brand-gallery`.",
-                                readiness: "Phase 4",
+                                summary: "Explore styles, characters, and visual themes across the app.",
+                                readiness: "Available soon",
                                 bullets: ["Mascot assets", "Theme gallery", "Onboarding scenes"],
                                 systemImage: "photo.stack.fill"
                             )

@@ -14,7 +14,7 @@ struct ExpensesCenterView: View {
                     Text("Track every local expense")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
-                    Text("This is the native replacement for the hybrid expenses center. Manual entry already persists on-device, and import/scan hooks are mapped as next migration steps.")
+                    Text("Add expenses quickly, review recent activity, and keep your budget up to date.")
                         .foregroundStyle(BrandTheme.muted)
 
                     HStack(spacing: 12) {
@@ -48,12 +48,12 @@ struct ExpensesCenterView: View {
                 NavigationLink("CSV Import") {
                     FeatureStubView(
                         title: "CSV Import",
-                        summary: "This route mirrors `/app/import-csv` from the hybrid app.",
-                        readiness: "Phase 3",
+                        summary: "Bring in transactions from a spreadsheet and review them before saving.",
+                        readiness: "Available soon",
                         bullets: [
-                            "Map CSV columns into native ledger records",
-                            "Preview row-level validation before import",
-                            "Keep parity with backend import contracts"
+                            "Match columns to expense fields",
+                            "Review rows before import",
+                            "Save clean entries into your ledger"
                         ],
                         systemImage: "tablecells"
                     )
@@ -62,12 +62,12 @@ struct ExpensesCenterView: View {
                 NavigationLink("Scan Receipts") {
                     FeatureStubView(
                         title: "Scan Receipts",
-                        summary: "This route mirrors `/app/scan` and will move to native camera plus Vision/OCR.",
-                        readiness: "Phase 4",
+                        summary: "Capture receipts and turn them into entries faster.",
+                        readiness: "Available soon",
                         bullets: [
-                            "Camera capture with receipt framing",
-                            "Vision OCR extraction and confidence review",
-                            "Optional backend enrichment after native parse"
+                            "Frame receipts with the camera",
+                            "Extract key details automatically",
+                            "Review entries before saving"
                         ],
                         systemImage: "camera.viewfinder"
                     )

@@ -27,7 +27,7 @@ struct AuthView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Text("Sign in natively")
+                Text("Welcome to SpendSage")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
@@ -85,7 +85,7 @@ struct AuthView: View {
                         if isLoading {
                             HStack(spacing: 8) {
                                 ProgressView()
-                                Text("Working securely in preview mode")
+                                Text("Signing you in...")
                                     .font(.footnote)
                                     .foregroundStyle(BrandTheme.muted)
                             }
@@ -123,16 +123,16 @@ struct AuthView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Other auth surfaces from the hybrid app")
+                        Text("Account help")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
                         NavigationLink("Confirm account") {
                             FeatureStubView(
                                 title: "Confirm Account",
-                                summary: "Native replacement for `/confirm-account`.",
-                                readiness: "Phase 2",
-                                bullets: ["Verification code entry", "Resend confirmation", "Cognito confirmation state"],
+                                summary: "Finish setting up your account with a confirmation code.",
+                                readiness: "Available soon",
+                                bullets: ["Enter your verification code", "Resend a code if needed", "Finish activating your account"],
                                 systemImage: "checkmark.shield.fill"
                             )
                         }
@@ -140,8 +140,8 @@ struct AuthView: View {
                         NavigationLink("Reset password") {
                             FeatureStubView(
                                 title: "Reset Password",
-                                summary: "Native replacement for `/reset-password` and `/reset-password/confirm`.",
-                                readiness: "Phase 2",
+                                summary: "Recover access to your account and choose a new password.",
+                                readiness: "Available soon",
                                 bullets: ["Forgot password request", "Confirmation code", "New password entry"],
                                 systemImage: "key.fill"
                             )
@@ -150,7 +150,7 @@ struct AuthView: View {
                 }
 
                 if viewModel.authConfiguration.allowsGuestAccess {
-                    Button("Continue in local free mode") {
+                    Button("Continue on this device") {
                         Task { await continueAsGuest() }
                     }
                     .buttonStyle(PrimaryCTAStyle())
@@ -182,7 +182,7 @@ struct AuthView: View {
 
     private var validationHint: String? {
         if !isValidEmail(email) {
-            return "Use a real email format so Hosted UI can take over later."
+            return "Use a valid email address."
         }
         if password.count < viewModel.authConfiguration.minimumPasswordLength {
             return "Password must be at least \(viewModel.authConfiguration.minimumPasswordLength) characters."
