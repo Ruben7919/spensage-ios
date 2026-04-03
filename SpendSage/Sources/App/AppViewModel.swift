@@ -189,6 +189,18 @@ final class AppViewModel: ObservableObject {
         await refreshDashboard()
     }
 
+    func deleteAccount(_ accountID: UUID) async {
+        await financeStore.deleteAccount(accountID, for: session)
+        notice = "Account removed from your local ledger."
+        await refreshDashboard()
+    }
+
+    func setPrimaryAccount(_ accountID: UUID) async {
+        await financeStore.setPrimaryAccount(accountID, for: session)
+        notice = "Primary account updated locally on this device."
+        await refreshDashboard()
+    }
+
     func addBill(_ draft: BillDraft) async {
         guard draft.isValid else {
             notice = "Add a bill title, amount, and due day."
@@ -200,6 +212,18 @@ final class AppViewModel: ObservableObject {
         await refreshDashboard()
     }
 
+    func deleteBill(_ billID: UUID) async {
+        await financeStore.deleteBill(billID, for: session)
+        notice = "Recurring bill removed from your local ledger."
+        await refreshDashboard()
+    }
+
+    func toggleBillAutopay(_ billID: UUID) async {
+        await financeStore.toggleBillAutopay(billID, for: session)
+        notice = "Bill autopay updated locally on this device."
+        await refreshDashboard()
+    }
+
     func addRule(_ draft: RuleDraft) async {
         guard draft.isValid else {
             notice = "Add a merchant keyword before saving a rule."
@@ -208,6 +232,18 @@ final class AppViewModel: ObservableObject {
 
         await financeStore.saveRule(draft, for: session)
         notice = "Rule saved locally on this device."
+        await refreshDashboard()
+    }
+
+    func deleteRule(_ ruleID: UUID) async {
+        await financeStore.deleteRule(ruleID, for: session)
+        notice = "Rule removed from your local ledger."
+        await refreshDashboard()
+    }
+
+    func toggleRuleEnabled(_ ruleID: UUID) async {
+        await financeStore.toggleRuleEnabled(ruleID, for: session)
+        notice = "Rule activity updated locally on this device."
         await refreshDashboard()
     }
 

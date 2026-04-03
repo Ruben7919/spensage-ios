@@ -15,6 +15,7 @@ struct DashboardView: View {
 
                 if let state = viewModel.dashboardState {
                     heroCard(for: state, growth: growthSnapshot)
+                    loopCard(for: state, growth: growthSnapshot)
                     coachCard(growth: growthSnapshot)
                     missionsSection(growth: growthSnapshot)
                     trophyShowcaseSection(growth: growthSnapshot)
@@ -222,6 +223,100 @@ struct DashboardView: View {
         .shadow(color: BrandTheme.shadow.opacity(0.18), radius: 24, x: 0, y: 14)
     }
 
+    private func loopCard(for state: FinanceDashboardState, growth: DashboardGrowthSnapshot) -> some View {
+        let progress = min(max(state.utilizationRatio, 0), 1)
+        let nextBill = viewModel.ledger?.upcomingBills().first
+        let nextBillValue = nextBill.map { bill -> String in
+            let dueDate = viewModel.ledger?.dueDate(for: bill)
+            let dueText = dueDate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "Soon"
+            return "\(bill.amount.formatted(.currency(code: currencyCode))) · \(dueText)"
+        } ?? "No bills queued"
+
+        return SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        sectionHeading(
+                            title: "Local loop",
+                            detail: "A compact month view that keeps spending, bills, and automation close together."
+                        )
+
+                        Text(loopStatusText(for: state))
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    BrandBadge(text: loopPaceLabel(for: state), systemImage: "arrow.triangle.2.circlepath")
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Budget pace")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(BrandTheme.ink)
+                        Spacer()
+                        Text("\(Int((progress * 100).rounded()))% used")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(BrandTheme.muted)
+                    }
+
+                    ProgressView(value: progress)
+                        .tint(BrandTheme.primary)
+
+                    HStack {
+                        Text("Spent \(state.budgetSnapshot.monthlySpent.formatted(.currency(code: currencyCode)))")
+                        Spacer()
+                        Text("Remaining \(state.budgetSnapshot.remaining.formatted(.currency(code: currencyCode)))")
+                    }
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(BrandTheme.muted)
+                }
+
+                LazyVGrid(
+                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                    spacing: 12
+                ) {
+                    BrandMetricTile(
+                        title: "Average ticket",
+                        value: state.averageExpense.formatted(.currency(code: currencyCode)),
+                        systemImage: "chart.bar.fill"
+                    )
+                    BrandMetricTile(
+                        title: "Largest expense",
+                        value: state.largestExpense?.amount.formatted(.currency(code: currencyCode)) ?? "None",
+                        systemImage: "arrow.up.right.circle.fill"
+                    )
+                    BrandMetricTile(
+                        title: "Accounts",
+                        value: "\(viewModel.accounts.count)",
+                        systemImage: "wallet.pass.fill"
+                    )
+                    BrandMetricTile(
+                        title: "Rules",
+                        value: "\(viewModel.rules.count)",
+                        systemImage: "line.3.horizontal.decrease.circle.fill"
+                    )
+                }
+
+                HStack(alignment: .top, spacing: 12) {
+                    dashboardLoopCallout(
+                        title: "Next bill",
+                        detail: nextBillValue,
+                        systemImage: "calendar.badge.clock"
+                    )
+
+                    dashboardLoopCallout(
+                        title: "Coach action",
+                        detail: growth.coachAction,
+                        systemImage: "lightbulb.max.fill"
+                    )
+                }
+            }
+        }
+    }
+
     private func coachCard(growth: DashboardGrowthSnapshot) -> some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
@@ -368,6 +463,21 @@ struct DashboardView: View {
                         title: "Active streak",
                         value: "\(growth.streakDays) days",
                         systemImage: "flame.fill"
+                    )
+                    BrandMetricTile(
+                        title: "Accounts",
+                        value: "\(viewModel.accounts.count)",
+                        systemImage: "wallet.pass.fill"
+                    )
+                    BrandMetricTile(
+                        title: "Bills",
+                        value: "\(viewModel.bills.count)",
+                        systemImage: "calendar.badge.clock"
+                    )
+                    BrandMetricTile(
+                        title: "Rules",
+                        value: "\(viewModel.rules.count)",
+                        systemImage: "line.3.horizontal.decrease.circle.fill"
                     )
                 }
             }
@@ -670,6 +780,60 @@ struct DashboardView: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(BrandTheme.surfaceTint)
         )
+    }
+
+    private func dashboardLoopCallout(title: String, detail: String, systemImage: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(BrandTheme.surfaceTint)
+                Image(systemName: systemImage)
+                    .foregroundStyle(BrandTheme.primary)
+            }
+            .frame(width: 40, height: 40)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(BrandTheme.ink)
+                Text(detail)
+                    .font(.footnote)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(BrandTheme.surfaceTint)
+        )
+    }
+
+    private func loopPaceLabel(for state: FinanceDashboardState) -> String {
+        if state.transactionCount == 0 {
+            return "Start here"
+        }
+        if state.utilizationRatio < 0.82 {
+            return "Calm pace"
+        }
+        if state.utilizationRatio < 1 {
+            return "Watch pace"
+        }
+        return "Over budget"
+    }
+
+    private func loopStatusText(for state: FinanceDashboardState) -> String {
+        if state.transactionCount == 0 {
+            return "One expense will unlock category pressure, pace, and bill radar."
+        }
+        if let nextBill = viewModel.ledger?.upcomingBills().first,
+           let dueDate = viewModel.ledger?.dueDate(for: nextBill) {
+            return "The next obligation is \(nextBill.title) due \(dueDate.formatted(date: .abbreviated, time: .omitted))."
+        }
+        return "The month is being tracked locally, so every card can react instantly to new entries."
     }
 }
 

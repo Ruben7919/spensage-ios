@@ -16,13 +16,13 @@ struct LegalCenterView: View {
     private let resources: [LegalResource] = [
         LegalResource(
             title: "Privacy Policy",
-            summary: "Review how SpendSage handles on-device data, support handoff details, and public privacy commitments.",
+            summary: "Review how SpendSage handles on-device data, support packet details, and public privacy commitments.",
             url: PublicLegalLinks.privacy,
             systemImage: "hand.raised.fill"
         ),
         LegalResource(
             title: "Support Center",
-            summary: "Open the public support path for escalation, documentation, and troubleshooting follow-up.",
+            summary: "Open the public support path for documentation and troubleshooting follow-up.",
             url: PublicLegalLinks.support,
             systemImage: "lifepreserver.fill"
         ),
@@ -73,7 +73,7 @@ struct LegalCenterView: View {
 
                         Label("Profile and ledger data are stored on this device.", systemImage: "lock.fill")
                         Label("Support packets are generated locally and can be shared manually.", systemImage: "square.and.arrow.up")
-                        Label("Connected services appear only when your account access enables them.", systemImage: "icloud")
+                        Label("Cloud features stay hidden until you sign in to a cloud-enabled account.", systemImage: "icloud")
                     }
                     .foregroundStyle(BrandTheme.ink)
                 }
@@ -81,6 +81,9 @@ struct LegalCenterView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
+        .overlay(alignment: .top) {
+            BrandBackdropView()
+        }
         .navigationTitle("Legal Center")
         .navigationBarTitleDisplayMode(.inline)
         .overlay(alignment: .bottom) {
@@ -106,7 +109,7 @@ struct LegalCenterView: View {
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Open privacy, support, and terms pages that correspond to the current environment without leaving the app.")
+                Text("Open privacy, support, and terms pages that match this local-first build without leaving the app.")
                     .foregroundStyle(BrandTheme.muted)
 
                 BrandArtworkSurface {
@@ -123,7 +126,7 @@ struct LegalCenterView: View {
                             character: .tikki,
                             expression: .proud,
                             title: "Trust should stay close",
-                            message: "When privacy and support are easy to open, testing feels safer and handoff stays cleaner."
+                            message: "When privacy and support are easy to open, testing feels safer and every packet stays easier to review."
                         )
                     }
                 }

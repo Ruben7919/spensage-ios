@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ConfirmAccountView: View {
     @State private var email = ""
@@ -6,51 +7,150 @@ struct ConfirmAccountView: View {
     @State private var notice: String?
 
     var body: some View {
-        List {
-            Section {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Confirm your account")
-                        .font(.title2.weight(.bold))
-                        .foregroundStyle(BrandTheme.ink)
-                    Text("Enter the verification code from your email to finish setting up your account.")
-                        .foregroundStyle(BrandTheme.muted)
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                headerCard
+                verificationCard
+                actionCard
+
+                if let notice {
+                    statusCard(message: notice)
                 }
-                .padding(.vertical, 6)
-                .listRowBackground(Color.clear)
             }
-
-            Section("Verification") {
-                TextField("Email", text: $email)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .textContentType(.emailAddress)
-
-                TextField("Confirmation code", text: $code)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
+            .padding(24)
+        }
+        .background(
+            ZStack {
+                BrandTheme.canvas
+                BrandBackdropView()
             }
+            .ignoresSafeArea()
+        )
+        .navigationTitle("Confirm Account")
+        .navigationBarTitleDisplayMode(.inline)
+    }
 
-            Section {
-                Button("Confirm account") {
-                    notice = "Your account confirmation request is ready. If this account exists, you can continue signing in after verification."
-                }
+    private var headerCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                BrandBadge(text: "Security checkpoint", systemImage: "checkmark.shield.fill")
 
-                Button("Resend code") {
-                    notice = "A new confirmation code will be sent to your email when account verification is connected."
-                }
-                .foregroundStyle(BrandTheme.primary)
-            }
+                Text("Confirm your account")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(BrandTheme.ink)
 
-            if let notice {
-                Section("Status") {
-                    Text(notice)
-                        .foregroundStyle(BrandTheme.muted)
+                Text("Enter the email used for signup and the code from your inbox to finish setup.")
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                HStack(spacing: 12) {
+                    BrandMetricTile(title: "Step", value: "2 of 2", systemImage: "number.circle.fill")
+                    BrandMetricTile(title: "Delivery", value: "Email code", systemImage: "envelope.fill")
                 }
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(BrandTheme.canvas)
-        .navigationTitle("Confirm Account")
-        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var verificationCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                sectionHeader(number: "01", title: "Verification details", summary: "Use the same email address you entered when creating the account.")
+
+                authField(title: "Email", placeholder: "name@domain.com", text: $email, contentType: .emailAddress)
+                authField(title: "Confirmation code", placeholder: "6-digit code", text: $code, contentType: .oneTimeCode, keyboard: .numberPad)
+            }
+        }
+    }
+
+    private var actionCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                sectionHeader(number: "02", title: "Finish setup", summary: "Once the code is accepted, you can return to sign in and continue with your account.")
+
+                Button("Confirm account") {
+                    notice = "Confirmation is ready. When the account service is connected, this step will complete verification and return you to sign in."
+                }
+                .buttonStyle(PrimaryCTAStyle())
+
+                Button("Resend code") {
+                    notice = "A new confirmation code will be sent to your email when the account service is available."
+                }
+                .buttonStyle(SecondaryCTAStyle())
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func statusCard(message: String) -> some View {
+        SurfaceCard {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "bell.badge.fill")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(BrandTheme.primary)
+                    .frame(width: 42, height: 42)
+                    .background(BrandTheme.accent.opacity(0.18))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Status")
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+                    Text(message)
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private func sectionHeader(number: String, title: String, summary: String) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(summary)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+
+            Text(number)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(BrandTheme.primary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(BrandTheme.accent.opacity(0.18), in: Capsule())
+        }
+    }
+
+    @ViewBuilder
+    private func authField(
+        title: String,
+        placeholder: String,
+        text: Binding<String>,
+        contentType: UITextContentType,
+        keyboard: UIKeyboardType = .default
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(BrandTheme.muted)
+
+            TextField(placeholder, text: text)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .textContentType(contentType)
+                .keyboardType(keyboard)
+                .padding()
+                .background(Color.black.opacity(0.03))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
     }
 }

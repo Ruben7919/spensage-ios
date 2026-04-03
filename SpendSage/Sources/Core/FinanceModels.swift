@@ -52,6 +52,58 @@ enum AccountKind: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+enum AccountBalanceState: String, CaseIterable, Codable, Identifiable {
+    case asset = "Asset"
+    case neutral = "Neutral"
+    case liability = "Liability"
+
+    var id: String { rawValue }
+
+    var symbolName: String {
+        switch self {
+        case .asset: return "arrow.up.circle.fill"
+        case .neutral: return "minus.circle.fill"
+        case .liability: return "arrow.down.circle.fill"
+        }
+    }
+}
+
+enum BillPaymentState: String, CaseIterable, Codable, Identifiable {
+    case paid = "Paid"
+    case dueSoon = "Due soon"
+    case upcoming = "Upcoming"
+    case overdue = "Overdue"
+
+    var id: String { rawValue }
+
+    var symbolName: String {
+        switch self {
+        case .paid: return "checkmark.circle.fill"
+        case .dueSoon: return "clock.badge.exclamationmark.fill"
+        case .upcoming: return "calendar.circle.fill"
+        case .overdue: return "exclamationmark.triangle.fill"
+        }
+    }
+}
+
+enum RuleActivityState: String, CaseIterable, Codable, Identifiable {
+    case active = "Active"
+    case quiet = "Quiet"
+    case dormant = "Dormant"
+    case disabled = "Disabled"
+
+    var id: String { rawValue }
+
+    var symbolName: String {
+        switch self {
+        case .active: return "sparkles"
+        case .quiet: return "moon.zzz.fill"
+        case .dormant: return "circle.dashed"
+        case .disabled: return "pause.circle.fill"
+        }
+    }
+}
+
 struct AccountDraft: Equatable {
     var name: String
     var institution: String
@@ -81,6 +133,58 @@ struct AccountRecord: Identifiable, Codable, Equatable {
     var institution: String
     var balance: Decimal
     var kind: AccountKind
+    var isPrimary: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case institution
+        case balance
+        case kind
+        case isPrimary
+    }
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        institution: String,
+        balance: Decimal,
+        kind: AccountKind,
+        isPrimary: Bool = false
+    ) {
+        self.id = id
+        self.name = name
+        self.institution = institution
+        self.balance = balance
+        self.kind = kind
+        self.isPrimary = isPrimary
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        institution = try container.decode(String.self, forKey: .institution)
+        balance = try container.decode(Decimal.self, forKey: .balance)
+        kind = try container.decode(AccountKind.self, forKey: .kind)
+        isPrimary = try container.decodeIfPresent(Bool.self, forKey: .isPrimary) ?? false
+    }
+
+    var balanceState: AccountBalanceState {
+        if kind == .creditCard || balance < 0 {
+            return .liability
+        }
+        if balance == 0 {
+            return .neutral
+        }
+        return .asset
+    }
+
+    var summaryLabel: String {
+        [institution.trimmingCharacters(in: .whitespacesAndNewlines), kind.rawValue]
+            .filter { !$0.isEmpty }
+            .joined(separator: " · ")
+    }
 }
 
 struct BillDraft: Equatable {
@@ -117,6 +221,34 @@ struct BillRecord: Identifiable, Codable, Equatable {
     var category: ExpenseCategory
     var autopay: Bool
     var lastPaidAt: Date?
+
+    func paymentState(referenceDate: Date = .now, ledger: LocalFinanceLedger? = nil) -> BillPaymentState {
+        guard lastPaidAt == nil else {
+            return .paid
+        }
+
+        let dueDate: Date
+        if let ledger {
+            dueDate = ledger.dueDate(for: self, referenceDate: referenceDate)
+        } else {
+            let calendar = Calendar.autoupdatingCurrent
+            let components = calendar.dateComponents([.year, .month], from: referenceDate)
+            let day = min(max(dueDay, 1), 28)
+            dueDate = calendar.date(from: DateComponents(year: components.year, month: components.month, day: day)) ?? referenceDate
+        }
+
+        let calendar = Calendar.autoupdatingCurrent
+        let startOfToday = calendar.startOfDay(for: referenceDate)
+        if dueDate < startOfToday {
+            return .overdue
+        }
+
+        if let warningDate = calendar.date(byAdding: .day, value: 3, to: startOfToday), dueDate <= warningDate {
+            return .dueSoon
+        }
+
+        return .upcoming
+    }
 }
 
 struct RuleDraft: Equatable {
@@ -144,6 +276,38 @@ struct RuleRecord: Identifiable, Codable, Equatable {
     var merchantKeyword: String
     var category: ExpenseCategory
     var note: String?
+    var isEnabled: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case merchantKeyword
+        case category
+        case note
+        case isEnabled
+    }
+
+    init(
+        id: UUID = UUID(),
+        merchantKeyword: String,
+        category: ExpenseCategory,
+        note: String? = nil,
+        isEnabled: Bool = true
+    ) {
+        self.id = id
+        self.merchantKeyword = merchantKeyword
+        self.category = category
+        self.note = note
+        self.isEnabled = isEnabled
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        merchantKeyword = try container.decode(String.self, forKey: .merchantKeyword)
+        category = try container.decode(ExpenseCategory.self, forKey: .category)
+        note = try container.decodeIfPresent(String.self, forKey: .note)
+        isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
+    }
 }
 
 struct ProfileRecord: Codable, Equatable {
@@ -379,13 +543,15 @@ struct LocalFinanceLedger: Codable, Equatable {
     }
 
     mutating func appendAccount(_ draft: AccountDraft, id: UUID = UUID(), date: Date = .now) {
+        let shouldMarkPrimary = primaryAccount == nil
         accounts.insert(
             AccountRecord(
                 id: id,
                 name: draft.name.trimmingCharacters(in: .whitespacesAndNewlines),
                 institution: draft.institution.trimmingCharacters(in: .whitespacesAndNewlines),
                 balance: draft.balance,
-                kind: draft.kind
+                kind: draft.kind,
+                isPrimary: shouldMarkPrimary
             ),
             at: 0
         )
@@ -414,7 +580,8 @@ struct LocalFinanceLedger: Codable, Equatable {
                 id: id,
                 merchantKeyword: draft.merchantKeyword.trimmingCharacters(in: .whitespacesAndNewlines),
                 category: draft.category,
-                note: draft.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : draft.note.trimmingCharacters(in: .whitespacesAndNewlines)
+                note: draft.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : draft.note.trimmingCharacters(in: .whitespacesAndNewlines),
+                isEnabled: true
             ),
             at: 0
         )
@@ -452,6 +619,73 @@ struct LocalFinanceLedger: Codable, Equatable {
         accounts.reduce(Decimal.zero) { $0 + $1.balance }
     }
 
+    var primaryAccount: AccountRecord? {
+        accounts.first(where: { $0.isPrimary }) ?? accounts.first
+    }
+
+    func accountBalanceState(for account: AccountRecord) -> AccountBalanceState {
+        account.balanceState
+    }
+
+    func liquidAccountBalance() -> Decimal {
+        accounts
+            .filter { $0.kind != .creditCard && $0.balance > 0 }
+            .reduce(Decimal.zero) { $0 + $1.balance }
+    }
+
+    func creditExposure() -> Decimal {
+        accounts
+            .filter { $0.kind == .creditCard || $0.balance < 0 }
+            .reduce(Decimal.zero) { $0 + ($1.balance < 0 ? -$1.balance : $1.balance) }
+    }
+
+    func billStatus(for bill: BillRecord, referenceDate: Date = .now) -> BillPaymentState {
+        bill.paymentState(referenceDate: referenceDate, ledger: self)
+    }
+
+    func ruleActivityState(for rule: RuleRecord) -> RuleActivityState {
+        guard rule.isEnabled else { return .disabled }
+        let matches = matchingExpensesCount(for: rule)
+        if matches == 0 { return .dormant }
+        if matches < 3 { return .quiet }
+        return .active
+    }
+
+    mutating func deleteAccount(_ accountID: UUID, date: Date = .now) {
+        accounts.removeAll { $0.id == accountID }
+        updatedAt = date
+    }
+
+    mutating func setPrimaryAccount(_ accountID: UUID, date: Date = .now) {
+        guard accounts.contains(where: { $0.id == accountID }) else { return }
+        for index in accounts.indices {
+            accounts[index].isPrimary = accounts[index].id == accountID
+        }
+        updatedAt = date
+    }
+
+    mutating func deleteBill(_ billID: UUID, date: Date = .now) {
+        bills.removeAll { $0.id == billID }
+        updatedAt = date
+    }
+
+    mutating func toggleBillAutopay(_ billID: UUID, date: Date = .now) {
+        guard let index = bills.firstIndex(where: { $0.id == billID }) else { return }
+        bills[index].autopay.toggle()
+        updatedAt = date
+    }
+
+    mutating func deleteRule(_ ruleID: UUID, date: Date = .now) {
+        rules.removeAll { $0.id == ruleID }
+        updatedAt = date
+    }
+
+    mutating func toggleRuleEnabled(_ ruleID: UUID, date: Date = .now) {
+        guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
+        rules[index].isEnabled.toggle()
+        updatedAt = date
+    }
+
     func upcomingBills(referenceDate: Date = .now) -> [BillRecord] {
         bills.sorted {
             dueDate(for: $0, referenceDate: referenceDate) < dueDate(for: $1, referenceDate: referenceDate)
@@ -470,13 +704,14 @@ struct LocalFinanceLedger: Codable, Equatable {
     }
 
     func matchingExpensesCount(for rule: RuleRecord) -> Int {
+        guard rule.isEnabled else { return 0 }
         let keyword = rule.merchantKeyword.lowercased()
         return expenses.filter { $0.merchant.lowercased().contains(keyword) }.count
     }
 
     func inferredCategory(for merchant: String) -> ExpenseCategory? {
         let normalized = merchant.lowercased()
-        return rules.first(where: { normalized.contains($0.merchantKeyword.lowercased()) })?.category
+        return rules.first(where: { $0.isEnabled && normalized.contains($0.merchantKeyword.lowercased()) })?.category
     }
 }
 

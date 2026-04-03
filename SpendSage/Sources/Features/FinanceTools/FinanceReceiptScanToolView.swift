@@ -71,6 +71,16 @@ struct FinanceReceiptScanToolView: View {
         parsedAmount ?? 0
     }
 
+    private var recentExpenseItems: [ExpenseItem] {
+        viewModel.ledger?.recentExpenseItems(limit: 3) ?? []
+    }
+
+    private var suggestedCategory: ExpenseCategory? {
+        let trimmedMerchant = merchant.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedMerchant.isEmpty else { return nil }
+        return viewModel.ledger?.inferredCategory(for: trimmedMerchant)
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -86,6 +96,7 @@ struct FinanceReceiptScanToolView: View {
                 }
 
                 statusOverviewCard
+                smartFillCard
                 captureFlowCard
                 quickTipsCard
                 draftEditorCard
@@ -295,6 +306,96 @@ struct FinanceReceiptScanToolView: View {
         }
     }
 
+    private var smartFillCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Smart fill")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                Text("Use the latest expense or a rule-based category suggestion to reduce manual typing before you save.")
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+
+                if let suggestedCategory {
+                    HStack(spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .foregroundStyle(.orange)
+                        Text("Rule suggestion: \(suggestedCategory.rawValue)")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(BrandTheme.ink)
+                        Spacer()
+                        Button("Adopt") {
+                            category = suggestedCategory
+                            clearTransientState()
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(BrandTheme.surfaceTint)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                }
+
+                if let latest = recentExpenseItems.first {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(BrandTheme.primary)
+                            .frame(width: 40, height: 40)
+                            .background(BrandTheme.accent.opacity(0.18))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Latest expense template")
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
+                            Text("\(latest.title) · \(latest.category) · \(latest.amount.formatted(.currency(code: "USD")))")
+                                .font(.footnote)
+                                .foregroundStyle(BrandTheme.muted)
+                        }
+
+                        Spacer()
+
+                        Button("Use") {
+                            applyTemplate(from: latest)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                    }
+                }
+
+                if !recentExpenseItems.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Recent merchants")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(BrandTheme.muted)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(recentExpenseItems) { item in
+                                    Button {
+                                        applyTemplate(from: item)
+                                    } label: {
+                                        Text(item.title)
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(BrandTheme.primary)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(BrandTheme.primary.opacity(0.12))
+                                            .clipShape(Capsule())
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private var draftEditorCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
@@ -422,6 +523,17 @@ struct FinanceReceiptScanToolView: View {
         category = .coffee
         date = .now
         note = "Local-first receipt draft from an in-store purchase."
+        clearTransientState()
+    }
+
+    private func applyTemplate(from item: ExpenseItem) {
+        merchant = item.title
+        amount = item.amount.formatted(.number.precision(.fractionLength(2)))
+        category = ExpenseCategory.allCases.first(where: { $0.rawValue == item.category }) ?? .other
+        date = item.date
+        if note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            note = "Prefilled from recent local activity."
+        }
         clearTransientState()
     }
 

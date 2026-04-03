@@ -13,6 +13,18 @@ struct FinanceAccountsToolView: View {
         viewModel.ledger?.totalAccountBalance() ?? 0
     }
 
+    private var liquidBalance: Decimal {
+        viewModel.ledger?.liquidAccountBalance() ?? 0
+    }
+
+    private var creditExposure: Decimal {
+        viewModel.ledger?.creditExposure() ?? 0
+    }
+
+    private var primaryAccountID: UUID? {
+        viewModel.ledger?.primaryAccount?.id
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -43,6 +55,16 @@ struct FinanceAccountsToolView: View {
                                 title: "Balance",
                                 value: totalBalance.formatted(.currency(code: "USD")),
                                 systemImage: "banknote.fill"
+                            )
+                            BrandMetricTile(
+                                title: "Liquid",
+                                value: liquidBalance.formatted(.currency(code: "USD")),
+                                systemImage: "arrow.up.circle.fill"
+                            )
+                            BrandMetricTile(
+                                title: "Exposure",
+                                value: creditExposure.formatted(.currency(code: "USD")),
+                                systemImage: "arrow.down.circle.fill"
                             )
                         }
                     }
@@ -128,29 +150,75 @@ struct FinanceAccountsToolView: View {
     }
 
     private func accountRow(_ account: AccountRecord) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: account.kind.symbolName)
-                .font(.headline)
-                .foregroundStyle(BrandTheme.primary)
-                .frame(width: 42, height: 42)
-                .background(BrandTheme.primary.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        let balanceState = account.balanceState
+        let isPrimary = primaryAccountID == account.id
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(account.name)
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: account.kind.symbolName)
                     .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text([account.institution, account.kind.rawValue].filter { !$0.isEmpty }.joined(separator: " · "))
-                    .font(.footnote)
-                    .foregroundStyle(BrandTheme.muted)
+                    .foregroundStyle(BrandTheme.primary)
+                    .frame(width: 42, height: 42)
+                    .background(BrandTheme.primary.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(account.name)
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+                    Text(account.summaryLabel)
+                        .font(.footnote)
+                        .foregroundStyle(BrandTheme.muted)
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(account.balance, format: .currency(code: "USD"))
+                        .font(.headline)
+                        .foregroundStyle(balanceState == .liability ? .red : BrandTheme.ink)
+
+                    Text(balanceState.rawValue)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(balanceState == .liability ? .red : BrandTheme.muted)
+                }
             }
 
-            Spacer()
+            HStack(spacing: 8) {
+                accountChip(title: account.kind.rawValue, systemImage: account.kind.symbolName)
+                accountChip(title: balanceState.rawValue, systemImage: balanceState.symbolName)
 
-            Text(account.balance, format: .currency(code: "USD"))
-                .font(.headline)
-                .foregroundStyle(BrandTheme.ink)
+                if isPrimary {
+                    accountChip(title: "Primary", systemImage: "star.fill")
+                } else {
+                    Button("Make primary") {
+                        Task { await viewModel.setPrimaryAccount(account.id) }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+
+                Spacer()
+
+                Button(role: .destructive) {
+                    Task { await viewModel.deleteAccount(account.id) }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
         }
+    }
+
+    private func accountChip(title: String, systemImage: String) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(BrandTheme.primary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(BrandTheme.primary.opacity(0.12))
+            .clipShape(Capsule())
     }
 
     private func saveAccount() async {

@@ -7,8 +7,14 @@ protocol FinanceDashboardStoring {
     func saveExpense(_ draft: ExpenseDraft, for session: SessionState) async
     func saveBudget(monthlyIncome: Decimal, monthlyBudget: Decimal, for session: SessionState) async
     func saveAccount(_ draft: AccountDraft, for session: SessionState) async
+    func deleteAccount(_ accountID: UUID, for session: SessionState) async
+    func setPrimaryAccount(_ accountID: UUID, for session: SessionState) async
     func saveBill(_ draft: BillDraft, for session: SessionState) async
+    func deleteBill(_ billID: UUID, for session: SessionState) async
+    func toggleBillAutopay(_ billID: UUID, for session: SessionState) async
     func saveRule(_ draft: RuleDraft, for session: SessionState) async
+    func deleteRule(_ ruleID: UUID, for session: SessionState) async
+    func toggleRuleEnabled(_ ruleID: UUID, for session: SessionState) async
     func markBillPaid(_ billID: UUID, for session: SessionState) async
     func importExpenses(_ drafts: [ExpenseDraft], for session: SessionState) async
     func saveProfile(_ profile: ProfileRecord, for session: SessionState) async
@@ -66,15 +72,51 @@ final class LocalFinanceStore: FinanceDashboardStoring {
         saveLedger(ledger)
     }
 
+    func deleteAccount(_ accountID: UUID, for session: SessionState) async {
+        var ledger = loadLedger()
+        ledger.deleteAccount(accountID)
+        saveLedger(ledger)
+    }
+
+    func setPrimaryAccount(_ accountID: UUID, for session: SessionState) async {
+        var ledger = loadLedger()
+        ledger.setPrimaryAccount(accountID)
+        saveLedger(ledger)
+    }
+
     func saveBill(_ draft: BillDraft, for session: SessionState) async {
         var ledger = loadLedger()
         ledger.appendBill(draft)
         saveLedger(ledger)
     }
 
+    func deleteBill(_ billID: UUID, for session: SessionState) async {
+        var ledger = loadLedger()
+        ledger.deleteBill(billID)
+        saveLedger(ledger)
+    }
+
+    func toggleBillAutopay(_ billID: UUID, for session: SessionState) async {
+        var ledger = loadLedger()
+        ledger.toggleBillAutopay(billID)
+        saveLedger(ledger)
+    }
+
     func saveRule(_ draft: RuleDraft, for session: SessionState) async {
         var ledger = loadLedger()
         ledger.appendRule(draft)
+        saveLedger(ledger)
+    }
+
+    func deleteRule(_ ruleID: UUID, for session: SessionState) async {
+        var ledger = loadLedger()
+        ledger.deleteRule(ruleID)
+        saveLedger(ledger)
+    }
+
+    func toggleRuleEnabled(_ ruleID: UUID, for session: SessionState) async {
+        var ledger = loadLedger()
+        ledger.toggleRuleEnabled(ruleID)
         saveLedger(ledger)
     }
 
@@ -126,9 +168,21 @@ struct PreviewFinanceStore: FinanceDashboardStoring {
 
     func saveAccount(_ draft: AccountDraft, for session: SessionState) async {}
 
+    func deleteAccount(_ accountID: UUID, for session: SessionState) async {}
+
+    func setPrimaryAccount(_ accountID: UUID, for session: SessionState) async {}
+
     func saveBill(_ draft: BillDraft, for session: SessionState) async {}
 
+    func deleteBill(_ billID: UUID, for session: SessionState) async {}
+
+    func toggleBillAutopay(_ billID: UUID, for session: SessionState) async {}
+
     func saveRule(_ draft: RuleDraft, for session: SessionState) async {}
+
+    func deleteRule(_ ruleID: UUID, for session: SessionState) async {}
+
+    func toggleRuleEnabled(_ ruleID: UUID, for session: SessionState) async {}
 
     func markBillPaid(_ billID: UUID, for session: SessionState) async {}
 

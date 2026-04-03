@@ -26,15 +26,15 @@ struct SupportCenterView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 FinanceToolsHeaderCard(
-                    eyebrow: "Support-ready handoff",
+                    eyebrow: "Support-ready packet",
                     title: "Support Center",
-                    summary: "Describe the issue, package a local summary, and share a cleaner troubleshooting packet from the device you are using now.",
+                    summary: "Describe the issue, package a local summary, and share a cleaner troubleshooting packet from this device.",
                     systemImage: "lifepreserver.fill"
                 )
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("What the packet includes")
+                        Text("Packet at a glance")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -56,7 +56,7 @@ struct SupportCenterView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Compose support packet")
+                        Text("Compose packet")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -162,6 +162,9 @@ struct SupportCenterView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
+        .overlay(alignment: .top) {
+            BrandBackdropView()
+        }
         .overlay(alignment: .bottom) {
             if copiedState {
                 Text("Support packet copied")

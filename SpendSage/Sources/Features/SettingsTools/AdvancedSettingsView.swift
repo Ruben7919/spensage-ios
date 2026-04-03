@@ -31,6 +31,9 @@ struct AdvancedSettingsView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
+        .overlay(alignment: .top) {
+            BrandBackdropView()
+        }
         .navigationTitle("Advanced settings")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {
@@ -47,8 +50,34 @@ struct AdvancedSettingsView: View {
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Inspect the ledger, generate a safe export, and keep support-ready details close without leaving the main flow.")
+                Text("Inspect the ledger, generate a safe export, and keep support details close without leaving the main flow.")
                     .foregroundStyle(BrandTheme.muted)
+
+                LazyVGrid(
+                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                    spacing: 12
+                ) {
+                    BrandMetricTile(
+                        title: "Overlay",
+                        value: debugOverlayEnabled ? "On" : "Off",
+                        systemImage: "circle.grid.3x3.fill"
+                    )
+                    BrandMetricTile(
+                        title: "Diagnostics",
+                        value: includeDiagnostics ? "On" : "Off",
+                        systemImage: "doc.text.magnifyingglass"
+                    )
+                    BrandMetricTile(
+                        title: "Format",
+                        value: exportMode.rawValue,
+                        systemImage: "square.and.arrow.up"
+                    )
+                    BrandMetricTile(
+                        title: "Scope",
+                        value: "On device",
+                        systemImage: "lock.fill"
+                    )
+                }
 
                 BrandArtworkSurface {
                     BrandAssetImage(
@@ -74,7 +103,7 @@ struct AdvancedSettingsView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Open the interactive guide that explains exports, support handoff, and the collaboration tone across the app.")
+                        Text("Open the interactive guide that explains exports, support packets, and the collaboration tone across the app.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                     }
@@ -194,10 +223,23 @@ struct AdvancedSettingsView: View {
         }
     }
 
+    private var exportBody: String {
+        switch exportMode {
+        case .readable:
+            let summary = LocalLedgerExportComposer.readableSummary(viewModel: viewModel)
+            if includeDiagnostics {
+                return summary + "\n\nDiagnostics\n- Debug overlay: \(debugOverlayEnabled ? "Enabled" : "Disabled")"
+            }
+            return summary
+        case .json:
+            return LocalLedgerExportComposer.jsonSnapshot(viewModel: viewModel)
+        }
+    }
+
     private var supportHandoffCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Support handoff")
+                Text("Support packet")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
@@ -225,19 +267,6 @@ struct AdvancedSettingsView: View {
                     .buttonStyle(PrimaryCTAStyle())
                 }
             }
-        }
-    }
-
-    private var exportBody: String {
-        switch exportMode {
-        case .readable:
-            let summary = LocalLedgerExportComposer.readableSummary(viewModel: viewModel)
-            if includeDiagnostics {
-                return summary + "\n\nDiagnostics\n- Debug overlay: \(debugOverlayEnabled ? "Enabled" : "Disabled")"
-            }
-            return summary
-        case .json:
-            return LocalLedgerExportComposer.jsonSnapshot(viewModel: viewModel)
         }
     }
 }

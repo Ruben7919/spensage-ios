@@ -14,6 +14,20 @@ struct FinanceBillsToolView: View {
         viewModel.bills.reduce(Decimal.zero) { $0 + $1.amount }
     }
 
+    private var overdueCount: Int {
+        guard let ledger = viewModel.ledger else { return 0 }
+        return viewModel.bills.filter { ledger.billStatus(for: $0) == .overdue }.count
+    }
+
+    private var dueSoonCount: Int {
+        guard let ledger = viewModel.ledger else { return 0 }
+        return viewModel.bills.filter { ledger.billStatus(for: $0) == .dueSoon }.count
+    }
+
+    private var autopayCount: Int {
+        viewModel.bills.filter { $0.autopay }.count
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -44,6 +58,16 @@ struct FinanceBillsToolView: View {
                                 title: "Monthly total",
                                 value: totalMonthlyBills.formatted(.currency(code: "USD")),
                                 systemImage: "dollarsign.gauge.chart.leftthird.topthird.rightthird"
+                            )
+                            BrandMetricTile(
+                                title: "Due soon",
+                                value: "\(dueSoonCount)",
+                                systemImage: "clock.badge.exclamationmark.fill"
+                            )
+                            BrandMetricTile(
+                                title: "Overdue",
+                                value: "\(overdueCount)",
+                                systemImage: "exclamationmark.triangle.fill"
                             )
                         }
                     }
@@ -142,7 +166,9 @@ struct FinanceBillsToolView: View {
     }
 
     private func billRow(_ bill: BillRecord) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        let status = viewModel.ledger?.billStatus(for: bill) ?? .upcoming
+
+        return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(bill.title)
@@ -156,25 +182,79 @@ struct FinanceBillsToolView: View {
 
                 Spacer()
 
-                Text(bill.amount, format: .currency(code: "USD"))
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(bill.amount, format: .currency(code: "USD"))
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+
+                    Text(status.rawValue)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(statusColor(status))
+                }
             }
 
-            HStack {
-                Text(FinanceToolFormatting.paymentStatusText(for: bill))
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(bill.lastPaidAt == nil ? BrandTheme.muted : BrandTheme.primary)
-
+            HStack(spacing: 8) {
+                billChip(title: status.rawValue, systemImage: status.symbolName, color: statusColor(status))
+                if bill.autopay {
+                    billChip(title: "Autopay", systemImage: "repeat.circle.fill", color: BrandTheme.primary)
+                }
+                if let lastPaidAt = bill.lastPaidAt {
+                    billChip(
+                        title: "Paid \(lastPaidAt.formatted(date: .abbreviated, time: .omitted))",
+                        systemImage: "checkmark.circle.fill",
+                        color: BrandTheme.primary
+                    )
+                }
                 Spacer()
+            }
 
+            HStack(spacing: 10) {
                 Button(bill.lastPaidAt == nil ? "Mark paid" : "Record again") {
                     Task { await viewModel.payBill(bill.id) }
                 }
-                .buttonStyle(SecondaryCTAStyle())
-                .frame(maxWidth: 164)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+
+                Button(bill.autopay ? "Disable autopay" : "Enable autopay") {
+                    Task { await viewModel.toggleBillAutopay(bill.id) }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+
+                Spacer()
+
+                Button(role: .destructive) {
+                    Task { await viewModel.deleteBill(bill.id) }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
             }
         }
+    }
+
+    private func statusColor(_ status: BillPaymentState) -> Color {
+        switch status {
+        case .paid:
+            return BrandTheme.primary
+        case .dueSoon:
+            return .orange
+        case .upcoming:
+            return BrandTheme.muted
+        case .overdue:
+            return .red
+        }
+    }
+
+    private func billChip(title: String, systemImage: String, color: Color) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(color.opacity(0.12))
+            .clipShape(Capsule())
     }
 
     private func saveBill() async {

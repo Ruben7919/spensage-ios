@@ -13,6 +13,14 @@ struct FinanceRulesToolView: View {
         return viewModel.rules.reduce(0) { $0 + ledger.matchingExpensesCount(for: $1) }
     }
 
+    private var disabledRuleCount: Int {
+        viewModel.rules.filter { !$0.isEnabled }.count
+    }
+
+    private var activeRuleCount: Int {
+        viewModel.rules.filter { $0.isEnabled }.count
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -43,6 +51,16 @@ struct FinanceRulesToolView: View {
                                 title: "Matches",
                                 value: "\(matchedTransactions)",
                                 systemImage: "wand.and.stars"
+                            )
+                            BrandMetricTile(
+                                title: "Active",
+                                value: "\(activeRuleCount)",
+                                systemImage: "play.circle.fill"
+                            )
+                            BrandMetricTile(
+                                title: "Disabled",
+                                value: "\(disabledRuleCount)",
+                                systemImage: "pause.circle.fill"
                             )
                         }
                     }
@@ -126,11 +144,20 @@ struct FinanceRulesToolView: View {
     }
 
     private func ruleRow(_ rule: RuleRecord) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(rule.merchantKeyword)
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
+        let matches = viewModel.ledger?.matchingExpensesCount(for: rule) ?? 0
+        let activityState = viewModel.ledger?.ruleActivityState(for: rule) ?? .dormant
+
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(rule.merchantKeyword)
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+
+                    Text("\(matches) matching local transaction\(matches == 1 ? "" : "s")")
+                        .font(.footnote)
+                        .foregroundStyle(BrandTheme.muted)
+                }
 
                 Spacer()
 
@@ -139,15 +166,61 @@ struct FinanceRulesToolView: View {
                     .foregroundStyle(BrandTheme.primary)
             }
 
-            Text("\(viewModel.ledger?.matchingExpensesCount(for: rule) ?? 0) matching local transactions")
-                .font(.footnote)
-                .foregroundStyle(BrandTheme.muted)
+            HStack(spacing: 8) {
+                ruleChip(title: activityState.rawValue, systemImage: activityState.symbolName, color: ruleChipColor(activityState))
+                if let note = rule.note, !note.isEmpty {
+                    ruleChip(title: "Note saved", systemImage: "note.text", color: BrandTheme.muted)
+                }
+                Spacer()
+            }
 
             if let note = rule.note, !note.isEmpty {
                 Text(note)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+
+            HStack(spacing: 10) {
+                Button(rule.isEnabled ? "Disable" : "Enable") {
+                    Task { await viewModel.toggleRuleEnabled(rule.id) }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+
+                Spacer()
+
+                Button(role: .destructive) {
+                    Task { await viewModel.deleteRule(rule.id) }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+        }
+    }
+
+    private func ruleChip(title: String, systemImage: String, color: Color) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(color.opacity(0.12))
+            .clipShape(Capsule())
+    }
+
+    private func ruleChipColor(_ state: RuleActivityState) -> Color {
+        switch state {
+        case .active:
+            return BrandTheme.primary
+        case .quiet:
+            return .orange
+        case .dormant:
+            return BrandTheme.muted
+        case .disabled:
+            return .red
         }
     }
 

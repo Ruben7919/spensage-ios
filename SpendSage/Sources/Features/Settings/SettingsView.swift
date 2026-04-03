@@ -14,7 +14,7 @@ struct SettingsView: View {
                 FinanceToolsHeaderCard(
                     eyebrow: "Local-first settings",
                     title: "Settings",
-                    summary: "Tune the app, open the budget wizard, and keep support, legal, and advanced tools close in one place.",
+                    summary: "Tune local preferences, open the budget wizard, and keep support, legal, and growth tools close in one place.",
                     systemImage: "gearshape.fill"
                 )
 
@@ -43,15 +43,15 @@ struct SettingsView: View {
                             }
                             .buttonStyle(PrimaryCTAStyle())
 
-                            NavigationLink {
-                                AdvancedSettingsView(viewModel: viewModel)
-                            } label: {
-                                settingsRouteLabel(
-                                    title: "Advanced settings",
-                                    summary: "Inspect exports, support packets, and local debug controls.",
-                                    systemImage: "switch.2"
-                                )
-                            }
+                        NavigationLink {
+                            AdvancedSettingsView(viewModel: viewModel)
+                        } label: {
+                            settingsRouteLabel(
+                                title: "Advanced settings",
+                                summary: "Inspect exports, support packets, and local debug controls.",
+                                systemImage: "switch.2"
+                            )
+                        }
                             .buttonStyle(.plain)
                         }
                     }
@@ -91,7 +91,7 @@ struct SettingsView: View {
                                 Text("Daily reminders")
                                     .font(.headline)
                                     .foregroundStyle(BrandTheme.ink)
-                                Text("Keep lightweight nudges enabled while you stay in local-first mode.")
+                                Text("Keep lightweight nudges enabled while you stay on-device.")
                                     .font(.subheadline)
                                     .foregroundStyle(BrandTheme.muted)
                             }
@@ -122,7 +122,7 @@ struct SettingsView: View {
                         } label: {
                             settingsRouteLabel(
                                 title: "Advanced settings",
-                                summary: "Local export center, diagnostics, and support-ready state.",
+                                summary: "Local export center, diagnostics, and support packet tools.",
                                 systemImage: "slider.horizontal.3"
                             )
                         }
@@ -158,7 +158,7 @@ struct SettingsView: View {
                         } label: {
                             settingsRouteLabel(
                                 title: "Support Center",
-                                summary: "Build a local support packet and share a clean troubleshooting handoff.",
+                                summary: "Build a local support packet and share a clean troubleshooting summary.",
                                 systemImage: "lifepreserver.fill"
                             )
                         }
@@ -169,7 +169,7 @@ struct SettingsView: View {
                         } label: {
                             settingsRouteLabel(
                                 title: "Legal Center",
-                                summary: "Privacy, terms, and public support links for the current build.",
+                                summary: "Privacy, terms, and public support links for this build.",
                                 systemImage: "doc.text.fill"
                             )
                         }

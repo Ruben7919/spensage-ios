@@ -34,6 +34,9 @@ struct TrophyHistoryView: View {
             }
             .ignoresSafeArea()
         )
+        .overlay(alignment: .top) {
+            BrandBackdropView()
+        }
         .navigationTitle("Trophy History")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -58,6 +61,15 @@ struct TrophyHistoryView: View {
                     BrandMetricTile(title: "XP", value: "\(growthSnapshot.totalXP)", systemImage: "sparkles")
                     BrandMetricTile(title: "Unlocked", value: "\(growthSnapshot.trophies.filter(\.unlocked).count)", systemImage: "rosette")
                     BrandMetricTile(title: "Next level", value: "\(growthSnapshot.xpToNextLevel) XP", systemImage: "arrow.up.forward")
+                }
+
+                BrandArtworkSurface {
+                    MascotSpeechCard(
+                        character: .manchas,
+                        expression: .proud,
+                        title: "Progress lives here",
+                        message: "Trophies and streaks reflect the habits already visible in your local ledger."
+                    )
                 }
             }
         }

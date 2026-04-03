@@ -23,16 +23,12 @@ struct BrandGalleryView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("Brand Gallery")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-
-                        Text("A live gallery of the visual building blocks used across SpendSage: palette, mascots, guides, badges, and product storytelling surfaces.")
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-                }
+                FinanceToolsHeaderCard(
+                    eyebrow: "Brand system",
+                    title: "Brand Gallery",
+                    summary: "A live gallery of the visual building blocks used across SpendSage: palette, mascots, guides, badges, and product storytelling surfaces.",
+                    systemImage: "swatchpalette.fill"
+                )
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 18) {
@@ -118,7 +114,7 @@ struct BrandGalleryView: View {
                         BrandFeatureRow(
                             systemImage: "sparkles.rectangle.stack.fill",
                             title: "Growth energy",
-                            detail: "Badges, trophies, mascots, and guide surfaces push premium and retention loops without breaking the local-first tone."
+                            detail: "Badges, trophies, mascots, and guide surfaces keep the experience lively without breaking the local-first tone."
                         )
                     }
                 }
@@ -219,6 +215,9 @@ struct BrandGalleryView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
+        .overlay(alignment: .top) {
+            BrandBackdropView()
+        }
         .navigationTitle("Brand Gallery")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedGuide) { guide in
