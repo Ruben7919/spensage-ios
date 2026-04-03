@@ -23,15 +23,34 @@ struct SupportCenterView: View {
     @State private var copiedState = false
 
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
+                FinanceToolsHeaderCard(
+                    eyebrow: "Support-ready handoff",
+                    title: "Support Center",
+                    summary: "Describe the issue, package a local summary, and share a cleaner troubleshooting packet from the device you are using now.",
+                    systemImage: "lifepreserver.fill"
+                )
+
                 SurfaceCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("Support Center")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("What the packet includes")
+                            .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
-                        Text("Create a support packet from the device you are using now, then share it by email with enough context to speed up troubleshooting.")
-                            .foregroundStyle(BrandTheme.muted)
+
+                        HStack(spacing: 12) {
+                            BrandMetricTile(title: "Expenses", value: "\(viewModel.dashboardState?.transactionCount ?? 0)", systemImage: "receipt.fill")
+                            BrandMetricTile(title: "Accounts", value: "\(viewModel.accounts.count)", systemImage: "creditcard.fill")
+                            BrandMetricTile(title: "Rules", value: "\(viewModel.rules.count)", systemImage: "line.3.horizontal.decrease.circle.fill")
+                        }
+
+                        BrandFeatureRow(
+                            systemImage: includeDiagnostics ? "checkmark.shield.fill" : "shield.slash.fill",
+                            title: includeDiagnostics ? "Diagnostics included" : "Diagnostics excluded",
+                            detail: includeDiagnostics
+                                ? "The generated packet includes local budget and ledger summary details to speed up troubleshooting."
+                                : "Only the issue description will be shared. You can toggle diagnostics back on any time."
+                        )
                     }
                 }
 
@@ -46,19 +65,29 @@ struct SupportCenterView: View {
                                 Text(type.rawValue).tag(type)
                             }
                         }
+                        .pickerStyle(.segmented)
 
-                        TextField("Subject", text: $subject)
-                            .textInputAutocapitalization(.sentences)
+                        FinanceField(
+                            label: "Subject",
+                            placeholder: "Briefly summarize the issue",
+                            text: $subject,
+                            keyboard: .default,
+                            capitalization: .sentences
+                        )
 
-                        TextField("What happened?", text: $detail, axis: .vertical)
-                            .lineLimit(5...9)
+                        FinanceMultilineField(
+                            label: "What happened?",
+                            placeholder: "Include what you expected, what you saw instead, and any recent step that might help reproduce it.",
+                            text: $detail
+                        )
 
                         Toggle("Include local diagnostics", isOn: $includeDiagnostics)
+                            .tint(BrandTheme.primary)
 
                         HStack(spacing: 12) {
                             Button("Copy packet") {
                                 UIPasteboard.general.string = supportPacket
-                                copiedState = true
+                                showCopiedToast()
                             }
                             .buttonStyle(SecondaryCTAStyle())
 
@@ -74,11 +103,35 @@ struct SupportCenterView: View {
                         }
                         .buttonStyle(SecondaryCTAStyle())
 
-                        if copiedState {
-                            Text("Support packet copied to the clipboard.")
-                                .font(.footnote)
-                                .foregroundStyle(BrandTheme.primary)
+                        NavigationLink {
+                            LegalCenterView()
+                        } label: {
+                            HStack(alignment: .top, spacing: 14) {
+                                Image(systemName: "doc.text.fill")
+                                    .font(.headline.weight(.semibold))
+                                    .foregroundStyle(BrandTheme.primary)
+                                    .frame(width: 42, height: 42)
+                                    .background(BrandTheme.accent.opacity(0.18))
+                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Review legal and public support links")
+                                        .font(.headline)
+                                        .foregroundStyle(BrandTheme.ink)
+                                    Text("Open the public privacy, terms, and support pages if you need a policy or contact reference.")
+                                        .font(.subheadline)
+                                        .foregroundStyle(BrandTheme.muted)
+                                }
+
+                                Spacer(minLength: 0)
+
+                                Image(systemName: "chevron.right")
+                                    .font(.footnote.weight(.bold))
+                                    .foregroundStyle(BrandTheme.muted)
+                                    .padding(.top, 6)
+                            }
                         }
+                        .buttonStyle(.plain)
                     }
                 }
 
@@ -95,16 +148,33 @@ struct SupportCenterView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .textSelection(.enabled)
                         }
-                        .frame(minHeight: 220)
+                        .frame(minHeight: 240)
                         .padding(14)
                         .background(BrandTheme.surfaceTint)
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                        )
                     }
                 }
             }
             .padding(24)
         }
         .background(BrandTheme.canvas)
+        .overlay(alignment: .bottom) {
+            if copiedState {
+                Text("Support packet copied")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(BrandTheme.ink)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(BrandTheme.surface)
+                    .clipShape(Capsule(style: .continuous))
+                    .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 12, x: 0, y: 6)
+                    .padding(.bottom, 18)
+            }
+        }
         .navigationTitle("Support Center")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -123,5 +193,13 @@ struct SupportCenterView: View {
         let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let encodedBody = supportPacket.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         return URL(string: "mailto:support@spendsage.ai?subject=\(encodedSubject)&body=\(encodedBody)")
+    }
+
+    private func showCopiedToast() {
+        copiedState = true
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_800_000_000)
+            copiedState = false
+        }
     }
 }

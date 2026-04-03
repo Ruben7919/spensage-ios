@@ -27,6 +27,25 @@ struct BrandBackdropView: View {
     }
 }
 
+struct BrandArtworkSurface<Content: View>: View {
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        content
+            .padding(18)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(BrandTheme.guideArtworkGradient)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.72), lineWidth: 1)
+            )
+            .shadow(color: BrandTheme.shadow.opacity(0.1), radius: 18, x: 0, y: 10)
+    }
+}
+
 struct BrandBadge: View {
     let text: String
     let systemImage: String
@@ -50,6 +69,69 @@ struct BrandBadge: View {
                 .stroke(BrandTheme.line.opacity(0.9), lineWidth: 1)
         )
         .shadow(color: BrandTheme.shadow.opacity(0.06), radius: 10, x: 0, y: 5)
+    }
+}
+
+struct MascotAvatarView: View {
+    let character: BrandCharacterID
+    var expression: BrandExpression = .neutral
+    var size: CGFloat = 76
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(BrandTheme.heroGlowGradient)
+
+            BrandAssetImage(
+                source: BrandAssetCatalog.shared.character(character, expression: expression),
+                fallbackSystemImage: "face.smiling.inverse"
+            )
+            .aspectRatio(contentMode: .fit)
+            .padding(size * 0.14)
+        }
+        .frame(width: size, height: size)
+        .overlay(
+            Circle()
+                .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+        )
+        .shadow(color: BrandTheme.shadow.opacity(0.1), radius: 14, x: 0, y: 8)
+    }
+}
+
+struct MascotSpeechCard: View {
+    let character: BrandCharacterID
+    var expression: BrandExpression = .neutral
+    var title: String? = nil
+    let message: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            MascotAvatarView(character: character, expression: expression)
+
+            VStack(alignment: .leading, spacing: 8) {
+                if let title {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+                }
+
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(BrandTheme.speechBubble)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.72), lineWidth: 1)
+            )
+            .shadow(color: BrandTheme.shadow.opacity(0.08), radius: 14, x: 0, y: 8)
+        }
     }
 }
 

@@ -1,151 +1,186 @@
 import SwiftUI
 
-private struct TrophyMilestone: Identifiable {
-    let id = UUID()
-    let title: String
-    let detail: String
-    let systemImage: String
-    let achieved: Bool
-    let progress: String
-}
-
 struct TrophyHistoryView: View {
     @ObservedObject var viewModel: AppViewModel
 
+    private var growthSnapshot: DashboardGrowthSnapshot {
+        GrowthSnapshotBuilder.build(
+            session: viewModel.session,
+            state: viewModel.dashboardState,
+            ledger: viewModel.ledger,
+            accounts: viewModel.accounts,
+            bills: viewModel.bills,
+            rules: viewModel.rules,
+            profile: viewModel.profile
+        )
+    }
+
     var body: some View {
-        let trophies = buildTrophies()
-        let earned = trophies.filter(\.achieved).count
-
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("Trophy History")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-
-                        Text("Celebrate the milestones already unlocked by your local ledger, plus the next wins available from the data on this device.")
-                            .foregroundStyle(BrandTheme.muted)
-
-                        BrandBadge(text: "\(earned) earned", systemImage: "trophy.fill")
-                    }
-                }
-
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Progress")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        ProgressView(value: Double(earned), total: Double(max(trophies.count, 1)))
-                            .tint(BrandTheme.primary)
-
-                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                            BrandMetricTile(title: "Earned", value: "\(earned)", systemImage: "rosette")
-                            BrandMetricTile(title: "Next goal", value: trophies.first(where: { !$0.achieved })?.title ?? "Complete", systemImage: "flag.checkered")
-                        }
-                    }
-                }
-
-                ForEach(trophies) { trophy in
-                    SurfaceCard {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack(alignment: .top) {
-                                Image(systemName: trophy.systemImage)
-                                    .font(.title2.weight(.semibold))
-                                    .foregroundStyle(trophy.achieved ? BrandTheme.primary : BrandTheme.muted)
-                                    .frame(width: 48, height: 48)
-                                    .background((trophy.achieved ? BrandTheme.accent : BrandTheme.surfaceTint).opacity(0.28))
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(trophy.title)
-                                        .font(.headline)
-                                        .foregroundStyle(BrandTheme.ink)
-                                    Text(trophy.detail)
-                                        .foregroundStyle(BrandTheme.muted)
-                                }
-
-                                Spacer()
-
-                                Text(trophy.achieved ? "Unlocked" : "In progress")
-                                    .font(.footnote.weight(.semibold))
-                                    .foregroundStyle(trophy.achieved ? BrandTheme.primary : BrandTheme.muted)
-                            }
-
-                            Text(trophy.progress)
-                                .font(.subheadline)
-                                .foregroundStyle(BrandTheme.ink)
-                        }
-                    }
-                }
+                heroCard
+                trophyCollection
+                trophyTimeline
+                trophyFootnotes
             }
-            .padding(24)
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 40)
         }
-        .background(BrandTheme.canvas)
+        .background(
+            ZStack {
+                BrandTheme.canvas
+                BrandBackdropView()
+            }
+            .ignoresSafeArea()
+        )
         .navigationTitle("Trophy History")
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private func buildTrophies() -> [TrophyMilestone] {
-        let state = viewModel.dashboardState
-        let expenseCount = state?.transactionCount ?? 0
-        let accounts = viewModel.accounts.count
-        let bills = viewModel.bills.count
-        let rules = viewModel.rules.count
-        let profileCustomized = viewModel.profile.fullName != ProfileRecord.default.fullName || viewModel.profile.householdName != ProfileRecord.default.householdName
-        let stayingOnBudget = (state?.budgetSnapshot.remaining ?? 0) >= 0 && expenseCount > 0
+    private var heroCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                BrandBadge(text: "\(growthSnapshot.trophies.filter(\.unlocked).count) unlocked", systemImage: "trophy.fill")
 
-        return [
-            TrophyMilestone(
-                title: "First expense logged",
-                detail: "You started the native ledger with a real transaction.",
-                systemImage: "1.circle.fill",
-                achieved: expenseCount >= 1,
-                progress: "\(expenseCount)/1 expense saved locally"
-            ),
-            TrophyMilestone(
-                title: "Five-transaction streak",
-                detail: "You have enough activity for meaningful budget and category insights.",
-                systemImage: "flame.fill",
-                achieved: expenseCount >= 5,
-                progress: "\(min(expenseCount, 5))/5 recent expenses"
-            ),
-            TrophyMilestone(
-                title: "Rule architect",
-                detail: "You created at least one merchant rule to improve local categorization.",
-                systemImage: "point.3.filled.connected.trianglepath.dotted",
-                achieved: rules >= 1,
-                progress: "\(rules) rule\(rules == 1 ? "" : "s") saved"
-            ),
-            TrophyMilestone(
-                title: "Bill keeper",
-                detail: "Recurring obligations are tracked inside the device ledger.",
-                systemImage: "calendar.badge.clock",
-                achieved: bills >= 1,
-                progress: "\(bills) bill\(bills == 1 ? "" : "s") configured"
-            ),
-            TrophyMilestone(
-                title: "Account stack",
-                detail: "You are tracking multiple financial buckets, not just spend.",
-                systemImage: "building.columns.fill",
-                achieved: accounts >= 2,
-                progress: "\(accounts)/2 accounts added"
-            ),
-            TrophyMilestone(
-                title: "Budget guardian",
-                detail: "Current monthly spend is still within the target budget.",
-                systemImage: "shield.checkered",
-                achieved: stayingOnBudget,
-                progress: stayingOnBudget ? "Remaining budget is positive." : "Spend is above budget or not tracked yet."
-            ),
-            TrophyMilestone(
-                title: "Identity tuned",
-                detail: "Your profile is customized for the household using this device.",
-                systemImage: "person.crop.circle.badge.checkmark",
-                achieved: profileCustomized,
-                progress: profileCustomized ? "Profile record updated." : "Customize the local profile to unlock this trophy."
-            )
-        ]
+                Text("Trophy collection")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(BrandTheme.ink)
+
+                Text("Track the wins that make the finance loop feel alive: streaks, budgeting, clean categories, and stronger daily habits.")
+                    .foregroundStyle(BrandTheme.muted)
+
+                LazyVGrid(
+                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                    spacing: 12
+                ) {
+                    BrandMetricTile(title: "Level", value: "\(growthSnapshot.level)", systemImage: "bolt.fill")
+                    BrandMetricTile(title: "XP", value: "\(growthSnapshot.totalXP)", systemImage: "sparkles")
+                    BrandMetricTile(title: "Unlocked", value: "\(growthSnapshot.trophies.filter(\.unlocked).count)", systemImage: "rosette")
+                    BrandMetricTile(title: "Next level", value: "\(growthSnapshot.xpToNextLevel) XP", systemImage: "arrow.up.forward")
+                }
+            }
+        }
+    }
+
+    private var trophyCollection: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeading(
+                    title: "Collection",
+                    detail: "Unlocked trophies stay bright; the rest expose progress toward the next visible milestone."
+                )
+
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
+                    ForEach(growthSnapshot.trophies) { trophy in
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(alignment: .top) {
+                                GrowthTrophyPlate(trophy: trophy, size: 52)
+
+                                Spacer(minLength: 0)
+
+                                Text(trophy.unlocked ? "Unlocked" : trophy.progressText)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
+                            }
+
+                            Text(trophy.title)
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
+                            Text(trophy.detail)
+                                .font(.subheadline)
+                                .foregroundStyle(BrandTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            ProgressView(value: trophy.progressRatio)
+                                .tint(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted.opacity(0.8))
+
+                            if let unlockedAt = trophy.unlockedAt {
+                                Text(unlockedAt.formatted(date: .abbreviated, time: .omitted))
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(BrandTheme.primary)
+                            } else {
+                                Text("Next unlock at \(trophy.progressText)")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(BrandTheme.muted)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                .fill(BrandTheme.surfaceTint)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private var trophyTimeline: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeading(
+                    title: "Timeline",
+                    detail: "A simple event stream built from unlocked trophies, category momentum, and coach prompts."
+                )
+
+                if growthSnapshot.events.isEmpty {
+                    emptyTimeline
+                } else {
+                    ForEach(growthSnapshot.events) { event in
+                        DashboardTimelineRow(event: event)
+                    }
+                }
+            }
+        }
+    }
+
+    private var trophyFootnotes: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 12) {
+                sectionHeading(
+                    title: "How trophies are earned",
+                    detail: "Trophies react to the habits visible in your current ledger and help turn routine finance work into a repeatable loop."
+                )
+
+                Label("Add expenses consistently to grow streak-based badges faster.", systemImage: "flame.fill")
+                Label("Accounts, bills, and rules unlock deeper trophies because the dashboard sees more of the month.", systemImage: "square.stack.3d.up")
+                Label("A clean budget and regular review flow usually unlock the most visible wins first.", systemImage: "checkmark.seal.fill")
+            }
+            .foregroundStyle(BrandTheme.ink)
+        }
+    }
+
+    private var emptyTimeline: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("No trophy events yet")
+                .font(.headline)
+                .foregroundStyle(BrandTheme.ink)
+            Text("The first expense usually unlocks the first visible event in this timeline.")
+                .font(.subheadline)
+                .foregroundStyle(BrandTheme.muted)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(BrandTheme.surfaceTint)
+        )
+    }
+
+    private func sectionHeading(title: String, detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(BrandTheme.ink)
+            Text(detail)
+                .font(.subheadline)
+                .foregroundStyle(BrandTheme.muted)
+        }
     }
 }

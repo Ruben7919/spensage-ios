@@ -11,6 +11,12 @@
 		04E00FF56F15EBE2816E0EFB /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785F4A4F7DC3D1425773B754 /* HelpCenterView.swift */; };
 		0F23374C3FFF9B892C7C0270 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E9688AB4D62C4797F2C444 /* AppViewModel.swift */; };
 		0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE8903B75C047C59E5F634A /* Assets.xcassets */; };
+		103FAD7090014D4CAAA00001 /* BrandAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00011 /* BrandAssets.swift */; };
+		103FAD7090014D4CAAA00002 /* BrandAssetImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00012 /* BrandAssetImage.swift */; };
+		103FAD7090014D4CAAA00003 /* Guides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00013 /* Guides.swift */; };
+		103FAD7090014D4CAAA00004 /* GuideSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00014 /* GuideSheet.swift */; };
+		103FAD7090014D4CAAA00005 /* Brand in Resources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00015 /* Brand */; };
+		103FAD7090014D4CAAA00031 /* GrowthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00041 /* GrowthSnapshot.swift */; };
 		17EBFD7F7D5C568DFA011E37 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABD400C4F74E75F803BAFC /* Models.swift */; };
 		1BFAC9F2D1D8FBF19FBE8052 /* LocalLedgerExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32229B7B2F800571C744726E /* LocalLedgerExport.swift */; };
 		24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659DC0EB3BB892E509CF9D7E /* FinanceToolSupportViews.swift */; };
@@ -65,6 +71,12 @@
 		02576402B4D9548B912CF835 /* NativeAppShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAppShellView.swift; sourceTree = "<group>"; };
 		07CC2A6F29FF5CDF041CF122 /* ConfirmAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmAccountView.swift; sourceTree = "<group>"; };
 		0C815B84250314C2A948D50C /* SpendSageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageApp.swift; sourceTree = "<group>"; };
+		103FAD7090014D4CAAA00011 /* BrandAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssets.swift; sourceTree = "<group>"; };
+		103FAD7090014D4CAAA00012 /* BrandAssetImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssetImage.swift; sourceTree = "<group>"; };
+		103FAD7090014D4CAAA00013 /* Guides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Guides.swift; sourceTree = "<group>"; };
+		103FAD7090014D4CAAA00014 /* GuideSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideSheet.swift; sourceTree = "<group>"; };
+		103FAD7090014D4CAAA00015 /* Brand */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Brand; sourceTree = "<group>"; };
+		103FAD7090014D4CAAA00041 /* GrowthSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthSnapshot.swift; sourceTree = "<group>"; };
 		0D342BCB4C716DD57F41EBFA /* SupportCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportCenterView.swift; sourceTree = "<group>"; };
 		19D129F26CE378A5B66A57DC /* LegalCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalCenterView.swift; sourceTree = "<group>"; };
 		32229B7B2F800571C744726E /* LocalLedgerExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalLedgerExport.swift; sourceTree = "<group>"; };
@@ -145,6 +157,24 @@
 			path = Premium;
 			sourceTree = "<group>";
 		};
+		103FAD7090014D4CAAA00021 /* Brand */ = {
+			isa = PBXGroup;
+			children = (
+				103FAD7090014D4CAAA00011 /* BrandAssets.swift */,
+				103FAD7090014D4CAAA00012 /* BrandAssetImage.swift */,
+			);
+			path = Brand;
+			sourceTree = "<group>";
+		};
+		103FAD7090014D4CAAA00022 /* Guides */ = {
+			isa = PBXGroup;
+			children = (
+				103FAD7090014D4CAAA00013 /* Guides.swift */,
+				103FAD7090014D4CAAA00014 /* GuideSheet.swift */,
+			);
+			path = Guides;
+			sourceTree = "<group>";
+		};
 		2789462E0DF8797345A7F293 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -158,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				89985226F3D7B000843752AB /* BrandGalleryView.swift */,
+				103FAD7090014D4CAAA00041 /* GrowthSnapshot.swift */,
 				7845E9A91B6C587A2C6B48B7 /* TrophyHistoryView.swift */,
 			);
 			path = Growth;
@@ -171,8 +202,10 @@
 				37595A2FF2CF4E81B4AE65CF /* Services.swift */,
 				A6227E322248CA2A7A980D40 /* Theme.swift */,
 				DDA9C73E819C396AB3DFFCCC /* Auth */,
+				103FAD7090014D4CAAA00021 /* Brand */,
 				439FAC31D754D6BDBCCA5018 /* Components */,
 				A8083AF293910F6CCF2E0EAB /* Config */,
+				103FAD7090014D4CAAA00022 /* Guides */,
 				982784B8B26FBF2C67EE94B5 /* PreviewData */,
 				88EC4787DA5650A6C7B20A9F /* Storage */,
 			);
@@ -339,6 +372,7 @@
 			isa = PBXGroup;
 			children = (
 				9AE8903B75C047C59E5F634A /* Assets.xcassets */,
+				103FAD7090014D4CAAA00015 /* Brand */,
 				FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */,
 			);
 			name = Resources;
@@ -429,6 +463,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */,
+				103FAD7090014D4CAAA00005 /* Brand in Resources */,
 				93A5A96EF2B3A5812249918F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -447,6 +482,8 @@
 				814A93CC9BAC8C86152BE59E /* AuthConfiguration.swift in Sources */,
 				9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */,
 				4D4645CD2FE607017F0639D5 /* AuthView.swift in Sources */,
+				103FAD7090014D4CAAA00002 /* BrandAssetImage.swift in Sources */,
+				103FAD7090014D4CAAA00001 /* BrandAssets.swift in Sources */,
 				A45A022AE99A11335AFB290E /* BrandComponents.swift in Sources */,
 				9BF510400E05D1A4B72ECA8A /* BrandGalleryView.swift in Sources */,
 				7883824A9181C09919A5380F /* BudgetWizardView.swift in Sources */,
@@ -461,6 +498,9 @@
 				CB8F42A6511C41025ABF0910 /* FinanceRulesToolView.swift in Sources */,
 				A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */,
 				24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */,
+				103FAD7090014D4CAAA00004 /* GuideSheet.swift in Sources */,
+				103FAD7090014D4CAAA00003 /* Guides.swift in Sources */,
+				103FAD7090014D4CAAA00031 /* GrowthSnapshot.swift in Sources */,
 				04E00FF56F15EBE2816E0EFB /* HelpCenterView.swift in Sources */,
 				02C6DDAE3EB1ABFCFBF4C91E /* HostedUIAuthService.swift in Sources */,
 				DCE0492B5DA8A93842388CF6 /* InsightsView.swift in Sources */,

@@ -1,0 +1,106 @@
+{
+  "version": "v2",
+  "characters": {
+    "tikki": {
+      "base": "tikki_neutral_v2.png",
+      "expressions": {
+        "neutral": "tikki_neutral_v2.png",
+        "happy": "tikki_happy_v2.png",
+        "thinking": "tikki_thinking_v2.png",
+        "warning": "tikki_warning_v2.png",
+        "proud": "tikki_proud_v2.png",
+        "shocked": "tikki_shocked_v2.png",
+        "sad": "tikki_sad_v2.png",
+        "angry": "tikki_angry_v2.png",
+        "excited": "tikki_excited_v2.png",
+        "sleepy": "tikki_sleepy_v2.png",
+        "confused": "tikki_confused_v2.png",
+        "love": "tikki_love_v2.png"
+      }
+    },
+    "mei": {
+      "base": "mei_neutral_v2.png",
+      "expressions": {
+        "neutral": "mei_neutral_v2.png",
+        "happy": "mei_happy_v2.png",
+        "thinking": "mei_thinking_v2.png",
+        "warning": "mei_warning_v2.png",
+        "proud": "mei_proud_v2.png",
+        "shocked": "mei_shocked_v2.png",
+        "sad": "mei_sad_v2.png",
+        "angry": "mei_angry_v2.png",
+        "excited": "mei_excited_v2.png",
+        "sleepy": "mei_sleepy_v2.png",
+        "confused": "mei_confused_v2.png",
+        "love": "mei_love_v2.png"
+      }
+    },
+    "manchas": {
+      "base": "manchas_neutral_v2.png",
+      "expressions": {
+        "neutral": "manchas_neutral_v2.png",
+        "happy": "manchas_happy_v2.png",
+        "thinking": "manchas_thinking_v2.png",
+        "warning": "manchas_warning_v2.png",
+        "proud": "manchas_proud_v2.png",
+        "shocked": "manchas_shocked_v2.png",
+        "sad": "manchas_sad_v2.png",
+        "angry": "manchas_angry_v2.png",
+        "excited": "manchas_excited_v2.png",
+        "sleepy": "manchas_sleepy_v2.png",
+        "confused": "manchas_confused_v2.png",
+        "love": "manchas_love_v2.png"
+      }
+    }
+  },
+  "guides": {
+    "guide_01_dashboard_game_manchas": "guide_01_dashboard_game_manchas_v2.png",
+    "guide_02_log_expense_manchas": "guide_02_log_expense_manchas_v2.png",
+    "guide_03_budgets_tikki": "guide_03_budgets_tikki_v2.png",
+    "guide_04_ai_insights_mei": "guide_04_ai_insights_mei_v2.png",
+    "guide_05_scan_receipt_mei": "guide_05_scan_receipt_mei_v2.png",
+    "guide_06_sharing_family_manchas": "guide_06_sharing_family_manchas_v2.png",
+    "guide_07_first_win_mei": "guide_07_first_win_mei_v2.png",
+    "guide_08_daily_checkin_manchas": "guide_08_daily_checkin_manchas_v2.png",
+    "guide_09_weekly_boss_tikki_manchas": "guide_09_weekly_boss_tikki_manchas_v2.png",
+    "guide_10_premium_trial_mei": "guide_10_premium_trial_mei_v2.png"
+  },
+  "badges": [
+    "badge_savings_v2.png",
+    "badge_streak_v2.png",
+    "badge_budgeting_v2.png",
+    "badge_receipt_scan_v2.png",
+    "badge_ai_insights_v2.png",
+    "badge_sharing_v2.png",
+    "badge_level_up_v2.png",
+    "badge_consistency_v2.png",
+    "badge_smart_spend_v2.png",
+    "badge_goals_v2.png",
+    "badge_promo_v2.png",
+    "badge_security_v2.png",
+    "badge_quest_daily_v2.png",
+    "badge_quest_weekly_v2.png",
+    "badge_questline_monthly_v2.png",
+    "badge_boss_fight_v2.png",
+    "badge_skip_shield_v2.png",
+    "badge_trial_starter_v2.png",
+    "badge_streak_guardian_v2.png",
+    "badge_emergency_fund_v2.png"
+  ],
+  "accessories": [
+    "acc_calculator_notebook_coin_v2.png",
+    "acc_hologram_charts_magnifier_v2.png",
+    "acc_receipt_scan_beam_v2.png",
+    "acc_warning_triangle_lightning_v2.png",
+    "acc_trophy_star_v2.png",
+    "acc_piggy_bank_v2.png",
+    "acc_wallet_card_v2.png",
+    "acc_gift_box_v2.png"
+  ],
+  "logo": {
+    "mark": "logo_mark_rosette_v2.png",
+    "appIcon": "app_icon_v2.png",
+    "wordmark": "wordmark_v2.png"
+  }
+}
+

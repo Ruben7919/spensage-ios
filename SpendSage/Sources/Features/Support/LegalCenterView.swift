@@ -22,7 +22,7 @@ struct LegalCenterView: View {
         ),
         LegalResource(
             title: "Support Center",
-            summary: "Public support path for escalation, documentation, and future service updates.",
+            summary: "Open the public support path for escalation, documentation, and troubleshooting follow-up.",
             url: PublicLegalLinks.support,
             systemImage: "lifepreserver.fill"
         ),
@@ -35,17 +35,9 @@ struct LegalCenterView: View {
     ]
 
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("Legal Center")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-                        Text("Open the current public legal and support pages for the dev environment directly from the app.")
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-                }
+                heroCard
 
                 ForEach(resources) { resource in
                     SurfaceCard {
@@ -75,13 +67,13 @@ struct LegalCenterView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Current build posture")
+                        Text("Current data posture")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Label("Profile and ledger data are stored locally on this device.", systemImage: "lock.fill")
+                        Label("Profile and ledger data are stored on this device.", systemImage: "lock.fill")
                         Label("Support packets are generated locally and can be shared manually.", systemImage: "square.and.arrow.up")
-                        Label("Cloud-linked services are only available when your account access enables them.", systemImage: "icloud.slash")
+                        Label("Connected services appear only when your account access enables them.", systemImage: "icloud")
                     }
                     .foregroundStyle(BrandTheme.ink)
                 }
@@ -101,6 +93,40 @@ struct LegalCenterView: View {
                     .clipShape(Capsule(style: .continuous))
                     .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 12, x: 0, y: 6)
                     .padding(.bottom, 18)
+            }
+        }
+    }
+
+    private var heroCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                BrandBadge(text: "Trust center", systemImage: "hand.raised.fill")
+
+                Text("Legal Center")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(BrandTheme.ink)
+
+                Text("Open privacy, support, and terms pages that correspond to the current environment without leaving the app.")
+                    .foregroundStyle(BrandTheme.muted)
+
+                BrandArtworkSurface {
+                    VStack(alignment: .leading, spacing: 16) {
+                        BrandAssetImage(
+                            source: BrandAssetCatalog.shared.guide("guide_06_sharing_family_manchas"),
+                            fallbackSystemImage: "doc.text.fill"
+                        )
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 180)
+
+                        MascotSpeechCard(
+                            character: .tikki,
+                            expression: .proud,
+                            title: "Trust should stay close",
+                            message: "When privacy and support are easy to open, testing feels safer and handoff stays cleaner."
+                        )
+                    }
+                }
             }
         }
     }
