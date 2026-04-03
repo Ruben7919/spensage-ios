@@ -15,6 +15,10 @@ enum ExpenseCategory: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
+
     var symbolName: String {
         switch self {
         case .groceries: return "cart.fill"
@@ -41,6 +45,10 @@ enum AccountKind: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
+
     var symbolName: String {
         switch self {
         case .checking: return "building.columns.fill"
@@ -59,6 +67,10 @@ enum AccountBalanceState: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
+
     var symbolName: String {
         switch self {
         case .asset: return "arrow.up.circle.fill"
@@ -75,6 +87,10 @@ enum BillPaymentState: String, CaseIterable, Codable, Identifiable {
     case overdue = "Overdue"
 
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
 
     var symbolName: String {
         switch self {
@@ -93,6 +109,10 @@ enum RuleActivityState: String, CaseIterable, Codable, Identifiable {
     case disabled = "Disabled"
 
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
 
     var symbolName: String {
         switch self {
@@ -181,7 +201,7 @@ struct AccountRecord: Identifiable, Codable, Equatable {
     }
 
     var summaryLabel: String {
-        [institution.trimmingCharacters(in: .whitespacesAndNewlines), kind.rawValue]
+        [institution.trimmingCharacters(in: .whitespacesAndNewlines), kind.localizedTitle]
             .filter { !$0.isEmpty }
             .joined(separator: " · ")
     }
@@ -597,7 +617,7 @@ struct LocalFinanceLedger: Codable, Equatable {
                 amount: bills[index].amount,
                 category: bills[index].category,
                 date: date,
-                note: bills[index].autopay ? "Autopay bill" : "Bill payment"
+                note: bills[index].autopay ? "Autopay bill".appLocalized : "Bill payment".appLocalized
             ),
             date: date
         )

@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Escanea recibos y captura imágenes de respaldo.";
+"NSPhotoLibraryUsageDescription" = "Importa recibos e imágenes de respaldo.";
+"NSPhotoLibraryAddUsageDescription" = "Guarda imágenes y documentos exportados.";

@@ -529,7 +529,7 @@ struct ExpensesCenterView: View {
                 .frame(width: 46, height: 46)
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(category.category.rawValue)
+                    Text(category.category.localizedTitle)
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                     Text("\(category.count) expense\(category.count == 1 ? "" : "s")")
@@ -561,7 +561,7 @@ struct ExpensesCenterView: View {
                 Text(expense.merchant)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text("\(expense.category.rawValue) · \(expense.date.formatted(date: .abbreviated, time: .omitted))")
+                Text("\(expense.category.localizedTitle) · \(expense.date.formatted(date: .abbreviated, time: .omitted))")
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
                 if let note = expense.note, !note.isEmpty {
@@ -582,10 +582,10 @@ struct ExpensesCenterView: View {
 
     private func emptyRow(title: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.headline)
                 .foregroundStyle(BrandTheme.ink)
-            Text(detail)
+            Text(detail.appLocalized)
                 .font(.subheadline)
                 .foregroundStyle(BrandTheme.muted)
         }

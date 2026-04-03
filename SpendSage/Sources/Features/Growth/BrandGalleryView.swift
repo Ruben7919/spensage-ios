@@ -109,7 +109,7 @@ struct BrandGalleryView: View {
                                             RoundedRectangle(cornerRadius: 18, style: .continuous)
                                                 .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
                                         )
-                                    Text(swatch.name)
+                                    Text(swatch.name.appLocalized)
                                         .font(.headline)
                                         .foregroundStyle(BrandTheme.ink)
                                 }
@@ -172,10 +172,10 @@ struct BrandGalleryView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
 
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text(guide.title)
+                                        Text(guide.title.appLocalized)
                                             .font(.headline)
                                             .foregroundStyle(BrandTheme.ink)
-                                        Text(guide.slides.first?.title ?? "Open guide")
+                                        Text((guide.slides.first?.title ?? "Open guide").appLocalized)
                                             .font(.subheadline)
                                             .foregroundStyle(BrandTheme.muted)
                                             .lineLimit(2)

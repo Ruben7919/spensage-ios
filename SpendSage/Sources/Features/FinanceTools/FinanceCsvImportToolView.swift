@@ -87,7 +87,7 @@ struct FinanceCsvImportToolView: View {
 
                         Picker("Template", selection: $templateKind) {
                             ForEach(TemplateKind.allCases) { kind in
-                                Text(kind.rawValue).tag(kind)
+                                Text(kind.localizedTitle).tag(kind)
                             }
                         }
                         .pickerStyle(.segmented)
@@ -315,7 +315,7 @@ struct FinanceCsvImportToolView: View {
                 Text(row.draft.merchant)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text("\(row.draft.category.rawValue) · \(row.draft.date.formatted(date: .abbreviated, time: .omitted))")
+                Text("\(row.draft.category.localizedTitle) · \(row.draft.date.formatted(date: .abbreviated, time: .omitted))")
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
                 if !row.draft.note.isEmpty {
@@ -336,7 +336,7 @@ struct FinanceCsvImportToolView: View {
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Text(row.source.rawValue)
+                Text(row.source.localizedTitle)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(row.source.color)
             }
@@ -389,6 +389,10 @@ private enum CSVImportSource: String {
     case ruleMatch = "Rule matched"
     case defaultCategory = "Default"
 
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
+
     var symbolName: String {
         switch self {
         case .explicitCategory: return "tag.fill"
@@ -411,6 +415,10 @@ private enum TemplateKind: String, CaseIterable, Identifiable {
     case debitCredit = "Debit / credit"
 
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
 
     var sampleCSV: String {
         switch self {

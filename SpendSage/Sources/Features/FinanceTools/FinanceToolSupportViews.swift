@@ -12,11 +12,11 @@ struct FinanceToolsHeaderCard: View {
             VStack(alignment: .leading, spacing: 14) {
                 BrandBadge(text: eyebrow, systemImage: systemImage)
 
-                Text(title)
+                Text(title.appLocalized)
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text(summary)
+                Text(summary.appLocalized)
                     .foregroundStyle(BrandTheme.muted)
             }
         }
@@ -33,7 +33,7 @@ struct FinanceNoticeCard: View {
                     .font(.headline)
                     .foregroundStyle(BrandTheme.primary)
 
-                Text(message)
+                Text(message.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.ink)
                     .fixedSize(horizontal: false, vertical: true)
@@ -57,11 +57,11 @@ struct FinanceEmptyStateCard: View {
                     .background(BrandTheme.accent.opacity(0.18))
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
             }
@@ -79,11 +79,11 @@ struct FinanceField: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(label)
+            Text(label.appLocalized)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(BrandTheme.muted)
 
-            TextField(placeholder, text: $text)
+            TextField(placeholder.appLocalized, text: $text)
                 .keyboardType(keyboard)
                 .textInputAutocapitalization(capitalization)
                 .autocorrectionDisabled()
@@ -105,7 +105,7 @@ struct FinanceMultilineField: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(label)
+            Text(label.appLocalized)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(BrandTheme.muted)
 
@@ -118,7 +118,7 @@ struct FinanceMultilineField: View {
                     )
 
                 if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text(placeholder)
+                    Text(placeholder.appLocalized)
                         .foregroundStyle(BrandTheme.muted.opacity(0.8))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 16)
@@ -150,10 +150,10 @@ struct FinanceToolRowLabel: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)

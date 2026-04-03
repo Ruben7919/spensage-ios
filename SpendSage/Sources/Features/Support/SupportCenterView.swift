@@ -9,6 +9,10 @@ private enum SupportIssueType: String, CaseIterable, Identifiable {
     case bug = "Bug"
 
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
 }
 
 private enum SupportPriority: String, CaseIterable, Identifiable {
@@ -18,6 +22,10 @@ private enum SupportPriority: String, CaseIterable, Identifiable {
     case urgent = "Urgent"
 
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
 }
 
 private struct RecentSupportPacket: Identifiable {
@@ -139,7 +147,12 @@ struct SupportCenterView: View {
                             BrandFeatureRow(
                                 systemImage: "slider.horizontal.3",
                                 title: topRule.merchantKeyword,
-                                detail: "\(topRule.category.rawValue) · \(matches) matching transaction\(matches == 1 ? "" : "s")"
+                                detail: AppLocalization.localized(
+                                    "%@ · %d matching transaction%@",
+                                    arguments: topRule.category.localizedTitle,
+                                    matches,
+                                    matches == 1 ? "" : "s"
+                                )
                             )
                         }
                     }
@@ -153,14 +166,14 @@ struct SupportCenterView: View {
 
                         Picker("Priority", selection: $priority) {
                             ForEach(SupportPriority.allCases) { value in
-                                Text(value.rawValue).tag(value)
+                                Text(value.localizedTitle).tag(value)
                             }
                         }
                         .pickerStyle(.segmented)
 
                         Picker("Issue type", selection: $issueType) {
                             ForEach(SupportIssueType.allCases) { type in
-                                Text(type.rawValue).tag(type)
+                                Text(type.localizedTitle).tag(type)
                             }
                         }
                         .pickerStyle(.segmented)
@@ -242,7 +255,7 @@ struct SupportCenterView: View {
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
                             Spacer()
-                            BrandBadge(text: priority.rawValue, systemImage: "exclamationmark.circle.fill")
+                            BrandBadge(text: priority.localizedTitle, systemImage: "exclamationmark.circle.fill")
                         }
 
                         ScrollView {
@@ -280,7 +293,7 @@ struct SupportCenterView: View {
                                         Text(packet.subject)
                                             .font(.headline)
                                             .foregroundStyle(BrandTheme.ink)
-                                        Text("\(packet.ticketID) · \(packet.issueType.rawValue) · \(packet.priority.rawValue)")
+                                        Text("\(packet.ticketID) · \(packet.issueType.localizedTitle) · \(packet.priority.localizedTitle)")
                                             .font(.footnote)
                                             .foregroundStyle(BrandTheme.muted)
                                         Text(packet.createdAt.formatted(date: .abbreviated, time: .shortened))
@@ -329,7 +342,7 @@ struct SupportCenterView: View {
     private var supportPacket: String {
         LocalLedgerExportComposer.supportPacket(
             viewModel: viewModel,
-            issueType: issueType.rawValue,
+            issueType: issueType.localizedTitle,
             subject: subject,
             detail: detail,
             includeDiagnostics: includeDiagnostics

@@ -330,7 +330,7 @@ struct FinanceBillsToolView: View {
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text("\(FinanceToolFormatting.dueDateText(for: bill, ledger: viewModel.ledger)) · \(bill.category.rawValue)")
+                    Text("\(FinanceToolFormatting.dueDateText(for: bill, ledger: viewModel.ledger)) · \(bill.category.localizedTitle)")
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -342,14 +342,14 @@ struct FinanceBillsToolView: View {
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text(status.rawValue)
+                    Text(status.localizedTitle)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(statusColor(status))
                 }
             }
 
             HStack(spacing: 8) {
-                billChip(title: status.rawValue, systemImage: status.symbolName, color: statusColor(status))
+                billChip(title: status.localizedTitle, systemImage: status.symbolName, color: statusColor(status))
                 billChip(
                     title: isPaused ? "Paused" : "Active",
                     systemImage: isPaused ? "pause.circle.fill" : "play.circle.fill",

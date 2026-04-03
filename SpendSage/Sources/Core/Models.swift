@@ -5,6 +5,10 @@ enum SocialProvider: String, CaseIterable, Identifiable {
     case apple = "Apple"
 
     var id: String { rawValue }
+
+    var displayName: String {
+        rawValue.appLocalized
+    }
 }
 
 enum SessionState: Equatable {
@@ -39,4 +43,3 @@ struct BudgetSnapshot: Equatable {
         monthlyBudget - monthlySpent
     }
 }
-

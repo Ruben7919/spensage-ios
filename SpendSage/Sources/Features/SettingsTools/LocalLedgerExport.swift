@@ -39,7 +39,7 @@ enum LocalLedgerExportComposer {
         let billsCount = viewModel.bills.count
         let rulesCount = viewModel.rules.count
         let sessionMode = sessionLabel(for: viewModel.session)
-        let lastUpdated = viewModel.ledger?.updatedAt.formatted(date: .abbreviated, time: .shortened) ?? "Not yet saved"
+        let lastUpdated = viewModel.ledger?.updatedAt.formatted(date: .abbreviated, time: .shortened) ?? "Not yet saved".appLocalized
 
         var lines = [
             "SpendSage local summary",
@@ -64,7 +64,7 @@ enum LocalLedgerExportComposer {
         }
 
         if let topCategory = state?.topCategory {
-            lines.append("Top category: \(topCategory.category.rawValue) · \(currency(topCategory.total))")
+            lines.append(AppLocalization.localized("Top category: %@ · %@", arguments: topCategory.category.localizedTitle, currency(topCategory.total)))
         }
 
         return lines.joined(separator: "\n")
@@ -135,14 +135,14 @@ enum LocalLedgerExportComposer {
     static func sessionLabel(for session: SessionState) -> String {
         switch session {
         case .signedOut:
-            return "Signed out"
+            return "Signed out".appLocalized
         case .guest:
-            return "Guest local mode"
+            return "Guest local mode".appLocalized
         case let .signedIn(email, provider):
             if let provider, !provider.isEmpty {
-                return "Signed in as \(email) via \(provider)"
+                return AppLocalization.localized("Signed in as %@ via %@", arguments: email, provider)
             }
-            return "Signed in as \(email)"
+            return AppLocalization.localized("Signed in as %@", arguments: email)
         }
     }
 

@@ -6,6 +6,10 @@ struct GrowthMission: Identifiable, Equatable {
         case pending = "Pending"
         case ready = "Ready"
         case completed = "Completed"
+
+        var localizedTitle: String {
+            rawValue.appLocalized
+        }
     }
 
     let id: String
@@ -48,7 +52,7 @@ struct GrowthTrophy: Identifiable, Equatable {
 
     var progressText: String {
         if unlocked {
-            return "Unlocked"
+            return "Unlocked".appLocalized
         }
         return "\(min(progressValue, progressTarget))/\(progressTarget)"
     }
@@ -70,9 +74,9 @@ struct DashboardGrowthSnapshot: Equatable {
 
         var label: String {
             switch self {
-            case .calm: return "Stable"
-            case .watch: return "Watchlist"
-            case .urgent: return "Recovery mode"
+            case .calm: return "Stable".appLocalized
+            case .watch: return "Watchlist".appLocalized
+            case .urgent: return "Recovery mode".appLocalized
             }
         }
 
@@ -153,57 +157,60 @@ enum GrowthSnapshotBuilder {
         let greetingTitle: String
         switch session {
         case .guest:
-            greetingTitle = "Your local growth loop"
+            greetingTitle = "Your local growth loop".appLocalized
         case let .signedIn(email, _):
-            greetingTitle = "Welcome back, \(email)"
+            greetingTitle = AppLocalization.localized("Welcome back, %@", arguments: email)
         case .signedOut:
-            greetingTitle = "Dashboard"
+            greetingTitle = "Dashboard".appLocalized
         }
 
         let heroTitle: String
         let heroBody: String
         if transactionCount == 0 {
-            heroTitle = "Start the first mission"
-            heroBody = "Log one expense to wake up coach tips, mission progress, and trophy momentum."
+            heroTitle = "Start the first mission".appLocalized
+            heroBody = "Log one expense to wake up coach tips, mission progress, and trophy momentum.".appLocalized
         } else if riskState == .urgent {
-            heroTitle = "Tighten the month before it drifts"
-            heroBody = "Spending is above the current budget track. Focus on the top category and lock one cleanup action today."
+            heroTitle = "Tighten the month before it drifts".appLocalized
+            heroBody = "Spending is above the current budget track. Focus on the top category and lock one cleanup action today.".appLocalized
         } else if riskState == .watch {
-            heroTitle = "You still have room to steer"
-            heroBody = "The month is heating up, but one rule, one bill review, or one trimmed category keeps the dashboard in control."
+            heroTitle = "You still have room to steer".appLocalized
+            heroBody = "The month is heating up, but one rule, one bill review, or one trimmed category keeps the dashboard in control.".appLocalized
         } else {
-            heroTitle = "Momentum is compounding"
-            heroBody = "Your local ledger is clean enough for coaching, missions, and trophy progress to feel intentional."
+            heroTitle = "Momentum is compounding".appLocalized
+            heroBody = "Your local ledger is clean enough for coaching, missions, and trophy progress to feel intentional.".appLocalized
         }
 
-        let topCategoryName = state?.topCategory?.category.rawValue ?? "your top category"
+        let topCategoryName = state?.topCategory?.category.localizedTitle ?? "your top category".appLocalized
         let coachTitle: String
         let coachBody: String
         let coachAction: String
         if transactionCount == 0 {
-            coachTitle = "Coach: capture the first receipt-sized win"
-            coachBody = "The dashboard is ready, but it needs one real expense before it can coach patterns."
-            coachAction = "Add one expense today."
+            coachTitle = "Coach: capture the first receipt-sized win".appLocalized
+            coachBody = "The dashboard is ready, but it needs one real expense before it can coach patterns.".appLocalized
+            coachAction = "Add one expense today.".appLocalized
         } else if utilization >= 1 {
-            coachTitle = "Coach: rescue the monthly runway"
-            coachBody = "The fastest relief is usually hiding inside \(topCategoryName.lowercased()). Trim one purchase or move one bill before the week closes."
-            coachAction = "Protect cash before opening a new category."
+            coachTitle = "Coach: rescue the monthly runway".appLocalized
+            coachBody = AppLocalization.localized(
+                "The fastest relief is usually hiding inside %@. Trim one purchase or move one bill before the week closes.",
+                arguments: topCategoryName.lowercased()
+            )
+            coachAction = "Protect cash before opening a new category.".appLocalized
         } else if rules.isEmpty && transactionCount >= 3 {
-            coachTitle = "Coach: automate the repeated noise"
-            coachBody = "You already have enough transactions for a merchant rule. Turn repetition into cleaner category data."
-            coachAction = "Create one rule for the merchant you type most."
+            coachTitle = "Coach: automate the repeated noise".appLocalized
+            coachBody = "You already have enough transactions for a merchant rule. Turn repetition into cleaner category data.".appLocalized
+            coachAction = "Create one rule for the merchant you type most.".appLocalized
         } else if accounts.count < 2 {
-            coachTitle = "Coach: widen the financial map"
-            coachBody = "The dashboard reads spend well, but it gets smarter once savings or cash balances are part of the story."
-            coachAction = "Add one more account bucket."
+            coachTitle = "Coach: widen the financial map".appLocalized
+            coachBody = "The dashboard reads spend well, but it gets smarter once savings or cash balances are part of the story.".appLocalized
+            coachAction = "Add one more account bucket.".appLocalized
         } else if bills.isEmpty {
-            coachTitle = "Coach: make future obligations visible"
-            coachBody = "Recurring bills are still invisible to the dashboard. Add the next due obligation so the coach can call it out early."
-            coachAction = "Set up your first recurring bill."
+            coachTitle = "Coach: make future obligations visible".appLocalized
+            coachBody = "Recurring bills are still invisible to the dashboard. Add the next due obligation so the coach can call it out early.".appLocalized
+            coachAction = "Set up your first recurring bill.".appLocalized
         } else {
-            coachTitle = "Coach: keep the rhythm predictable"
-            coachBody = "You already have the pieces of a strong local loop. Now the win is consistency: short check-ins, clean categories, and fewer surprises."
-            coachAction = "Protect the streak with one quick review tonight."
+            coachTitle = "Coach: keep the rhythm predictable".appLocalized
+            coachBody = "You already have the pieces of a strong local loop. Now the win is consistency: short check-ins, clean categories, and fewer surprises.".appLocalized
+            coachAction = "Protect the streak with one quick review tonight.".appLocalized
         }
 
         let missions = buildMissions(
@@ -238,8 +245,8 @@ enum GrowthSnapshotBuilder {
         return DashboardGrowthSnapshot(
             greetingTitle: greetingTitle,
             greetingBody: session == .guest
-                ? "Everything here is generated from the ledger on this device."
-                : "Your dashboard mixes budget health, missions, coach tips, and trophy momentum.",
+                ? "Everything here is generated from the ledger on this device.".appLocalized
+                : "Your dashboard mixes budget health, missions, coach tips, and trophy momentum.".appLocalized,
             heroTitle: heroTitle,
             heroBody: heroBody,
             coachTitle: coachTitle,
@@ -269,10 +276,10 @@ enum GrowthSnapshotBuilder {
         let candidates = [
             GrowthMission(
                 id: "ledger-momentum",
-                title: "Log five expenses",
-                detail: "Build enough activity for better coach calls and trophy momentum.",
-                coachNote: "Short bursts of clean entries are better than one long catch-up session.",
-                cadenceLabel: "Daily",
+                title: "Log five expenses".appLocalized,
+                detail: "Build enough activity for better coach calls and trophy momentum.".appLocalized,
+                coachNote: "Short bursts of clean entries are better than one long catch-up session.".appLocalized,
+                cadenceLabel: "Daily".appLocalized,
                 rewardXP: 80,
                 systemImage: "square.and.pencil.circle.fill",
                 progressValue: transactionCount,
@@ -281,10 +288,10 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthMission(
                 id: "streak-keeper",
-                title: "Protect a three-day streak",
-                detail: "Consecutive active days turn the dashboard from static to predictive.",
-                coachNote: "A streak is just repeatability made visible.",
-                cadenceLabel: "Weekly",
+                title: "Protect a three-day streak".appLocalized,
+                detail: "Consecutive active days turn the dashboard from static to predictive.".appLocalized,
+                coachNote: "A streak is just repeatability made visible.".appLocalized,
+                cadenceLabel: "Weekly".appLocalized,
                 rewardXP: 110,
                 systemImage: "flame.fill",
                 progressValue: streakDays,
@@ -293,10 +300,10 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthMission(
                 id: "account-map",
-                title: "Add two account buckets",
-                detail: "Cash, savings, and cards make the dashboard feel like a real cockpit.",
-                coachNote: "One extra account usually unlocks the clearest net-worth story.",
-                cadenceLabel: "Weekly",
+                title: "Add two account buckets".appLocalized,
+                detail: "Cash, savings, and cards make the dashboard feel like a real cockpit.".appLocalized,
+                coachNote: "One extra account usually unlocks the clearest net-worth story.".appLocalized,
+                cadenceLabel: "Weekly".appLocalized,
                 rewardXP: 90,
                 systemImage: "building.columns.fill",
                 progressValue: accounts,
@@ -305,10 +312,10 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthMission(
                 id: "bill-radar",
-                title: "Turn on bills radar",
-                detail: "Track at least one recurring bill so the dashboard can flag future pressure.",
-                coachNote: "The calmest months are the ones where obligations stop arriving as surprises.",
-                cadenceLabel: "Boss",
+                title: "Turn on bills radar".appLocalized,
+                detail: "Track at least one recurring bill so the dashboard can flag future pressure.".appLocalized,
+                coachNote: "The calmest months are the ones where obligations stop arriving as surprises.".appLocalized,
+                cadenceLabel: "Boss".appLocalized,
                 rewardXP: 120,
                 systemImage: "calendar.badge.clock",
                 progressValue: bills,
@@ -317,10 +324,10 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthMission(
                 id: "rule-architect",
-                title: "Create one smart rule",
-                detail: "Let recurring merchants auto-land in the right category.",
-                coachNote: "Rules remove friction from every future expense.",
-                cadenceLabel: "Boss",
+                title: "Create one smart rule".appLocalized,
+                detail: "Let recurring merchants auto-land in the right category.".appLocalized,
+                coachNote: "Rules remove friction from every future expense.".appLocalized,
+                cadenceLabel: "Boss".appLocalized,
                 rewardXP: 120,
                 systemImage: "point.3.filled.connected.trianglepath.dotted",
                 progressValue: rules,
@@ -329,10 +336,10 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthMission(
                 id: "budget-guardian",
-                title: "Keep the month inside budget",
-                detail: "Stay under the current monthly plan through the next review.",
-                coachNote: "If the dashboard stays green, your next decisions get easier.",
-                cadenceLabel: "Monthly",
+                title: "Keep the month inside budget".appLocalized,
+                detail: "Stay under the current monthly plan through the next review.".appLocalized,
+                coachNote: "If the dashboard stays green, your next decisions get easier.".appLocalized,
+                cadenceLabel: "Monthly".appLocalized,
                 rewardXP: 140,
                 systemImage: "shield.lefthalf.filled",
                 progressValue: budgetHealthy ? 1 : 0,
@@ -372,9 +379,9 @@ enum GrowthSnapshotBuilder {
         return [
             GrowthTrophy(
                 id: "rookie-ledger",
-                title: "Rookie Ledger",
-                detail: "The first expense is in. The dashboard can finally coach with real data.",
-                celebration: "First expense saved locally.",
+                title: "Rookie Ledger".appLocalized,
+                detail: "The first expense is in. The dashboard can finally coach with real data.".appLocalized,
+                celebration: "First expense saved locally.".appLocalized,
                 systemImage: "sparkles.rectangle.stack.fill",
                 hybridBadgeAsset: "badge_savings_v2.png",
                 progressValue: expenses.count,
@@ -384,9 +391,9 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthTrophy(
                 id: "steady-paws",
-                title: "Steady Paws",
-                detail: "Seven active days turned your finance rhythm into a visible streak.",
-                celebration: "A full week of active ledger days.",
+                title: "Steady Paws".appLocalized,
+                detail: "Seven active days turned your finance rhythm into a visible streak.".appLocalized,
+                celebration: "A full week of active ledger days.".appLocalized,
                 systemImage: "pawprint.fill",
                 hybridBadgeAsset: "badge_streak_guardian_v2.png",
                 progressValue: uniqueDayCount,
@@ -396,9 +403,9 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthTrophy(
                 id: "budget-boss",
-                title: "Budget Boss",
-                detail: "The month is still inside the current plan while activity keeps growing.",
-                celebration: "Budget remained in the safe zone.",
+                title: "Budget Boss".appLocalized,
+                detail: "The month is still inside the current plan while activity keeps growing.".appLocalized,
+                celebration: "Budget remained in the safe zone.".appLocalized,
                 systemImage: "shield.checkered",
                 hybridBadgeAsset: "badge_budgeting_v2.png",
                 progressValue: budgetHealthy ? 1 : 0,
@@ -408,9 +415,9 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthTrophy(
                 id: "rule-architect",
-                title: "Rule Architect",
-                detail: "One merchant rule means the local ledger is starting to self-organize.",
-                celebration: "First rule added.",
+                title: "Rule Architect".appLocalized,
+                detail: "One merchant rule means the local ledger is starting to self-organize.".appLocalized,
+                celebration: "First rule added.".appLocalized,
                 systemImage: "point.3.connected.trianglepath.dotted",
                 hybridBadgeAsset: "badge_smart_spend_v2.png",
                 progressValue: rules,
@@ -420,9 +427,9 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthTrophy(
                 id: "bill-keeper",
-                title: "Bill Keeper",
-                detail: "Recurring obligations now have a home inside the dashboard.",
-                celebration: "Bills radar activated.",
+                title: "Bill Keeper".appLocalized,
+                detail: "Recurring obligations now have a home inside the dashboard.".appLocalized,
+                celebration: "Bills radar activated.".appLocalized,
                 systemImage: "calendar.badge.clock",
                 hybridBadgeAsset: "badge_goals_v2.png",
                 progressValue: bills,
@@ -432,9 +439,9 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthTrophy(
                 id: "level-five",
-                title: "Level Five",
-                detail: "Your local system is deep enough to feel like a product loop, not just a ledger.",
-                celebration: "Level five reached.",
+                title: "Level Five".appLocalized,
+                detail: "Your local system is deep enough to feel like a product loop, not just a ledger.".appLocalized,
+                celebration: "Level five reached.".appLocalized,
                 systemImage: "bolt.circle.fill",
                 hybridBadgeAsset: "badge_level_up_v2.png",
                 progressValue: level,
@@ -444,9 +451,9 @@ enum GrowthSnapshotBuilder {
             ),
             GrowthTrophy(
                 id: "identity-tuned",
-                title: "Identity Tuned",
-                detail: "The household profile is customized, making the app feel owned instead of generic.",
-                celebration: "Profile updated for this household.",
+                title: "Identity Tuned".appLocalized,
+                detail: "The household profile is customized, making the app feel owned instead of generic.".appLocalized,
+                celebration: "Profile updated for this household.".appLocalized,
                 systemImage: "person.crop.circle.badge.checkmark",
                 hybridBadgeAsset: "badge_security_v2.png",
                 progressValue: profileCustomized ? 1 : 0,
@@ -480,8 +487,12 @@ enum GrowthSnapshotBuilder {
             items.append(
                 GrowthEvent(
                     id: "category-\(topCategory.id)",
-                    title: "\(topCategory.category.rawValue) is leading this month",
-                    detail: "\(topCategory.count) local expense\(topCategory.count == 1 ? "" : "s") are shaping the current plan.",
+                    title: AppLocalization.localized("%@ is leading this month", arguments: topCategory.category.localizedTitle),
+                    detail: AppLocalization.localized(
+                        "%d local expense%@ are shaping the current plan.",
+                        arguments: topCategory.count,
+                        topCategory.count == 1 ? "" : "s"
+                    ),
                     occurredAt: lastUpdated,
                     systemImage: topCategory.category.symbolName
                 )
@@ -492,8 +503,8 @@ enum GrowthSnapshotBuilder {
             items.append(
                 GrowthEvent(
                     id: "largest-\(largestExpense.id)",
-                    title: "Largest recent swing",
-                    detail: "\(largestExpense.title) is the biggest recent movement in the ledger.",
+                    title: "Largest recent swing".appLocalized,
+                    detail: AppLocalization.localized("%@ is the biggest recent movement in the ledger.", arguments: largestExpense.title),
                     occurredAt: largestExpense.date,
                     systemImage: "arrow.up.right.circle.fill"
                 )
@@ -503,7 +514,7 @@ enum GrowthSnapshotBuilder {
         items.append(
             GrowthEvent(
                 id: "coach-action",
-                title: riskState == .urgent ? "Coach wants a rescue move" : "Coach picked the next move",
+                title: (riskState == .urgent ? "Coach wants a rescue move" : "Coach picked the next move").appLocalized,
                 detail: coachAction,
                 occurredAt: lastUpdated,
                 systemImage: "lightbulb.max.fill"

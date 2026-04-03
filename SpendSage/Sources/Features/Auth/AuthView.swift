@@ -3,7 +3,7 @@ import UIKit
 
 struct AuthView: View {
     @ObservedObject var viewModel: AppViewModel
-    @AppStorage("native.settings.language") private var language = "en"
+    @AppStorage("native.settings.language") private var language = "auto"
     @AppStorage("native.auth.rememberDevice") private var rememberDeviceOnSignIn = true
 
     enum Mode: String, CaseIterable, Identifiable {
@@ -73,7 +73,7 @@ struct AuthView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle(mode.rawValue)
+        .navigationTitle(mode.rawValue.appLocalized)
         .navigationBarTitleDisplayMode(.inline)
         .overlay(alignment: .topLeading) {
             languagePicker
@@ -91,11 +91,11 @@ struct AuthView: View {
                 )
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(modeTitle)
+                    Text(modeTitle.appLocalized)
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text(modeSubtitle)
+                    Text(modeSubtitle.appLocalized)
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -104,12 +104,12 @@ struct AuthView: View {
                 HStack(spacing: 12) {
                     BrandMetricTile(
                         title: "Flow",
-                        value: flowLabel,
+                        value: flowLabel.appLocalized,
                         systemImage: "person.crop.circle"
                     )
                     BrandMetricTile(
                         title: "Recovery",
-                        value: mode == .resetConfirm ? "New password" : "Confirm / reset",
+                        value: (mode == .resetConfirm ? "New password" : "Confirm / reset").appLocalized,
                         systemImage: "lifepreserver.fill"
                     )
                 }
@@ -195,11 +195,11 @@ struct AuthView: View {
                 BrandBadge(text: "SpendSage", systemImage: "sparkles")
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(modeTitle)
+                    Text(modeTitle.appLocalized)
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text(modeSubtitle)
+                    Text(modeSubtitle.appLocalized)
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -281,7 +281,7 @@ struct AuthView: View {
                 }
 
                 if let errorMessage {
-                    Text(errorMessage)
+                    Text(errorMessage.appLocalized)
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(Color(red: 0.72, green: 0.24, blue: 0.20))
                         .padding(.horizontal, 14)
@@ -291,7 +291,7 @@ struct AuthView: View {
                 }
 
                 if let infoMessage {
-                    Text(infoMessage)
+                    Text(infoMessage.appLocalized)
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(Color(red: 0.16, green: 0.45, blue: 0.23))
                         .padding(.horizontal, 14)
@@ -300,7 +300,7 @@ struct AuthView: View {
                         .background(Color.green.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
 
-                Button(submitLabel) {
+                Button(submitLabel.appLocalized) {
                     Task { await submitEmailForm() }
                 }
                 .buttonStyle(PrimaryCTAStyle())
@@ -308,7 +308,7 @@ struct AuthView: View {
 
                 if mode == .confirmAccount {
                     Button("Resend code") {
-                        infoMessage = "A fresh confirmation code will be sent to your email when the account service is connected."
+                        infoMessage = "A fresh confirmation code will be sent to your email when the account service is connected.".appLocalized
                         errorMessage = nil
                     }
                     .buttonStyle(SecondaryCTAStyle())
@@ -322,7 +322,7 @@ struct AuthView: View {
                             .foregroundStyle(BrandTheme.muted)
                     }
                 } else if let hint = validationHint {
-                    Text(hint)
+                    Text(hint.appLocalized)
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -350,7 +350,7 @@ struct AuthView: View {
                         Text(mode == .signIn ? "Continue with Apple or Google" : "Create with Apple or Google")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
-                        Text(viewModel.authConfiguration.hostedUIFootnote)
+                        Text(viewModel.authConfiguration.hostedUIFootnote.appLocalized)
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
@@ -389,9 +389,13 @@ struct AuthView: View {
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 } else {
-                    Text(mode == .signIn
-                         ? "Continue with Apple or Google to sign in through the browser, then come straight back to the app."
-                         : "Continue with Apple or Google to create the account in the browser and return here confirmed.")
+                    Text(
+                        (
+                            mode == .signIn
+                                ? "Continue with Apple or Google to sign in through the browser, then come straight back to the app."
+                                : "Continue with Apple or Google to create the account in the browser and return here confirmed."
+                        ).appLocalized
+                    )
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -528,29 +532,35 @@ struct AuthView: View {
 
     private var validationHint: String? {
         if viewModel.authConfiguration.isHostedUIReady && (mode == .signIn || mode == .createAccount) {
-            return "You will finish this step in a secure browser session."
+            return "You will finish this step in a secure browser session.".appLocalized
         }
         if !isValidEmail(email) {
-            return "Use a valid email address."
+            return "Use a valid email address.".appLocalized
         }
         if mode == .resetRequest {
             return nil
         }
         if mode == .confirmAccount && code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Paste the confirmation code from your inbox."
+            return "Paste the confirmation code from your inbox.".appLocalized
         }
         if mode == .resetConfirm && code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Paste the reset code from your inbox."
+            return "Paste the reset code from your inbox.".appLocalized
         }
         if mode == .resetConfirm && newPassword.count < viewModel.authConfiguration.minimumPasswordLength {
-            return "Password must be at least \(viewModel.authConfiguration.minimumPasswordLength) characters."
+            return AppLocalization.localized(
+                "Password must be at least %d characters.",
+                arguments: viewModel.authConfiguration.minimumPasswordLength
+            )
         }
         if mode == .signIn || mode == .createAccount {
             if password.count < viewModel.authConfiguration.minimumPasswordLength {
-                return "Password must be at least \(viewModel.authConfiguration.minimumPasswordLength) characters."
+                return AppLocalization.localized(
+                    "Password must be at least %d characters.",
+                    arguments: viewModel.authConfiguration.minimumPasswordLength
+                )
             }
             if mode == .createAccount && password != confirmPassword {
-                return "Passwords must match."
+                return "Passwords must match.".appLocalized
             }
         }
         return nil
@@ -562,7 +572,7 @@ struct AuthView: View {
 
     private func submitEmailForm() async {
         guard canSubmit else {
-            errorMessage = validationHint ?? "Check the form fields."
+            errorMessage = validationHint ?? "Check the form fields.".appLocalized
             return
         }
 
@@ -577,17 +587,17 @@ struct AuthView: View {
                 try await viewModel.signIn(email: email, password: password)
             case .createAccount:
                 try await viewModel.createAccount(email: email, password: password)
-                infoMessage = "Account created. If confirmation is required, use the code from your inbox."
+                infoMessage = "Account created. If confirmation is required, use the code from your inbox.".appLocalized
                 mode = .confirmAccount
             case .confirmAccount:
-                infoMessage = "Account confirmed. You can now sign in."
+                infoMessage = "Account confirmed. You can now sign in.".appLocalized
                 mode = .signIn
                 code = ""
             case .resetRequest:
-                infoMessage = "Reset code sent. Enter the code from your inbox and choose a new password."
+                infoMessage = "Reset code sent. Enter the code from your inbox and choose a new password.".appLocalized
                 mode = .resetConfirm
             case .resetConfirm:
-                infoMessage = "Password updated. Sign in with the new password."
+                infoMessage = "Password updated. Sign in with the new password.".appLocalized
                 mode = .signIn
                 code = ""
                 newPassword = ""
@@ -599,7 +609,7 @@ struct AuthView: View {
 
     private func submitSocial(_ provider: SocialProvider) async {
         guard supportsProvider(provider) else {
-            errorMessage = "\(provider.rawValue) sign-in is not available yet."
+            errorMessage = AppLocalization.localized("%@ sign-in is not available yet.", arguments: provider.displayName)
             return
         }
 
@@ -703,8 +713,12 @@ struct AuthView: View {
                 errorMessage = nil
                 infoMessage = nil
             } label: {
-                Label(target.rawValue, systemImage: systemImage)
-                    .frame(maxWidth: .infinity)
+                Label {
+                    Text(target.rawValue.appLocalized)
+                } icon: {
+                    Image(systemName: systemImage)
+                }
+                .frame(maxWidth: .infinity)
             }
             .buttonStyle(PrimaryCTAStyle())
         } else {
@@ -713,8 +727,12 @@ struct AuthView: View {
                 errorMessage = nil
                 infoMessage = nil
             } label: {
-                Label(target.rawValue, systemImage: systemImage)
-                    .frame(maxWidth: .infinity)
+                Label {
+                    Text(target.rawValue.appLocalized)
+                } icon: {
+                    Image(systemName: systemImage)
+                }
+                .frame(maxWidth: .infinity)
             }
             .buttonStyle(SecondaryCTAStyle())
         }
@@ -722,7 +740,7 @@ struct AuthView: View {
 
     @ViewBuilder
     private func inlineModeLink(_ title: String, target: Mode) -> some View {
-        Button(title) {
+        Button(title.appLocalized) {
             mode = target
             errorMessage = nil
             infoMessage = nil
@@ -733,12 +751,13 @@ struct AuthView: View {
 
     private var languagePicker: some View {
         Menu {
+            Button("Auto") { language = "auto" }
             Button("English") { language = "en" }
             Button("Español") { language = "es" }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "globe")
-                Text(language.uppercased())
+                Text(AppLocalization.menuLabel(for: language))
             }
             .font(.caption.weight(.semibold))
             .foregroundStyle(BrandTheme.ink)
@@ -763,15 +782,15 @@ struct AuthView: View {
         isSecure: Bool
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(BrandTheme.muted)
 
             Group {
                 if isSecure {
-                    SecureField(placeholder, text: text)
+                    SecureField(placeholder.appLocalized, text: text)
                 } else {
-                    TextField(placeholder, text: text)
+                    TextField(placeholder.appLocalized, text: text)
                 }
             }
             .textInputAutocapitalization(.never)
@@ -795,10 +814,10 @@ struct AuthView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -830,10 +849,10 @@ struct AuthView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
+                    Text(title.appLocalized)
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
-                    Text(message)
+                    Text(message.appLocalized)
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -856,7 +875,7 @@ private struct TagChip: View {
 
     var body: some View {
         Label {
-            Text(text)
+            Text(text.appLocalized)
         } icon: {
             Image(systemName: systemImage)
         }

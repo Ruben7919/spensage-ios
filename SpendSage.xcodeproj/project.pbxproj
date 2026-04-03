@@ -7,54 +7,154 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0083CC041DF393B4AFD5080A /* guide_06_sharing_family_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 06C282CB03BDEC6AEF44B9C5 /* guide_06_sharing_family_manchas_v2.png */; };
 		02C6DDAE3EB1ABFCFBF4C91E /* HostedUIAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20799AB6E9D49FDE20443E9 /* HostedUIAuthService.swift */; };
 		04E00FF56F15EBE2816E0EFB /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785F4A4F7DC3D1425773B754 /* HelpCenterView.swift */; };
 		0F23374C3FFF9B892C7C0270 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E9688AB4D62C4797F2C444 /* AppViewModel.swift */; };
 		0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE8903B75C047C59E5F634A /* Assets.xcassets */; };
-		103FAD7090014D4CAAA00001 /* BrandAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00011 /* BrandAssets.swift */; };
-		103FAD7090014D4CAAA00002 /* BrandAssetImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00012 /* BrandAssetImage.swift */; };
-		103FAD7090014D4CAAA00003 /* Guides.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00013 /* Guides.swift */; };
-		103FAD7090014D4CAAA00004 /* GuideSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00014 /* GuideSheet.swift */; };
-		103FAD7090014D4CAAA00005 /* Brand in Resources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00015 /* Brand */; };
-		103FAD7090014D4CAAA00031 /* GrowthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103FAD7090014D4CAAA00041 /* GrowthSnapshot.swift */; };
+		11685060690A3954AE0688AD /* badge_budgeting_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = F95A90D8A956479B803898A9 /* badge_budgeting_v2.png */; };
+		11D4EDED70C86DB7D2566D40 /* guide_16_family_mission_board_team_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D34F0CB2B678B65728E704E /* guide_16_family_mission_board_team_v2.png */; };
+		1297C5EB241903AF0BABCDB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4C99B87AC3D4FD5B02CB8C6A /* Localizable.strings */; };
+		1471A33FCC39E0845D2459AE /* guide_15_emergency_fund_shield_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 982D4114C1EC443CF5F589B0 /* guide_15_emergency_fund_shield_mei_v2.png */; };
 		17EBFD7F7D5C568DFA011E37 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABD400C4F74E75F803BAFC /* Models.swift */; };
+		1A39E8A6890D71AA0AE136C4 /* guide_13_subscription_hydra_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 879896D4090BAF21D8382509 /* guide_13_subscription_hydra_manchas_v2.png */; };
 		1BFAC9F2D1D8FBF19FBE8052 /* LocalLedgerExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32229B7B2F800571C744726E /* LocalLedgerExport.swift */; };
+		1CE14497B68CA6E4954F9024 /* badge_savings_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 63E04732FD9E469418EE3975 /* badge_savings_v2.png */; };
+		1E3FF07028AD55E759042E65 /* guide_20_subscription_checkout_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1053B33502C1AAC11F427D5C /* guide_20_subscription_checkout_manchas_v2.png */; };
+		1EDAB963E4B94727860B6295 /* tikki_proud_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 32D571FF86AFF17DD600166C /* tikki_proud_v2.png */; };
+		2075B4BAD8CFC8E86497DF21 /* manchas_love_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 88014219EB3F0992C86B6B8F /* manchas_love_v2.png */; };
+		2180ED9BE745BCC430A6B38C /* GuideSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20839DBFC007023E8C5F905 /* GuideSheet.swift */; };
 		24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659DC0EB3BB892E509CF9D7E /* FinanceToolSupportViews.swift */; };
+		25951CEDF2272CAE81E49CBB /* badge_promo_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 541EB56F619104E174DEEFC0 /* badge_promo_v2.png */; };
+		2685AE7DA32662207BB88286 /* badge_family_mission_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 03D769D9ED07B6EBE80182A1 /* badge_family_mission_v2.png */; };
 		27ED7669DDCF299D7726CED2 /* TrophyHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7845E9A91B6C587A2C6B48B7 /* TrophyHistoryView.swift */; };
 		28DAA76C5037D75DEC8EDDEC /* FinanceBillsToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A19F8E0812FD23E0901887 /* FinanceBillsToolView.swift */; };
+		2C344217F9D80A1DC684F6C1 /* badge_consistency_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 73E3C4474402F5037300D8ED /* badge_consistency_v2.png */; };
+		2C6851D6C10A86FF7CD2AF01 /* tikki_love_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = A8ED715118825E59A8C7D31F /* tikki_love_v2.png */; };
+		2C79A673121DD0E5826340D8 /* manchas_warning_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 343675A1190A132B36BB1EBE /* manchas_warning_v2.png */; };
 		2DC48FEE7581A00FF9087E18 /* ConfirmAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07CC2A6F29FF5CDF041CF122 /* ConfirmAccountView.swift */; };
+		2EB29CB1121A96A1465D209C /* guide_02_log_expense_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = A511C8E9FCC26A2D46E74E8E /* guide_02_log_expense_manchas_v2.png */; };
 		30CC4427086325546CBEFE6A /* SpendSageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C815B84250314C2A948D50C /* SpendSageApp.swift */; };
+		314224FD0FC0F6682AF9F444 /* badge_sharing_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 378620C0690A616199A2C0E9 /* badge_sharing_v2.png */; };
+		3670C685389907A51DF26B33 /* badge_boss_fight_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D5B69B0FEBEE21F1A351DB7B /* badge_boss_fight_v2.png */; };
+		3728D313064AF5547716224D /* tikki_shocked_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 892E229A6B0A3521B629B4C9 /* tikki_shocked_v2.png */; };
+		396CC1814EFDE8EE92647C33 /* guide_08_daily_checkin_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D0C1A2BE8999CC797CEA6DE /* guide_08_daily_checkin_manchas_v2.png */; };
+		3FE7B310989B98BD69678336 /* mei_happy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0EA5F8005ABD9F3AFD3D0533 /* mei_happy_v2.png */; };
+		41272B5D248649B61D7C367C /* manchas_happy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 47666EACB35D65453210294C /* manchas_happy_v2.png */; };
+		4404D795880F86C1125D6917 /* mei_love_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 91D094C74AA70ED5B5BDD719 /* mei_love_v2.png */; };
+		47507D83620E8BA77B4BBAB0 /* badge_subscription_hydra_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = B1C81AE4CDAB676C1935EBB5 /* badge_subscription_hydra_v2.png */; };
+		4AC59ECC6C5FAC2BE9B27D48 /* badge_receipt_scan_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = B7B1538715687F2EE6552CA7 /* badge_receipt_scan_v2.png */; };
+		4C03C37B3AF9BD27DC87A4E6 /* badge_safe_to_spend_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FD463CBF88A570CC373ACAF /* badge_safe_to_spend_v2.png */; };
+		4CDDE7C4304F9716DE55E223 /* badge_bill_radar_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 074ED50AD46A79F7959B19F5 /* badge_bill_radar_v2.png */; };
 		4D4645CD2FE607017F0639D5 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC8D8BD53F09EA71C1D0744 /* AuthView.swift */; };
+		5154AF9E6F213923B5C3A85F /* BrandAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE2F76BDDB3352DE57B540F /* BrandAssets.swift */; };
+		51FAC1B085057384E851296F /* guide_11_budget_wizard_steps_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4EC8FC03BF043A01412B0A19 /* guide_11_budget_wizard_steps_mei_v2.png */; };
 		52978F026A957FCC3741603E /* ResetPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED414330125E63F549BE0AC /* ResetPasswordView.swift */; };
+		53326A1648AC3A7FD899300F /* badge_questline_monthly_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 97159ED4214285E5D0121413 /* badge_questline_monthly_v2.png */; };
+		5340611E555D802AA8F15F72 /* badge_import_wizard_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = AE8C1C919AE0E0513B4DA678 /* badge_import_wizard_v2.png */; };
+		54778A0605C6E1DFED6AD518 /* asset_manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1288CDB648EC0EE60433AA28 /* asset_manifest.json */; };
+		56BB8D8311E4328268C5B457 /* mei_sad_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = F98A5CF74809E99E93E1C62A /* mei_sad_v2.png */; };
 		5857534E7E423891F0D2B0EE /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBCBCE8B2F2F891F368C7DFB /* AdvancedSettingsView.swift */; };
+		595315DF5DA18CECF73DDD87 /* guide_03_budgets_tikki_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D99D734B1727A89137ADB2A2 /* guide_03_budgets_tikki_v2.png */; };
+		5990879729FF8B63FB7F8BA4 /* tikki_happy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5456D851E00E542F1EA16 /* tikki_happy_v2.png */; };
+		59DD44AF2E83C6059C98A1D6 /* guide_19_pricing_cards_tikki_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C943812C888E3649FB12721 /* guide_19_pricing_cards_tikki_v2.png */; };
+		5BB52A0F143440689412542C /* guide_05_scan_receipt_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2B87008CE2372CB69639994B /* guide_05_scan_receipt_mei_v2.png */; };
+		5ED18086411C9BF641209300 /* guide_17_landing_hero_team_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D580D8C19B9AB6A19F40056F /* guide_17_landing_hero_team_v2.png */; };
 		5F087A9A789816CA3D0374CB /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF636AE08A9FDCCDF51460A3 /* ProfileView.swift */; };
+		5F44785BE1DCD74E6C9965D3 /* badge_skip_shield_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0950D54C8EE164795F75E8E0 /* badge_skip_shield_v2.png */; };
+		63C6E1A11E502FF3A3FAFA95 /* acc_gift_box_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 395612E2903C037F30684D06 /* acc_gift_box_v2.png */; };
 		65B04B25CFA84CFF4DB53DCF /* SpendSageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */; };
+		65DEE45F1C785415514FA596 /* badge_emergency_fund_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 52B3CA92761FBC301047656D /* badge_emergency_fund_v2.png */; };
+		6774303E61BA886C94A15DAB /* acc_warning_triangle_lightning_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 11BBA3D8FF7A9D47779934EC /* acc_warning_triangle_lightning_v2.png */; };
+		68B17B5FED39DD6438F6AA71 /* acc_hologram_charts_magnifier_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 880A65382CE97B752CBFCC0A /* acc_hologram_charts_magnifier_v2.png */; };
+		6A7708B2F5103A9CCFC04D88 /* mei_sleepy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0670165A10A90A31703E4200 /* mei_sleepy_v2.png */; };
 		748A230A2F9398A3A9D02B41 /* ExpensesCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C24351BCC0914DF6508A0 /* ExpensesCenterView.swift */; };
 		77843C280365837DC6797467 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23BFBEACF79B0FDCC1A81A6 /* OnboardingView.swift */; };
 		7883824A9181C09919A5380F /* BudgetWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4BECA3A82774A38C48D3E3 /* BudgetWizardView.swift */; };
 		78FD6FF7284FE22A88BCE118 /* FinanceReceiptScanToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975B357AB70EED51E253E86B /* FinanceReceiptScanToolView.swift */; };
+		7DF4DC2173F9DABE964341CE /* mei_neutral_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C21073C0C9AA6223F9F37057 /* mei_neutral_v2.png */; };
+		805D1B4518B239EA06BEEC51 /* badge_quest_weekly_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = F3B24BF2E6CF26600BC87CD9 /* badge_quest_weekly_v2.png */; };
+		8105DE94DC5BF7700AA2AF55 /* guide_01_dashboard_game_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE112CF5E024F291765EC /* guide_01_dashboard_game_manchas_v2.png */; };
+		8138660088F953DFBD59FD05 /* manchas_proud_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1169E0D96A6C65EC1687F228 /* manchas_proud_v2.png */; };
 		814A93CC9BAC8C86152BE59E /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8C04C37584D822E473A28C /* AuthConfiguration.swift */; };
 		8190DE8A0F0ADDF37A21E9A0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3A812673FCF633E5AD7A82 /* SettingsView.swift */; };
+		81A195C6661D81AD64D01C2B /* mei_confused_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A23E37FABB52A00D56C60E0 /* mei_confused_v2.png */; };
+		8292A4A6EA5F306BF62E8F2B /* acc_piggy_bank_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = EA374BFBC213D0206C79331D /* acc_piggy_bank_v2.png */; };
+		82DEEAED45406847C6ACBF4B /* GrowthSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3AEF1794D4F1F9FB3A5132 /* GrowthSnapshot.swift */; };
+		8372F74D3DFD4FA61F319A04 /* manchas_confused_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9FBC5889CBCCFDF8175100DF /* manchas_confused_v2.png */; };
+		854E570E14FDC559AC45CF85 /* manchas_excited_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 43615E6FC9EF243440A82D03 /* manchas_excited_v2.png */; };
+		881D226EEA77199BD5AF973C /* badge_quest_daily_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E17F16160A75590F982D8F7 /* badge_quest_daily_v2.png */; };
 		89E9E8CAFC4E34AC1E24BBB5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6227E322248CA2A7A980D40 /* Theme.swift */; };
+		8AEE18EA81762170D25C4430 /* badge_streak_guardian_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 93D1BE1943CAF1390751D8D1 /* badge_streak_guardian_v2.png */; };
+		8C73293B4B63FCC6FA3933BB /* manchas_sleepy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = DBE7F426A63A571AE1C649B2 /* manchas_sleepy_v2.png */; };
+		8DA60C3925DAF9C6CAFCE167 /* guide_04_ai_insights_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6A004DC3D845B540E03A0F8E /* guide_04_ai_insights_mei_v2.png */; };
+		90423D9EBA9817B430E3AD6D /* mei_thinking_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 93401EF4F5CA0C3623B192EC /* mei_thinking_v2.png */; };
+		90729DDE223995E1CAD0EFDD /* acc_receipt_scan_beam_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 094260DEB3E03665653E57E2 /* acc_receipt_scan_beam_v2.png */; };
+		913F7F3BB80FF05CB5AF32D2 /* badge_ai_insights_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6484EA58C0651098BBA4EBF9 /* badge_ai_insights_v2.png */; };
 		91E731398ADCE401D5B7B1F6 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC5D00895B952997D987883 /* FinanceModels.swift */; };
 		93A5A96EF2B3A5812249918F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */; };
+		9530C8BBEF430A2B30F885CC /* badge_goals_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 381690D6AA9297592598EC3A /* badge_goals_v2.png */; };
+		970786DA41BB24AC236F80E0 /* badge_recovery_mode_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BF97127EEC9ABE5F58F3976 /* badge_recovery_mode_v2.png */; };
 		9BF510400E05D1A4B72ECA8A /* BrandGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89985226F3D7B000843752AB /* BrandGalleryView.swift */; };
+		9C0618AEBF3310C881D2F0AA /* badge_weekly_decision_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 98A12E850C7A5E616CC20C87 /* badge_weekly_decision_v2.png */; };
 		9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679F2DB952FBB586D6057598 /* AuthSupport.swift */; };
+		9D4E37757DC5A04361C411D5 /* BrandAssetImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EAA70C86EF69DD1AC280342 /* BrandAssetImage.swift */; };
+		9EBBBC5B08AEB392943CEDEF /* tikki_neutral_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 7C165C936A00E089518582FE /* tikki_neutral_v2.png */; };
+		A00BC835A937F9EF119972B6 /* guide_10_premium_trial_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 53028644B920BAD667473DCA /* guide_10_premium_trial_mei_v2.png */; };
+		A04E5EE473BA9699A0BFA40F /* mei_warning_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BDD4046567E2758D2FBE557 /* mei_warning_v2.png */; };
 		A14E5B6B21BADE70EC7F687F /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B314CADFCED6D85AF660846D /* AppRootView.swift */; };
 		A30437ECD8F41BABB4A42203 /* FinanceCsvImportToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB5D74645DF4C38E921764 /* FinanceCsvImportToolView.swift */; };
 		A45A022AE99A11335AFB290E /* BrandComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4814CA0146FBD47E788B58D9 /* BrandComponents.swift */; };
 		A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87421858D2F5088C6CDD796E /* FinanceStore.swift */; };
 		A6ADBC686E1CB99E645B79AB /* AddExpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E175C0F00D3BFE3E05056D15 /* AddExpenseView.swift */; };
+		AAC28C76A7226EBAF0D9A40A /* manchas_sad_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = ED2472E52EB780F9F6A31D1B /* manchas_sad_v2.png */; };
+		AAEB7D01E712F4A2C7B8EDB0 /* mei_excited_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ED9FC2B123E911909B373D9 /* mei_excited_v2.png */; };
+		AB2296AC9A01E51AD8D2089C /* manchas_angry_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0683344F3860FA14F10363A3 /* manchas_angry_v2.png */; };
+		ABA71B8C879D5ED55FED6FB5 /* guide_07_first_win_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9112931606581AFC35F6638B /* guide_07_first_win_mei_v2.png */; };
+		ADDAF24DAE772F38566306B3 /* manchas_neutral_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9756F9FE063E1099AFF7B0B8 /* manchas_neutral_v2.png */; };
+		AFC44BB846CDF66F5FEE2D7C /* mei_angry_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 376F7F2404E91AF75E89CCED /* mei_angry_v2.png */; };
+		B080CCDE88FE108A3976B497 /* badge_level_up_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 510A9603A5754D7EF0CB477F /* badge_level_up_v2.png */; };
+		B3FAD3530E5C3545269E681F /* Guides.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA553B6500B3D28724615D2F /* Guides.swift */; };
+		B46D59A3AD0468E9B116E0D5 /* badge_streak_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = DE70A775400DDF0E3CBF1306 /* badge_streak_v2.png */; };
+		B7816BC711D0B69DE984FBCB /* tikki_warning_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = A36A2570109AE0FD2847EEE4 /* tikki_warning_v2.png */; };
+		B7E351474CD77F07070565D5 /* manchas_thinking_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E2EABFC6AEB991E51874149 /* manchas_thinking_v2.png */; };
 		BA3E435560B1762B69507B9B /* SupportCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D342BCB4C716DD57F41EBFA /* SupportCenterView.swift */; };
+		BF39D786A0B6089967ABB8E4 /* acc_trophy_star_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C3BBD9C9389B38F4A67936B4 /* acc_trophy_star_v2.png */; };
 		BFB1C3C45472B438B680F918 /* NativeAppShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02576402B4D9548B912CF835 /* NativeAppShellView.swift */; };
+		BFF58A01F143EEB767E1BB2B /* badge_debt_slayer_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6C683E92B3AC851970F0F8F6 /* badge_debt_slayer_v2.png */; };
+		C7774AF9FCA3292049521C41 /* logo_mark_rosette_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DFAEECDA8CD17DF4B0E80CC /* logo_mark_rosette_v2.png */; };
+		C89160FB8287A75BE902597B /* tikki_excited_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = A1CBDFBEA5BC1FA2D5E04F09 /* tikki_excited_v2.png */; };
 		CB8F42A6511C41025ABF0910 /* FinanceRulesToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED13FEEB87E9B10AC5DCBD3B /* FinanceRulesToolView.swift */; };
+		CC7C69A3C62FF0841BCE7979 /* badge_no_spend_day_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 927048F7599BE8F4BF4D2A3B /* badge_no_spend_day_v2.png */; };
+		CFEDF48A4FDA77EFC6FAD2B4 /* manchas_shocked_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 694EB7074F11A82FAD2A8FFB /* manchas_shocked_v2.png */; };
+		D32B4986C1306208E18755C2 /* guide_12_budget_review_family_tikki_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = EE54CD72F5015E9537F73A54 /* guide_12_budget_review_family_tikki_manchas_v2.png */; };
+		D5A63F5297E1DC9294373C18 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6921A66E622A020378A8781E /* InfoPlist.strings */; };
 		D84782692819883735AEBC17 /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37595A2FF2CF4E81B4AE65CF /* Services.swift */; };
+		D8F8CC2700F1F9919ED0851F /* badge_impulse_pause_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6739F1D28DEEC3B3961D8680 /* badge_impulse_pause_v2.png */; };
+		D97365A599A2623E035CBCB1 /* acc_wallet_card_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 54B4C2EA2A96E843D0264B1F /* acc_wallet_card_v2.png */; };
 		DCE0492B5DA8A93842388CF6 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2213A82431EDCFC0907F03E /* InsightsView.swift */; };
 		DD5EF1AA1AA2C0479F642F48 /* PreviewFinanceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */; };
+		DDB676037694904B3200DF10 /* mei_shocked_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0FA52659E4112BAB6EB0B /* mei_shocked_v2.png */; };
 		DE5D447306B02BC086076ED6 /* LegalCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19D129F26CE378A5B66A57DC /* LegalCenterView.swift */; };
+		E25034002BAE44787628E3C6 /* guide_14_bill_radar_tikki_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3C9EC4535CCE8895E6F6EFA1 /* guide_14_bill_radar_tikki_v2.png */; };
+		E25A6E367BEDBD1C79DB67A4 /* tikki_angry_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = CA56DF4650B5021F47704B05 /* tikki_angry_v2.png */; };
 		E30FD45D36AE9FF7582B0794 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E05C5BF495CA177EAE3510 /* DashboardView.swift */; };
+		E35CC7910D62E3105C971CCB /* tikki_sad_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = DBE89991A8F54D1CE2F4D27A /* tikki_sad_v2.png */; };
+		E3B1F629C68F702F0146C595 /* badge_smart_spend_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 91322E115925FDD6AD0C2182 /* badge_smart_spend_v2.png */; };
+		E47578E85D90851BDB30D96B /* AppLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8953868912CFE4A94891E678 /* AppLocalization.swift */; };
+		E6141BA9C218629262E952A8 /* badge_security_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BF4494C2C9263636ABAA42A /* badge_security_v2.png */; };
+		E69BC38F7105C656F88A66A3 /* tikki_confused_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E576E70A3793EB758F39D52 /* tikki_confused_v2.png */; };
+		E808C62D35AF1A4E666758F8 /* tikki_thinking_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8AA28564D2854E1BAE58B808 /* tikki_thinking_v2.png */; };
 		E9DAD4C151A3D2FCBD608678 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978311B951262001E5361352 /* PremiumView.swift */; };
+		EACB7A6A1ACF088F9ADFA30F /* guide_09_weekly_boss_tikki_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C1E64C438F1553E4639812E3 /* guide_09_weekly_boss_tikki_manchas_v2.png */; };
+		F041F9A2211E2F6A273FFD2D /* badge_trial_starter_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 68A962C994F5DE5697471F65 /* badge_trial_starter_v2.png */; };
+		F344FC8A5262BA300A86C6F7 /* acc_calculator_notebook_coin_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = B07B0A36C4437FF6DABFD08D /* acc_calculator_notebook_coin_v2.png */; };
+		F54EF749BC540E5FBF036647 /* mei_proud_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = DE55C3D98F865BE3049CAA23 /* mei_proud_v2.png */; };
+		F6AE0A61C32FE8A8903427BD /* app_icon_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */; };
+		F6B4536F6F60E2EB56759A8B /* guide_18_landing_trust_shield_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2033E37D418EDB7A5CB1ED5F /* guide_18_landing_trust_shield_mei_v2.png */; };
+		FB19B404E1F4529356C0489D /* wordmark_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C48A2C6F56D93D7DCF485CA /* wordmark_v2.png */; };
 		FDC9CF4BAB873272B35E87BB /* FinanceAccountsToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EA145E6EEC82916F75C622 /* FinanceAccountsToolView.swift */; };
+		FFB288A14F62765FDCBFAC77 /* tikki_sleepy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CD7057B2906325234B32F64 /* tikki_sleepy_v2.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,54 +169,154 @@
 
 /* Begin PBXFileReference section */
 		02576402B4D9548B912CF835 /* NativeAppShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAppShellView.swift; sourceTree = "<group>"; };
+		03D769D9ED07B6EBE80182A1 /* badge_family_mission_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_family_mission_v2.png; sourceTree = "<group>"; };
+		0670165A10A90A31703E4200 /* mei_sleepy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_sleepy_v2.png; sourceTree = "<group>"; };
+		0683344F3860FA14F10363A3 /* manchas_angry_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_angry_v2.png; sourceTree = "<group>"; };
+		06C282CB03BDEC6AEF44B9C5 /* guide_06_sharing_family_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_06_sharing_family_manchas_v2.png; sourceTree = "<group>"; };
+		074ED50AD46A79F7959B19F5 /* badge_bill_radar_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_bill_radar_v2.png; sourceTree = "<group>"; };
 		07CC2A6F29FF5CDF041CF122 /* ConfirmAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmAccountView.swift; sourceTree = "<group>"; };
+		094260DEB3E03665653E57E2 /* acc_receipt_scan_beam_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_receipt_scan_beam_v2.png; sourceTree = "<group>"; };
+		0950D54C8EE164795F75E8E0 /* badge_skip_shield_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_skip_shield_v2.png; sourceTree = "<group>"; };
 		0C815B84250314C2A948D50C /* SpendSageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageApp.swift; sourceTree = "<group>"; };
-		103FAD7090014D4CAAA00011 /* BrandAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssets.swift; sourceTree = "<group>"; };
-		103FAD7090014D4CAAA00012 /* BrandAssetImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssetImage.swift; sourceTree = "<group>"; };
-		103FAD7090014D4CAAA00013 /* Guides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Guides.swift; sourceTree = "<group>"; };
-		103FAD7090014D4CAAA00014 /* GuideSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideSheet.swift; sourceTree = "<group>"; };
-		103FAD7090014D4CAAA00015 /* Brand */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Brand; sourceTree = "<group>"; };
-		103FAD7090014D4CAAA00041 /* GrowthSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthSnapshot.swift; sourceTree = "<group>"; };
 		0D342BCB4C716DD57F41EBFA /* SupportCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportCenterView.swift; sourceTree = "<group>"; };
+		0E17F16160A75590F982D8F7 /* badge_quest_daily_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_quest_daily_v2.png; sourceTree = "<group>"; };
+		0E1BE112CF5E024F291765EC /* guide_01_dashboard_game_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_01_dashboard_game_manchas_v2.png; sourceTree = "<group>"; };
+		0EA5F8005ABD9F3AFD3D0533 /* mei_happy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_happy_v2.png; sourceTree = "<group>"; };
+		1053B33502C1AAC11F427D5C /* guide_20_subscription_checkout_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_20_subscription_checkout_manchas_v2.png; sourceTree = "<group>"; };
+		1169E0D96A6C65EC1687F228 /* manchas_proud_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_proud_v2.png; sourceTree = "<group>"; };
+		11BBA3D8FF7A9D47779934EC /* acc_warning_triangle_lightning_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_warning_triangle_lightning_v2.png; sourceTree = "<group>"; };
+		1288CDB648EC0EE60433AA28 /* asset_manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = asset_manifest.json; sourceTree = "<group>"; };
 		19D129F26CE378A5B66A57DC /* LegalCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalCenterView.swift; sourceTree = "<group>"; };
+		1AE2F76BDDB3352DE57B540F /* BrandAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssets.swift; sourceTree = "<group>"; };
+		1C48A2C6F56D93D7DCF485CA /* wordmark_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wordmark_v2.png; sourceTree = "<group>"; };
+		1C943812C888E3649FB12721 /* guide_19_pricing_cards_tikki_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_19_pricing_cards_tikki_v2.png; sourceTree = "<group>"; };
+		2033E37D418EDB7A5CB1ED5F /* guide_18_landing_trust_shield_mei_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_18_landing_trust_shield_mei_v2.png; sourceTree = "<group>"; };
+		2B87008CE2372CB69639994B /* guide_05_scan_receipt_mei_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_05_scan_receipt_mei_v2.png; sourceTree = "<group>"; };
+		2E576E70A3793EB758F39D52 /* tikki_confused_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_confused_v2.png; sourceTree = "<group>"; };
+		2EAA70C86EF69DD1AC280342 /* BrandAssetImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssetImage.swift; sourceTree = "<group>"; };
 		32229B7B2F800571C744726E /* LocalLedgerExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalLedgerExport.swift; sourceTree = "<group>"; };
+		32D571FF86AFF17DD600166C /* tikki_proud_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_proud_v2.png; sourceTree = "<group>"; };
 		33A19F8E0812FD23E0901887 /* FinanceBillsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceBillsToolView.swift; sourceTree = "<group>"; };
+		343675A1190A132B36BB1EBE /* manchas_warning_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_warning_v2.png; sourceTree = "<group>"; };
 		37595A2FF2CF4E81B4AE65CF /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
+		376F7F2404E91AF75E89CCED /* mei_angry_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_angry_v2.png; sourceTree = "<group>"; };
+		378620C0690A616199A2C0E9 /* badge_sharing_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_sharing_v2.png; sourceTree = "<group>"; };
+		381690D6AA9297592598EC3A /* badge_goals_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_goals_v2.png; sourceTree = "<group>"; };
+		395612E2903C037F30684D06 /* acc_gift_box_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_gift_box_v2.png; sourceTree = "<group>"; };
+		3C9EC4535CCE8895E6F6EFA1 /* guide_14_bill_radar_tikki_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_14_bill_radar_tikki_v2.png; sourceTree = "<group>"; };
+		43615E6FC9EF243440A82D03 /* manchas_excited_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_excited_v2.png; sourceTree = "<group>"; };
+		47666EACB35D65453210294C /* manchas_happy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_happy_v2.png; sourceTree = "<group>"; };
 		4814CA0146FBD47E788B58D9 /* BrandComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandComponents.swift; sourceTree = "<group>"; };
+		4BF4494C2C9263636ABAA42A /* badge_security_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_security_v2.png; sourceTree = "<group>"; };
+		4C99B87AC3D4FD5B02CB8C6A /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4CD7057B2906325234B32F64 /* tikki_sleepy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_sleepy_v2.png; sourceTree = "<group>"; };
+		4EC8FC03BF043A01412B0A19 /* guide_11_budget_wizard_steps_mei_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_11_budget_wizard_steps_mei_v2.png; sourceTree = "<group>"; };
+		510A9603A5754D7EF0CB477F /* badge_level_up_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_level_up_v2.png; sourceTree = "<group>"; };
+		52B3CA92761FBC301047656D /* badge_emergency_fund_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_emergency_fund_v2.png; sourceTree = "<group>"; };
+		53028644B920BAD667473DCA /* guide_10_premium_trial_mei_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_10_premium_trial_mei_v2.png; sourceTree = "<group>"; };
+		541EB56F619104E174DEEFC0 /* badge_promo_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_promo_v2.png; sourceTree = "<group>"; };
+		54B4C2EA2A96E843D0264B1F /* acc_wallet_card_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_wallet_card_v2.png; sourceTree = "<group>"; };
+		5BDD4046567E2758D2FBE557 /* mei_warning_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_warning_v2.png; sourceTree = "<group>"; };
 		5D3A812673FCF633E5AD7A82 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		5DFAEECDA8CD17DF4B0E80CC /* logo_mark_rosette_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo_mark_rosette_v2.png; sourceTree = "<group>"; };
+		5E2EABFC6AEB991E51874149 /* manchas_thinking_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_thinking_v2.png; sourceTree = "<group>"; };
+		5ED9FC2B123E911909B373D9 /* mei_excited_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_excited_v2.png; sourceTree = "<group>"; };
 		5FC5D00895B952997D987883 /* FinanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceModels.swift; sourceTree = "<group>"; };
+		63E04732FD9E469418EE3975 /* badge_savings_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_savings_v2.png; sourceTree = "<group>"; };
+		6484EA58C0651098BBA4EBF9 /* badge_ai_insights_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_ai_insights_v2.png; sourceTree = "<group>"; };
 		65830A2C04AA833875A9E3EF /* SpendSage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SpendSage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		659DC0EB3BB892E509CF9D7E /* FinanceToolSupportViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceToolSupportViews.swift; sourceTree = "<group>"; };
+		6739F1D28DEEC3B3961D8680 /* badge_impulse_pause_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_impulse_pause_v2.png; sourceTree = "<group>"; };
 		679F2DB952FBB586D6057598 /* AuthSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSupport.swift; sourceTree = "<group>"; };
 		68A549D8C5A62F9B2DF1A166 /* SpendSageTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SpendSageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		68A962C994F5DE5697471F65 /* badge_trial_starter_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_trial_starter_v2.png; sourceTree = "<group>"; };
+		6921A66E622A020378A8781E /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		694EB7074F11A82FAD2A8FFB /* manchas_shocked_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_shocked_v2.png; sourceTree = "<group>"; };
+		6A004DC3D845B540E03A0F8E /* guide_04_ai_insights_mei_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_04_ai_insights_mei_v2.png; sourceTree = "<group>"; };
+		6C683E92B3AC851970F0F8F6 /* badge_debt_slayer_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_debt_slayer_v2.png; sourceTree = "<group>"; };
+		6CD5456D851E00E542F1EA16 /* tikki_happy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_happy_v2.png; sourceTree = "<group>"; };
+		6D34F0CB2B678B65728E704E /* guide_16_family_mission_board_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_16_family_mission_board_team_v2.png; sourceTree = "<group>"; };
 		6D4BECA3A82774A38C48D3E3 /* BudgetWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetWizardView.swift; sourceTree = "<group>"; };
+		73E3C4474402F5037300D8ED /* badge_consistency_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_consistency_v2.png; sourceTree = "<group>"; };
 		7845E9A91B6C587A2C6B48B7 /* TrophyHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrophyHistoryView.swift; sourceTree = "<group>"; };
 		785F4A4F7DC3D1425773B754 /* HelpCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpCenterView.swift; sourceTree = "<group>"; };
+		7C165C936A00E089518582FE /* tikki_neutral_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_neutral_v2.png; sourceTree = "<group>"; };
+		7FD463CBF88A570CC373ACAF /* badge_safe_to_spend_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_safe_to_spend_v2.png; sourceTree = "<group>"; };
 		8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageTests.swift; sourceTree = "<group>"; };
+		82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_v2.png; sourceTree = "<group>"; };
 		87421858D2F5088C6CDD796E /* FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceStore.swift; sourceTree = "<group>"; };
+		879896D4090BAF21D8382509 /* guide_13_subscription_hydra_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_13_subscription_hydra_manchas_v2.png; sourceTree = "<group>"; };
+		88014219EB3F0992C86B6B8F /* manchas_love_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_love_v2.png; sourceTree = "<group>"; };
+		880A65382CE97B752CBFCC0A /* acc_hologram_charts_magnifier_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_hologram_charts_magnifier_v2.png; sourceTree = "<group>"; };
+		892E229A6B0A3521B629B4C9 /* tikki_shocked_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_shocked_v2.png; sourceTree = "<group>"; };
+		8953868912CFE4A94891E678 /* AppLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLocalization.swift; sourceTree = "<group>"; };
 		89985226F3D7B000843752AB /* BrandGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandGalleryView.swift; sourceTree = "<group>"; };
+		8AA28564D2854E1BAE58B808 /* tikki_thinking_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_thinking_v2.png; sourceTree = "<group>"; };
 		8CC8D8BD53F09EA71C1D0744 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		8F8C04C37584D822E473A28C /* AuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfiguration.swift; sourceTree = "<group>"; };
+		9112931606581AFC35F6638B /* guide_07_first_win_mei_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_07_first_win_mei_v2.png; sourceTree = "<group>"; };
+		91322E115925FDD6AD0C2182 /* badge_smart_spend_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_smart_spend_v2.png; sourceTree = "<group>"; };
+		91D094C74AA70ED5B5BDD719 /* mei_love_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_love_v2.png; sourceTree = "<group>"; };
+		927048F7599BE8F4BF4D2A3B /* badge_no_spend_day_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_no_spend_day_v2.png; sourceTree = "<group>"; };
+		93401EF4F5CA0C3623B192EC /* mei_thinking_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_thinking_v2.png; sourceTree = "<group>"; };
+		93D1BE1943CAF1390751D8D1 /* badge_streak_guardian_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_streak_guardian_v2.png; sourceTree = "<group>"; };
+		97159ED4214285E5D0121413 /* badge_questline_monthly_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_questline_monthly_v2.png; sourceTree = "<group>"; };
+		9756F9FE063E1099AFF7B0B8 /* manchas_neutral_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_neutral_v2.png; sourceTree = "<group>"; };
 		975B357AB70EED51E253E86B /* FinanceReceiptScanToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceReceiptScanToolView.swift; sourceTree = "<group>"; };
 		978311B951262001E5361352 /* PremiumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumView.swift; sourceTree = "<group>"; };
+		982D4114C1EC443CF5F589B0 /* guide_15_emergency_fund_shield_mei_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_15_emergency_fund_shield_mei_v2.png; sourceTree = "<group>"; };
+		98A12E850C7A5E616CC20C87 /* badge_weekly_decision_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_weekly_decision_v2.png; sourceTree = "<group>"; };
+		9A23E37FABB52A00D56C60E0 /* mei_confused_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_confused_v2.png; sourceTree = "<group>"; };
 		9AE8903B75C047C59E5F634A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9BF97127EEC9ABE5F58F3976 /* badge_recovery_mode_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_recovery_mode_v2.png; sourceTree = "<group>"; };
+		9D0C1A2BE8999CC797CEA6DE /* guide_08_daily_checkin_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_08_daily_checkin_manchas_v2.png; sourceTree = "<group>"; };
+		9D3AEF1794D4F1F9FB3A5132 /* GrowthSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthSnapshot.swift; sourceTree = "<group>"; };
+		9FBC5889CBCCFDF8175100DF /* manchas_confused_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_confused_v2.png; sourceTree = "<group>"; };
 		A17C24351BCC0914DF6508A0 /* ExpensesCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpensesCenterView.swift; sourceTree = "<group>"; };
+		A1CBDFBEA5BC1FA2D5E04F09 /* tikki_excited_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_excited_v2.png; sourceTree = "<group>"; };
+		A20839DBFC007023E8C5F905 /* GuideSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideSheet.swift; sourceTree = "<group>"; };
+		A2D0FA52659E4112BAB6EB0B /* mei_shocked_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_shocked_v2.png; sourceTree = "<group>"; };
+		A36A2570109AE0FD2847EEE4 /* tikki_warning_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_warning_v2.png; sourceTree = "<group>"; };
+		A511C8E9FCC26A2D46E74E8E /* guide_02_log_expense_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_02_log_expense_manchas_v2.png; sourceTree = "<group>"; };
 		A6227E322248CA2A7A980D40 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		A8ED715118825E59A8C7D31F /* tikki_love_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_love_v2.png; sourceTree = "<group>"; };
+		AE8C1C919AE0E0513B4DA678 /* badge_import_wizard_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_import_wizard_v2.png; sourceTree = "<group>"; };
+		B07B0A36C4437FF6DABFD08D /* acc_calculator_notebook_coin_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_calculator_notebook_coin_v2.png; sourceTree = "<group>"; };
+		B1C81AE4CDAB676C1935EBB5 /* badge_subscription_hydra_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_subscription_hydra_v2.png; sourceTree = "<group>"; };
 		B1E9688AB4D62C4797F2C444 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		B2213A82431EDCFC0907F03E /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
 		B23BFBEACF79B0FDCC1A81A6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B314CADFCED6D85AF660846D /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		B7B1538715687F2EE6552CA7 /* badge_receipt_scan_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_receipt_scan_v2.png; sourceTree = "<group>"; };
+		BA553B6500B3D28724615D2F /* Guides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Guides.swift; sourceTree = "<group>"; };
 		C0ABD400C4F74E75F803BAFC /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		C1E64C438F1553E4639812E3 /* guide_09_weekly_boss_tikki_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_09_weekly_boss_tikki_manchas_v2.png; sourceTree = "<group>"; };
+		C21073C0C9AA6223F9F37057 /* mei_neutral_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_neutral_v2.png; sourceTree = "<group>"; };
+		C3BBD9C9389B38F4A67936B4 /* acc_trophy_star_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_trophy_star_v2.png; sourceTree = "<group>"; };
 		C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewFinanceData.swift; sourceTree = "<group>"; };
+		CA56DF4650B5021F47704B05 /* tikki_angry_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_angry_v2.png; sourceTree = "<group>"; };
 		CED414330125E63F549BE0AC /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
 		CF636AE08A9FDCCDF51460A3 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		D20799AB6E9D49FDE20443E9 /* HostedUIAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedUIAuthService.swift; sourceTree = "<group>"; };
 		D2CB5D74645DF4C38E921764 /* FinanceCsvImportToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCsvImportToolView.swift; sourceTree = "<group>"; };
+		D580D8C19B9AB6A19F40056F /* guide_17_landing_hero_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_17_landing_hero_team_v2.png; sourceTree = "<group>"; };
+		D5B69B0FEBEE21F1A351DB7B /* badge_boss_fight_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_boss_fight_v2.png; sourceTree = "<group>"; };
 		D7EA145E6EEC82916F75C622 /* FinanceAccountsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceAccountsToolView.swift; sourceTree = "<group>"; };
+		D99D734B1727A89137ADB2A2 /* guide_03_budgets_tikki_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_03_budgets_tikki_v2.png; sourceTree = "<group>"; };
+		DBE7F426A63A571AE1C649B2 /* manchas_sleepy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_sleepy_v2.png; sourceTree = "<group>"; };
+		DBE89991A8F54D1CE2F4D27A /* tikki_sad_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_sad_v2.png; sourceTree = "<group>"; };
+		DE55C3D98F865BE3049CAA23 /* mei_proud_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_proud_v2.png; sourceTree = "<group>"; };
+		DE70A775400DDF0E3CBF1306 /* badge_streak_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_streak_v2.png; sourceTree = "<group>"; };
 		E175C0F00D3BFE3E05056D15 /* AddExpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
+		EA374BFBC213D0206C79331D /* acc_piggy_bank_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_piggy_bank_v2.png; sourceTree = "<group>"; };
 		EBCBCE8B2F2F891F368C7DFB /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
 		ED13FEEB87E9B10AC5DCBD3B /* FinanceRulesToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceRulesToolView.swift; sourceTree = "<group>"; };
+		ED2472E52EB780F9F6A31D1B /* manchas_sad_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_sad_v2.png; sourceTree = "<group>"; };
+		EE54CD72F5015E9537F73A54 /* guide_12_budget_review_family_tikki_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_12_budget_review_family_tikki_manchas_v2.png; sourceTree = "<group>"; };
+		F3B24BF2E6CF26600BC87CD9 /* badge_quest_weekly_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_quest_weekly_v2.png; sourceTree = "<group>"; };
 		F6E05C5BF495CA177EAE3510 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		F95A90D8A956479B803898A9 /* badge_budgeting_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_budgeting_v2.png; sourceTree = "<group>"; };
+		F98A5CF74809E99E93E1C62A /* mei_sad_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_sad_v2.png; sourceTree = "<group>"; };
 		FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -140,6 +340,27 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		09B22F592D9E53961A6E26E9 /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				8953868912CFE4A94891E678 /* AppLocalization.swift */,
+			);
+			path = Localization;
+			sourceTree = "<group>";
+		};
+		150760529CE5B130388C2855 /* v2 */ = {
+			isa = PBXGroup;
+			children = (
+				1288CDB648EC0EE60433AA28 /* asset_manifest.json */,
+				DB6B06D6BA40159386AE61E2 /* accessories */,
+				C3CF431E130FA67B3228FBE1 /* badges */,
+				C13985B3229F875224541908 /* characters */,
+				8CDAD9E48C832C418AC2F241 /* guides */,
+				8DFC002C4657564069F8B84A /* logo */,
+			);
+			path = v2;
+			sourceTree = "<group>";
+		};
 		1B129884E74155ABC09C42F8 /* Expenses */ = {
 			isa = PBXGroup;
 			children = (
@@ -157,24 +378,6 @@
 			path = Premium;
 			sourceTree = "<group>";
 		};
-		103FAD7090014D4CAAA00021 /* Brand */ = {
-			isa = PBXGroup;
-			children = (
-				103FAD7090014D4CAAA00011 /* BrandAssets.swift */,
-				103FAD7090014D4CAAA00012 /* BrandAssetImage.swift */,
-			);
-			path = Brand;
-			sourceTree = "<group>";
-		};
-		103FAD7090014D4CAAA00022 /* Guides */ = {
-			isa = PBXGroup;
-			children = (
-				103FAD7090014D4CAAA00013 /* Guides.swift */,
-				103FAD7090014D4CAAA00014 /* GuideSheet.swift */,
-			);
-			path = Guides;
-			sourceTree = "<group>";
-		};
 		2789462E0DF8797345A7F293 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -184,11 +387,20 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		2F847507D28B40B87D9298F2 /* Brand */ = {
+			isa = PBXGroup;
+			children = (
+				2EAA70C86EF69DD1AC280342 /* BrandAssetImage.swift */,
+				1AE2F76BDDB3352DE57B540F /* BrandAssets.swift */,
+			);
+			path = Brand;
+			sourceTree = "<group>";
+		};
 		388E81309124D16A8928E893 /* Growth */ = {
 			isa = PBXGroup;
 			children = (
 				89985226F3D7B000843752AB /* BrandGalleryView.swift */,
-				103FAD7090014D4CAAA00041 /* GrowthSnapshot.swift */,
+				9D3AEF1794D4F1F9FB3A5132 /* GrowthSnapshot.swift */,
 				7845E9A91B6C587A2C6B48B7 /* TrophyHistoryView.swift */,
 			);
 			path = Growth;
@@ -202,10 +414,11 @@
 				37595A2FF2CF4E81B4AE65CF /* Services.swift */,
 				A6227E322248CA2A7A980D40 /* Theme.swift */,
 				DDA9C73E819C396AB3DFFCCC /* Auth */,
-				103FAD7090014D4CAAA00021 /* Brand */,
+				2F847507D28B40B87D9298F2 /* Brand */,
 				439FAC31D754D6BDBCCA5018 /* Components */,
 				A8083AF293910F6CCF2E0EAB /* Config */,
-				103FAD7090014D4CAAA00022 /* Guides */,
+				C8E9CA6F064F9DBD4953442D /* Guides */,
+				09B22F592D9E53961A6E26E9 /* Localization */,
 				982784B8B26FBF2C67EE94B5 /* PreviewData */,
 				88EC4787DA5650A6C7B20A9F /* Storage */,
 			);
@@ -292,12 +505,57 @@
 			path = FinanceTools;
 			sourceTree = "<group>";
 		};
+		88362C512CBB16E72B7A54C7 /* Brand */ = {
+			isa = PBXGroup;
+			children = (
+				150760529CE5B130388C2855 /* v2 */,
+			);
+			path = Brand;
+			sourceTree = "<group>";
+		};
 		88EC4787DA5650A6C7B20A9F /* Storage */ = {
 			isa = PBXGroup;
 			children = (
 				87421858D2F5088C6CDD796E /* FinanceStore.swift */,
 			);
 			path = Storage;
+			sourceTree = "<group>";
+		};
+		8CDAD9E48C832C418AC2F241 /* guides */ = {
+			isa = PBXGroup;
+			children = (
+				0E1BE112CF5E024F291765EC /* guide_01_dashboard_game_manchas_v2.png */,
+				A511C8E9FCC26A2D46E74E8E /* guide_02_log_expense_manchas_v2.png */,
+				D99D734B1727A89137ADB2A2 /* guide_03_budgets_tikki_v2.png */,
+				6A004DC3D845B540E03A0F8E /* guide_04_ai_insights_mei_v2.png */,
+				2B87008CE2372CB69639994B /* guide_05_scan_receipt_mei_v2.png */,
+				06C282CB03BDEC6AEF44B9C5 /* guide_06_sharing_family_manchas_v2.png */,
+				9112931606581AFC35F6638B /* guide_07_first_win_mei_v2.png */,
+				9D0C1A2BE8999CC797CEA6DE /* guide_08_daily_checkin_manchas_v2.png */,
+				C1E64C438F1553E4639812E3 /* guide_09_weekly_boss_tikki_manchas_v2.png */,
+				53028644B920BAD667473DCA /* guide_10_premium_trial_mei_v2.png */,
+				4EC8FC03BF043A01412B0A19 /* guide_11_budget_wizard_steps_mei_v2.png */,
+				EE54CD72F5015E9537F73A54 /* guide_12_budget_review_family_tikki_manchas_v2.png */,
+				879896D4090BAF21D8382509 /* guide_13_subscription_hydra_manchas_v2.png */,
+				3C9EC4535CCE8895E6F6EFA1 /* guide_14_bill_radar_tikki_v2.png */,
+				982D4114C1EC443CF5F589B0 /* guide_15_emergency_fund_shield_mei_v2.png */,
+				6D34F0CB2B678B65728E704E /* guide_16_family_mission_board_team_v2.png */,
+				D580D8C19B9AB6A19F40056F /* guide_17_landing_hero_team_v2.png */,
+				2033E37D418EDB7A5CB1ED5F /* guide_18_landing_trust_shield_mei_v2.png */,
+				1C943812C888E3649FB12721 /* guide_19_pricing_cards_tikki_v2.png */,
+				1053B33502C1AAC11F427D5C /* guide_20_subscription_checkout_manchas_v2.png */,
+			);
+			path = guides;
+			sourceTree = "<group>";
+		};
+		8DFC002C4657564069F8B84A /* logo */ = {
+			isa = PBXGroup;
+			children = (
+				82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */,
+				5DFAEECDA8CD17DF4B0E80CC /* logo_mark_rosette_v2.png */,
+				1C48A2C6F56D93D7DCF485CA /* wordmark_v2.png */,
+			);
+			path = logo;
 			sourceTree = "<group>";
 		};
 		982784B8B26FBF2C67EE94B5 /* PreviewData */ = {
@@ -316,12 +574,101 @@
 			path = Config;
 			sourceTree = "<group>";
 		};
+		C13985B3229F875224541908 /* characters */ = {
+			isa = PBXGroup;
+			children = (
+				0683344F3860FA14F10363A3 /* manchas_angry_v2.png */,
+				9FBC5889CBCCFDF8175100DF /* manchas_confused_v2.png */,
+				43615E6FC9EF243440A82D03 /* manchas_excited_v2.png */,
+				47666EACB35D65453210294C /* manchas_happy_v2.png */,
+				88014219EB3F0992C86B6B8F /* manchas_love_v2.png */,
+				9756F9FE063E1099AFF7B0B8 /* manchas_neutral_v2.png */,
+				1169E0D96A6C65EC1687F228 /* manchas_proud_v2.png */,
+				ED2472E52EB780F9F6A31D1B /* manchas_sad_v2.png */,
+				694EB7074F11A82FAD2A8FFB /* manchas_shocked_v2.png */,
+				DBE7F426A63A571AE1C649B2 /* manchas_sleepy_v2.png */,
+				5E2EABFC6AEB991E51874149 /* manchas_thinking_v2.png */,
+				343675A1190A132B36BB1EBE /* manchas_warning_v2.png */,
+				376F7F2404E91AF75E89CCED /* mei_angry_v2.png */,
+				9A23E37FABB52A00D56C60E0 /* mei_confused_v2.png */,
+				5ED9FC2B123E911909B373D9 /* mei_excited_v2.png */,
+				0EA5F8005ABD9F3AFD3D0533 /* mei_happy_v2.png */,
+				91D094C74AA70ED5B5BDD719 /* mei_love_v2.png */,
+				C21073C0C9AA6223F9F37057 /* mei_neutral_v2.png */,
+				DE55C3D98F865BE3049CAA23 /* mei_proud_v2.png */,
+				F98A5CF74809E99E93E1C62A /* mei_sad_v2.png */,
+				A2D0FA52659E4112BAB6EB0B /* mei_shocked_v2.png */,
+				0670165A10A90A31703E4200 /* mei_sleepy_v2.png */,
+				93401EF4F5CA0C3623B192EC /* mei_thinking_v2.png */,
+				5BDD4046567E2758D2FBE557 /* mei_warning_v2.png */,
+				CA56DF4650B5021F47704B05 /* tikki_angry_v2.png */,
+				2E576E70A3793EB758F39D52 /* tikki_confused_v2.png */,
+				A1CBDFBEA5BC1FA2D5E04F09 /* tikki_excited_v2.png */,
+				6CD5456D851E00E542F1EA16 /* tikki_happy_v2.png */,
+				A8ED715118825E59A8C7D31F /* tikki_love_v2.png */,
+				7C165C936A00E089518582FE /* tikki_neutral_v2.png */,
+				32D571FF86AFF17DD600166C /* tikki_proud_v2.png */,
+				DBE89991A8F54D1CE2F4D27A /* tikki_sad_v2.png */,
+				892E229A6B0A3521B629B4C9 /* tikki_shocked_v2.png */,
+				4CD7057B2906325234B32F64 /* tikki_sleepy_v2.png */,
+				8AA28564D2854E1BAE58B808 /* tikki_thinking_v2.png */,
+				A36A2570109AE0FD2847EEE4 /* tikki_warning_v2.png */,
+			);
+			path = characters;
+			sourceTree = "<group>";
+		};
 		C1610FAFA0F65A823AB0B4A5 /* Insights */ = {
 			isa = PBXGroup;
 			children = (
 				B2213A82431EDCFC0907F03E /* InsightsView.swift */,
 			);
 			path = Insights;
+			sourceTree = "<group>";
+		};
+		C3CF431E130FA67B3228FBE1 /* badges */ = {
+			isa = PBXGroup;
+			children = (
+				6484EA58C0651098BBA4EBF9 /* badge_ai_insights_v2.png */,
+				074ED50AD46A79F7959B19F5 /* badge_bill_radar_v2.png */,
+				D5B69B0FEBEE21F1A351DB7B /* badge_boss_fight_v2.png */,
+				F95A90D8A956479B803898A9 /* badge_budgeting_v2.png */,
+				73E3C4474402F5037300D8ED /* badge_consistency_v2.png */,
+				6C683E92B3AC851970F0F8F6 /* badge_debt_slayer_v2.png */,
+				52B3CA92761FBC301047656D /* badge_emergency_fund_v2.png */,
+				03D769D9ED07B6EBE80182A1 /* badge_family_mission_v2.png */,
+				381690D6AA9297592598EC3A /* badge_goals_v2.png */,
+				AE8C1C919AE0E0513B4DA678 /* badge_import_wizard_v2.png */,
+				6739F1D28DEEC3B3961D8680 /* badge_impulse_pause_v2.png */,
+				510A9603A5754D7EF0CB477F /* badge_level_up_v2.png */,
+				927048F7599BE8F4BF4D2A3B /* badge_no_spend_day_v2.png */,
+				541EB56F619104E174DEEFC0 /* badge_promo_v2.png */,
+				0E17F16160A75590F982D8F7 /* badge_quest_daily_v2.png */,
+				F3B24BF2E6CF26600BC87CD9 /* badge_quest_weekly_v2.png */,
+				97159ED4214285E5D0121413 /* badge_questline_monthly_v2.png */,
+				B7B1538715687F2EE6552CA7 /* badge_receipt_scan_v2.png */,
+				9BF97127EEC9ABE5F58F3976 /* badge_recovery_mode_v2.png */,
+				7FD463CBF88A570CC373ACAF /* badge_safe_to_spend_v2.png */,
+				63E04732FD9E469418EE3975 /* badge_savings_v2.png */,
+				4BF4494C2C9263636ABAA42A /* badge_security_v2.png */,
+				378620C0690A616199A2C0E9 /* badge_sharing_v2.png */,
+				0950D54C8EE164795F75E8E0 /* badge_skip_shield_v2.png */,
+				91322E115925FDD6AD0C2182 /* badge_smart_spend_v2.png */,
+				93D1BE1943CAF1390751D8D1 /* badge_streak_guardian_v2.png */,
+				DE70A775400DDF0E3CBF1306 /* badge_streak_v2.png */,
+				B1C81AE4CDAB676C1935EBB5 /* badge_subscription_hydra_v2.png */,
+				68A962C994F5DE5697471F65 /* badge_trial_starter_v2.png */,
+				98A12E850C7A5E616CC20C87 /* badge_weekly_decision_v2.png */,
+			);
+			path = badges;
+			sourceTree = "<group>";
+		};
+		C8E9CA6F064F9DBD4953442D /* Guides */ = {
+			isa = PBXGroup;
+			children = (
+				BA553B6500B3D28724615D2F /* Guides.swift */,
+				A20839DBFC007023E8C5F905 /* GuideSheet.swift */,
+			);
+			path = Guides;
 			sourceTree = "<group>";
 		};
 		CB742A7B4FAE58DBC5EAE096 /* Onboarding */ = {
@@ -351,6 +698,21 @@
 			path = SpendSageTests;
 			sourceTree = "<group>";
 		};
+		DB6B06D6BA40159386AE61E2 /* accessories */ = {
+			isa = PBXGroup;
+			children = (
+				B07B0A36C4437FF6DABFD08D /* acc_calculator_notebook_coin_v2.png */,
+				395612E2903C037F30684D06 /* acc_gift_box_v2.png */,
+				880A65382CE97B752CBFCC0A /* acc_hologram_charts_magnifier_v2.png */,
+				EA374BFBC213D0206C79331D /* acc_piggy_bank_v2.png */,
+				094260DEB3E03665653E57E2 /* acc_receipt_scan_beam_v2.png */,
+				C3BBD9C9389B38F4A67936B4 /* acc_trophy_star_v2.png */,
+				54B4C2EA2A96E843D0264B1F /* acc_wallet_card_v2.png */,
+				11BBA3D8FF7A9D47779934EC /* acc_warning_triangle_lightning_v2.png */,
+			);
+			path = accessories;
+			sourceTree = "<group>";
+		};
 		DDA9C73E819C396AB3DFFCCC /* Auth */ = {
 			isa = PBXGroup;
 			children = (
@@ -372,8 +734,10 @@
 			isa = PBXGroup;
 			children = (
 				9AE8903B75C047C59E5F634A /* Assets.xcassets */,
-				103FAD7090014D4CAAA00015 /* Brand */,
+				6921A66E622A020378A8781E /* InfoPlist.strings */,
+				4C99B87AC3D4FD5B02CB8C6A /* Localizable.strings */,
 				FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */,
+				88362C512CBB16E72B7A54C7 /* Brand */,
 			);
 			name = Resources;
 			path = SpendSage/Resources;
@@ -443,6 +807,7 @@
 			knownRegions = (
 				Base,
 				en,
+				es,
 			);
 			mainGroup = 6CEDF2D37F27A5D7BD67593F;
 			minimizedProjectReferenceProxies = 1;
@@ -463,8 +828,107 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */,
-				103FAD7090014D4CAAA00005 /* Brand in Resources */,
+				D5A63F5297E1DC9294373C18 /* InfoPlist.strings in Resources */,
+				1297C5EB241903AF0BABCDB9 /* Localizable.strings in Resources */,
 				93A5A96EF2B3A5812249918F /* PrivacyInfo.xcprivacy in Resources */,
+				F344FC8A5262BA300A86C6F7 /* acc_calculator_notebook_coin_v2.png in Resources */,
+				63C6E1A11E502FF3A3FAFA95 /* acc_gift_box_v2.png in Resources */,
+				68B17B5FED39DD6438F6AA71 /* acc_hologram_charts_magnifier_v2.png in Resources */,
+				8292A4A6EA5F306BF62E8F2B /* acc_piggy_bank_v2.png in Resources */,
+				90729DDE223995E1CAD0EFDD /* acc_receipt_scan_beam_v2.png in Resources */,
+				BF39D786A0B6089967ABB8E4 /* acc_trophy_star_v2.png in Resources */,
+				D97365A599A2623E035CBCB1 /* acc_wallet_card_v2.png in Resources */,
+				6774303E61BA886C94A15DAB /* acc_warning_triangle_lightning_v2.png in Resources */,
+				F6AE0A61C32FE8A8903427BD /* app_icon_v2.png in Resources */,
+				54778A0605C6E1DFED6AD518 /* asset_manifest.json in Resources */,
+				913F7F3BB80FF05CB5AF32D2 /* badge_ai_insights_v2.png in Resources */,
+				4CDDE7C4304F9716DE55E223 /* badge_bill_radar_v2.png in Resources */,
+				3670C685389907A51DF26B33 /* badge_boss_fight_v2.png in Resources */,
+				11685060690A3954AE0688AD /* badge_budgeting_v2.png in Resources */,
+				2C344217F9D80A1DC684F6C1 /* badge_consistency_v2.png in Resources */,
+				BFF58A01F143EEB767E1BB2B /* badge_debt_slayer_v2.png in Resources */,
+				65DEE45F1C785415514FA596 /* badge_emergency_fund_v2.png in Resources */,
+				2685AE7DA32662207BB88286 /* badge_family_mission_v2.png in Resources */,
+				9530C8BBEF430A2B30F885CC /* badge_goals_v2.png in Resources */,
+				5340611E555D802AA8F15F72 /* badge_import_wizard_v2.png in Resources */,
+				D8F8CC2700F1F9919ED0851F /* badge_impulse_pause_v2.png in Resources */,
+				B080CCDE88FE108A3976B497 /* badge_level_up_v2.png in Resources */,
+				CC7C69A3C62FF0841BCE7979 /* badge_no_spend_day_v2.png in Resources */,
+				25951CEDF2272CAE81E49CBB /* badge_promo_v2.png in Resources */,
+				881D226EEA77199BD5AF973C /* badge_quest_daily_v2.png in Resources */,
+				805D1B4518B239EA06BEEC51 /* badge_quest_weekly_v2.png in Resources */,
+				53326A1648AC3A7FD899300F /* badge_questline_monthly_v2.png in Resources */,
+				4AC59ECC6C5FAC2BE9B27D48 /* badge_receipt_scan_v2.png in Resources */,
+				970786DA41BB24AC236F80E0 /* badge_recovery_mode_v2.png in Resources */,
+				4C03C37B3AF9BD27DC87A4E6 /* badge_safe_to_spend_v2.png in Resources */,
+				1CE14497B68CA6E4954F9024 /* badge_savings_v2.png in Resources */,
+				E6141BA9C218629262E952A8 /* badge_security_v2.png in Resources */,
+				314224FD0FC0F6682AF9F444 /* badge_sharing_v2.png in Resources */,
+				5F44785BE1DCD74E6C9965D3 /* badge_skip_shield_v2.png in Resources */,
+				E3B1F629C68F702F0146C595 /* badge_smart_spend_v2.png in Resources */,
+				8AEE18EA81762170D25C4430 /* badge_streak_guardian_v2.png in Resources */,
+				B46D59A3AD0468E9B116E0D5 /* badge_streak_v2.png in Resources */,
+				47507D83620E8BA77B4BBAB0 /* badge_subscription_hydra_v2.png in Resources */,
+				F041F9A2211E2F6A273FFD2D /* badge_trial_starter_v2.png in Resources */,
+				9C0618AEBF3310C881D2F0AA /* badge_weekly_decision_v2.png in Resources */,
+				8105DE94DC5BF7700AA2AF55 /* guide_01_dashboard_game_manchas_v2.png in Resources */,
+				2EB29CB1121A96A1465D209C /* guide_02_log_expense_manchas_v2.png in Resources */,
+				595315DF5DA18CECF73DDD87 /* guide_03_budgets_tikki_v2.png in Resources */,
+				8DA60C3925DAF9C6CAFCE167 /* guide_04_ai_insights_mei_v2.png in Resources */,
+				5BB52A0F143440689412542C /* guide_05_scan_receipt_mei_v2.png in Resources */,
+				0083CC041DF393B4AFD5080A /* guide_06_sharing_family_manchas_v2.png in Resources */,
+				ABA71B8C879D5ED55FED6FB5 /* guide_07_first_win_mei_v2.png in Resources */,
+				396CC1814EFDE8EE92647C33 /* guide_08_daily_checkin_manchas_v2.png in Resources */,
+				EACB7A6A1ACF088F9ADFA30F /* guide_09_weekly_boss_tikki_manchas_v2.png in Resources */,
+				A00BC835A937F9EF119972B6 /* guide_10_premium_trial_mei_v2.png in Resources */,
+				51FAC1B085057384E851296F /* guide_11_budget_wizard_steps_mei_v2.png in Resources */,
+				D32B4986C1306208E18755C2 /* guide_12_budget_review_family_tikki_manchas_v2.png in Resources */,
+				1A39E8A6890D71AA0AE136C4 /* guide_13_subscription_hydra_manchas_v2.png in Resources */,
+				E25034002BAE44787628E3C6 /* guide_14_bill_radar_tikki_v2.png in Resources */,
+				1471A33FCC39E0845D2459AE /* guide_15_emergency_fund_shield_mei_v2.png in Resources */,
+				11D4EDED70C86DB7D2566D40 /* guide_16_family_mission_board_team_v2.png in Resources */,
+				5ED18086411C9BF641209300 /* guide_17_landing_hero_team_v2.png in Resources */,
+				F6B4536F6F60E2EB56759A8B /* guide_18_landing_trust_shield_mei_v2.png in Resources */,
+				59DD44AF2E83C6059C98A1D6 /* guide_19_pricing_cards_tikki_v2.png in Resources */,
+				1E3FF07028AD55E759042E65 /* guide_20_subscription_checkout_manchas_v2.png in Resources */,
+				C7774AF9FCA3292049521C41 /* logo_mark_rosette_v2.png in Resources */,
+				AB2296AC9A01E51AD8D2089C /* manchas_angry_v2.png in Resources */,
+				8372F74D3DFD4FA61F319A04 /* manchas_confused_v2.png in Resources */,
+				854E570E14FDC559AC45CF85 /* manchas_excited_v2.png in Resources */,
+				41272B5D248649B61D7C367C /* manchas_happy_v2.png in Resources */,
+				2075B4BAD8CFC8E86497DF21 /* manchas_love_v2.png in Resources */,
+				ADDAF24DAE772F38566306B3 /* manchas_neutral_v2.png in Resources */,
+				8138660088F953DFBD59FD05 /* manchas_proud_v2.png in Resources */,
+				AAC28C76A7226EBAF0D9A40A /* manchas_sad_v2.png in Resources */,
+				CFEDF48A4FDA77EFC6FAD2B4 /* manchas_shocked_v2.png in Resources */,
+				8C73293B4B63FCC6FA3933BB /* manchas_sleepy_v2.png in Resources */,
+				B7E351474CD77F07070565D5 /* manchas_thinking_v2.png in Resources */,
+				2C79A673121DD0E5826340D8 /* manchas_warning_v2.png in Resources */,
+				AFC44BB846CDF66F5FEE2D7C /* mei_angry_v2.png in Resources */,
+				81A195C6661D81AD64D01C2B /* mei_confused_v2.png in Resources */,
+				AAEB7D01E712F4A2C7B8EDB0 /* mei_excited_v2.png in Resources */,
+				3FE7B310989B98BD69678336 /* mei_happy_v2.png in Resources */,
+				4404D795880F86C1125D6917 /* mei_love_v2.png in Resources */,
+				7DF4DC2173F9DABE964341CE /* mei_neutral_v2.png in Resources */,
+				F54EF749BC540E5FBF036647 /* mei_proud_v2.png in Resources */,
+				56BB8D8311E4328268C5B457 /* mei_sad_v2.png in Resources */,
+				DDB676037694904B3200DF10 /* mei_shocked_v2.png in Resources */,
+				6A7708B2F5103A9CCFC04D88 /* mei_sleepy_v2.png in Resources */,
+				90423D9EBA9817B430E3AD6D /* mei_thinking_v2.png in Resources */,
+				A04E5EE473BA9699A0BFA40F /* mei_warning_v2.png in Resources */,
+				E25A6E367BEDBD1C79DB67A4 /* tikki_angry_v2.png in Resources */,
+				E69BC38F7105C656F88A66A3 /* tikki_confused_v2.png in Resources */,
+				C89160FB8287A75BE902597B /* tikki_excited_v2.png in Resources */,
+				5990879729FF8B63FB7F8BA4 /* tikki_happy_v2.png in Resources */,
+				2C6851D6C10A86FF7CD2AF01 /* tikki_love_v2.png in Resources */,
+				9EBBBC5B08AEB392943CEDEF /* tikki_neutral_v2.png in Resources */,
+				1EDAB963E4B94727860B6295 /* tikki_proud_v2.png in Resources */,
+				E35CC7910D62E3105C971CCB /* tikki_sad_v2.png in Resources */,
+				3728D313064AF5547716224D /* tikki_shocked_v2.png in Resources */,
+				FFB288A14F62765FDCBFAC77 /* tikki_sleepy_v2.png in Resources */,
+				E808C62D35AF1A4E666758F8 /* tikki_thinking_v2.png in Resources */,
+				B7816BC711D0B69DE984FBCB /* tikki_warning_v2.png in Resources */,
+				FB19B404E1F4529356C0489D /* wordmark_v2.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -477,13 +941,14 @@
 			files = (
 				A6ADBC686E1CB99E645B79AB /* AddExpenseView.swift in Sources */,
 				5857534E7E423891F0D2B0EE /* AdvancedSettingsView.swift in Sources */,
+				E47578E85D90851BDB30D96B /* AppLocalization.swift in Sources */,
 				A14E5B6B21BADE70EC7F687F /* AppRootView.swift in Sources */,
 				0F23374C3FFF9B892C7C0270 /* AppViewModel.swift in Sources */,
 				814A93CC9BAC8C86152BE59E /* AuthConfiguration.swift in Sources */,
 				9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */,
 				4D4645CD2FE607017F0639D5 /* AuthView.swift in Sources */,
-				103FAD7090014D4CAAA00002 /* BrandAssetImage.swift in Sources */,
-				103FAD7090014D4CAAA00001 /* BrandAssets.swift in Sources */,
+				9D4E37757DC5A04361C411D5 /* BrandAssetImage.swift in Sources */,
+				5154AF9E6F213923B5C3A85F /* BrandAssets.swift in Sources */,
 				A45A022AE99A11335AFB290E /* BrandComponents.swift in Sources */,
 				9BF510400E05D1A4B72ECA8A /* BrandGalleryView.swift in Sources */,
 				7883824A9181C09919A5380F /* BudgetWizardView.swift in Sources */,
@@ -498,9 +963,9 @@
 				CB8F42A6511C41025ABF0910 /* FinanceRulesToolView.swift in Sources */,
 				A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */,
 				24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */,
-				103FAD7090014D4CAAA00004 /* GuideSheet.swift in Sources */,
-				103FAD7090014D4CAAA00003 /* Guides.swift in Sources */,
-				103FAD7090014D4CAAA00031 /* GrowthSnapshot.swift in Sources */,
+				82DEEAED45406847C6ACBF4B /* GrowthSnapshot.swift in Sources */,
+				2180ED9BE745BCC430A6B38C /* GuideSheet.swift in Sources */,
+				B3FAD3530E5C3545269E681F /* Guides.swift in Sources */,
 				04E00FF56F15EBE2816E0EFB /* HelpCenterView.swift in Sources */,
 				02C6DDAE3EB1ABFCFBF4C91E /* HostedUIAuthService.swift in Sources */,
 				DCE0492B5DA8A93842388CF6 /* InsightsView.swift in Sources */,
@@ -614,7 +1079,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -719,7 +1184,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_NS_ASSERTIONS = NO;

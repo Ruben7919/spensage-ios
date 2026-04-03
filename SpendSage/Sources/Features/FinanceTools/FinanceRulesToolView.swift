@@ -236,7 +236,7 @@ struct FinanceRulesToolView: View {
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
 
-                    Text("\(matches) matching local transaction\(matches == 1 ? "" : "s")")
+                    Text(AppLocalization.localized("%d matching local transaction%@", arguments: matches, matches == 1 ? "" : "s"))
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -244,7 +244,7 @@ struct FinanceRulesToolView: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 6) {
-                    Label(rule.category.rawValue, systemImage: rule.category.symbolName)
+                    Label(rule.category.localizedTitle, systemImage: rule.category.symbolName)
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(BrandTheme.primary)
 

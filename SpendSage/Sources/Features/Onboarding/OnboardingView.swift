@@ -3,7 +3,7 @@ import SwiftUI
 struct OnboardingView: View {
     let onContinue: () -> Void
 
-    @AppStorage("native.settings.language") private var language = "en"
+    @AppStorage("native.settings.language") private var language = "auto"
     @State private var monthlyIncome = ""
     @State private var fixedBills = ""
     @State private var currentBalance = ""
@@ -104,7 +104,7 @@ struct OnboardingView: View {
 
                     Picker("Goal track", selection: $goalTrack) {
                         ForEach(GoalTrack.allCases) { track in
-                            Text(track.title).tag(track)
+                            Text(track.title.appLocalized).tag(track)
                         }
                     }
                     .pickerStyle(.menu)
@@ -141,7 +141,7 @@ struct OnboardingView: View {
 
                     Picker("Persona", selection: $persona) {
                         ForEach(Persona.allCases) { item in
-                            Text(item.title).tag(item)
+                            Text(item.title.appLocalized).tag(item)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -150,7 +150,12 @@ struct OnboardingView: View {
                 Button {
                     isPreviewVisible = true
                 } label: {
-                    Label(isPreviewVisible ? "Refresh preview" : "Show my first win", systemImage: "arrow.right.circle.fill")
+                    Label(
+                        isPreviewVisible
+                            ? "Refresh preview".appLocalized
+                            : "Show my first win".appLocalized,
+                        systemImage: "arrow.right.circle.fill"
+                    )
                 }
                 .buttonStyle(PrimaryCTAStyle())
                 .disabled(snapshot == nil)
@@ -174,12 +179,12 @@ struct OnboardingView: View {
 
                             BrandBadge(text: snapshot.goalTrack.title, systemImage: "arrow.triangle.branch")
 
-                            Text(snapshot.nextAction)
+                            Text(snapshot.nextAction.appLocalized)
                                 .font(.subheadline)
                                 .foregroundStyle(BrandTheme.muted)
                                 .fixedSize(horizontal: false, vertical: true)
 
-                            Text("Confidence \(snapshot.confidence)%")
+                            Text(AppLocalization.localized("Confidence %d%%", arguments: snapshot.confidence))
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(BrandTheme.muted)
                         }
@@ -255,13 +260,19 @@ struct OnboardingView: View {
         let nextAction: String
         switch goalTrack {
         case .savings:
-            nextAction = "Set aside \(currency(goalReserveCents)) each month and keep your weekly spending inside \(currency(weeklyGuardrail))."
+            nextAction = AppLocalization.localized(
+                "Set aside %@ each month and keep your weekly spending inside %@.",
+                arguments: currency(goalReserveCents), currency(weeklyGuardrail)
+            )
         case .debt:
-            nextAction = "Use \(currency(weeklyGuardrail)) as the guardrail and send the extra room toward debt payoff."
+            nextAction = AppLocalization.localized(
+                "Use %@ as the guardrail and send the extra room toward debt payoff.",
+                arguments: currency(weeklyGuardrail)
+            )
         case .impulseControl:
-            nextAction = "Keep one weekly spending lane and pause non-essential purchases before you tap buy."
+            nextAction = "Keep one weekly spending lane and pause non-essential purchases before you tap buy.".appLocalized
         case .emergencyFund:
-            nextAction = "Build the buffer first, then keep the weekly guardrail steady until your target date."
+            nextAction = "Build the buffer first, then keep the weekly guardrail steady until your target date.".appLocalized
         }
 
         return FirstWinSnapshot(
@@ -289,12 +300,13 @@ struct OnboardingView: View {
 
     private var languagePicker: some View {
         Menu {
+            Button("Auto") { language = "auto" }
             Button("English") { language = "en" }
             Button("Español") { language = "es" }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "globe")
-                Text(language.uppercased())
+                Text(AppLocalization.menuLabel(for: language))
             }
             .font(.caption.weight(.semibold))
             .foregroundStyle(BrandTheme.ink)
@@ -312,10 +324,10 @@ struct OnboardingView: View {
     private func sectionHeader(number: String, title: String, summary: String) -> some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -335,11 +347,11 @@ struct OnboardingView: View {
     @ViewBuilder
     private func moneyField(title: String, placeholder: String, text: Binding<String>, allowsEmpty: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(BrandTheme.muted)
 
-            TextField(placeholder, text: text)
+            TextField(placeholder.appLocalized, text: text)
                 .keyboardType(.decimalPad)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()

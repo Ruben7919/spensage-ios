@@ -96,7 +96,7 @@ struct AddExpenseView: View {
                         Text(merchant.isEmpty ? "Merchant" : merchant)
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
-                        Text(category.rawValue)
+                        Text(category.localizedTitle)
                             .font(.footnote)
                             .foregroundStyle(BrandTheme.muted)
                     }
@@ -117,11 +117,11 @@ struct AddExpenseView: View {
 
     private func field(label: String, placeholder: String, text: Binding<String>, keyboard: UIKeyboardType = .default) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(label)
+            Text(label.appLocalized)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(BrandTheme.muted)
 
-            TextField(placeholder, text: text)
+            TextField(placeholder.appLocalized, text: text)
                 .keyboardType(keyboard)
                 .textInputAutocapitalization(.words)
                 .autocorrectionDisabled()

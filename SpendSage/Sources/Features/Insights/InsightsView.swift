@@ -616,7 +616,13 @@ struct InsightsView: View {
                 BrandFeatureRow(
                     systemImage: "target",
                     title: "Top pressure area",
-                    detail: state.topCategory.map { "\($0.category.rawValue) is currently leading the month at \($0.total.formatted(.currency(code: currencyCode)))." }
+                    detail: state.topCategory.map {
+                        AppLocalization.localized(
+                            "%@ is currently leading the month at %@.",
+                            arguments: $0.category.localizedTitle,
+                            $0.total.formatted(.currency(code: currencyCode))
+                        )
+                    }
                         ?? "Add more expenses to reveal where category pressure is landing."
                 )
 
@@ -626,7 +632,7 @@ struct InsightsView: View {
                 ) {
                     ForEach(plannerCategories, id: \.rawValue) { category in
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(category.rawValue)
+                            Text(category.localizedTitle)
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(BrandTheme.muted)
 
@@ -649,7 +655,7 @@ struct InsightsView: View {
                 HStack(spacing: 12) {
                     Button("Apply suggested mix") {
                         budgetDraft = suggestedBudgetDraft(from: state)
-                        plannerNotice = "Suggested category mix loaded."
+                        plannerNotice = "Suggested category mix loaded.".appLocalized
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
@@ -657,14 +663,14 @@ struct InsightsView: View {
                         Task {
                             let totalBudget = parsedBudgetDraftTotal()
                             guard totalBudget > 0 else {
-                                plannerNotice = "Add at least one category amount before saving."
+                                plannerNotice = "Add at least one category amount before saving.".appLocalized
                                 return
                             }
                             await viewModel.saveBudget(
                                 monthlyIncome: state.budgetSnapshot.monthlyIncome,
                                 monthlyBudget: totalBudget
                             )
-                            plannerNotice = "Local budget updated from planner categories."
+                            plannerNotice = "Local budget updated from planner categories.".appLocalized
                         }
                     }
                     .buttonStyle(PrimaryCTAStyle())
@@ -676,7 +682,7 @@ struct InsightsView: View {
                 .buttonStyle(SecondaryCTAStyle())
 
                 if let plannerNotice {
-                    Text(plannerNotice)
+                    Text(plannerNotice.appLocalized)
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -880,7 +886,7 @@ struct InsightsView: View {
                 return [
                     expense.date.formatted(date: .numeric, time: .omitted),
                     expense.merchant,
-                    expense.category.rawValue,
+                    expense.category.localizedTitle,
                     NSDecimalNumber(decimal: expense.amount).stringValue,
                     note
                 ].joined(separator: ",")
@@ -891,7 +897,7 @@ struct InsightsView: View {
     private var exportCategoriesCSVText: String {
         let rows = categoryBreakdown.map { item in
             [
-                item.category.rawValue,
+                item.category.localizedTitle,
                 NSDecimalNumber(decimal: item.total).stringValue,
                 "\(item.count)"
             ].joined(separator: ",")
@@ -932,7 +938,7 @@ struct InsightsView: View {
                 summary: "You are already over budget this month. Trim the top category first and review the next bill before adding new discretionary spend.",
                 alerts: [
                     "Monthly utilization is already above budget.",
-                    state.topCategory.map { "\($0.category.rawValue) is the heaviest category right now." } ?? "The top category is adding the strongest pressure."
+                    state.topCategory.map { AppLocalization.localized("%@ is the heaviest category right now.", arguments: $0.category.localizedTitle) } ?? "The top category is adding the strongest pressure."
                 ],
                 actions: [
                     "Reduce one discretionary purchase in the top category today.",
@@ -943,9 +949,17 @@ struct InsightsView: View {
 
         if let topCategory = state.topCategory {
             return GeneratedInsightResult(
-                summary: "\(topCategory.category.rawValue) is the strongest pressure point right now. Keep the next \(safeSuggestionDaysLeft(for: state)) days focused there to protect the monthly runway.",
+                summary: AppLocalization.localized(
+                    "%@ is the strongest pressure point right now. Keep the next %d days focused there to protect the monthly runway.",
+                    arguments: topCategory.category.localizedTitle,
+                    safeSuggestionDaysLeft(for: state)
+                ),
                 alerts: [
-                    "\(topCategory.category.rawValue) is leading the month at \(topCategory.total.formatted(.currency(code: currencyCode)))."
+                    AppLocalization.localized(
+                        "%@ is leading the month at %@.",
+                        arguments: topCategory.category.localizedTitle,
+                        topCategory.total.formatted(.currency(code: currencyCode))
+                    )
                 ],
                 actions: [
                     "Hold this category flat for the next few days.",
@@ -966,10 +980,10 @@ struct InsightsView: View {
 
     private func sectionHeading(title: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.headline)
                 .foregroundStyle(BrandTheme.ink)
-            Text(detail)
+            Text(detail.appLocalized)
                 .font(.subheadline)
                 .foregroundStyle(BrandTheme.muted)
         }
@@ -983,7 +997,7 @@ struct InsightsView: View {
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(category.category.rawValue)
+                    Text(category.category.localizedTitle)
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                     Text("\(category.count) expense\(category.count == 1 ? "" : "s")")

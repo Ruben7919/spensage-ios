@@ -17,13 +17,13 @@ enum AuthError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .invalidEmail:
-            return "Enter a valid email address."
+            return "Enter a valid email address.".appLocalized
         case let .weakPassword(minimum):
-            return "Use at least \(minimum) characters."
+            return AppLocalization.localized("Use at least %d characters.", arguments: minimum)
         case .passwordsDoNotMatch:
-            return "Passwords do not match."
+            return "Passwords do not match.".appLocalized
         case let .providerUnavailable(provider):
-            return "\(provider.rawValue) sign-in is not available yet."
+            return AppLocalization.localized("%@ sign-in is not available yet.", arguments: provider.displayName)
         }
     }
 }
@@ -51,4 +51,3 @@ enum AuthValidation {
         }
     }
 }
-

@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 struct ConfirmAccountView: View {
-    @AppStorage("native.settings.language") private var language = "en"
+    @AppStorage("native.settings.language") private var language = "auto"
     @State private var email = ""
     @State private var code = ""
     @State private var notice: String?
@@ -103,12 +103,12 @@ struct ConfirmAccountView: View {
                 sectionHeader(number: "02", title: "Finish setup", summary: "Once the code is accepted, you can return to sign in and continue with your account.")
 
                 Button("Confirm account") {
-                    notice = "Confirmation is ready. This step completes invite or signup verification and returns you to sign in."
+                    notice = "Confirmation is ready. This step completes invite or signup verification and returns you to sign in.".appLocalized
                 }
                 .buttonStyle(PrimaryCTAStyle())
 
                 Button("Resend code") {
-                    notice = "A new confirmation code will be sent to your email when the account service is available."
+                    notice = "A new confirmation code will be sent to your email when the account service is available.".appLocalized
                 }
                 .buttonStyle(SecondaryCTAStyle())
             }
@@ -130,7 +130,7 @@ struct ConfirmAccountView: View {
                     Text("Status")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
-                    Text(message)
+                    Text(message.appLocalized)
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -144,10 +144,10 @@ struct ConfirmAccountView: View {
     private func sectionHeader(number: String, title: String, summary: String) -> some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -166,12 +166,13 @@ struct ConfirmAccountView: View {
 
     private var languagePicker: some View {
         Menu {
+            Button("Auto") { language = "auto" }
             Button("English") { language = "en" }
             Button("Español") { language = "es" }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "globe")
-                Text(language.uppercased())
+                Text(AppLocalization.menuLabel(for: language))
             }
             .font(.caption.weight(.semibold))
             .foregroundStyle(BrandTheme.ink)
@@ -195,11 +196,11 @@ struct ConfirmAccountView: View {
         keyboard: UIKeyboardType = .default
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(BrandTheme.muted)
 
-            TextField(placeholder, text: text)
+            TextField(placeholder.appLocalized, text: text)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .textContentType(contentType)

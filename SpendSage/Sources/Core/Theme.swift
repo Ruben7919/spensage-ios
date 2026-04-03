@@ -1,19 +1,84 @@
 import SwiftUI
+import UIKit
+
+enum AppAppearance {
+    static let themeDefaultsKey = "native.settings.theme"
+
+    static func colorScheme(for rawValue: String?) -> ColorScheme? {
+        switch (rawValue ?? "finance").lowercased() {
+        case "midnight":
+            return .dark
+        case "sunrise":
+            return .light
+        default:
+            return nil
+        }
+    }
+}
+
+private extension Color {
+    static func adaptive(light: UIColor, dark: UIColor) -> Color {
+        Color(
+            uiColor: UIColor { traits in
+                traits.userInterfaceStyle == .dark ? dark : light
+            }
+        )
+    }
+}
 
 enum BrandTheme {
-    static let background = Color(red: 0.95, green: 0.97, blue: 0.97)
-    static let canvas = Color(red: 0.92, green: 0.96, blue: 0.95)
-    static let guideCanvas = Color(red: 0.94, green: 0.97, blue: 0.98)
-    static let surface = Color.white
-    static let surfaceTint = Color(red: 0.98, green: 0.99, blue: 0.99)
-    static let line = Color(red: 0.82, green: 0.89, blue: 0.88)
-    static let primary = Color(red: 0.08, green: 0.45, blue: 0.45)
-    static let accent = Color(red: 0.58, green: 0.82, blue: 0.80)
-    static let glow = Color(red: 0.71, green: 0.91, blue: 0.88)
-    static let ink = Color(red: 0.10, green: 0.17, blue: 0.19)
-    static let muted = Color(red: 0.40, green: 0.47, blue: 0.49)
-    static let shadow = Color(red: 0.03, green: 0.11, blue: 0.13)
-    static let speechBubble = Color(red: 0.98, green: 0.99, blue: 1.0)
+    static let background = Color.adaptive(
+        light: UIColor(red: 0.95, green: 0.97, blue: 0.97, alpha: 1),
+        dark: UIColor(red: 0.05, green: 0.09, blue: 0.10, alpha: 1)
+    )
+    static let canvas = Color.adaptive(
+        light: UIColor(red: 0.92, green: 0.96, blue: 0.95, alpha: 1),
+        dark: UIColor(red: 0.07, green: 0.12, blue: 0.13, alpha: 1)
+    )
+    static let guideCanvas = Color.adaptive(
+        light: UIColor(red: 0.94, green: 0.97, blue: 0.98, alpha: 1),
+        dark: UIColor(red: 0.08, green: 0.11, blue: 0.14, alpha: 1)
+    )
+    static let surface = Color.adaptive(
+        light: .white,
+        dark: UIColor(red: 0.10, green: 0.15, blue: 0.17, alpha: 1)
+    )
+    static let surfaceTint = Color.adaptive(
+        light: UIColor(red: 0.98, green: 0.99, blue: 0.99, alpha: 1),
+        dark: UIColor(red: 0.13, green: 0.19, blue: 0.21, alpha: 1)
+    )
+    static let line = Color.adaptive(
+        light: UIColor(red: 0.82, green: 0.89, blue: 0.88, alpha: 1),
+        dark: UIColor(red: 0.24, green: 0.33, blue: 0.35, alpha: 1)
+    )
+    static let primary = Color.adaptive(
+        light: UIColor(red: 0.08, green: 0.45, blue: 0.45, alpha: 1),
+        dark: UIColor(red: 0.48, green: 0.87, blue: 0.84, alpha: 1)
+    )
+    static let accent = Color.adaptive(
+        light: UIColor(red: 0.58, green: 0.82, blue: 0.80, alpha: 1),
+        dark: UIColor(red: 0.19, green: 0.37, blue: 0.39, alpha: 1)
+    )
+    static let glow = Color.adaptive(
+        light: UIColor(red: 0.71, green: 0.91, blue: 0.88, alpha: 1),
+        dark: UIColor(red: 0.25, green: 0.53, blue: 0.50, alpha: 1)
+    )
+    static let ink = Color.adaptive(
+        light: UIColor(red: 0.10, green: 0.17, blue: 0.19, alpha: 1),
+        dark: UIColor(red: 0.90, green: 0.95, blue: 0.95, alpha: 1)
+    )
+    static let muted = Color.adaptive(
+        light: UIColor(red: 0.40, green: 0.47, blue: 0.49, alpha: 1),
+        dark: UIColor(red: 0.62, green: 0.70, blue: 0.71, alpha: 1)
+    )
+    static let shadow = Color.adaptive(
+        light: UIColor(red: 0.03, green: 0.11, blue: 0.13, alpha: 1),
+        dark: UIColor.black
+    )
+    static let speechBubble = Color.adaptive(
+        light: UIColor(red: 0.98, green: 0.99, blue: 1.0, alpha: 1),
+        dark: UIColor(red: 0.12, green: 0.18, blue: 0.20, alpha: 1)
+    )
 
     static let guideArtworkGradient = LinearGradient(
         colors: [

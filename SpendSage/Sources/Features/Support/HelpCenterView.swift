@@ -97,7 +97,7 @@ struct HelpCenterView: View {
 
                         ForEach(topics) { topic in
                             DisclosureGroup(isExpanded: expansionBinding(for: topic.id)) {
-                                Text(topic.detail)
+                                Text(topic.detail.appLocalized)
                                     .font(.subheadline)
                                     .foregroundStyle(BrandTheme.muted)
                                     .padding(.top, 8)
@@ -132,10 +132,10 @@ struct HelpCenterView: View {
                                     .clipShape(Circle())
 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(step.title)
+                                    Text(step.title.appLocalized)
                                         .font(.headline)
                                         .foregroundStyle(BrandTheme.ink)
-                                    Text(step.detail)
+                                    Text(step.detail.appLocalized)
                                         .font(.subheadline)
                                         .foregroundStyle(BrandTheme.muted)
                                 }
@@ -213,10 +213,10 @@ struct HelpCenterView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)

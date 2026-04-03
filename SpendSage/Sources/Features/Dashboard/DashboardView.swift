@@ -698,7 +698,7 @@ struct DashboardView: View {
                         BrandFeatureRow(
                             systemImage: status.symbolName,
                             title: bill.title,
-                            detail: "\(bill.amount.formatted(.currency(code: currencyCode))) · \(status.rawValue) · \(dueDate)"
+                            detail: "\(bill.amount.formatted(.currency(code: currencyCode))) · \(status.localizedTitle) · \(dueDate)"
                         )
                     }
                 }
@@ -839,7 +839,7 @@ struct DashboardView: View {
                             .frame(width: 46, height: 46)
 
                             VStack(alignment: .leading, spacing: 3) {
-                                Text(category.category.rawValue)
+                                Text(category.category.localizedTitle)
                                     .font(.headline)
                                     .foregroundStyle(BrandTheme.ink)
                                 Text("\(category.count) expense\(category.count == 1 ? "" : "s")")
@@ -1063,7 +1063,7 @@ struct DashboardView: View {
                 Text(expense.title)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text("\(category.rawValue) · \(expense.date.formatted(date: .abbreviated, time: .omitted))")
+                Text("\(category.localizedTitle) · \(expense.date.formatted(date: .abbreviated, time: .omitted))")
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
             }
@@ -1626,8 +1626,12 @@ private enum WeeklyDecisionSurface: String, CaseIterable, Identifiable {
     func detail(for state: FinanceDashboardState, growth: DashboardGrowthSnapshot, weekSpend: Decimal, nextBill: BillRecord?) -> String {
         switch self {
         case .trimTopCategory:
-            let category = state.topCategory?.category.rawValue.lowercased() ?? "your top category"
-            return "The quickest relief is usually inside \(category). Keep \(weekSpend.formatted(.currency(code: "USD"))) of weekly spend from turning into another spike."
+            let category = state.topCategory?.category.localizedTitle.lowercased() ?? "your top category".appLocalized
+            return AppLocalization.localized(
+                "The quickest relief is usually inside %@. Keep %@ of weekly spend from turning into another spike.",
+                arguments: category,
+                weekSpend.formatted(.currency(code: "USD"))
+            )
         case .delayPurchase:
             return growth.riskState == .urgent
                 ? "Push one discretionary expense to next week and protect cash before the month tightens further."
@@ -1646,6 +1650,10 @@ private enum QuestBoardStatus: String {
     case ready = "Ready"
     case completed = "Completed"
     case skipped = "Skipped"
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
 
     var tint: Color {
         switch self {
@@ -1720,7 +1728,7 @@ private struct DashboardMissionCard: View {
             HStack {
                 BrandBadge(text: mission.cadenceLabel, systemImage: mission.systemImage)
                 Spacer()
-                Text(status.rawValue)
+                Text(status.localizedTitle)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(status.tint)
             }

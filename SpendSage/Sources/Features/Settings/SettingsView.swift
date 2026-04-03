@@ -5,7 +5,7 @@ import AudioToolbox
 struct SettingsView: View {
     @ObservedObject var viewModel: AppViewModel
 
-    @AppStorage("native.settings.language") private var language = "en"
+    @AppStorage("native.settings.language") private var language = "auto"
     @AppStorage("native.settings.currency") private var currency = "USD"
     @AppStorage("native.settings.theme") private var theme = "finance"
     @AppStorage("native.settings.reminders") private var remindersEnabled = true
@@ -29,11 +29,11 @@ struct SettingsView: View {
     private func soundDisplayName(_ value: String) -> String {
         switch value {
         case "miau":
-            return "Miau"
+            return "Meow".appLocalized
         case "off":
-            return "Off"
+            return "Off".appLocalized
         default:
-            return "Playful"
+            return "Playful".appLocalized
         }
     }
 
@@ -61,7 +61,7 @@ struct SettingsView: View {
                             )
                             BrandMetricTile(
                                 title: "Language",
-                                value: language.uppercased(),
+                                value: AppLocalization.menuLabel(for: language),
                                 systemImage: "globe"
                             )
                             BrandMetricTile(
@@ -154,7 +154,6 @@ struct SettingsView: View {
                             Text("Auto").tag("auto")
                             Text("English").tag("en")
                             Text("Español").tag("es")
-                            Text("日本語").tag("ja")
                         }
 
                         Divider()
@@ -253,7 +252,7 @@ struct SettingsView: View {
 
                         settingsPickerRow(title: "Notification sound", selection: $soundStyle) {
                             Text("Off").tag("off")
-                            Text("Miau").tag("miau")
+                            Text("Meow").tag("miau")
                             Text("Playful").tag("playful")
                         }
 
@@ -407,9 +406,9 @@ struct SettingsView: View {
     private var sessionModeLabel: String {
         switch viewModel.session {
         case .signedOut:
-            return "Signed out"
+            return "Signed out".appLocalized
         case .guest:
-            return "Guest local"
+            return "Guest local".appLocalized
         case let .signedIn(email, _):
             return email.components(separatedBy: "@").first ?? "Signed in"
         }
@@ -485,11 +484,11 @@ struct SettingsView: View {
     private func themeDisplayName(_ value: String) -> String {
         switch value {
         case "midnight":
-            return "Midnight"
+            return "Midnight".appLocalized
         case "sunrise":
-            return "Sunrise"
+            return "Sunrise".appLocalized
         default:
-            return "Finance"
+            return "Finance".appLocalized
         }
     }
 
@@ -501,7 +500,7 @@ struct SettingsView: View {
     ) -> some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
                 Text("Saved only on this device right now.")
@@ -530,10 +529,10 @@ struct SettingsView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)

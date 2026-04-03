@@ -6,6 +6,10 @@ private enum ExportMode: String, CaseIterable, Identifiable {
     case json = "JSON"
 
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
 }
 
 struct AdvancedSettingsView: View {
@@ -69,7 +73,7 @@ struct AdvancedSettingsView: View {
                     )
                     BrandMetricTile(
                         title: "Format",
-                        value: exportMode.rawValue,
+                        value: exportMode.localizedTitle,
                         systemImage: "square.and.arrow.up"
                     )
                     BrandMetricTile(
@@ -153,7 +157,7 @@ struct AdvancedSettingsView: View {
 
                 Picker("Format", selection: $exportMode) {
                     ForEach(ExportMode.allCases) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(mode.localizedTitle).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -215,7 +219,7 @@ struct AdvancedSettingsView: View {
                     )
                     BrandMetricTile(
                         title: "Top category",
-                        value: state?.topCategory?.category.rawValue ?? "None",
+                        value: state?.topCategory?.category.localizedTitle ?? "None".appLocalized,
                         systemImage: "sparkles.rectangle.stack"
                     )
                 }

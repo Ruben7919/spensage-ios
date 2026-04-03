@@ -288,15 +288,15 @@ struct FinanceAccountsToolView: View {
                         .font(.headline)
                         .foregroundStyle(balanceState == .liability ? .red : BrandTheme.ink)
 
-                    Text(balanceState.rawValue)
+                    Text(balanceState.localizedTitle)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(balanceState == .liability ? .red : BrandTheme.muted)
                 }
             }
 
             HStack(spacing: 8) {
-                accountChip(title: account.kind.rawValue, systemImage: account.kind.symbolName)
-                accountChip(title: balanceState.rawValue, systemImage: balanceState.symbolName)
+                accountChip(title: account.kind.localizedTitle, systemImage: account.kind.symbolName)
+                accountChip(title: balanceState.localizedTitle, systemImage: balanceState.symbolName)
                 accountChip(
                     title: isIncluded ? "Included in net worth" : "Excluded from net worth",
                     systemImage: isIncluded ? "chart.line.uptrend.xyaxis" : "chart.line.downtrend.xyaxis",

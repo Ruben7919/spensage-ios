@@ -356,7 +356,7 @@ struct FinanceReceiptScanToolView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "sparkles")
                             .foregroundStyle(.orange)
-                        Text("Rule suggestion: \(suggestedCategory.rawValue)")
+                        Text(AppLocalization.localized("Rule suggestion: %@", arguments: suggestedCategory.localizedTitle))
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.ink)
                         Spacer()
@@ -386,7 +386,7 @@ struct FinanceReceiptScanToolView: View {
                             Text("Latest expense template")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
-                            Text("\(latest.title) · \(latest.category) · \(latest.amount.formatted(.currency(code: "USD")))")
+                            Text("\(latest.title) · \(latest.category.appLocalized) · \(latest.amount.formatted(.currency(code: "USD")))")
                                 .font(.footnote)
                                 .foregroundStyle(BrandTheme.muted)
                         }
@@ -460,7 +460,7 @@ struct FinanceReceiptScanToolView: View {
 
                     Picker("Category", selection: $category) {
                         ForEach(ExpenseCategory.allCases) { item in
-                            Label(item.rawValue, systemImage: item.symbolName)
+                            Label(item.localizedTitle, systemImage: item.symbolName)
                                 .tag(item)
                         }
                     }
@@ -477,7 +477,7 @@ struct FinanceReceiptScanToolView: View {
                 )
 
                 if let errorMessage {
-                    Text(errorMessage)
+                    Text(errorMessage.appLocalized)
                         .font(.footnote)
                         .foregroundStyle(.red)
                 }
@@ -518,7 +518,7 @@ struct FinanceReceiptScanToolView: View {
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("\(category.rawValue) · \(date.formatted(date: .abbreviated, time: .omitted))")
+                Text("\(category.localizedTitle) · \(date.formatted(date: .abbreviated, time: .omitted))")
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
 
@@ -545,7 +545,7 @@ struct FinanceReceiptScanToolView: View {
     private func openCamera() {
         clearTransientState()
         guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
-            errorMessage = "Camera capture is not available on this device."
+            errorMessage = "Camera capture is not available on this device.".appLocalized
             return
         }
 
@@ -567,19 +567,19 @@ struct FinanceReceiptScanToolView: View {
         category = ExpenseCategory.allCases.first(where: { $0.rawValue == item.category }) ?? .other
         date = item.date
         if note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            note = "Prefilled from recent local activity."
+            note = "Prefilled from recent local activity.".appLocalized
         }
         clearTransientState()
     }
 
     private var extractedTextPreview: String {
         let lines = [
-            "Merchant: \(merchant.isEmpty ? "..." : merchant)",
-            "Amount: \(amount.isEmpty ? "..." : amount)",
-            "Category: \(category.rawValue)",
-            "Date: \(date.formatted(date: .abbreviated, time: .omitted))",
-            "Notes: \(note.isEmpty ? "..." : note)",
-            "Source: \(captureSource?.title ?? "Manual draft")"
+            AppLocalization.localized("Merchant: %@", arguments: merchant.isEmpty ? "..." : merchant),
+            AppLocalization.localized("Amount: %@", arguments: amount.isEmpty ? "..." : amount),
+            AppLocalization.localized("Category: %@", arguments: category.localizedTitle),
+            AppLocalization.localized("Date: %@", arguments: date.formatted(date: .abbreviated, time: .omitted)),
+            AppLocalization.localized("Notes: %@", arguments: note.isEmpty ? "..." : note),
+            AppLocalization.localized("Source: %@", arguments: captureSource?.title.appLocalized ?? "Manual draft".appLocalized)
         ]
         return lines.joined(separator: "\n")
     }

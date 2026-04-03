@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 struct ResetPasswordView: View {
-    @AppStorage("native.settings.language") private var language = "en"
+    @AppStorage("native.settings.language") private var language = "auto"
     @State private var email = ""
     @State private var code = ""
     @State private var newPassword = ""
@@ -95,7 +95,7 @@ struct ResetPasswordView: View {
                 authField(title: "Email", placeholder: "name@domain.com", text: $email, contentType: .emailAddress)
 
                 Button("Send reset code") {
-                    notice = "A reset code request will be sent when the account recovery flow is connected."
+                    notice = "A reset code request will be sent when the account recovery flow is connected.".appLocalized
                 }
                 .buttonStyle(SecondaryCTAStyle())
             }
@@ -111,7 +111,7 @@ struct ResetPasswordView: View {
                 authField(title: "New password", placeholder: "At least 8 characters", text: $newPassword, contentType: .newPassword, secure: true)
 
                 Button("Save new password") {
-                    notice = "Your password reset is staged. Finish this step once account recovery is enabled."
+                    notice = "Your password reset is staged. Finish this step once account recovery is enabled.".appLocalized
                 }
                 .buttonStyle(PrimaryCTAStyle())
             }
@@ -133,7 +133,7 @@ struct ResetPasswordView: View {
                     Text("Status")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
-                    Text(message)
+                    Text(message.appLocalized)
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -147,10 +147,10 @@ struct ResetPasswordView: View {
     private func sectionHeader(number: String, title: String, summary: String) -> some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -169,12 +169,13 @@ struct ResetPasswordView: View {
 
     private var languagePicker: some View {
         Menu {
+            Button("Auto") { language = "auto" }
             Button("English") { language = "en" }
             Button("Español") { language = "es" }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "globe")
-                Text(language.uppercased())
+                Text(AppLocalization.menuLabel(for: language))
             }
             .font(.caption.weight(.semibold))
             .foregroundStyle(BrandTheme.ink)
@@ -199,15 +200,15 @@ struct ResetPasswordView: View {
         secure: Bool = false
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(BrandTheme.muted)
 
             Group {
                 if secure {
-                    SecureField(placeholder, text: text)
+                    SecureField(placeholder.appLocalized, text: text)
                 } else {
-                    TextField(placeholder, text: text)
+                    TextField(placeholder.appLocalized, text: text)
                 }
             }
             .textInputAutocapitalization(.never)

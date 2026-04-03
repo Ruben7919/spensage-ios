@@ -160,15 +160,21 @@ final class BrandAssetCatalog {
         let nsFile = source.fileName as NSString
         let name = nsFile.deletingPathExtension
         let ext = nsFile.pathExtension.isEmpty ? nil : nsFile.pathExtension
-        return bundle.url(forResource: name, withExtension: ext, subdirectory: source.subdirectory)
+        if let nestedURL = bundle.url(forResource: name, withExtension: ext, subdirectory: source.subdirectory) {
+            return nestedURL
+        }
+        return bundle.url(forResource: name, withExtension: ext)
     }
 
     private static func loadManifest(version: BrandVersion, bundle: Bundle) -> BrandAssetManifest {
-        guard let url = bundle.url(
+        let nestedURL = bundle.url(
             forResource: "asset_manifest",
             withExtension: "json",
             subdirectory: "Brand/\(version.rawValue)"
-        ) else {
+        )
+        let rootURL = bundle.url(forResource: "asset_manifest", withExtension: "json")
+
+        guard let url = nestedURL ?? rootURL else {
             preconditionFailure("Missing Brand asset manifest for \(version.rawValue)")
         }
 

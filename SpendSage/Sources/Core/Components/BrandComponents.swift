@@ -54,7 +54,7 @@ struct BrandBadge: View {
         HStack(spacing: 8) {
             Image(systemName: systemImage)
                 .font(.caption.weight(.semibold))
-            Text(text)
+            Text(text.appLocalized)
                 .font(.caption.weight(.semibold))
         }
         .foregroundStyle(BrandTheme.primary)
@@ -110,12 +110,12 @@ struct MascotSpeechCard: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 if let title {
-                    Text(title)
+                    Text(title.appLocalized)
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                 }
 
-                Text(message)
+                Text(message.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -152,10 +152,10 @@ struct BrandFeatureRow: View {
             .frame(width: 42, height: 42)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(detail)
+                Text(detail.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -176,7 +176,7 @@ struct BrandMetricTile: View {
             HStack(spacing: 8) {
                 Image(systemName: systemImage)
                     .font(.caption.weight(.semibold))
-                Text(title)
+                Text(title.appLocalized)
                     .font(.caption.weight(.semibold))
             }
             .foregroundStyle(BrandTheme.muted)

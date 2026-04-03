@@ -26,11 +26,11 @@ struct GuideSheet: View {
                                 MascotSpeechCard(
                                     character: slide.character,
                                     expression: slide.expression,
-                                    title: slide.title,
-                                    message: slide.body
+                                    title: slide.title.appLocalized,
+                                    message: slide.body.appLocalized
                                 )
 
-                                Text("Step \(slideIndex + 1) of \(guide.slides.count)")
+                                Text(AppLocalization.localized("Step %d of %d", arguments: slideIndex + 1, guide.slides.count))
                                     .font(.footnote.weight(.semibold))
                                     .foregroundStyle(BrandTheme.muted)
                             }
@@ -55,7 +55,7 @@ struct GuideSheet: View {
     private var header: some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(guide.title)
+                Text(guide.title.appLocalized)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
@@ -64,7 +64,7 @@ struct GuideSheet: View {
 
             Spacer()
 
-            Button("Close") {
+            Button("Close".appLocalized) {
                 close(markSeen: false)
             }
             .font(.subheadline.weight(.semibold))
@@ -86,7 +86,7 @@ struct GuideSheet: View {
             Button {
                 index = max(0, index - 1)
             } label: {
-                Text("Back")
+                Text("Back".appLocalized)
             }
             .buttonStyle(SecondaryCTAStyle())
             .disabled(index == 0)
@@ -101,7 +101,7 @@ struct GuideSheet: View {
                     }
                 }
             } label: {
-                Text(isLast ? "Done" : "Next")
+                Text((isLast ? "Done" : "Next").appLocalized)
             }
             .buttonStyle(PrimaryCTAStyle())
         }

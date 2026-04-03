@@ -167,7 +167,6 @@ struct ProfileView: View {
                     Text("Auto").tag("auto")
                     Text("English").tag("en")
                     Text("Español").tag("es")
-                    Text("日本語").tag("ja")
                 }
 
                 Divider()
@@ -192,7 +191,7 @@ struct ProfileView: View {
 
                 preferenceMenu(title: "Sound style", selection: $soundStyle) {
                     Text("Off").tag("off")
-                    Text("Miau").tag("miau")
+                    Text("Meow").tag("miau")
                     Text("Playful").tag("playful")
                 }
 
@@ -233,7 +232,7 @@ struct ProfileView: View {
     ) -> some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
                 Text("Saved locally for this device.")

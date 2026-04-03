@@ -19,11 +19,11 @@ final class AppViewModel: ObservableObject {
 
         var title: String {
             switch self {
-            case .dashboard: return "Dashboard"
-            case .expenses: return "Expenses"
-            case .insights: return "Insights"
-            case .premium: return "Premium"
-            case .settings: return "Settings"
+            case .dashboard: return "Dashboard".appLocalized
+            case .expenses: return "Expenses".appLocalized
+            case .insights: return "Insights".appLocalized
+            case .premium: return "Premium".appLocalized
+            case .settings: return "Settings".appLocalized
             }
         }
 
@@ -129,13 +129,13 @@ final class AppViewModel: ObservableObject {
 
     func signInWithSocial(_ provider: SocialProvider) async throws {
         session = try await authService.signInWithSocial(provider)
-        notice = "Signed in with \(provider.rawValue)."
+        notice = AppLocalization.localized("Signed in with %@.", arguments: provider.displayName)
         await refreshDashboard()
     }
 
     func continueAsGuest() async {
         session = await authService.continueAsGuest()
-        notice = "Guest mode stays local on this device."
+        notice = "Guest mode stays local on this device.".appLocalized
         await refreshDashboard()
     }
 
@@ -173,117 +173,117 @@ final class AppViewModel: ObservableObject {
 
     func addExpense(_ draft: ExpenseDraft) async {
         guard draft.isValid else {
-            notice = "Add a merchant name and a positive amount."
+            notice = "Add a merchant name and a positive amount.".appLocalized
             return
         }
 
         await financeStore.saveExpense(draft, for: session)
-        notice = "Expense saved locally on this device."
+        notice = "Expense saved locally on this device.".appLocalized
         isPresentingAddExpense = false
         await refreshDashboard()
     }
 
     func saveBudget(monthlyIncome: Decimal, monthlyBudget: Decimal) async {
         guard monthlyIncome > 0, monthlyBudget > 0 else {
-            notice = "Income and budget must be positive values."
+            notice = "Income and budget must be positive values.".appLocalized
             return
         }
 
         await financeStore.saveBudget(monthlyIncome: monthlyIncome, monthlyBudget: monthlyBudget, for: session)
-        notice = "Budget updated locally on this device."
+        notice = "Budget updated locally on this device.".appLocalized
         isPresentingBudgetWizard = false
         await refreshDashboard()
     }
 
     func addAccount(_ draft: AccountDraft) async {
         guard draft.isValid else {
-            notice = "Add an account name before saving."
+            notice = "Add an account name before saving.".appLocalized
             return
         }
 
         await financeStore.saveAccount(draft, for: session)
-        notice = "Account saved locally on this device."
+        notice = "Account saved locally on this device.".appLocalized
         await refreshDashboard()
     }
 
     func deleteAccount(_ accountID: UUID) async {
         await financeStore.deleteAccount(accountID, for: session)
-        notice = "Account removed from your local ledger."
+        notice = "Account removed from your local ledger.".appLocalized
         await refreshDashboard()
     }
 
     func setPrimaryAccount(_ accountID: UUID) async {
         await financeStore.setPrimaryAccount(accountID, for: session)
-        notice = "Primary account updated locally on this device."
+        notice = "Primary account updated locally on this device.".appLocalized
         await refreshDashboard()
     }
 
     func addBill(_ draft: BillDraft) async {
         guard draft.isValid else {
-            notice = "Add a bill title, amount, and due day."
+            notice = "Add a bill title, amount, and due day.".appLocalized
             return
         }
 
         await financeStore.saveBill(draft, for: session)
-        notice = "Recurring bill saved locally on this device."
+        notice = "Recurring bill saved locally on this device.".appLocalized
         await refreshDashboard()
     }
 
     func deleteBill(_ billID: UUID) async {
         await financeStore.deleteBill(billID, for: session)
-        notice = "Recurring bill removed from your local ledger."
+        notice = "Recurring bill removed from your local ledger.".appLocalized
         await refreshDashboard()
     }
 
     func toggleBillAutopay(_ billID: UUID) async {
         await financeStore.toggleBillAutopay(billID, for: session)
-        notice = "Bill autopay updated locally on this device."
+        notice = "Bill autopay updated locally on this device.".appLocalized
         await refreshDashboard()
     }
 
     func addRule(_ draft: RuleDraft) async {
         guard draft.isValid else {
-            notice = "Add a merchant keyword before saving a rule."
+            notice = "Add a merchant keyword before saving a rule.".appLocalized
             return
         }
 
         await financeStore.saveRule(draft, for: session)
-        notice = "Rule saved locally on this device."
+        notice = "Rule saved locally on this device.".appLocalized
         await refreshDashboard()
     }
 
     func deleteRule(_ ruleID: UUID) async {
         await financeStore.deleteRule(ruleID, for: session)
-        notice = "Rule removed from your local ledger."
+        notice = "Rule removed from your local ledger.".appLocalized
         await refreshDashboard()
     }
 
     func toggleRuleEnabled(_ ruleID: UUID) async {
         await financeStore.toggleRuleEnabled(ruleID, for: session)
-        notice = "Rule activity updated locally on this device."
+        notice = "Rule activity updated locally on this device.".appLocalized
         await refreshDashboard()
     }
 
     func payBill(_ billID: UUID) async {
         await financeStore.markBillPaid(billID, for: session)
-        notice = "Bill payment saved to your local ledger."
+        notice = "Bill payment saved to your local ledger.".appLocalized
         await refreshDashboard()
     }
 
     func importExpenses(_ drafts: [ExpenseDraft]) async {
         guard !drafts.isEmpty else {
-            notice = "There are no expenses ready to import."
+            notice = "There are no expenses ready to import.".appLocalized
             return
         }
 
         await financeStore.importExpenses(drafts, for: session)
-        notice = "\(drafts.count) expenses imported into your local ledger."
+        notice = AppLocalization.localized("%d expenses imported into your local ledger.", arguments: drafts.count)
         await refreshDashboard()
     }
 
     func saveProfile(_ profile: ProfileRecord) async {
         await financeStore.saveProfile(profile, for: session)
-        notice = "Profile preferences saved on this device."
+        notice = "Profile preferences saved on this device.".appLocalized
         await refreshDashboard()
     }
 

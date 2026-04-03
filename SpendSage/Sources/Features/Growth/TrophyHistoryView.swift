@@ -91,15 +91,15 @@ struct TrophyHistoryView: View {
 
                                 Spacer(minLength: 0)
 
-                                Text(trophy.unlocked ? "Unlocked" : trophy.progressText)
+                                Text(trophy.unlocked ? "Unlocked".appLocalized : trophy.progressText.appLocalized)
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
                             }
 
-                            Text(trophy.title)
+                            Text(trophy.title.appLocalized)
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
-                            Text(trophy.detail)
+                            Text(trophy.detail.appLocalized)
                                 .font(.subheadline)
                                 .foregroundStyle(BrandTheme.muted)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -112,7 +112,7 @@ struct TrophyHistoryView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(BrandTheme.primary)
                             } else {
-                                Text("Next unlock at \(trophy.progressText)")
+                                Text(AppLocalization.localized("Next unlock at %@", arguments: trophy.progressText.appLocalized))
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(BrandTheme.muted)
                             }
@@ -187,10 +187,10 @@ struct TrophyHistoryView: View {
 
     private func sectionHeading(title: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.headline)
                 .foregroundStyle(BrandTheme.ink)
-            Text(detail)
+            Text(detail.appLocalized)
                 .font(.subheadline)
                 .foregroundStyle(BrandTheme.muted)
         }
