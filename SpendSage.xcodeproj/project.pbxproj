@@ -1,0 +1,576 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0F23374C3FFF9B892C7C0270 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E9688AB4D62C4797F2C444 /* AppViewModel.swift */; };
+		0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE8903B75C047C59E5F634A /* Assets.xcassets */; };
+		17EBFD7F7D5C568DFA011E37 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABD400C4F74E75F803BAFC /* Models.swift */; };
+		30CC4427086325546CBEFE6A /* SpendSageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C815B84250314C2A948D50C /* SpendSageApp.swift */; };
+		4D4645CD2FE607017F0639D5 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC8D8BD53F09EA71C1D0744 /* AuthView.swift */; };
+		65B04B25CFA84CFF4DB53DCF /* SpendSageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */; };
+		77843C280365837DC6797467 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23BFBEACF79B0FDCC1A81A6 /* OnboardingView.swift */; };
+		814A93CC9BAC8C86152BE59E /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8C04C37584D822E473A28C /* AuthConfiguration.swift */; };
+		89E9E8CAFC4E34AC1E24BBB5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6227E322248CA2A7A980D40 /* Theme.swift */; };
+		91E731398ADCE401D5B7B1F6 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC5D00895B952997D987883 /* FinanceModels.swift */; };
+		9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679F2DB952FBB586D6057598 /* AuthSupport.swift */; };
+		A14E5B6B21BADE70EC7F687F /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B314CADFCED6D85AF660846D /* AppRootView.swift */; };
+		A45A022AE99A11335AFB290E /* BrandComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4814CA0146FBD47E788B58D9 /* BrandComponents.swift */; };
+		A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87421858D2F5088C6CDD796E /* FinanceStore.swift */; };
+		A6ADBC686E1CB99E645B79AB /* AddExpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E175C0F00D3BFE3E05056D15 /* AddExpenseView.swift */; };
+		D84782692819883735AEBC17 /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37595A2FF2CF4E81B4AE65CF /* Services.swift */; };
+		DD5EF1AA1AA2C0479F642F48 /* PreviewFinanceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */; };
+		E30FD45D36AE9FF7582B0794 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E05C5BF495CA177EAE3510 /* DashboardView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		64FD085295E77B93A81E9BC8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 630140D4516574A7C7A9712B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F2ED8D47CD74BCA367AABE9;
+			remoteInfo = SpendSage;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0C815B84250314C2A948D50C /* SpendSageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageApp.swift; sourceTree = "<group>"; };
+		37595A2FF2CF4E81B4AE65CF /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
+		4814CA0146FBD47E788B58D9 /* BrandComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandComponents.swift; sourceTree = "<group>"; };
+		5FC5D00895B952997D987883 /* FinanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceModels.swift; sourceTree = "<group>"; };
+		65830A2C04AA833875A9E3EF /* SpendSage.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SpendSage.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		679F2DB952FBB586D6057598 /* AuthSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSupport.swift; sourceTree = "<group>"; };
+		68A549D8C5A62F9B2DF1A166 /* SpendSageTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SpendSageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageTests.swift; sourceTree = "<group>"; };
+		87421858D2F5088C6CDD796E /* FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceStore.swift; sourceTree = "<group>"; };
+		8CC8D8BD53F09EA71C1D0744 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		8F8C04C37584D822E473A28C /* AuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfiguration.swift; sourceTree = "<group>"; };
+		9AE8903B75C047C59E5F634A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A6227E322248CA2A7A980D40 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		B1E9688AB4D62C4797F2C444 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		B23BFBEACF79B0FDCC1A81A6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		B314CADFCED6D85AF660846D /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		C0ABD400C4F74E75F803BAFC /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewFinanceData.swift; sourceTree = "<group>"; };
+		E175C0F00D3BFE3E05056D15 /* AddExpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
+		F6E05C5BF495CA177EAE3510 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1B129884E74155ABC09C42F8 /* Expenses */ = {
+			isa = PBXGroup;
+			children = (
+				E175C0F00D3BFE3E05056D15 /* AddExpenseView.swift */,
+			);
+			path = Expenses;
+			sourceTree = "<group>";
+		};
+		2789462E0DF8797345A7F293 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				65830A2C04AA833875A9E3EF /* SpendSage.app */,
+				68A549D8C5A62F9B2DF1A166 /* SpendSageTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		42E22C42738047FB4DDA2674 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				5FC5D00895B952997D987883 /* FinanceModels.swift */,
+				C0ABD400C4F74E75F803BAFC /* Models.swift */,
+				37595A2FF2CF4E81B4AE65CF /* Services.swift */,
+				A6227E322248CA2A7A980D40 /* Theme.swift */,
+				DDA9C73E819C396AB3DFFCCC /* Auth */,
+				439FAC31D754D6BDBCCA5018 /* Components */,
+				A8083AF293910F6CCF2E0EAB /* Config */,
+				982784B8B26FBF2C67EE94B5 /* PreviewData */,
+				88EC4787DA5650A6C7B20A9F /* Storage */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		439FAC31D754D6BDBCCA5018 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				4814CA0146FBD47E788B58D9 /* BrandComponents.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		55917ABE3F391F5EC9EEDA28 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B314CADFCED6D85AF660846D /* AppRootView.swift */,
+				B1E9688AB4D62C4797F2C444 /* AppViewModel.swift */,
+				0C815B84250314C2A948D50C /* SpendSageApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		5BB61729313D128E1B5C1FF8 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				8CC8D8BD53F09EA71C1D0744 /* AuthView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		6B21BD96DC9D99EAE9871EBA /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				5BB61729313D128E1B5C1FF8 /* Auth */,
+				E3221063713C291E3202C799 /* Dashboard */,
+				1B129884E74155ABC09C42F8 /* Expenses */,
+				CB742A7B4FAE58DBC5EAE096 /* Onboarding */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		6CEDF2D37F27A5D7BD67593F = {
+			isa = PBXGroup;
+			children = (
+				EE59D1387E7C148E1E644E1B /* Resources */,
+				D45E34289ECDDC0E7677F54C /* Sources */,
+				D63995B83E0ABA1D6AF79F35 /* SpendSageTests */,
+				2789462E0DF8797345A7F293 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		88EC4787DA5650A6C7B20A9F /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				87421858D2F5088C6CDD796E /* FinanceStore.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		982784B8B26FBF2C67EE94B5 /* PreviewData */ = {
+			isa = PBXGroup;
+			children = (
+				C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */,
+			);
+			path = PreviewData;
+			sourceTree = "<group>";
+		};
+		A8083AF293910F6CCF2E0EAB /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				8F8C04C37584D822E473A28C /* AuthConfiguration.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		CB742A7B4FAE58DBC5EAE096 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				B23BFBEACF79B0FDCC1A81A6 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		D45E34289ECDDC0E7677F54C /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				55917ABE3F391F5EC9EEDA28 /* App */,
+				42E22C42738047FB4DDA2674 /* Core */,
+				6B21BD96DC9D99EAE9871EBA /* Features */,
+			);
+			name = Sources;
+			path = SpendSage/Sources;
+			sourceTree = "<group>";
+		};
+		D63995B83E0ABA1D6AF79F35 /* SpendSageTests */ = {
+			isa = PBXGroup;
+			children = (
+				8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */,
+			);
+			path = SpendSageTests;
+			sourceTree = "<group>";
+		};
+		DDA9C73E819C396AB3DFFCCC /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				679F2DB952FBB586D6057598 /* AuthSupport.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		E3221063713C291E3202C799 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				F6E05C5BF495CA177EAE3510 /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		EE59D1387E7C148E1E644E1B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9AE8903B75C047C59E5F634A /* Assets.xcassets */,
+			);
+			name = Resources;
+			path = SpendSage/Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9F2ED8D47CD74BCA367AABE9 /* SpendSage */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D0BF39BAB528D549C05E133 /* Build configuration list for PBXNativeTarget "SpendSage" */;
+			buildPhases = (
+				0A25A722FCE77BB36166A18F /* Sources */,
+				17FBAE610CE038386929EC5F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpendSage;
+			packageProductDependencies = (
+			);
+			productName = SpendSage;
+			productReference = 65830A2C04AA833875A9E3EF /* SpendSage.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F92411BCA530BEA029B91065 /* SpendSageTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAA997ADB65BC4DC13E70DF7 /* Build configuration list for PBXNativeTarget "SpendSageTests" */;
+			buildPhases = (
+				E8A95A5EED2DD9F478C51DFA /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7416128096ADF2052A7A2380 /* PBXTargetDependency */,
+			);
+			name = SpendSageTests;
+			packageProductDependencies = (
+			);
+			productName = SpendSageTests;
+			productReference = 68A549D8C5A62F9B2DF1A166 /* SpendSageTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		630140D4516574A7C7A9712B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 0C7F8DBB5C0A8097AD1A477E /* Build configuration list for PBXProject "SpendSage" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6CEDF2D37F27A5D7BD67593F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 2789462E0DF8797345A7F293 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9F2ED8D47CD74BCA367AABE9 /* SpendSage */,
+				F92411BCA530BEA029B91065 /* SpendSageTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		17FBAE610CE038386929EC5F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0A25A722FCE77BB36166A18F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6ADBC686E1CB99E645B79AB /* AddExpenseView.swift in Sources */,
+				A14E5B6B21BADE70EC7F687F /* AppRootView.swift in Sources */,
+				0F23374C3FFF9B892C7C0270 /* AppViewModel.swift in Sources */,
+				814A93CC9BAC8C86152BE59E /* AuthConfiguration.swift in Sources */,
+				9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */,
+				4D4645CD2FE607017F0639D5 /* AuthView.swift in Sources */,
+				A45A022AE99A11335AFB290E /* BrandComponents.swift in Sources */,
+				E30FD45D36AE9FF7582B0794 /* DashboardView.swift in Sources */,
+				91E731398ADCE401D5B7B1F6 /* FinanceModels.swift in Sources */,
+				A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */,
+				17EBFD7F7D5C568DFA011E37 /* Models.swift in Sources */,
+				77843C280365837DC6797467 /* OnboardingView.swift in Sources */,
+				DD5EF1AA1AA2C0479F642F48 /* PreviewFinanceData.swift in Sources */,
+				D84782692819883735AEBC17 /* Services.swift in Sources */,
+				30CC4427086325546CBEFE6A /* SpendSageApp.swift in Sources */,
+				89E9E8CAFC4E34AC1E24BBB5 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8A95A5EED2DD9F478C51DFA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65B04B25CFA84CFF4DB53DCF /* SpendSageTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7416128096ADF2052A7A2380 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F2ED8D47CD74BCA367AABE9 /* SpendSage */;
+			targetProxy = 64FD085295E77B93A81E9BC8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0C48E95CDB0345D59C0C9ED8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.spendsage.native.tests;
+				PRODUCT_NAME = SpendSageTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpendSage.app/SpendSage";
+			};
+			name = Debug;
+		};
+		4AADC1A9AFF198411801A4F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpendSage/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.spendsage.native;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		7A133AE9412634D2AEFDA9B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_ASSET_PATHS = "\"SpendSage/Resources\"";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = SpendSage;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		851879AC7FC2C024D68D0790 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.spendsage.native.tests;
+				PRODUCT_NAME = SpendSageTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpendSage.app/SpendSage";
+			};
+			name = Release;
+		};
+		A929DFAE2C495E575577A85D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SpendSage/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.spendsage.native;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D6D30590802EC7FBF3A82273 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"SpendSage/Resources\"";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = SpendSage;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0C7F8DBB5C0A8097AD1A477E /* Build configuration list for PBXProject "SpendSage" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A133AE9412634D2AEFDA9B3 /* Debug */,
+				D6D30590802EC7FBF3A82273 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4D0BF39BAB528D549C05E133 /* Build configuration list for PBXNativeTarget "SpendSage" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A929DFAE2C495E575577A85D /* Debug */,
+				4AADC1A9AFF198411801A4F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AAA997ADB65BC4DC13E70DF7 /* Build configuration list for PBXNativeTarget "SpendSageTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C48E95CDB0345D59C0C9ED8 /* Debug */,
+				851879AC7FC2C024D68D0790 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 630140D4516574A7C7A9712B /* Project object */;
+}

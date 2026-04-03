@@ -1,0 +1,59 @@
+name: SpendSage
+options:
+  minimumXcodeGenVersion: 2.45.0
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    PRODUCT_NAME: SpendSage
+    SWIFT_VERSION: "6.0"
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 0.1.0
+    DEVELOPMENT_ASSET_PATHS: "\"SpendSage/Resources\""
+targets:
+  SpendSage:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: SpendSage/Sources
+      - path: SpendSage/Resources
+    info:
+      path: SpendSage/Info.plist
+      properties:
+        CFBundleDisplayName: SpendSage
+        UILaunchScreen: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        LSRequiresIPhoneOS: true
+        NSCameraUsageDescription: Scan receipts and capture supporting images.
+        NSPhotoLibraryUsageDescription: Import receipts and supporting images.
+        NSPhotoLibraryAddUsageDescription: Save exported images and documents.
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ai.spendsage.native
+        GENERATE_INFOPLIST_FILE: false
+        INFOPLIST_FILE: SpendSage/Info.plist
+  SpendSageTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: SpendSageTests
+    dependencies:
+      - target: SpendSage
+    settings:
+      base:
+        PRODUCT_NAME: SpendSageTests
+        PRODUCT_BUNDLE_IDENTIFIER: ai.spendsage.native.tests
+        GENERATE_INFOPLIST_FILE: true
+schemes:
+  SpendSage:
+    build:
+      targets:
+        SpendSage: all
+        SpendSageTests: [test]
+    test:
+      targets:
+        - SpendSageTests
