@@ -35,24 +35,12 @@ struct PremiumView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        NavigationLink("Trophies") {
-                            FeatureStubView(
-                                title: "Trophies",
-                                summary: "Celebrate milestones, streaks, and financial wins.",
-                                readiness: "Available soon",
-                                bullets: ["Milestones", "Review loops", "Habit streaks"],
-                                systemImage: "trophy.fill"
-                            )
+                        NavigationLink("Trophy History") {
+                            TrophyHistoryView(viewModel: viewModel)
                         }
 
                         NavigationLink("Brand Gallery") {
-                            FeatureStubView(
-                                title: "Brand Gallery",
-                                summary: "Explore styles, characters, and visual themes across the app.",
-                                readiness: "Available soon",
-                                bullets: ["Mascot assets", "Theme gallery", "Onboarding scenes"],
-                                systemImage: "photo.stack.fill"
-                            )
+                            BrandGalleryView()
                         }
                     }
                 }

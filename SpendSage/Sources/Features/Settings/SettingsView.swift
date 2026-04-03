@@ -33,23 +33,11 @@ struct SettingsView: View {
 
             Section("Account and app") {
                 NavigationLink("Profile") {
-                    FeatureStubView(
-                        title: "Profile",
-                        summary: "Manage your personal details, household setup, and account status.",
-                        readiness: "Available soon",
-                        bullets: ["Identity", "Household state", "Access status"],
-                        systemImage: "person.crop.circle.fill"
-                    )
+                    ProfileView(viewModel: viewModel)
                 }
 
                 NavigationLink("Advanced settings") {
-                    FeatureStubView(
-                        title: "Advanced Settings",
-                        summary: "Fine-tune diagnostics, exports, and advanced app controls.",
-                        readiness: "Available soon",
-                        bullets: ["Diagnostics", "Data export", "Developer toggles"],
-                        systemImage: "switch.2"
-                    )
+                    AdvancedSettingsView(viewModel: viewModel)
                 }
 
                 Button("Sign out") {
@@ -60,33 +48,19 @@ struct SettingsView: View {
 
             Section("Support") {
                 NavigationLink("Help Center") {
-                    FeatureStubView(
-                        title: "Help Center",
-                        summary: "Browse quick answers and practical guidance for common tasks.",
-                        readiness: "Available soon",
-                        bullets: ["FAQ", "Guided walkthroughs", "Feature explanations"],
-                        systemImage: "questionmark.circle.fill"
-                    )
+                    HelpCenterView()
                 }
 
                 NavigationLink("Support Center") {
-                    FeatureStubView(
-                        title: "Support Center",
-                        summary: "Reach support, follow up on requests, and manage help tickets.",
-                        readiness: "Available soon",
-                        bullets: ["Ticket creation", "Status tracking", "Account deletion handoff"],
-                        systemImage: "bubble.left.and.bubble.right.fill"
-                    )
+                    SupportCenterView(viewModel: viewModel)
                 }
 
                 NavigationLink("Legal Center") {
-                    FeatureStubView(
-                        title: "Legal Center",
-                        summary: "Review terms, privacy information, and support contact details.",
-                        readiness: "Available soon",
-                        bullets: ["Terms", "Privacy", "Support contact"],
-                        systemImage: "doc.text.fill"
-                    )
+                    LegalCenterView()
+                }
+
+                NavigationLink("Brand Gallery") {
+                    BrandGalleryView()
                 }
             }
         }

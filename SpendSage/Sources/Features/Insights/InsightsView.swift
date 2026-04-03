@@ -56,34 +56,54 @@ struct InsightsView: View {
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
 
-                            NavigationLink("Bills") {
-                                FeatureStubView(
-                                title: "Bills",
-                                summary: "Track recurring bills and upcoming due dates.",
-                                readiness: "Available soon",
-                                bullets: ["Recurring bills", "Upcoming due dates", "Safe-to-spend impact"],
-                                systemImage: "calendar.badge.clock"
-                            )
+                            NavigationLink {
+                                FinanceBillsToolView(viewModel: viewModel)
+                            } label: {
+                                FinanceToolRowLabel(
+                                    title: "Bills",
+                                    summary: "Track recurring bills, due dates, and payment history locally.",
+                                    systemImage: "calendar.badge.clock"
+                                )
                             }
 
-                            NavigationLink("Accounts") {
-                                FeatureStubView(
-                                title: "Accounts",
-                                summary: "Organize cash, cards, and balances in one place.",
-                                readiness: "Available soon",
-                                bullets: ["Cash accounts", "Cards", "Manual balances"],
-                                systemImage: "creditcard.fill"
-                            )
+                            NavigationLink {
+                                FinanceAccountsToolView(viewModel: viewModel)
+                            } label: {
+                                FinanceToolRowLabel(
+                                    title: "Accounts",
+                                    summary: "See balances across checking, savings, cash, and cards.",
+                                    systemImage: "wallet.pass.fill"
+                                )
                             }
 
-                            NavigationLink("Rules") {
-                                FeatureStubView(
-                                title: "Rules",
-                                summary: "Automate how transactions are categorized and cleaned up.",
-                                readiness: "Available soon",
-                                bullets: ["Auto-categorization", "Merchant patterns", "Ledger cleanup"],
-                                systemImage: "slider.horizontal.3"
-                            )
+                            NavigationLink {
+                                FinanceRulesToolView(viewModel: viewModel)
+                            } label: {
+                                FinanceToolRowLabel(
+                                    title: "Rules",
+                                    summary: "Map merchant keywords to categories for cleaner imports.",
+                                    systemImage: "slider.horizontal.3"
+                                )
+                            }
+
+                            NavigationLink {
+                                FinanceCsvImportToolView(viewModel: viewModel)
+                            } label: {
+                                FinanceToolRowLabel(
+                                    title: "CSV Import",
+                                    summary: "Paste rows from a spreadsheet and preview them before saving.",
+                                    systemImage: "tablecells.fill"
+                                )
+                            }
+
+                            NavigationLink {
+                                FinanceReceiptScanToolView(viewModel: viewModel)
+                            } label: {
+                                FinanceToolRowLabel(
+                                    title: "Receipt Scan",
+                                    summary: "Capture a receipt image and finish the expense draft manually.",
+                                    systemImage: "camera.viewfinder"
+                                )
                             }
                         }
                     }

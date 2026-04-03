@@ -46,6 +46,63 @@ enum PreviewFinanceData {
                 note: nil
             )
         ],
+        accounts: [
+            AccountRecord(
+                id: UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa") ?? UUID(),
+                name: "Main Checking",
+                institution: "SpendSage Bank",
+                balance: 1_840.60,
+                kind: .checking
+            ),
+            AccountRecord(
+                id: UUID(uuidString: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") ?? UUID(),
+                name: "Rainy Day Savings",
+                institution: "SpendSage Bank",
+                balance: 4_920.15,
+                kind: .savings
+            )
+        ],
+        bills: [
+            BillRecord(
+                id: UUID(uuidString: "cccccccc-cccc-cccc-cccc-cccccccccccc") ?? UUID(),
+                title: "Internet",
+                amount: 54.99,
+                dueDay: 8,
+                category: .bills,
+                autopay: true,
+                lastPaidAt: Calendar.autoupdatingCurrent.date(byAdding: .day, value: -20, to: .now)
+            ),
+            BillRecord(
+                id: UUID(uuidString: "dddddddd-dddd-dddd-dddd-dddddddddddd") ?? UUID(),
+                title: "Rent",
+                amount: 980.00,
+                dueDay: 1,
+                category: .home,
+                autopay: false,
+                lastPaidAt: Calendar.autoupdatingCurrent.date(byAdding: .day, value: -2, to: .now)
+            )
+        ],
+        rules: [
+            RuleRecord(
+                id: UUID(uuidString: "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee") ?? UUID(),
+                merchantKeyword: "morning",
+                category: .coffee,
+                note: "Coffee stops"
+            ),
+            RuleRecord(
+                id: UUID(uuidString: "ffffffff-ffff-ffff-ffff-ffffffffffff") ?? UUID(),
+                merchantKeyword: "super",
+                category: .groceries,
+                note: "Grocery merchants"
+            )
+        ],
+        profile: ProfileRecord(
+            fullName: "Ruben",
+            householdName: "SpendSage Home",
+            email: "rubenl97m@gmail.com",
+            countryCode: "US",
+            marketingOptIn: true
+        ),
         updatedAt: .now
     )
 }

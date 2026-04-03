@@ -10,6 +10,7 @@ struct DashboardView: View {
                 if let state = viewModel.dashboardState {
                     summaryCard(for: state)
                     categoryCard(for: state)
+                    workspaceCard
                     recentExpensesCard(for: state)
                 } else {
                     SurfaceCard {
@@ -144,6 +145,49 @@ struct DashboardView: View {
         }
     }
 
+    private var workspaceCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Workspace")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                NavigationLink {
+                    FinanceAccountsToolView(viewModel: viewModel)
+                } label: {
+                    workspaceRow(
+                        title: "Accounts",
+                        detail: "\(viewModel.accounts.count) tracked",
+                        value: (viewModel.ledger?.totalAccountBalance() ?? 0).formatted(.currency(code: "USD")),
+                        systemImage: "creditcard.fill"
+                    )
+                }
+
+                NavigationLink {
+                    FinanceBillsToolView(viewModel: viewModel)
+                } label: {
+                    workspaceRow(
+                        title: "Bills",
+                        detail: "\(viewModel.bills.count) recurring",
+                        value: viewModel.bills.isEmpty ? "None" : "Due soon",
+                        systemImage: "calendar.badge.clock"
+                    )
+                }
+
+                NavigationLink {
+                    FinanceRulesToolView(viewModel: viewModel)
+                } label: {
+                    workspaceRow(
+                        title: "Rules",
+                        detail: "\(viewModel.rules.count) active",
+                        value: "Automation",
+                        systemImage: "line.3.horizontal.decrease.circle.fill"
+                    )
+                }
+            }
+        }
+    }
+
     private func recentExpensesCard(for state: FinanceDashboardState) -> some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
@@ -209,5 +253,30 @@ struct DashboardView: View {
                 .foregroundStyle(BrandTheme.ink)
         }
         .padding(.vertical, 2)
+    }
+
+    private func workspaceRow(title: String, detail: String, value: String, systemImage: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .frame(width: 34, height: 34)
+                .foregroundStyle(BrandTheme.primary)
+                .background(BrandTheme.primary.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(detail)
+                    .font(.footnote)
+                    .foregroundStyle(BrandTheme.muted)
+            }
+
+            Spacer()
+
+            Text(value)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(BrandTheme.muted)
+        }
     }
 }

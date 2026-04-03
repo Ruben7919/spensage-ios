@@ -128,23 +128,11 @@ struct AuthView: View {
                             .foregroundStyle(BrandTheme.ink)
 
                         NavigationLink("Confirm account") {
-                            FeatureStubView(
-                                title: "Confirm Account",
-                                summary: "Finish setting up your account with a confirmation code.",
-                                readiness: "Available soon",
-                                bullets: ["Enter your verification code", "Resend a code if needed", "Finish activating your account"],
-                                systemImage: "checkmark.shield.fill"
-                            )
+                            ConfirmAccountView()
                         }
 
                         NavigationLink("Reset password") {
-                            FeatureStubView(
-                                title: "Reset Password",
-                                summary: "Recover access to your account and choose a new password.",
-                                readiness: "Available soon",
-                                bullets: ["Forgot password request", "Confirmation code", "New password entry"],
-                                systemImage: "key.fill"
-                            )
+                            ResetPasswordView()
                         }
                     }
                 }

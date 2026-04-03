@@ -66,6 +66,22 @@ final class AppViewModel: ObservableObject {
         authService.configuration
     }
 
+    var accounts: [AccountRecord] {
+        ledger?.accounts ?? []
+    }
+
+    var bills: [BillRecord] {
+        ledger?.upcomingBills() ?? []
+    }
+
+    var rules: [RuleRecord] {
+        ledger?.rules ?? []
+    }
+
+    var profile: ProfileRecord {
+        ledger?.profile ?? .default
+    }
+
     var screen: Screen {
         if !hasCompletedOnboarding {
             return .onboarding
@@ -159,6 +175,62 @@ final class AppViewModel: ObservableObject {
         await financeStore.saveBudget(monthlyIncome: monthlyIncome, monthlyBudget: monthlyBudget, for: session)
         notice = "Budget updated locally on this device."
         isPresentingBudgetWizard = false
+        await refreshDashboard()
+    }
+
+    func addAccount(_ draft: AccountDraft) async {
+        guard draft.isValid else {
+            notice = "Add an account name before saving."
+            return
+        }
+
+        await financeStore.saveAccount(draft, for: session)
+        notice = "Account saved locally on this device."
+        await refreshDashboard()
+    }
+
+    func addBill(_ draft: BillDraft) async {
+        guard draft.isValid else {
+            notice = "Add a bill title, amount, and due day."
+            return
+        }
+
+        await financeStore.saveBill(draft, for: session)
+        notice = "Recurring bill saved locally on this device."
+        await refreshDashboard()
+    }
+
+    func addRule(_ draft: RuleDraft) async {
+        guard draft.isValid else {
+            notice = "Add a merchant keyword before saving a rule."
+            return
+        }
+
+        await financeStore.saveRule(draft, for: session)
+        notice = "Rule saved locally on this device."
+        await refreshDashboard()
+    }
+
+    func payBill(_ billID: UUID) async {
+        await financeStore.markBillPaid(billID, for: session)
+        notice = "Bill payment saved to your local ledger."
+        await refreshDashboard()
+    }
+
+    func importExpenses(_ drafts: [ExpenseDraft]) async {
+        guard !drafts.isEmpty else {
+            notice = "There are no expenses ready to import."
+            return
+        }
+
+        await financeStore.importExpenses(drafts, for: session)
+        notice = "\(drafts.count) expenses imported into your local ledger."
+        await refreshDashboard()
+    }
+
+    func saveProfile(_ profile: ProfileRecord) async {
+        await financeStore.saveProfile(profile, for: session)
+        notice = "Profile preferences saved on this device."
         await refreshDashboard()
     }
 }

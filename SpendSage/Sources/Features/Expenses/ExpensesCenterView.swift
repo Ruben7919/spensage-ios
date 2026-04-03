@@ -46,30 +46,42 @@ struct ExpensesCenterView: View {
 
             Section("Import and scan") {
                 NavigationLink("CSV Import") {
-                    FeatureStubView(
-                        title: "CSV Import",
-                        summary: "Bring in transactions from a spreadsheet and review them before saving.",
-                        readiness: "Available soon",
-                        bullets: [
-                            "Match columns to expense fields",
-                            "Review rows before import",
-                            "Save clean entries into your ledger"
-                        ],
-                        systemImage: "tablecells"
-                    )
+                    FinanceCsvImportToolView(viewModel: viewModel)
                 }
 
                 NavigationLink("Scan Receipts") {
-                    FeatureStubView(
-                        title: "Scan Receipts",
-                        summary: "Capture receipts and turn them into entries faster.",
-                        readiness: "Available soon",
-                        bullets: [
-                            "Frame receipts with the camera",
-                            "Extract key details automatically",
-                            "Review entries before saving"
-                        ],
-                        systemImage: "camera.viewfinder"
+                    FinanceReceiptScanToolView(viewModel: viewModel)
+                }
+            }
+
+            Section("Finance tools") {
+                NavigationLink {
+                    FinanceAccountsToolView(viewModel: viewModel)
+                } label: {
+                    FinanceToolRowLabel(
+                        title: "Accounts",
+                        summary: "Add cash, cards, and manual balances for a fuller local snapshot.",
+                        systemImage: "wallet.pass.fill"
+                    )
+                }
+
+                NavigationLink {
+                    FinanceBillsToolView(viewModel: viewModel)
+                } label: {
+                    FinanceToolRowLabel(
+                        title: "Bills",
+                        summary: "Track recurring payments and mark them paid into the ledger.",
+                        systemImage: "calendar.badge.clock"
+                    )
+                }
+
+                NavigationLink {
+                    FinanceRulesToolView(viewModel: viewModel)
+                } label: {
+                    FinanceToolRowLabel(
+                        title: "Rules",
+                        summary: "Save merchant keywords to auto-categorize imported expenses.",
+                        systemImage: "slider.horizontal.3"
                     )
                 }
             }
