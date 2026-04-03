@@ -157,6 +157,9 @@ struct AuthView: View {
     }
 
     private var canSubmit: Bool {
+        if viewModel.authConfiguration.isHostedUIReady {
+            return isValidEmail(email)
+        }
         switch mode {
         case .signIn:
             return isValidEmail(email)
@@ -169,6 +172,9 @@ struct AuthView: View {
     }
 
     private var validationHint: String? {
+        if viewModel.authConfiguration.isHostedUIReady {
+            return "You will finish this step securely in the browser."
+        }
         if !isValidEmail(email) {
             return "Use a valid email address."
         }

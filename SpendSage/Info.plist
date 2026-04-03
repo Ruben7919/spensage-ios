@@ -5,9 +5,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>SpendSage</string>
+	<string>SpendSage AI</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -17,9 +19,22 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.spendsage.ai</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>spendsage</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
@@ -28,10 +43,20 @@
 	<string>Save exported images and documents.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Import receipts and supporting images.</string>
+	<key>SpendSageCognitoHostedUIDomain</key>
+	<string></string>
+	<key>SpendSageCognitoRedirectSignIn</key>
+	<string>spendsage://auth-callback</string>
+	<key>SpendSageCognitoRedirectSignOut</key>
+	<string>spendsage://auth-logout</string>
+	<key>SpendSageCognitoUserPoolClientId</key>
+	<string></string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<key>UIRequiresFullScreen</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

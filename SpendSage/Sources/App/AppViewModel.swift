@@ -52,7 +52,7 @@ final class AppViewModel: ObservableObject {
     private let onboardingKey = "native_onboarding_completed"
 
     init(
-        authService: AuthServicing = PreviewAuthService(),
+        authService: AuthServicing = DefaultAuthService.make(),
         financeStore: FinanceDashboardStoring = LocalFinanceStore()
     ) {
         self.authService = authService

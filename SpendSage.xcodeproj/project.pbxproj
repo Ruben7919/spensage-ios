@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02C6DDAE3EB1ABFCFBF4C91E /* HostedUIAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20799AB6E9D49FDE20443E9 /* HostedUIAuthService.swift */; };
 		04E00FF56F15EBE2816E0EFB /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785F4A4F7DC3D1425773B754 /* HelpCenterView.swift */; };
 		0F23374C3FFF9B892C7C0270 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E9688AB4D62C4797F2C444 /* AppViewModel.swift */; };
 		0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE8903B75C047C59E5F634A /* Assets.xcassets */; };
@@ -30,6 +31,7 @@
 		8190DE8A0F0ADDF37A21E9A0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3A812673FCF633E5AD7A82 /* SettingsView.swift */; };
 		89E9E8CAFC4E34AC1E24BBB5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6227E322248CA2A7A980D40 /* Theme.swift */; };
 		91E731398ADCE401D5B7B1F6 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC5D00895B952997D987883 /* FinanceModels.swift */; };
+		93A5A96EF2B3A5812249918F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */; };
 		9BF510400E05D1A4B72ECA8A /* BrandGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89985226F3D7B000843752AB /* BrandGalleryView.swift */; };
 		9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679F2DB952FBB586D6057598 /* AuthSupport.swift */; };
 		A14E5B6B21BADE70EC7F687F /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B314CADFCED6D85AF660846D /* AppRootView.swift */; };
@@ -96,12 +98,14 @@
 		C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewFinanceData.swift; sourceTree = "<group>"; };
 		CED414330125E63F549BE0AC /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
 		CF636AE08A9FDCCDF51460A3 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		D20799AB6E9D49FDE20443E9 /* HostedUIAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedUIAuthService.swift; sourceTree = "<group>"; };
 		D2CB5D74645DF4C38E921764 /* FinanceCsvImportToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCsvImportToolView.swift; sourceTree = "<group>"; };
 		D7EA145E6EEC82916F75C622 /* FinanceAccountsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceAccountsToolView.swift; sourceTree = "<group>"; };
 		E175C0F00D3BFE3E05056D15 /* AddExpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
 		EBCBCE8B2F2F891F368C7DFB /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
 		ED13FEEB87E9B10AC5DCBD3B /* FinanceRulesToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceRulesToolView.swift; sourceTree = "<group>"; };
 		F6E05C5BF495CA177EAE3510 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -318,6 +322,7 @@
 			isa = PBXGroup;
 			children = (
 				679F2DB952FBB586D6057598 /* AuthSupport.swift */,
+				D20799AB6E9D49FDE20443E9 /* HostedUIAuthService.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -334,6 +339,7 @@
 			isa = PBXGroup;
 			children = (
 				9AE8903B75C047C59E5F634A /* Assets.xcassets */,
+				FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */,
 			);
 			name = Resources;
 			path = SpendSage/Resources;
@@ -387,6 +393,14 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					9F2ED8D47CD74BCA367AABE9 = {
+						DevelopmentTeam = YU855NB22W;
+						ProvisioningStyle = Automatic;
+					};
+					F92411BCA530BEA029B91065 = {
+						DevelopmentTeam = YU855NB22W;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 0C7F8DBB5C0A8097AD1A477E /* Build configuration list for PBXProject "SpendSage" */;
@@ -415,6 +429,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */,
+				93A5A96EF2B3A5812249918F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,6 +462,7 @@
 				A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */,
 				24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */,
 				04E00FF56F15EBE2816E0EFB /* HelpCenterView.swift in Sources */,
+				02C6DDAE3EB1ABFCFBF4C91E /* HostedUIAuthService.swift in Sources */,
 				DCE0492B5DA8A93842388CF6 /* InsightsView.swift in Sources */,
 				DE5D447306B02BC086076ED6 /* LegalCenterView.swift in Sources */,
 				1BFAC9F2D1D8FBF19FBE8052 /* LocalLedgerExport.swift in Sources */,
@@ -496,7 +512,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ai.spendsage.native.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.spendsage.ai.tests;
 				PRODUCT_NAME = SpendSageTests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -511,14 +527,15 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SpendSage/Info.plist;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ai.spendsage.native;
+				PRODUCT_BUNDLE_IDENTIFIER = com.spendsage.ai;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -555,10 +572,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_ASSET_PATHS = "\"SpendSage/Resources\"";
+				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -576,7 +594,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -599,7 +617,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ai.spendsage.native.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.spendsage.ai.tests;
 				PRODUCT_NAME = SpendSageTests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -614,14 +632,15 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SpendSage/Info.plist;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ai.spendsage.native;
+				PRODUCT_BUNDLE_IDENTIFIER = com.spendsage.ai;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -658,10 +677,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_ASSET_PATHS = "\"SpendSage/Resources\"";
+				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -673,7 +693,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = SpendSage;

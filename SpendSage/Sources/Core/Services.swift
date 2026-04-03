@@ -16,6 +16,16 @@ protocol DashboardProviding {
     func loadRecentExpenses(for session: SessionState) async -> [ExpenseItem]
 }
 
+enum DefaultAuthService {
+    @MainActor
+    static func make() -> AuthServicing {
+        if let liveConfiguration = AuthConfiguration.liveFromBundle() {
+            return HostedUIAuthService(configuration: liveConfiguration)
+        }
+        return PreviewAuthService()
+    }
+}
+
 @MainActor
 struct PreviewAuthService: AuthServicing {
     let configuration: AuthConfiguration

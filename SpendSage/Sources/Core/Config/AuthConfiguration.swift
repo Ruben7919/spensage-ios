@@ -15,12 +15,22 @@ struct AuthConfiguration: Equatable {
     struct HostedUI: Equatable {
         let issuerBaseURL: URL
         let callbackScheme: String
+        let clientId: String
+        let redirectSignIn: String
+        let redirectSignOut: String
+        let scopes: [String]
         let signInPath: String
         let signUpPath: String
-        let applePath: String
-        let googlePath: String
+        let tokenPath: String
 
-        func authorizationURL(for provider: SocialProvider, action: AuthAction) -> URL {
+        var authorizePath: String { "/oauth2/authorize" }
+
+        func authorizationURL(
+            for provider: SocialProvider?,
+            action: AuthAction,
+            codeChallenge: String,
+            loginHint: String? = nil
+        ) -> URL {
             let path: String
             switch action {
             case .signIn:
@@ -28,15 +38,33 @@ struct AuthConfiguration: Equatable {
             case .createAccount:
                 path = signUpPath
             case .social:
-                path = provider == .apple ? applePath : googlePath
+                path = authorizePath
             }
 
             var components = URLComponents(url: issuerBaseURL, resolvingAgainstBaseURL: false) ?? URLComponents()
             components.path = issuerBaseURL.path + path
-            components.queryItems = [
-                URLQueryItem(name: "provider", value: provider.rawValue.lowercased()),
-                URLQueryItem(name: "action", value: action.rawValue)
+            var queryItems: [URLQueryItem] = [
+                URLQueryItem(name: "client_id", value: clientId),
+                URLQueryItem(name: "response_type", value: "code"),
+                URLQueryItem(name: "scope", value: scopes.joined(separator: " ")),
+                URLQueryItem(name: "redirect_uri", value: redirectSignIn),
+                URLQueryItem(name: "code_challenge_method", value: "S256"),
+                URLQueryItem(name: "code_challenge", value: codeChallenge),
             ]
+            if let provider {
+                let providerName = provider == .apple ? "SignInWithApple" : provider.rawValue
+                queryItems.append(URLQueryItem(name: "identity_provider", value: providerName))
+            }
+            if let loginHint, !loginHint.isEmpty {
+                queryItems.append(URLQueryItem(name: "login_hint", value: loginHint))
+            }
+            components.queryItems = queryItems
+            return components.url ?? issuerBaseURL
+        }
+
+        var tokenURL: URL {
+            var components = URLComponents(url: issuerBaseURL, resolvingAgainstBaseURL: false) ?? URLComponents()
+            components.path = issuerBaseURL.path + tokenPath
             return components.url ?? issuerBaseURL
         }
     }
@@ -65,6 +93,57 @@ struct AuthConfiguration: Equatable {
         hostedUIFootnote: "Apple and Google sign in are available on supported accounts."
     )
 
+    static func liveFromBundle(_ bundle: Bundle = .main) -> AuthConfiguration? {
+        guard
+            let domain = bundle.object(forInfoDictionaryKey: "SpendSageCognitoHostedUIDomain") as? String,
+            let clientId = bundle.object(forInfoDictionaryKey: "SpendSageCognitoUserPoolClientId") as? String,
+            let redirectSignIn = bundle.object(forInfoDictionaryKey: "SpendSageCognitoRedirectSignIn") as? String,
+            let redirectSignOut = bundle.object(forInfoDictionaryKey: "SpendSageCognitoRedirectSignOut") as? String
+        else {
+            return nil
+        }
+
+        let trimmedDomain = domain.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedClientId = clientId.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedRedirectSignIn = redirectSignIn.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedRedirectSignOut = redirectSignOut.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard
+            !trimmedDomain.isEmpty,
+            !trimmedClientId.isEmpty,
+            !trimmedRedirectSignIn.isEmpty,
+            !trimmedRedirectSignOut.isEmpty,
+            let issuerBaseURL = URL(string: "https://\(trimmedDomain)")
+        else {
+            return nil
+        }
+
+        let callbackScheme = URL(string: trimmedRedirectSignIn)?.scheme ?? "spendsage"
+
+        return AuthConfiguration(
+            mode: .hostedUI,
+            appName: "SpendSage AI",
+            allowsGuestAccess: true,
+            emailPasswordEnabled: true,
+            minimumPasswordLength: 8,
+            supportedSocialProviders: SocialProvider.allCases,
+            hostedUI: HostedUI(
+                issuerBaseURL: issuerBaseURL,
+                callbackScheme: callbackScheme,
+                clientId: trimmedClientId,
+                redirectSignIn: trimmedRedirectSignIn,
+                redirectSignOut: trimmedRedirectSignOut,
+                scopes: ["openid", "email", "profile"],
+                signInPath: "/login",
+                signUpPath: "/signup",
+                tokenPath: "/oauth2/token"
+            ),
+            previewEmailDomain: "spendsage.ai",
+            localPreviewFootnote: "You can continue on this device or use your SpendSage account.",
+            hostedUIFootnote: "Apple and Google sign in use Cognito Hosted UI with a secure browser session."
+        )
+    }
+
     var isHostedUIReady: Bool {
         hostedUI != nil
     }
@@ -78,7 +157,7 @@ struct AuthConfiguration: Equatable {
         return AuthHostedUIRequest(
             provider: provider,
             action: action,
-            authorizationURL: hostedUI.authorizationURL(for: provider, action: action),
+            authorizationURL: hostedUI.issuerBaseURL,
             callbackScheme: hostedUI.callbackScheme,
             prefersEphemeralSession: true
         )
