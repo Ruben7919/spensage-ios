@@ -2,8 +2,10 @@ import SwiftUI
 
 struct ExpensesCenterView: View {
     @ObservedObject var viewModel: AppViewModel
+    @State private var isPresentingGuide = false
 
     private let currencyCode = "USD"
+    private let freeLocalExpenseLimit = 40
 
     private var ledger: LocalFinanceLedger? {
         viewModel.ledger
@@ -43,6 +45,28 @@ struct ExpensesCenterView: View {
         ledger?.upcomingBills().first
     }
 
+    private var remainingFreeEntries: Int {
+        max(0, freeLocalExpenseLimit - expenseRecords.count)
+    }
+
+    private var merchantSuggestions: [String] {
+        var counts: [String: Int] = [:]
+        for expense in expenseRecords {
+            let merchant = expense.merchant.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !merchant.isEmpty else { continue }
+            counts[merchant, default: 0] += 1
+        }
+
+        let rankedMerchants = counts.sorted { lhs, rhs in
+            lhs.value > rhs.value || (
+                lhs.value == rhs.value &&
+                lhs.key.localizedCaseInsensitiveCompare(rhs.key) == .orderedAscending
+            )
+        }
+
+        return rankedMerchants.prefix(3).map(\.key)
+    }
+
     private var daysElapsedInMonth: Int {
         let calendar = Calendar.autoupdatingCurrent
         return max(calendar.component(.day, from: .now), 1)
@@ -61,8 +85,9 @@ struct ExpensesCenterView: View {
                 if let state = currentState {
                     snapshotCard(for: state)
                     categoryCard(for: state)
-                    recentLedgerCard
                     importAndScanCard
+                    sponsorCard
+                    recentLedgerCard
                     toolsCard
                 } else {
                     loadingCard
@@ -81,6 +106,9 @@ struct ExpensesCenterView: View {
         )
         .navigationTitle("Expenses")
         .navigationBarTitleDisplayMode(.large)
+        .sheet(isPresented: $isPresentingGuide) {
+            GuideSheet(guide: GuideLibrary.guide(.expenses))
+        }
         .task {
             if viewModel.dashboardState == nil {
                 await viewModel.refreshDashboard()
@@ -125,6 +153,23 @@ struct ExpensesCenterView: View {
                     }
                     .buttonStyle(SecondaryCTAStyle())
                 }
+
+                HStack(spacing: 12) {
+                    Button("Open guide") {
+                        isPresentingGuide = true
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+
+                    NavigationLink("CSV Import") {
+                        FinanceCsvImportToolView(viewModel: viewModel)
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                }
+
+                BrandBadge(
+                    text: "Free local ledger \(expenseRecords.count)/\(freeLocalExpenseLimit)",
+                    systemImage: "shield.lefthalf.filled"
+                )
             }
         }
     }
@@ -209,6 +254,14 @@ struct ExpensesCenterView: View {
                         systemImage: "speedometer"
                     )
                 }
+
+                if case .guest = viewModel.session {
+                    BrandFeatureRow(
+                        systemImage: "iphone.gen3",
+                        title: "Local free mode",
+                        detail: "\(remainingFreeEntries) of \(freeLocalExpenseLimit) free local entries remain. Upgrade later for cloud sync, imports across devices, and a quieter billing experience."
+                    )
+                }
             }
         }
     }
@@ -231,6 +284,46 @@ struct ExpensesCenterView: View {
                 } else {
                     ForEach(categoryBreakdown) { category in
                         categoryRow(category, total: totalSpentThisMonth)
+                    }
+                }
+            }
+        }
+    }
+
+    private var sponsorCard: some View {
+        Group {
+            if case .guest = viewModel.session {
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 14) {
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Sponsor-supported free mode")
+                                    .font(.headline)
+                                    .foregroundStyle(BrandTheme.ink)
+                                Text("This sponsor surface stays visible in free mode, between the capture tools and the recent ledger, so the experience remains supported and upgrade-ready.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(BrandTheme.muted)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+
+                            Spacer(minLength: 0)
+
+                            BrandBadge(text: "Free mode", systemImage: "sparkles")
+                        }
+
+                        HStack(spacing: 12) {
+                            NavigationLink {
+                                PremiumView(viewModel: viewModel)
+                            } label: {
+                                Label("Unlock premium", systemImage: "sparkles")
+                            }
+                            .buttonStyle(PrimaryCTAStyle())
+
+                            Button("Why this appears") {
+                                isPresentingGuide = true
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                        }
                     }
                 }
             }
@@ -265,16 +358,60 @@ struct ExpensesCenterView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeading(
-                    title: "Import and scan",
-                    detail: "Seed the local ledger with receipts or spreadsheet data."
+                    title: "Import, suggestions, and limits",
+                    detail: "The free ledger stays on-device. Use CSV import for bulk rows, scan receipts for one-offs, and lean on merchant hints when the next expense feels repetitive."
                 )
 
-                NavigationLink("CSV Import") {
-                    FinanceCsvImportToolView(viewModel: viewModel)
+                HStack(spacing: 12) {
+                    infoPill(
+                        title: "Saved locally",
+                        detail: "\(expenseRecords.count) expenses are already on the device.",
+                        systemImage: "iphone.gen3"
+                    )
+
+                    infoPill(
+                        title: "Free left",
+                        detail: "\(remainingFreeEntries) of \(freeLocalExpenseLimit) entries remain in the free window.",
+                        systemImage: "shield.lefthalf.filled"
+                    )
                 }
 
-                NavigationLink("Scan Receipts") {
-                    FinanceReceiptScanToolView(viewModel: viewModel)
+                if merchantSuggestions.isEmpty {
+                    emptyRow(
+                        title: "No merchant hints yet",
+                        detail: "Once a few entries land, this card will surface the names you type most."
+                    )
+                } else {
+                    VStack(spacing: 10) {
+                        ForEach(merchantSuggestions, id: \.self) { merchant in
+                            merchantSuggestionRow(merchant)
+                        }
+                    }
+                }
+
+                HStack(spacing: 12) {
+                    NavigationLink("CSV Import") {
+                        FinanceCsvImportToolView(viewModel: viewModel)
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+
+                    NavigationLink("Scan Receipts") {
+                        FinanceReceiptScanToolView(viewModel: viewModel)
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+                }
+
+                Text("Use CSV when the spreadsheet already exists. Use scan when you want a receipt image turned into a draft you can finish manually.")
+                    .font(.footnote)
+                    .foregroundStyle(BrandTheme.muted)
+
+                if case .guest = viewModel.session {
+                    NavigationLink {
+                        PremiumView(viewModel: viewModel)
+                    } label: {
+                        Label("Unlock premium", systemImage: "sparkles")
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
                 }
             }
         }
@@ -454,6 +591,34 @@ struct ExpensesCenterView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(BrandTheme.surfaceTint)
+        )
+    }
+
+    private func merchantSuggestionRow(_ merchant: String) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(BrandTheme.accent.opacity(0.18))
+                Image(systemName: "sparkles")
+                    .foregroundStyle(BrandTheme.primary)
+            }
+            .frame(width: 46, height: 46)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(merchant)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text("Reuse this merchant name to keep import and categorization cleaner.")
+                    .font(.footnote)
+                    .foregroundStyle(BrandTheme.muted)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(14)
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(BrandTheme.surfaceTint)

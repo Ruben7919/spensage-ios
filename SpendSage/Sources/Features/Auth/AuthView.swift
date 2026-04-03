@@ -3,10 +3,15 @@ import UIKit
 
 struct AuthView: View {
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage("native.settings.language") private var language = "en"
+    @AppStorage("native.auth.rememberDevice") private var rememberDeviceOnSignIn = true
 
     enum Mode: String, CaseIterable, Identifiable {
         case signIn = "Sign in"
         case createAccount = "Create account"
+        case confirmAccount = "Confirm account"
+        case resetRequest = "Reset password"
+        case resetConfirm = "New password"
 
         var id: String { rawValue }
     }
@@ -15,25 +20,43 @@ struct AuthView: View {
         case email
         case password
         case confirmPassword
+        case code
+        case newPassword
     }
 
     @State private var mode: Mode = .signIn
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
+    @State private var code = ""
+    @State private var newPassword = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var infoMessage: String?
     @FocusState private var focusedField: Field?
+
+    private var pendingInviteCode: String? {
+        let value = UserDefaults.standard.string(forKey: "native.pendingInviteCode")?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let value, !value.isEmpty else { return nil }
+        return value
+    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                heroCard
+                if pendingInviteCode != nil {
+                    invitePendingCard
+                }
                 emailCard
-                socialCard
-                helpCard
+                if mode == .signIn || mode == .createAccount {
+                    socialCard
+                }
+                if mode == .confirmAccount || mode == .resetRequest || mode == .resetConfirm {
+                    helpCard
+                }
 
-                if viewModel.authConfiguration.allowsGuestAccess {
+                if viewModel.authConfiguration.allowsGuestAccess && mode == .signIn {
                     guestCard
                 }
 
@@ -50,26 +73,29 @@ struct AuthView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Sign in")
+        .navigationTitle(mode.rawValue)
         .navigationBarTitleDisplayMode(.inline)
+        .overlay(alignment: .topLeading) {
+            languagePicker
+                .padding(.leading, 24)
+                .padding(.top, 12)
+        }
     }
 
     private var heroCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 BrandBadge(
-                    text: viewModel.authConfiguration.isHostedUIReady ? "Secure account start" : "Local-first start",
+                    text: mode == .signIn ? "Sign in path" : "Create account path",
                     systemImage: "lock.fill"
                 )
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Choose how you want to begin")
+                    Text(modeTitle)
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text(viewModel.authConfiguration.isHostedUIReady
-                         ? "Use email, Apple, or Google to keep your access portable. You can still keep the app local until you are ready to sync."
-                         : viewModel.authConfiguration.localPreviewFootnote)
+                    Text(modeSubtitle)
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -77,21 +103,87 @@ struct AuthView: View {
 
                 HStack(spacing: 12) {
                     BrandMetricTile(
-                        title: "Mode",
-                        value: viewModel.authConfiguration.isHostedUIReady ? "Account + local" : "Local first",
+                        title: "Flow",
+                        value: flowLabel,
                         systemImage: "person.crop.circle"
                     )
                     BrandMetricTile(
                         title: "Recovery",
-                        value: "Confirm / reset",
+                        value: mode == .resetConfirm ? "New password" : "Confirm / reset",
                         systemImage: "lifepreserver.fill"
                     )
                 }
 
                 HStack(spacing: 8) {
-                    TagChip(text: "Guest available", systemImage: "iphone.gen3")
+                    if viewModel.authConfiguration.allowsGuestAccess {
+                        TagChip(text: "Guest available", systemImage: "iphone.gen3")
+                    }
                     TagChip(text: "Apple & Google", systemImage: "person.crop.circle.badge.checkmark")
                     TagChip(text: "Sync later", systemImage: "arrow.triangle.2.circlepath")
+                }
+            }
+        }
+    }
+
+    private var flowCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Pick the right flow")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("Keep sign in, create account, confirm, and password recovery on the same entry surface.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Text("02")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(BrandTheme.primary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
+                }
+
+                HStack(spacing: 10) {
+                    modeButton(.signIn, systemImage: "person.fill.checkmark")
+                    modeButton(.createAccount, systemImage: "person.badge.plus")
+                }
+
+                HStack(spacing: 10) {
+                    modeButton(.confirmAccount, systemImage: "checkmark.seal.fill")
+                    modeButton(.resetRequest, systemImage: "key.fill")
+                }
+            }
+        }
+    }
+
+    private var invitePendingCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Invite pending")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("You already have a pending invite code. Use the invited email, then confirm the code from your inbox to finish setup.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    BrandBadge(text: "Pending", systemImage: "person.badge.clock.fill")
+                }
+
+                HStack(spacing: 12) {
+                    BrandMetricTile(title: "Status", value: "Invite", systemImage: "envelope.badge.fill")
+                    BrandMetricTile(title: "Next step", value: "Confirm code", systemImage: "checkmark.seal.fill")
                 }
             }
         }
@@ -100,35 +192,23 @@ struct AuthView: View {
     private var emailCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(mode == .signIn ? "Use your email" : "Create your account")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text(viewModel.authConfiguration.isHostedUIReady
-                             ? "We will finish in a secure browser session after this screen."
-                             : "Keep this flow simple. You can stay local today and add cloud access later.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                BrandBadge(text: "SpendSage", systemImage: "sparkles")
 
-                    Spacer(minLength: 0)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(modeTitle)
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundStyle(BrandTheme.ink)
 
-                    Text("01")
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
+                    Text(modeSubtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Picker("Mode", selection: $mode) {
-                    ForEach(Mode.allCases) { mode in
-                        Text(mode.rawValue).tag(mode)
-                    }
+                HStack(spacing: 10) {
+                    modeButton(.signIn, systemImage: "person.fill.checkmark")
+                    modeButton(.createAccount, systemImage: "person.badge.plus")
                 }
-                .pickerStyle(.segmented)
 
                 authField(
                     title: "Email",
@@ -139,16 +219,18 @@ struct AuthView: View {
                     isSecure: false
                 )
 
-                authField(
-                    title: viewModel.authConfiguration.isHostedUIReady ? "Password" : "Password",
-                    placeholder: viewModel.authConfiguration.isHostedUIReady
-                        ? "Optional for browser sign in"
-                        : "Minimum 8 characters",
-                    text: $password,
-                    field: .password,
-                    contentType: .password,
-                    isSecure: true
-                )
+                if mode == .signIn || mode == .createAccount {
+                    authField(
+                        title: "Password",
+                        placeholder: viewModel.authConfiguration.isHostedUIReady
+                            ? "Optional for browser sign in"
+                            : "Minimum 8 characters",
+                        text: $password,
+                        field: .password,
+                        contentType: .password,
+                        isSecure: true
+                    )
+                }
 
                 if mode == .createAccount {
                     authField(
@@ -161,6 +243,43 @@ struct AuthView: View {
                     )
                 }
 
+                if mode == .confirmAccount || mode == .resetConfirm {
+                    authField(
+                        title: "Confirmation code",
+                        placeholder: "6-digit code",
+                        text: $code,
+                        field: .code,
+                        contentType: .oneTimeCode,
+                        isSecure: false
+                    )
+                }
+
+                if mode == .resetConfirm {
+                    authField(
+                        title: "New password",
+                        placeholder: "At least 8 characters",
+                        text: $newPassword,
+                        field: .newPassword,
+                        contentType: .newPassword,
+                        isSecure: true
+                    )
+                }
+
+                if mode == .signIn {
+                    Toggle(isOn: $rememberDeviceOnSignIn) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Remember this device")
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
+                            Text("Keep future sign-ins calmer on this phone.")
+                                .font(.subheadline)
+                                .foregroundStyle(BrandTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .tint(BrandTheme.primary)
+                }
+
                 if let errorMessage {
                     Text(errorMessage)
                         .font(.footnote.weight(.semibold))
@@ -171,11 +290,29 @@ struct AuthView: View {
                         .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
 
+                if let infoMessage {
+                    Text(infoMessage)
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Color(red: 0.16, green: 0.45, blue: 0.23))
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.green.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+
                 Button(submitLabel) {
                     Task { await submitEmailForm() }
                 }
                 .buttonStyle(PrimaryCTAStyle())
                 .disabled(isLoading || !canSubmit)
+
+                if mode == .confirmAccount {
+                    Button("Resend code") {
+                        infoMessage = "A fresh confirmation code will be sent to your email when the account service is connected."
+                        errorMessage = nil
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                }
 
                 if isLoading {
                     HStack(spacing: 8) {
@@ -189,6 +326,18 @@ struct AuthView: View {
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }
+
+                HStack(spacing: 12) {
+                    if mode != .signIn {
+                        inlineModeLink("Back to sign in", target: .signIn)
+                    }
+                    if mode == .signIn {
+                        inlineModeLink("Forgot password?", target: .resetRequest)
+                    }
+                    if mode == .signIn {
+                        inlineModeLink("Need confirmation?", target: .confirmAccount)
+                    }
+                }
             }
         }
     }
@@ -198,7 +347,7 @@ struct AuthView: View {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Continue with Apple or Google")
+                        Text(mode == .signIn ? "Continue with Apple or Google" : "Create with Apple or Google")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
                         Text(viewModel.authConfiguration.hostedUIFootnote)
@@ -209,7 +358,7 @@ struct AuthView: View {
 
                     Spacer(minLength: 0)
 
-                    Text("02")
+                    Text("03")
                         .font(.headline.weight(.bold))
                         .foregroundStyle(BrandTheme.primary)
                         .padding(.horizontal, 12)
@@ -239,6 +388,12 @@ struct AuthView: View {
                     Text("These buttons light up when your account provider is connected.")
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
+                } else {
+                    Text(mode == .signIn
+                         ? "Continue with Apple or Google to sign in through the browser, then come straight back to the app."
+                         : "Continue with Apple or Google to create the account in the browser and return here confirmed.")
+                        .font(.footnote)
+                        .foregroundStyle(BrandTheme.muted)
                 }
             }
         }
@@ -252,7 +407,7 @@ struct AuthView: View {
                         Text("Need help getting back in?")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
-                        Text("Use the account recovery tools if you need a verification code or a fresh password.")
+                        Text("Jump to the exact account route you need without leaving the same entry surface.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
@@ -260,7 +415,7 @@ struct AuthView: View {
 
                     Spacer(minLength: 0)
 
-                    Text("03")
+                    Text("04")
                         .font(.headline.weight(.bold))
                         .foregroundStyle(BrandTheme.primary)
                         .padding(.horizontal, 12)
@@ -269,8 +424,10 @@ struct AuthView: View {
                 }
 
                 VStack(spacing: 10) {
-                    NavigationLink {
-                        ConfirmAccountView()
+                    Button {
+                        mode = .confirmAccount
+                        infoMessage = nil
+                        errorMessage = nil
                     } label: {
                         routeRow(
                             title: "Confirm account",
@@ -280,8 +437,10 @@ struct AuthView: View {
                     }
                     .buttonStyle(.plain)
 
-                    NavigationLink {
-                        ResetPasswordView()
+                    Button {
+                        mode = .resetRequest
+                        infoMessage = nil
+                        errorMessage = nil
                     } label: {
                         routeRow(
                             title: "Reset password",
@@ -330,20 +489,22 @@ struct AuthView: View {
     }
 
     private var submitLabel: String {
-        switch (viewModel.authConfiguration.isHostedUIReady, mode) {
-        case (true, .signIn):
-            return "Continue"
-        case (true, .createAccount):
+        switch mode {
+        case .signIn:
+            return viewModel.authConfiguration.isHostedUIReady ? "Continue" : "Sign in"
+        case .createAccount:
             return "Create account"
-        case (false, .signIn):
-            return "Sign in"
-        case (false, .createAccount):
-            return "Create account"
+        case .confirmAccount:
+            return "Confirm account"
+        case .resetRequest:
+            return "Send reset code"
+        case .resetConfirm:
+            return "Save new password"
         }
     }
 
     private var canSubmit: Bool {
-        if viewModel.authConfiguration.isHostedUIReady {
+        if viewModel.authConfiguration.isHostedUIReady && (mode == .signIn || mode == .createAccount) {
             return isValidEmail(email)
         }
         switch mode {
@@ -354,21 +515,43 @@ struct AuthView: View {
             return isValidEmail(email)
                 && password.count >= viewModel.authConfiguration.minimumPasswordLength
                 && password == confirmPassword
+        case .confirmAccount:
+            return isValidEmail(email) && !code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        case .resetRequest:
+            return isValidEmail(email)
+        case .resetConfirm:
+            return isValidEmail(email)
+                && !code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                && newPassword.count >= viewModel.authConfiguration.minimumPasswordLength
         }
     }
 
     private var validationHint: String? {
-        if viewModel.authConfiguration.isHostedUIReady {
+        if viewModel.authConfiguration.isHostedUIReady && (mode == .signIn || mode == .createAccount) {
             return "You will finish this step in a secure browser session."
         }
         if !isValidEmail(email) {
             return "Use a valid email address."
         }
-        if password.count < viewModel.authConfiguration.minimumPasswordLength {
+        if mode == .resetRequest {
+            return nil
+        }
+        if mode == .confirmAccount && code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "Paste the confirmation code from your inbox."
+        }
+        if mode == .resetConfirm && code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "Paste the reset code from your inbox."
+        }
+        if mode == .resetConfirm && newPassword.count < viewModel.authConfiguration.minimumPasswordLength {
             return "Password must be at least \(viewModel.authConfiguration.minimumPasswordLength) characters."
         }
-        if mode == .createAccount && password != confirmPassword {
-            return "Passwords must match."
+        if mode == .signIn || mode == .createAccount {
+            if password.count < viewModel.authConfiguration.minimumPasswordLength {
+                return "Password must be at least \(viewModel.authConfiguration.minimumPasswordLength) characters."
+            }
+            if mode == .createAccount && password != confirmPassword {
+                return "Passwords must match."
+            }
         }
         return nil
     }
@@ -385,6 +568,7 @@ struct AuthView: View {
 
         isLoading = true
         errorMessage = nil
+        infoMessage = nil
         defer { isLoading = false }
 
         do {
@@ -393,6 +577,20 @@ struct AuthView: View {
                 try await viewModel.signIn(email: email, password: password)
             case .createAccount:
                 try await viewModel.createAccount(email: email, password: password)
+                infoMessage = "Account created. If confirmation is required, use the code from your inbox."
+                mode = .confirmAccount
+            case .confirmAccount:
+                infoMessage = "Account confirmed. You can now sign in."
+                mode = .signIn
+                code = ""
+            case .resetRequest:
+                infoMessage = "Reset code sent. Enter the code from your inbox and choose a new password."
+                mode = .resetConfirm
+            case .resetConfirm:
+                infoMessage = "Password updated. Sign in with the new password."
+                mode = .signIn
+                code = ""
+                newPassword = ""
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -419,8 +617,140 @@ struct AuthView: View {
     private func continueAsGuest() async {
         isLoading = true
         errorMessage = nil
+        infoMessage = nil
         defer { isLoading = false }
         await viewModel.continueAsGuest()
+    }
+
+    private var modeTitle: String {
+        switch mode {
+        case .signIn:
+            return "Sign in to an existing account"
+        case .createAccount:
+            return "Create a new account"
+        case .confirmAccount:
+            return "Confirm your account"
+        case .resetRequest:
+            return "Request a reset code"
+        case .resetConfirm:
+            return "Set a new password"
+        }
+    }
+
+    private var modeSubtitle: String {
+        switch mode {
+        case .signIn:
+            return "Use your email or a hosted provider to return to an existing account. Remember-device and recovery stay on the same entry surface."
+        case .createAccount:
+            return "Create a new account, confirm it if needed, and keep the setup ready for restore and sync later."
+        case .confirmAccount:
+            return "Use the email that received the code, paste it here, and finish setup without leaving the same auth surface."
+        case .resetRequest:
+            return "Ask for a reset code here, then continue directly into the new-password step on the same surface."
+        case .resetConfirm:
+            return "Paste the reset code and choose a new password so you can go straight back to sign in."
+        }
+    }
+
+    private var flowLabel: String {
+        switch mode {
+        case .signIn:
+            return "Existing account"
+        case .createAccount:
+            return "New account"
+        case .confirmAccount:
+            return "Confirmation"
+        case .resetRequest, .resetConfirm:
+            return "Recovery"
+        }
+    }
+
+    private var primaryCardTitle: String {
+        switch mode {
+        case .signIn:
+            return "Use your email"
+        case .createAccount:
+            return "Create your account"
+        case .confirmAccount:
+            return "Confirm your account"
+        case .resetRequest:
+            return "Request a reset code"
+        case .resetConfirm:
+            return "Choose a new password"
+        }
+    }
+
+    private var primaryCardSummary: String {
+        switch mode {
+        case .signIn:
+            return "Sign in returns to an existing account. Create account starts a new one."
+        case .createAccount:
+            return "Create account starts a new account. Confirmation can happen from this same auth surface."
+        case .confirmAccount:
+            return "Use the invited or registered email, then paste the confirmation code from your inbox."
+        case .resetRequest:
+            return "We will send a reset code to the email address tied to your account."
+        case .resetConfirm:
+            return "Paste the reset code and set the password you want to use from now on."
+        }
+    }
+
+    @ViewBuilder
+    private func modeButton(_ target: Mode, systemImage: String) -> some View {
+        if target == mode {
+            Button {
+                mode = target
+                errorMessage = nil
+                infoMessage = nil
+            } label: {
+                Label(target.rawValue, systemImage: systemImage)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(PrimaryCTAStyle())
+        } else {
+            Button {
+                mode = target
+                errorMessage = nil
+                infoMessage = nil
+            } label: {
+                Label(target.rawValue, systemImage: systemImage)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(SecondaryCTAStyle())
+        }
+    }
+
+    @ViewBuilder
+    private func inlineModeLink(_ title: String, target: Mode) -> some View {
+        Button(title) {
+            mode = target
+            errorMessage = nil
+            infoMessage = nil
+        }
+        .font(.footnote.weight(.semibold))
+        .foregroundStyle(BrandTheme.primary)
+    }
+
+    private var languagePicker: some View {
+        Menu {
+            Button("English") { language = "en" }
+            Button("Español") { language = "es" }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "globe")
+                Text(language.uppercased())
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(BrandTheme.ink)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(BrandTheme.surface, in: Capsule())
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
+            .shadow(color: BrandTheme.shadow.opacity(0.08), radius: 10, x: 0, y: 6)
+        }
     }
 
     @ViewBuilder

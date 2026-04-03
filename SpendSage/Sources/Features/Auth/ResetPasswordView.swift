@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 struct ResetPasswordView: View {
+    @AppStorage("native.settings.language") private var language = "en"
     @State private var email = ""
     @State private var code = ""
     @State private var newPassword = ""
@@ -11,6 +12,7 @@ struct ResetPasswordView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 headerCard
+                recoveryCueCard
                 requestCard
                 passwordCard
 
@@ -29,6 +31,11 @@ struct ResetPasswordView: View {
         )
         .navigationTitle("Reset Password")
         .navigationBarTitleDisplayMode(.inline)
+        .overlay(alignment: .topLeading) {
+            languagePicker
+                .padding(.leading, 24)
+                .padding(.top, 12)
+        }
     }
 
     private var headerCard: some View {
@@ -40,7 +47,7 @@ struct ResetPasswordView: View {
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Request a code, then choose a new password to get back into your account.")
+                Text("Request a reset code for an existing account, then choose a new password to get back in.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -48,6 +55,33 @@ struct ResetPasswordView: View {
                 HStack(spacing: 12) {
                     BrandMetricTile(title: "Step", value: "2-stage", systemImage: "number.circle.fill")
                     BrandMetricTile(title: "Recovery", value: "Secure", systemImage: "lock.rotation")
+                }
+            }
+        }
+    }
+
+    private var recoveryCueCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Recovery cue")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("Use this when you already have an account but need a fresh code or a new password. If you were invited instead, use Confirm Account.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    BrandBadge(text: "Recovery", systemImage: "lifepreserver.fill")
+                }
+
+                HStack(spacing: 12) {
+                    BrandMetricTile(title: "Code", value: "Email", systemImage: "envelope.fill")
+                    BrandMetricTile(title: "Finish", value: "New password", systemImage: "key.fill")
                 }
             }
         }
@@ -130,6 +164,28 @@ struct ResetPasswordView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(BrandTheme.accent.opacity(0.18), in: Capsule())
+        }
+    }
+
+    private var languagePicker: some View {
+        Menu {
+            Button("English") { language = "en" }
+            Button("Español") { language = "es" }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "globe")
+                Text(language.uppercased())
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(BrandTheme.ink)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(BrandTheme.surface, in: Capsule())
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
+            .shadow(color: BrandTheme.shadow.opacity(0.08), radius: 10, x: 0, y: 6)
         }
     }
 

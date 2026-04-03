@@ -98,6 +98,7 @@ struct FinanceReceiptScanToolView: View {
                 statusOverviewCard
                 smartFillCard
                 captureFlowCard
+                ocrPreviewCard
                 quickTipsCard
                 draftEditorCard
             }
@@ -301,6 +302,40 @@ struct FinanceReceiptScanToolView: View {
                     systemImage: "square.and.pencil",
                     title: "Review before saving",
                     detail: "This local-first flow does not run OCR. The editor is the final source of truth for the ledger."
+                )
+            }
+        }
+    }
+
+    private var ocrPreviewCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    Text("Extracted text preview")
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+                    Spacer()
+                    BrandBadge(text: capturedImage == nil ? "Local draft" : "Image linked", systemImage: "text.viewfinder")
+                }
+
+                Text("This keeps the receipt flow closer to an OCR job view even though capture and review stay local.")
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+
+                ScrollView {
+                    Text(extractedTextPreview)
+                        .font(.system(.footnote, design: .monospaced))
+                        .foregroundStyle(BrandTheme.ink)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                }
+                .frame(minHeight: 180)
+                .padding(14)
+                .background(BrandTheme.surfaceTint)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
                 )
             }
         }
@@ -535,6 +570,18 @@ struct FinanceReceiptScanToolView: View {
             note = "Prefilled from recent local activity."
         }
         clearTransientState()
+    }
+
+    private var extractedTextPreview: String {
+        let lines = [
+            "Merchant: \(merchant.isEmpty ? "..." : merchant)",
+            "Amount: \(amount.isEmpty ? "..." : amount)",
+            "Category: \(category.rawValue)",
+            "Date: \(date.formatted(date: .abbreviated, time: .omitted))",
+            "Notes: \(note.isEmpty ? "..." : note)",
+            "Source: \(captureSource?.title ?? "Manual draft")"
+        ]
+        return lines.joined(separator: "\n")
     }
 
     private func removeAttachedImage() {

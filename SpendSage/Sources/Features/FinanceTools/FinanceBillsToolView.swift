@@ -9,23 +9,83 @@ struct FinanceBillsToolView: View {
     @State private var category = ExpenseCategory.bills
     @State private var autopay = false
     @State private var errorMessage: String?
+    @AppStorage("native.bills.pausedIDs") private var pausedBillIDsJSON = "[]"
 
     private var totalMonthlyBills: Decimal {
-        viewModel.bills.reduce(Decimal.zero) { $0 + $1.amount }
+        activeBills.reduce(Decimal.zero) { $0 + $1.amount }
     }
 
     private var overdueCount: Int {
         guard let ledger = viewModel.ledger else { return 0 }
-        return viewModel.bills.filter { ledger.billStatus(for: $0) == .overdue }.count
+        return activeBills.filter { ledger.billStatus(for: $0) == .overdue }.count
     }
 
     private var dueSoonCount: Int {
         guard let ledger = viewModel.ledger else { return 0 }
-        return viewModel.bills.filter { ledger.billStatus(for: $0) == .dueSoon }.count
+        return activeBills.filter { ledger.billStatus(for: $0) == .dueSoon }.count
     }
 
     private var autopayCount: Int {
-        viewModel.bills.filter { $0.autopay }.count
+        activeBills.filter { $0.autopay }.count
+    }
+
+    private var pausedBillIDs: Set<String> {
+        decodePausedBillIDs(pausedBillIDsJSON)
+    }
+
+    private var activeBills: [BillRecord] {
+        viewModel.bills.filter { !isPaused($0.id) }
+    }
+
+    private var pausedBills: [BillRecord] {
+        viewModel.bills.filter { isPaused($0.id) }
+    }
+
+    private struct BillSuggestion: Identifiable {
+        let id = UUID()
+        let merchant: String
+        let category: ExpenseCategory
+        let averageAmount: Decimal
+        let cadenceDays: Int
+        let nextExpectedAt: Date
+        let sampleCount: Int
+    }
+
+    private var billSuggestions: [BillSuggestion] {
+        guard let ledger = viewModel.ledger else { return [] }
+        let recurringCategories: Set<String> = [
+            ExpenseCategory.bills.rawValue,
+            ExpenseCategory.subscriptions.rawValue,
+            ExpenseCategory.home.rawValue
+        ]
+        let recentExpenses = ledger.recentExpenseItems(limit: 24).filter { recurringCategories.contains(normalizedKey($0.category)) }
+        let grouped = Dictionary(grouping: recentExpenses, by: { normalizedKey($0.title) })
+        let calendar = Calendar.autoupdatingCurrent
+
+        return grouped.compactMap { _, items -> BillSuggestion? in
+            guard items.count >= 2 else { return nil }
+            let sorted = items.sorted { $0.date > $1.date }
+            let latest = sorted[0]
+            let gaps: [Int] = zip(sorted, sorted.dropFirst()).compactMap { newer, older in
+                calendar.dateComponents([.day], from: older.date, to: newer.date).day
+            }.filter { $0 > 0 }
+            let cadence = max(7, min(45, gaps.isEmpty ? 30 : gaps.reduce(0, +) / gaps.count))
+            let nextExpectedAt = calendar.date(byAdding: .day, value: cadence, to: latest.date) ?? latest.date
+            let averageAmount = items.reduce(Decimal.zero) { $0 + $1.amount } / Decimal(items.count)
+            let inferredCategory = ExpenseCategory(rawValue: latest.category) ?? .other
+
+            return BillSuggestion(
+                merchant: latest.title,
+                category: inferredCategory,
+                averageAmount: averageAmount,
+                cadenceDays: cadence,
+                nextExpectedAt: nextExpectedAt,
+                sampleCount: items.count
+            )
+        }
+        .sorted { $0.nextExpectedAt < $1.nextExpectedAt }
+        .prefix(3)
+        .map { $0 }
     }
 
     var body: some View {
@@ -34,7 +94,7 @@ struct FinanceBillsToolView: View {
                 FinanceToolsHeaderCard(
                     eyebrow: "Recurring cash flow",
                     title: "Bills",
-                    summary: "Track upcoming due dates, record payments, and keep monthly obligations in the same local ledger.",
+                    summary: "Track upcoming due dates, record payments, and keep monthly obligations in the same local ledger. Surface the bills that are due soon or late before they turn into surprises.",
                     systemImage: "calendar.badge.clock"
                 )
 
@@ -48,7 +108,10 @@ struct FinanceBillsToolView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        HStack(spacing: 12) {
+                        LazyVGrid(
+                            columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                            spacing: 12
+                        ) {
                             BrandMetricTile(
                                 title: "Tracked bills",
                                 value: "\(viewModel.bills.count)",
@@ -69,6 +132,70 @@ struct FinanceBillsToolView: View {
                                 value: "\(overdueCount)",
                                 systemImage: "exclamationmark.triangle.fill"
                             )
+                            BrandMetricTile(
+                                title: "Autopay",
+                                value: "\(autopayCount)",
+                                systemImage: "repeat.circle.fill"
+                            )
+                        }
+
+                        if overdueCount > 0 || dueSoonCount > 0 {
+                            BrandFeatureRow(
+                                systemImage: "bell.badge.fill",
+                                title: "Needs attention",
+                                detail: overdueCount > 0
+                                    ? "\(overdueCount) bill is late and should be handled first."
+                                    : "\(dueSoonCount) bill is due soon, so the next payment should be easy to spot."
+                            )
+                        } else {
+                            BrandFeatureRow(
+                                systemImage: "checkmark.circle.fill",
+                                title: "Stable for now",
+                                detail: "No bills are late or due soon, so the recurring queue is calm."
+                            )
+                        }
+                    }
+                }
+
+                if !billSuggestions.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("Detected from your history")
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
+
+                            Text("Recurring merchants from recent local expenses can become tracked bills in one tap.")
+                                .font(.subheadline)
+                                .foregroundStyle(BrandTheme.muted)
+
+                            ForEach(billSuggestions) { suggestion in
+                                HStack(alignment: .top, spacing: 12) {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(suggestion.merchant)
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+                                        Text("\(suggestion.sampleCount) matches · every ~\(suggestion.cadenceDays) days")
+                                            .font(.footnote)
+                                            .foregroundStyle(BrandTheme.muted)
+                                        Text("Next due \(suggestion.nextExpectedAt.formatted(date: .abbreviated, time: .omitted))")
+                                            .font(.footnote)
+                                            .foregroundStyle(BrandTheme.muted)
+                                    }
+
+                                    Spacer()
+
+                                    VStack(alignment: .trailing, spacing: 8) {
+                                        Text(suggestion.averageAmount.formatted(.currency(code: "USD")))
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+                                        Button("Track") {
+                                            Task { await trackSuggestion(suggestion) }
+                                        }
+                                        .buttonStyle(.bordered)
+                                        .controlSize(.small)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -82,14 +209,42 @@ struct FinanceBillsToolView: View {
                 } else {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Upcoming bills")
+                            Text("Active bills")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
 
-                            ForEach(viewModel.bills) { bill in
-                                billRow(bill)
+                            if activeBills.isEmpty {
+                                Text("No active bills right now. Paused bills stay below and can be resumed any time.")
+                                    .font(.footnote)
+                                    .foregroundStyle(BrandTheme.muted)
+                            }
 
-                                if bill.id != viewModel.bills.last?.id {
+                            ForEach(activeBills) { bill in
+                                billRow(bill, isPaused: false)
+
+                                if bill.id != activeBills.last?.id {
+                                    Divider()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if !pausedBills.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("Paused bills")
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
+
+                            Text("Paused bills stay saved locally and can be brought back with one tap.")
+                                .font(.footnote)
+                                .foregroundStyle(BrandTheme.muted)
+
+                            ForEach(pausedBills) { bill in
+                                billRow(bill, isPaused: true)
+
+                                if bill.id != pausedBills.last?.id {
                                     Divider()
                                 }
                             }
@@ -165,7 +320,7 @@ struct FinanceBillsToolView: View {
         }
     }
 
-    private func billRow(_ bill: BillRecord) -> some View {
+    private func billRow(_ bill: BillRecord, isPaused: Bool) -> some View {
         let status = viewModel.ledger?.billStatus(for: bill) ?? .upcoming
 
         return VStack(alignment: .leading, spacing: 12) {
@@ -195,9 +350,20 @@ struct FinanceBillsToolView: View {
 
             HStack(spacing: 8) {
                 billChip(title: status.rawValue, systemImage: status.symbolName, color: statusColor(status))
+                billChip(
+                    title: isPaused ? "Paused" : "Active",
+                    systemImage: isPaused ? "pause.circle.fill" : "play.circle.fill",
+                    color: isPaused ? .orange : BrandTheme.primary
+                )
                 if bill.autopay {
                     billChip(title: "Autopay", systemImage: "repeat.circle.fill", color: BrandTheme.primary)
                 }
+                if status == .overdue {
+                    billChip(title: "Pay now", systemImage: "exclamationmark.circle.fill", color: .red)
+                } else if status == .dueSoon {
+                    billChip(title: "Schedule", systemImage: "clock.badge.exclamationmark.fill", color: .orange)
+                }
+
                 if let lastPaidAt = bill.lastPaidAt {
                     billChip(
                         title: "Paid \(lastPaidAt.formatted(date: .abbreviated, time: .omitted))",
@@ -209,10 +375,16 @@ struct FinanceBillsToolView: View {
             }
 
             HStack(spacing: 10) {
-                Button(bill.lastPaidAt == nil ? "Mark paid" : "Record again") {
+                Button("Log payment") {
                     Task { await viewModel.payBill(bill.id) }
                 }
                 .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+
+                Button(isPaused ? "Resume" : "Pause") {
+                    togglePause(bill.id)
+                }
+                .buttonStyle(.bordered)
                 .controlSize(.small)
 
                 Button(bill.autopay ? "Disable autopay" : "Enable autopay") {
@@ -232,6 +404,37 @@ struct FinanceBillsToolView: View {
                 .controlSize(.small)
             }
         }
+    }
+
+    private func isPaused(_ billID: UUID) -> Bool {
+        pausedBillIDs.contains(billID.uuidString)
+    }
+
+    private func togglePause(_ billID: UUID) {
+        var updated = pausedBillIDs
+        let key = billID.uuidString
+        if updated.contains(key) {
+            updated.remove(key)
+        } else {
+            updated.insert(key)
+        }
+        pausedBillIDsJSON = encodePausedBillIDs(updated)
+    }
+
+    private func decodePausedBillIDs(_ raw: String) -> Set<String> {
+        guard let data = raw.data(using: .utf8),
+              let decoded = try? JSONDecoder().decode([String].self, from: data) else {
+            return []
+        }
+        return Set(decoded)
+    }
+
+    private func encodePausedBillIDs(_ ids: Set<String>) -> String {
+        guard let data = try? JSONEncoder().encode(Array(ids)),
+              let string = String(data: data, encoding: .utf8) else {
+            return "[]"
+        }
+        return string
     }
 
     private func statusColor(_ status: BillPaymentState) -> Color {
@@ -279,5 +482,24 @@ struct FinanceBillsToolView: View {
         dueDay = 1
         category = .bills
         autopay = false
+    }
+
+    private func trackSuggestion(_ suggestion: BillSuggestion) async {
+        let dueDay = Calendar.autoupdatingCurrent.component(.day, from: suggestion.nextExpectedAt)
+        await viewModel.addBill(
+            BillDraft(
+                title: suggestion.merchant,
+                amount: suggestion.averageAmount,
+                dueDay: dueDay,
+                category: suggestion.category,
+                autopay: false
+            )
+        )
+    }
+
+    private func normalizedKey(_ value: String) -> String {
+        value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
     }
 }

@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 struct ConfirmAccountView: View {
+    @AppStorage("native.settings.language") private var language = "en"
     @State private var email = ""
     @State private var code = ""
     @State private var notice: String?
@@ -10,6 +11,7 @@ struct ConfirmAccountView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 headerCard
+                inviteCueCard
                 verificationCard
                 actionCard
 
@@ -28,6 +30,11 @@ struct ConfirmAccountView: View {
         )
         .navigationTitle("Confirm Account")
         .navigationBarTitleDisplayMode(.inline)
+        .overlay(alignment: .topLeading) {
+            languagePicker
+                .padding(.leading, 24)
+                .padding(.top, 12)
+        }
     }
 
     private var headerCard: some View {
@@ -39,7 +46,7 @@ struct ConfirmAccountView: View {
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Enter the email used for signup and the code from your inbox to finish setup.")
+                Text("Use the email that received the invite or signup code, then finish setup from the inbox.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -47,6 +54,33 @@ struct ConfirmAccountView: View {
                 HStack(spacing: 12) {
                     BrandMetricTile(title: "Step", value: "2 of 2", systemImage: "number.circle.fill")
                     BrandMetricTile(title: "Delivery", value: "Email code", systemImage: "envelope.fill")
+                }
+            }
+        }
+    }
+
+    private var inviteCueCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Invite or confirmation")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("If you were invited, use the invited email. If this is a regular signup, use the email you just registered.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    BrandBadge(text: "Pending", systemImage: "person.badge.plus")
+                }
+
+                HStack(spacing: 12) {
+                    BrandMetricTile(title: "Cue", value: "Invite", systemImage: "envelope.badge.fill")
+                    BrandMetricTile(title: "Next", value: "Paste code", systemImage: "checkmark.seal.fill")
                 }
             }
         }
@@ -69,7 +103,7 @@ struct ConfirmAccountView: View {
                 sectionHeader(number: "02", title: "Finish setup", summary: "Once the code is accepted, you can return to sign in and continue with your account.")
 
                 Button("Confirm account") {
-                    notice = "Confirmation is ready. When the account service is connected, this step will complete verification and return you to sign in."
+                    notice = "Confirmation is ready. This step completes invite or signup verification and returns you to sign in."
                 }
                 .buttonStyle(PrimaryCTAStyle())
 
@@ -127,6 +161,28 @@ struct ConfirmAccountView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(BrandTheme.accent.opacity(0.18), in: Capsule())
+        }
+    }
+
+    private var languagePicker: some View {
+        Menu {
+            Button("English") { language = "en" }
+            Button("Español") { language = "es" }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "globe")
+                Text(language.uppercased())
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(BrandTheme.ink)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(BrandTheme.surface, in: Capsule())
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
+            .shadow(color: BrandTheme.shadow.opacity(0.08), radius: 10, x: 0, y: 6)
         }
     }
 

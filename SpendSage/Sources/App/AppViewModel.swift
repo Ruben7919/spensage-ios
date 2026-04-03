@@ -38,6 +38,20 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    enum DebugRoute: String {
+        case accounts
+        case bills
+        case rules
+        case csv = "csv"
+        case scan
+        case profile
+        case advanced = "advanced"
+        case support
+        case legal
+        case brand = "brand"
+        case budget = "budget"
+    }
+
     @Published var session: SessionState
     @Published var hasCompletedOnboarding: Bool
     @Published var selectedTab: AppTab
@@ -46,6 +60,7 @@ final class AppViewModel: ObservableObject {
     @Published var isPresentingAddExpense = false
     @Published var isPresentingBudgetWizard = false
     @Published var notice: String?
+    @Published var debugRoute: DebugRoute?
 
     private let authService: AuthServicing
     private let financeStore: FinanceDashboardStoring
@@ -60,6 +75,7 @@ final class AppViewModel: ObservableObject {
         self.session = .signedOut
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: onboardingKey)
         self.selectedTab = .dashboard
+        applyDebugLaunchOverrides()
     }
 
     var authConfiguration: AuthConfiguration {
@@ -130,6 +146,7 @@ final class AppViewModel: ObservableObject {
         isPresentingAddExpense = false
         isPresentingBudgetWizard = false
         selectedTab = .dashboard
+        debugRoute = nil
     }
 
     func refreshDashboard() async {
@@ -268,5 +285,74 @@ final class AppViewModel: ObservableObject {
         await financeStore.saveProfile(profile, for: session)
         notice = "Profile preferences saved on this device."
         await refreshDashboard()
+    }
+
+    private func applyDebugLaunchOverrides() {
+        let environment = ProcessInfo.processInfo.environment
+
+        if let onboarding = environment["SPENDSAGE_DEBUG_ONBOARDING"]?.lowercased() {
+            switch onboarding {
+            case "complete", "done", "true", "1":
+                hasCompletedOnboarding = true
+            case "incomplete", "pending", "false", "0":
+                hasCompletedOnboarding = false
+            default:
+                break
+            }
+        }
+
+        if let sessionOverride = environment["SPENDSAGE_DEBUG_SESSION"]?.lowercased() {
+            switch sessionOverride {
+            case "signed_out", "signedout", "logout":
+                session = .signedOut
+            case "guest", "local":
+                session = .guest
+            case "email":
+                session = .signedIn(email: "rubenl97m@gmail.com", provider: "Email")
+            case "google":
+                session = .signedIn(email: "rubenl97m@gmail.com", provider: SocialProvider.google.rawValue)
+            case "apple":
+                session = .signedIn(email: "rubenl97m@gmail.com", provider: SocialProvider.apple.rawValue)
+            default:
+                break
+            }
+        }
+
+        if let screenOverride = environment["SPENDSAGE_DEBUG_SCREEN"]?.lowercased() {
+            switch screenOverride {
+            case "onboarding":
+                hasCompletedOnboarding = false
+                session = .signedOut
+            case "auth", "login":
+                hasCompletedOnboarding = true
+                session = .signedOut
+            case "app", "shell":
+                hasCompletedOnboarding = true
+                if case .signedOut = session {
+                    session = .guest
+                }
+            default:
+                break
+            }
+        }
+
+        if let tabOverride = environment["SPENDSAGE_DEBUG_TAB"]?.lowercased(),
+           let tab = AppTab(rawValue: tabOverride) {
+            hasCompletedOnboarding = true
+            if case .signedOut = session {
+                session = .guest
+            }
+            selectedTab = tab
+        }
+
+        if let routeOverride = environment["SPENDSAGE_DEBUG_ROUTE"]?.lowercased(),
+           let route = DebugRoute(rawValue: routeOverride) {
+            hasCompletedOnboarding = true
+            if case .signedOut = session {
+                session = .guest
+            }
+            selectedTab = .settings
+            debugRoute = route
+        }
     }
 }

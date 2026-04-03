@@ -19,6 +19,7 @@ struct BrandGalleryView: View {
     ]
 
     private let catalog = BrandAssetCatalog.shared
+    private var manifest: BrandAssetManifest { catalog.activeManifest }
 
     var body: some View {
         ScrollView {
@@ -26,9 +27,32 @@ struct BrandGalleryView: View {
                 FinanceToolsHeaderCard(
                     eyebrow: "Brand system",
                     title: "Brand Gallery",
-                    summary: "A live gallery of the visual building blocks used across SpendSage: palette, mascots, guides, badges, and product storytelling surfaces.",
+                    summary: "A live gallery of the visual building blocks used across SpendSage: palette, mascots, guides, badges, and product storytelling surfaces. The manifest framing keeps the icon, expression, badge, and guide system easy to audit.",
                     systemImage: "swatchpalette.fill"
                 )
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Manifest framing")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        BrandBadge(text: "Manifest \(manifest.version.rawValue.uppercased())", systemImage: "bookmark.fill")
+
+                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                            BrandMetricTile(title: "Version", value: manifest.version.rawValue.uppercased(), systemImage: "bookmark.fill")
+                            BrandMetricTile(title: "Characters", value: "\(manifest.characters.count)", systemImage: "person.3.fill")
+                            BrandMetricTile(title: "Guides", value: "\(manifest.guides.count)", systemImage: "book.pages.fill")
+                            BrandMetricTile(title: "Badges", value: "\(manifest.badges.count)", systemImage: "seal.fill")
+                        }
+
+                        BrandFeatureRow(
+                            systemImage: "sparkles.rectangle.stack.fill",
+                            title: "Guide-ready system",
+                            detail: "Mascot expressions, badge art, and guide scenes all come from the same manifest, so the product language stays consistent."
+                        )
+                    }
+                }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 18) {
@@ -42,6 +66,11 @@ struct BrandGalleryView: View {
                                     BrandAssetImage(source: catalog.logo(.mark), fallbackSystemImage: "seal.fill")
                                         .aspectRatio(contentMode: .fit)
                                         .frame(width: 72, height: 72)
+
+                                    BrandAssetImage(source: catalog.logo(.appIcon), fallbackSystemImage: "app.fill")
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 72, height: 72)
+                                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
                                     VStack(alignment: .leading, spacing: 10) {
                                         BrandAssetImage(source: catalog.logo(.wordmark), fallbackSystemImage: "textformat")
@@ -125,7 +154,7 @@ struct BrandGalleryView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Preview the interactive guides exactly as they appear across the app, with the same artwork and pacing.")
+                        Text("Preview the interactive guides exactly as they appear across the app, with the same artwork, badge language, and pacing.")
                             .foregroundStyle(BrandTheme.muted)
 
                         ForEach(GuideID.allCases, id: \.self) { guideID in
@@ -208,6 +237,7 @@ struct BrandGalleryView: View {
                         Label("Dashboard: calm overview with actionable budget framing.", systemImage: "house.fill")
                         Label("Support: trusted, practical, and clipboard-friendly.", systemImage: "lifepreserver.fill")
                         Label("Premium: celebratory growth layer on top of grounded finance basics.", systemImage: "trophy.fill")
+                        Label("Manifest: icons, expressions, badges, and guide assets stay easy to audit.", systemImage: "doc.text.magnifyingglass")
                     }
                     .foregroundStyle(BrandTheme.ink)
                 }

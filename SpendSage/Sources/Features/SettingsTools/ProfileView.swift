@@ -1,10 +1,20 @@
 import SwiftUI
+import UIKit
+import AudioToolbox
 
 struct ProfileView: View {
     @ObservedObject var viewModel: AppViewModel
 
+    @AppStorage("native.settings.language") private var language = "auto"
+    @AppStorage("native.settings.currency") private var currency = "USD"
+    @AppStorage("native.settings.theme") private var theme = "finance"
+    @AppStorage("native.settings.sound") private var soundStyle = "playful"
     @State private var draft: ProfileRecord
     @State private var isSaving = false
+
+    private var deviceLabel: String {
+        UIDevice.current.localizedModel
+    }
 
     init(viewModel: AppViewModel) {
         self.viewModel = viewModel
@@ -17,6 +27,7 @@ struct ProfileView: View {
                 heroCard
                 snapshotCard
                 identityCard
+                preferencesCard
                 updatesCard
             }
             .padding(24)
@@ -38,7 +49,7 @@ struct ProfileView: View {
         FinanceToolsHeaderCard(
             eyebrow: "Local identity",
             title: "Profile",
-            summary: "Manage the identity and household details stored with your local finance ledger.",
+            summary: "Manage the identity and household details stored with your local finance ledger. These details flow into exports, support packets, and the local account snapshot.",
             systemImage: "person.crop.circle.fill"
         )
     }
@@ -74,6 +85,8 @@ struct ProfileView: View {
                     BrandMetricTile(title: "Bills", value: "\(viewModel.bills.count)", systemImage: "calendar.badge.clock")
                     BrandMetricTile(title: "Rules", value: "\(viewModel.rules.count)", systemImage: "line.3.horizontal.decrease.circle")
                     BrandMetricTile(title: "Expenses", value: "\(viewModel.dashboardState?.transactionCount ?? 0)", systemImage: "receipt")
+                    BrandMetricTile(title: "Country", value: draft.countryCode, systemImage: "globe")
+                    BrandMetricTile(title: "Device", value: deviceLabel, systemImage: "iphone.gen3")
                 }
             }
         }
@@ -134,6 +147,63 @@ struct ProfileView: View {
                     title: "Local-first persistence",
                     detail: "Changes are saved with the on-device ledger using the existing profile record."
                 )
+                BrandFeatureRow(
+                    systemImage: "sparkles.rectangle.stack",
+                    title: "Settings nearby",
+                    detail: "Profile now mirrors the most personal display preferences too, so identity and presentation can be reviewed together."
+                )
+            }
+        }
+    }
+
+    private var preferencesCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Display and feedback")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                preferenceMenu(title: "Language", selection: $language) {
+                    Text("Auto").tag("auto")
+                    Text("English").tag("en")
+                    Text("Español").tag("es")
+                    Text("日本語").tag("ja")
+                }
+
+                Divider()
+
+                preferenceMenu(title: "Currency", selection: $currency) {
+                    Text("USD").tag("USD")
+                    Text("EUR").tag("EUR")
+                    Text("GBP").tag("GBP")
+                    Text("JPY").tag("JPY")
+                    Text("MXN").tag("MXN")
+                }
+
+                Divider()
+
+                preferenceMenu(title: "Theme", selection: $theme) {
+                    Text("Finance").tag("finance")
+                    Text("Midnight").tag("midnight")
+                    Text("Sunrise").tag("sunrise")
+                }
+
+                Divider()
+
+                preferenceMenu(title: "Sound style", selection: $soundStyle) {
+                    Text("Off").tag("off")
+                    Text("Miau").tag("miau")
+                    Text("Playful").tag("playful")
+                }
+
+                Button("Test sound") {
+                    guard soundStyle != "off" else { return }
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.success)
+                    AudioServicesPlaySystemSound(1104)
+                }
+                .buttonStyle(SecondaryCTAStyle())
+                .disabled(soundStyle == "off")
             }
         }
     }
@@ -152,6 +222,33 @@ struct ProfileView: View {
             await viewModel.saveProfile(normalized)
             draft = normalized
             isSaving = false
+        }
+    }
+
+    @ViewBuilder
+    private func preferenceMenu<SelectionValue: Hashable, Content: View>(
+        title: String,
+        selection: Binding<SelectionValue>,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text("Saved locally for this device.")
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+            }
+
+            Spacer(minLength: 12)
+
+            Picker(title, selection: selection) {
+                content()
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .tint(BrandTheme.primary)
         }
     }
 }
