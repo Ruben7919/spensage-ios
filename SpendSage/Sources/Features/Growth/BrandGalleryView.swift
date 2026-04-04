@@ -28,7 +28,10 @@ struct BrandGalleryView: View {
                     eyebrow: "Brand system",
                     title: "Brand Gallery",
                     summary: "A live gallery of the visual building blocks used across SpendSage: palette, mascots, guides, badges, and product storytelling surfaces. The manifest framing keeps the icon, expression, badge, and guide system easy to audit.",
-                    systemImage: "swatchpalette.fill"
+                    systemImage: "swatchpalette.fill",
+                    character: .tikki,
+                    expression: .proud,
+                    sceneKey: "guide_17_landing_hero_team"
                 )
 
                 SurfaceCard {
@@ -125,7 +128,7 @@ struct BrandGalleryView: View {
                             .foregroundStyle(BrandTheme.ink)
 
                         HStack {
-                            BrandBadge(text: "Guest local mode", systemImage: "iphone.gen3")
+                            BrandBadge(text: "Account-first", systemImage: "person.crop.circle")
                             Spacer()
                             BrandBadge(text: "Premium growth", systemImage: "sparkles")
                         }
@@ -143,7 +146,7 @@ struct BrandGalleryView: View {
                         BrandFeatureRow(
                             systemImage: "sparkles.rectangle.stack.fill",
                             title: "Growth energy",
-                            detail: "Badges, trophies, mascots, and guide surfaces keep the experience lively without breaking the local-first tone."
+                            detail: "Badges, trophies, mascots, and guide surfaces keep the experience lively without breaking the clear account-first product tone."
                         )
                     }
                 }

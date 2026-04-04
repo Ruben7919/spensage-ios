@@ -6,7 +6,7 @@ struct SettingsView: View {
     @ObservedObject var viewModel: AppViewModel
 
     @AppStorage("native.settings.language") private var language = "auto"
-    @AppStorage("native.settings.currency") private var currency = "USD"
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
     @AppStorage("native.settings.reminders") private var remindersEnabled = true
     @AppStorage("native.settings.sound") private var soundStyle = "playful"
@@ -41,54 +41,28 @@ struct SettingsView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 FinanceToolsHeaderCard(
-                    eyebrow: "Local-first settings",
+                    eyebrow: "Account settings",
                     title: "Settings",
-                    summary: "Tune local preferences, open the budget wizard, and keep support, legal, and growth tools close in one place. Language, currency, notifications, and export cues stay visible without leaving the app.",
-                    systemImage: "gearshape.fill"
+                    summary: "Tune your account experience, keep support nearby, and make the app feel calmer without digging through dense menus.",
+                    systemImage: "gearshape.fill",
+                    character: .tikki,
+                    expression: .proud,
+                    sceneKey: "guide_25_splash_team"
                 )
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Session snapshot")
+                        Text("Account snapshot")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                            BrandMetricTile(
-                                title: "Mode",
-                                value: sessionModeLabel,
-                                systemImage: "person.crop.circle"
-                            )
-                            BrandMetricTile(
-                                title: "Language",
-                                value: AppLocalization.menuLabel(for: language),
-                                systemImage: "globe"
-                            )
-                            BrandMetricTile(
-                                title: "Currency",
-                                value: currency,
-                                systemImage: "dollarsign.circle.fill"
-                            )
-                            BrandMetricTile(
-                                title: "Theme",
-                                value: themeDisplayName(theme),
-                                systemImage: "paintpalette.fill"
-                            )
-                            BrandMetricTile(
-                                title: "Sound",
-                                value: soundDisplayName(soundStyle),
-                                systemImage: "speaker.wave.2.fill"
-                            )
-                            BrandMetricTile(
-                                title: "Device",
-                                value: deviceLabel,
-                                systemImage: "iphone.gen3"
-                            )
-                            BrandMetricTile(
-                                title: "Export",
-                                value: "Ready",
-                                systemImage: "square.and.arrow.up"
-                            )
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
+                            BrandMetricTile(title: "Mode", value: sessionModeLabel, systemImage: "person.crop.circle")
+                            BrandMetricTile(title: "Language", value: AppLocalization.menuLabel(for: language), systemImage: "globe")
+                            BrandMetricTile(title: "Currency", value: currency, systemImage: "dollarsign.circle.fill")
+                            BrandMetricTile(title: "Theme", value: themeDisplayName(theme), systemImage: "paintpalette.fill")
+                            BrandMetricTile(title: "Sound", value: soundDisplayName(soundStyle), systemImage: "speaker.wave.2.fill")
+                            BrandMetricTile(title: "Device", value: deviceLabel, systemImage: "iphone.gen3")
                         }
 
                         VStack(spacing: 12) {
@@ -102,7 +76,7 @@ struct SettingsView: View {
                             } label: {
                                 settingsRouteLabel(
                                     title: "Advanced settings",
-                                    summary: "Inspect exports, support packets, device controls, and local debug tools.",
+                                    summary: "Exports, diagnostics, and device-level control tools live here.",
                                     systemImage: "switch.2"
                                 )
                             }
@@ -114,27 +88,49 @@ struct SettingsView: View {
                 subscriptionSurface
 
                 SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("App data preview")
+                    VStack(alignment: .leading, spacing: 18) {
+                        Text("Your crew")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Preview a strip of brand assets and guides so the local experience keeps the same visual tone as the rest of the app.")
+                        Text("Tikki, Ludo, and Manchas give each part of the app a role so the product feels guided instead of mechanical.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
 
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(Array(BrandAssetCatalog.shared.allBadgeAssets().prefix(4).enumerated()), id: \.offset) { _, asset in
-                                    previewAssetCard(title: asset.fileName, source: asset, fallback: "seal.fill")
+                        BrandArtworkSurface {
+                            ViewThatFits(in: .horizontal) {
+                                HStack(alignment: .center, spacing: 16) {
+                                    crewRoleList
+
+                                    BrandAssetImage(
+                                        source: BrandAssetCatalog.shared.guide("guide_16_family_mission_board_team"),
+                                        fallbackSystemImage: "person.3.fill"
+                                    )
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 128, height: 128)
                                 }
 
-                                ForEach(Array(BrandAssetCatalog.shared.allAccessoryAssets().prefix(4).enumerated()), id: \.offset) { _, asset in
-                                    previewAssetCard(title: asset.fileName, source: asset, fallback: "wand.and.stars")
+                                VStack(alignment: .leading, spacing: 16) {
+                                    BrandAssetImage(
+                                        source: BrandAssetCatalog.shared.guide("guide_16_family_mission_board_team"),
+                                        fallbackSystemImage: "person.3.fill"
+                                    )
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 156)
+
+                                    crewRoleList
                                 }
                             }
-                            .padding(.horizontal, 2)
                         }
+
+                        MascotSpeechCard(
+                            character: .tikki,
+                            expression: .proud,
+                            title: "Crew update",
+                            message: "Keep settings lean. Change only what affects your day-to-day flow, and let the rest stay out of the way."
+                        )
 
                         Button("Replay guides") {
                             GuideProgressStore.resetAll()
@@ -144,127 +140,10 @@ struct SettingsView: View {
                     }
                 }
 
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Preferences")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        settingsPickerRow(title: "Language", selection: $language) {
-                            Text("Auto").tag("auto")
-                            Text("English").tag("en")
-                            Text("Español").tag("es")
-                        }
-
-                        Divider()
-
-                        settingsPickerRow(title: "Currency", selection: $currency) {
-                            Text("USD").tag("USD")
-                            Text("EUR").tag("EUR")
-                            Text("GBP").tag("GBP")
-                            Text("JPY").tag("JPY")
-                            Text("MXN").tag("MXN")
-                        }
-
-                        Divider()
-
-                        settingsPickerRow(title: "Theme", selection: $theme) {
-                            Text("Finance").tag("finance")
-                            Text("Midnight").tag("midnight")
-                            Text("Sunrise").tag("sunrise")
-                        }
-
-                        Divider()
-
-                        Toggle(isOn: $remindersEnabled) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Daily reminders")
-                                    .font(.headline)
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("Keep lightweight nudges enabled while you stay on-device. Notification sound follows the device's local reminder flow.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                            }
-                        }
-                        .tint(BrandTheme.primary)
-
-                        Divider()
-
-                        Toggle(isOn: $quietHoursEnabled) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Quiet hours")
-                                    .font(.headline)
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("Pause routine reminder noise during your selected quiet window.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                            }
-                        }
-                        .tint(BrandTheme.primary)
-
-                        settingsPickerRow(title: "Quiet hours start", selection: $quietHoursStart) {
-                            Text("21:00").tag("21:00")
-                            Text("22:00").tag("22:00")
-                            Text("23:00").tag("23:00")
-                            Text("00:00").tag("00:00")
-                        }
-
-                        Divider()
-
-                        settingsPickerRow(title: "Quiet hours end", selection: $quietHoursEnd) {
-                            Text("06:00").tag("06:00")
-                            Text("07:00").tag("07:00")
-                            Text("08:00").tag("08:00")
-                            Text("09:00").tag("09:00")
-                        }
-
-                        Divider()
-
-                        Toggle(isOn: $weekendQuietMode) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Weekend quiet mode")
-                                    .font(.headline)
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("Keep weekends calmer unless you manually open the app.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                            }
-                        }
-                        .tint(BrandTheme.primary)
-
-                        settingsPickerRow(title: "Max notifications per day", selection: $maxNotificationsPerDay) {
-                            Text("1").tag(1)
-                            Text("2").tag(2)
-                            Text("3").tag(3)
-                        }
-
-                        Divider()
-
-                        settingsPickerRow(title: "Max notifications per week", selection: $maxNotificationsPerWeek) {
-                            Text("3").tag(3)
-                            Text("4").tag(4)
-                            Text("5").tag(5)
-                            Text("6").tag(6)
-                            Text("7").tag(7)
-                        }
-
-                        Divider()
-
-                        settingsPickerRow(title: "Notification sound", selection: $soundStyle) {
-                            Text("Off").tag("off")
-                            Text("Meow").tag("miau")
-                            Text("Playful").tag("playful")
-                        }
-
-                        Button("Test notification sound") {
-                            guard soundStyle != "off" else { return }
-                            let generator = UINotificationFeedbackGenerator()
-                            generator.notificationOccurred(.success)
-                            AudioServicesPlaySystemSound(1104)
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
-                    }
-                }
+                appBasicsCard
+                remindersCard
+                quietHoursCard
+                soundCard
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
@@ -272,29 +151,15 @@ struct SettingsView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        BrandMetricTile(
-                            title: "Device",
-                            value: deviceLabel,
-                            systemImage: "iphone"
-                        )
-                        BrandMetricTile(
-                            title: "Version",
-                            value: systemVersionLabel,
-                            systemImage: "info.circle.fill"
-                        )
-
-                        BrandFeatureRow(
-                            systemImage: "square.and.arrow.up",
-                            title: "Export center",
-                            detail: "Advanced settings keeps the readable export, JSON snapshot, diagnostics toggle, and support packet tools close at hand."
-                        )
+                        BrandMetricTile(title: "Device", value: deviceLabel, systemImage: "iphone")
+                        BrandMetricTile(title: "Version", value: systemVersionLabel, systemImage: "info.circle.fill")
 
                         NavigationLink {
                             AdvancedSettingsView(viewModel: viewModel)
                         } label: {
                             settingsRouteLabel(
                                 title: "Open export and diagnostics",
-                                summary: "Read the ledger snapshot, copy an export, or share a support packet.",
+                                summary: "Read the local ledger snapshot, copy an export, or share a support packet.",
                                 systemImage: "square.and.arrow.up"
                             )
                         }
@@ -304,7 +169,7 @@ struct SettingsView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Account and tools")
+                        Text("Account and support")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -320,36 +185,11 @@ struct SettingsView: View {
                         .buttonStyle(.plain)
 
                         NavigationLink {
-                            AdvancedSettingsView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Advanced settings",
-                                summary: "Local export center, diagnostics, and support packet tools.",
-                                systemImage: "slider.horizontal.3"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        Button("Sign out") {
-                            viewModel.signOut()
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
-                        .foregroundStyle(.red)
-                    }
-                }
-
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Help and trust")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        NavigationLink {
                             HelpCenterView(viewModel: viewModel)
                         } label: {
                             settingsRouteLabel(
                                 title: "Help Center",
-                                summary: "Guided answers, setup flow, and quick paths when you get stuck.",
+                                summary: "Guided answers and quick paths when you get stuck.",
                                 systemImage: "questionmark.circle.fill"
                             )
                         }
@@ -360,7 +200,7 @@ struct SettingsView: View {
                         } label: {
                             settingsRouteLabel(
                                 title: "Support Center",
-                                summary: "Build a local support packet and share a clean troubleshooting summary.",
+                                summary: "Build a local packet and share a cleaner troubleshooting summary.",
                                 systemImage: "lifepreserver.fill"
                             )
                         }
@@ -382,16 +222,23 @@ struct SettingsView: View {
                         } label: {
                             settingsRouteLabel(
                                 title: "Brand Gallery",
-                                summary: "Reference the product's visual language without leaving Settings.",
+                                summary: "Reference the visual language without leaving Settings.",
                                 systemImage: "swatchpalette.fill"
                             )
                         }
                         .buttonStyle(.plain)
+
+                        Button("Sign out") {
+                            viewModel.signOut()
+                        }
+                        .buttonStyle(SecondaryCTAStyle())
+                        .foregroundStyle(.red)
                     }
                 }
             }
             .padding(24)
         }
+        .scrollDismissesKeyboard(.interactively)
         .background(BrandTheme.canvas)
         .overlay(alignment: .top) {
             BrandBackdropView()
@@ -399,7 +246,7 @@ struct SettingsView: View {
         .sheet(isPresented: $showingGuideReplay) {
             GuideSheet(guide: GuideLibrary.guide(.dashboard))
         }
-        .navigationTitle("Settings")
+        .navigationTitle("Settings".appLocalized)
         .navigationBarTitleDisplayMode(.large)
     }
 
@@ -408,7 +255,7 @@ struct SettingsView: View {
         case .signedOut:
             return "Signed out".appLocalized
         case .guest:
-            return "Guest local".appLocalized
+            return "Preview guest".appLocalized
         case let .signedIn(email, _):
             return email.components(separatedBy: "@").first ?? "Signed in"
         }
@@ -421,19 +268,19 @@ struct SettingsView: View {
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Free mode stays local, while restore and manage actions live on the premium surface.")
+                Text("Your account keeps plan status, restore, and billing actions in one connected place.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
 
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
                     BrandMetricTile(
                         title: "Mode",
-                        value: viewModel.session.isAuthenticated ? "Cloud ready" : "Local free",
+                        value: viewModel.session.isAuthenticated ? "Account ready" : "Sign in",
                         systemImage: "lock.fill"
                     )
                     BrandMetricTile(
                         title: "Restore",
-                        value: viewModel.session.isAuthenticated ? "Available" : "Sign in first",
+                        value: viewModel.session.isAuthenticated ? "Available" : "Requires account",
                         systemImage: "arrow.clockwise"
                     )
                     BrandMetricTile(
@@ -462,22 +309,234 @@ struct SettingsView: View {
         }
     }
 
-    private func previewAssetCard(title: String, source: BrandAssetSource, fallback: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            BrandAssetImage(source: source, fallbackSystemImage: fallback)
-                .frame(width: 72, height: 72)
-                .background(BrandTheme.surfaceTint)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+    private var crewRoleList: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            crewRoleRow(
+                character: .tikki,
+                expression: .proud,
+                name: "Tikki",
+                role: "Planning, goals, and control"
+            )
+            crewRoleRow(
+                character: .mei,
+                expression: .thinking,
+                name: "Ludo",
+                role: "Insights, reports, and next actions"
+            )
+            crewRoleRow(
+                character: .manchas,
+                expression: .happy,
+                name: "Manchas",
+                role: "Daily check-ins and expense capture"
+            )
+        }
+    }
+
+    private var appBasicsCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                settingsSectionHeader(
+                    title: "App basics",
+                    summary: "Language, currency, and theme stay together so the everyday feel is easy to tune.",
+                    character: .tikki,
+                    expression: .happy
                 )
 
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(BrandTheme.muted)
-                .frame(width: 88, alignment: .leading)
-                .lineLimit(2)
+                settingsPickerRow(title: "Language", selection: $language) {
+                    Text("Auto").tag("auto")
+                    Text("English").tag("en")
+                    Text("Español").tag("es")
+                }
+
+                Divider()
+
+                settingsPickerRow(title: "Currency", selection: $currency) {
+                    Text("USD").tag("USD")
+                    Text("EUR").tag("EUR")
+                    Text("GBP").tag("GBP")
+                    Text("JPY").tag("JPY")
+                    Text("MXN").tag("MXN")
+                }
+
+                Divider()
+
+                settingsPickerRow(title: "Theme", selection: $theme) {
+                    Text("Finance").tag("finance")
+                    Text("Midnight").tag("midnight")
+                    Text("Sunrise").tag("sunrise")
+                }
+            }
+        }
+    }
+
+    private var remindersCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                settingsSectionHeader(
+                    title: "Reminders",
+                    summary: "Keep nudges lightweight so the app stays helpful instead of noisy.",
+                    character: .manchas,
+                    expression: .happy
+                )
+
+                Toggle(isOn: $remindersEnabled) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Daily reminders")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("Keep lightweight nudges enabled while you stay on-device.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                    }
+                }
+                .tint(BrandTheme.primary)
+
+                Divider()
+
+                settingsPickerRow(title: "Max notifications per day", selection: $maxNotificationsPerDay) {
+                    Text("1").tag(1)
+                    Text("2").tag(2)
+                    Text("3").tag(3)
+                }
+
+                Divider()
+
+                settingsPickerRow(title: "Max notifications per week", selection: $maxNotificationsPerWeek) {
+                    Text("3").tag(3)
+                    Text("4").tag(4)
+                    Text("5").tag(5)
+                    Text("6").tag(6)
+                    Text("7").tag(7)
+                }
+            }
+        }
+    }
+
+    private var quietHoursCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                settingsSectionHeader(
+                    title: "Quiet hours",
+                    summary: "Use one calm window instead of micromanaging every reminder.",
+                    character: .mei,
+                    expression: .thinking
+                )
+
+                Toggle(isOn: $quietHoursEnabled) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Quiet hours")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("Pause routine reminder noise during your selected quiet window.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                    }
+                }
+                .tint(BrandTheme.primary)
+
+                Divider()
+
+                settingsPickerRow(title: "Quiet hours start", selection: $quietHoursStart) {
+                    Text("21:00").tag("21:00")
+                    Text("22:00").tag("22:00")
+                    Text("23:00").tag("23:00")
+                    Text("00:00").tag("00:00")
+                }
+
+                Divider()
+
+                settingsPickerRow(title: "Quiet hours end", selection: $quietHoursEnd) {
+                    Text("06:00").tag("06:00")
+                    Text("07:00").tag("07:00")
+                    Text("08:00").tag("08:00")
+                    Text("09:00").tag("09:00")
+                }
+
+                Divider()
+
+                Toggle(isOn: $weekendQuietMode) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Weekend quiet mode")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("Keep weekends calmer unless you manually open the app.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                    }
+                }
+                .tint(BrandTheme.primary)
+            }
+        }
+    }
+
+    private var soundCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                settingsSectionHeader(
+                    title: "Sound",
+                    summary: "Choose one feedback style and test it quickly.",
+                    character: .manchas,
+                    expression: .excited
+                )
+
+                settingsPickerRow(title: "Notification sound", selection: $soundStyle) {
+                    Text("Off").tag("off")
+                    Text("Meow").tag("miau")
+                    Text("Playful").tag("playful")
+                }
+
+                Button("Test notification sound") {
+                    guard soundStyle != "off" else { return }
+                    let generator = UINotificationFeedbackGenerator()
+                    generator.notificationOccurred(.success)
+                    AudioServicesPlaySystemSound(1104)
+                }
+                .buttonStyle(SecondaryCTAStyle())
+            }
+        }
+    }
+
+    private func crewRoleRow(
+        character: BrandCharacterID,
+        expression: BrandExpression,
+        name: String,
+        role: String
+    ) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            MascotAvatarView(character: character, expression: expression, size: 52)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(name.appLocalized)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(role.appLocalized)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func settingsSectionHeader(
+        title: String,
+        summary: String,
+        character: BrandCharacterID,
+        expression: BrandExpression
+    ) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            MascotAvatarView(character: character, expression: expression, size: 54)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title.appLocalized)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(summary.appLocalized)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
         }
     }
 
@@ -516,6 +575,13 @@ struct SettingsView: View {
             .labelsHidden()
             .pickerStyle(.menu)
             .tint(BrandTheme.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(BrandTheme.surfaceTint, in: Capsule())
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
         }
     }
 

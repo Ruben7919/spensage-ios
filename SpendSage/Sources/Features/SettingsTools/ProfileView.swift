@@ -6,7 +6,7 @@ struct ProfileView: View {
     @ObservedObject var viewModel: AppViewModel
 
     @AppStorage("native.settings.language") private var language = "auto"
-    @AppStorage("native.settings.currency") private var currency = "USD"
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
     @AppStorage("native.settings.sound") private var soundStyle = "playful"
     @State private var draft: ProfileRecord
@@ -32,11 +32,12 @@ struct ProfileView: View {
             }
             .padding(24)
         }
+        .scrollDismissesKeyboard(.interactively)
         .background(BrandTheme.canvas)
         .overlay(alignment: .top) {
             BrandBackdropView()
         }
-        .navigationTitle("Profile")
+        .navigationTitle("Profile".appLocalized)
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: viewModel.profile) { _, profile in
             if !isSaving {
@@ -46,12 +47,62 @@ struct ProfileView: View {
     }
 
     private var heroCard: some View {
-        FinanceToolsHeaderCard(
-            eyebrow: "Local identity",
-            title: "Profile",
-            summary: "Manage the identity and household details stored with your local finance ledger. These details flow into exports, support packets, and the local account snapshot.",
-            systemImage: "person.crop.circle.fill"
-        )
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top, spacing: 14) {
+                    MascotAvatarView(
+                        character: .mei,
+                        expression: viewModel.session.isAuthenticated ? .proud : .thinking,
+                        size: 76
+                    )
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        BrandBadge(text: "Local identity", systemImage: "person.crop.circle.fill")
+
+                                Text("Profile")
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text("Keep your identity, household label, and account context clear without turning profile into a settings dump.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                BrandScenePanel(
+                    sceneKey: "guide_21_profile_identity_ludo",
+                    fallbackSystemImage: "person.crop.circle.fill",
+                    height: 184
+                )
+
+                CharacterCrewRail(
+                    members: [
+                        CharacterCrewMember(
+                            title: "Tikki",
+                            role: "Account guide",
+                            detail: "Keeps the profile actions simple and trustworthy.",
+                            character: .tikki,
+                            expression: .proud
+                        ),
+                        CharacterCrewMember(
+                            title: "Ludo",
+                            role: "Identity guide",
+                            detail: "Keeps names, household details, and account context readable at a glance.",
+                            character: .mei,
+                            expression: .proud
+                        ),
+                        CharacterCrewMember(
+                            title: "Manchas",
+                            role: "Household keeper",
+                            detail: "Keeps the local profile feeling grounded.",
+                            character: .manchas,
+                            expression: .happy
+                        )
+                    ]
+                )
+            }
+        }
     }
 
     private var snapshotCard: some View {
@@ -59,7 +110,7 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 14) {
                     MascotAvatarView(
-                        character: .mei,
+                        character: .manchas,
                         expression: viewModel.session.isAuthenticated ? .proud : .thinking,
                         size: 72
                     )
@@ -74,7 +125,7 @@ struct ProfileView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("This screen stays local-first until you connect a cloud account.")
+                        Text("This screen stays tied to your account so profile details remain personal and ready for sync.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                     }
@@ -100,17 +151,29 @@ struct ProfileView: View {
                     .foregroundStyle(BrandTheme.ink)
 
                 VStack(spacing: 12) {
-                    TextField("Full name", text: $draft.fullName)
-                        .textInputAutocapitalization(.words)
-                        .textContentType(.name)
+                    FinanceField(
+                        label: "Full name",
+                        placeholder: "Enter your full name",
+                        text: $draft.fullName,
+                        keyboard: .default,
+                        capitalization: .words
+                    )
 
-                    TextField("Household name", text: $draft.householdName)
-                        .textInputAutocapitalization(.words)
+                    FinanceField(
+                        label: "Household name",
+                        placeholder: "Enter a household label",
+                        text: $draft.householdName,
+                        keyboard: .default,
+                        capitalization: .words
+                    )
 
-                    TextField("Email", text: $draft.email)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
+                    FinanceField(
+                        label: "Email",
+                        placeholder: "name@domain.com",
+                        text: $draft.email,
+                        keyboard: .emailAddress,
+                        capitalization: .never
+                    )
 
                     Picker("Country", selection: $draft.countryCode) {
                         ForEach(["US", "EC", "ES", "MX", "GB"], id: \.self) { code in
@@ -248,10 +311,16 @@ struct ProfileView: View {
             .labelsHidden()
             .pickerStyle(.menu)
             .tint(BrandTheme.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(BrandTheme.surfaceTint, in: Capsule())
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
         }
     }
 }
-
 private extension String {
     func ifEmpty(replacingWith fallback: String) -> String {
         isEmpty ? fallback : self

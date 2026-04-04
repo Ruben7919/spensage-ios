@@ -11,8 +11,15 @@ struct PremiumView: View {
                 heroCard
                 statusCard
                 plansCard
-                actionsCard
-                billingTrustCard
+                ExperienceDisclosureCard(
+                    title: "Billing tools",
+                    summary: "Restore, manage, sync, and legal links stay available without crowding the upgrade choice.",
+                    character: .mei,
+                    expression: .proud
+                ) {
+                    actionsCard
+                    billingTrustCard
+                }
 
                 if let notice {
                     messageCard(message: notice)
@@ -33,24 +40,90 @@ struct PremiumView: View {
 
     private var heroCard: some View {
         SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 18) {
                 BrandBadge(
                     text: currentStatus.badgeTitle,
                     systemImage: "sparkles"
                 )
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Choose the plan that fits your budget routine")
+                    Text("Choose what you want unlocked next".appLocalized)
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text(viewModel.session.isAuthenticated
-                         ? "Review the current plans and keep billing, restore, sync, and legal actions close in one place."
-                         : "Free mode stays on this device. Sign in or create an account before buying so upgrades can be restored across devices later.")
+                    Text(
+                        viewModel.session.isAuthenticated
+                            ? "Review the plan preview, account restore readiness, and what unlocks later once store billing is connected.".appLocalized
+                            : "Free mode stays on this device. Sign in first so future purchases can attach to your account once billing is connected.".appLocalized
+                    )
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+
+                BrandArtworkSurface {
+                    HStack(alignment: .center, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("This screen previews plans, value, and account readiness without pretending checkout is already live.".appLocalized)
+                                .font(.subheadline)
+                                .foregroundStyle(BrandTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            BrandMetricTile(
+                                title: "Access",
+                                value: sessionLabel,
+                                systemImage: "person.crop.circle"
+                            )
+
+                            BrandBadge(
+                                text: currentPlan.name,
+                                systemImage: "star.fill"
+                            )
+                        }
+
+                        BrandAssetImage(
+                            source: BrandAssetCatalog.shared.guide("guide_19_pricing_cards_tikki"),
+                            fallbackSystemImage: "sparkles"
+                        )
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 126, height: 126)
+                    }
+                }
+
+                MascotSpeechCard(
+                    character: .mei,
+                    expression: currentStatus == .expired ? .warning : .proud,
+                    title: "Ludo",
+                    message: viewModel.session.isAuthenticated
+                        ? "You can review plan structure and restore readiness now. Real purchases activate once Store billing is connected."
+                        : "You can stay local for now. Sign in first, then the upgrade path will be ready when billing goes live."
+                )
+
+                CharacterCrewRail(
+                    members: [
+                        CharacterCrewMember(
+                            title: "Tikki",
+                            role: "Plan guide",
+                            detail: "Helps you compare the plans without adding pressure.",
+                            character: .tikki,
+                            expression: .proud
+                        ),
+                        CharacterCrewMember(
+                            title: "Ludo",
+                            role: "Billing preview",
+                            detail: "Keeps restore and account readiness easy to understand.",
+                            character: .mei,
+                            expression: .proud
+                        ),
+                        CharacterCrewMember(
+                            title: "Manchas",
+                            role: "Value map",
+                            detail: "Keeps the upgrade focused on what actually improves next.",
+                            character: .manchas,
+                            expression: .happy
+                        )
+                    ]
+                )
 
                 HStack(spacing: 12) {
                     BrandMetricTile(
@@ -60,7 +133,7 @@ struct PremiumView: View {
                     )
                     BrandMetricTile(
                         title: "Current plan",
-                        value: currentPlan.name,
+                        value: currentPlan.name.appLocalized,
                         systemImage: "star.fill"
                     )
                     BrandMetricTile(
@@ -71,16 +144,11 @@ struct PremiumView: View {
                 }
 
                 HStack(spacing: 8) {
-                    TagChip(text: "Remove ads", systemImage: "rectangle.3.group")
-                    TagChip(text: "Restore ready", systemImage: "arrow.clockwise")
-                    TagChip(text: "Family ready", systemImage: "person.3.fill")
+                    TagChip(text: "Plan preview", systemImage: "rectangle.3.group")
+                    TagChip(text: "Restore path", systemImage: "arrow.clockwise")
+                    TagChip(text: "Family planned", systemImage: "person.3.fill")
                 }
 
-                Text(viewModel.session.isAuthenticated
-                     ? "Subscription state, restore, billing, sync, and legal links stay visible from this same surface."
-                     : "Create an account before purchasing so the upgrade can be restored across devices later.")
-                    .font(.footnote)
-                    .foregroundStyle(BrandTheme.muted)
             }
         }
     }
@@ -98,25 +166,16 @@ struct PremiumView: View {
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-
-                    Spacer(minLength: 0)
-
-                    Text("01")
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
                 }
 
                 HStack(spacing: 12) {
-                    BrandMetricTile(title: "Plan", value: currentPlan.name, systemImage: "star.fill")
-                    BrandMetricTile(title: "Source", value: viewModel.session.isAuthenticated ? "Account" : "Guest local", systemImage: "arrow.left.arrow.right")
+                    BrandMetricTile(title: "Plan", value: currentPlan.name.appLocalized, systemImage: "star.fill")
+                    BrandMetricTile(title: "Source", value: viewModel.session.isAuthenticated ? "Account".appLocalized : "Not linked".appLocalized, systemImage: "arrow.left.arrow.right")
                     BrandMetricTile(title: "Billing", value: currentStatus.billingSourceLabel, systemImage: "creditcard.fill")
-                    BrandMetricTile(title: "Restore", value: viewModel.session.isAuthenticated ? "Available" : "Sign in first", systemImage: "arrow.clockwise")
+                    BrandMetricTile(title: "Restore", value: viewModel.session.isAuthenticated ? "Account-ready".appLocalized : "Sign in first".appLocalized, systemImage: "arrow.clockwise")
                 }
 
-                Text("Auto-renew, restore, manage subscription, and legal actions stay visible here so the paywall feels like a real billing surface.")
+                Text("Store billing, renewals, and restore are not live in this build yet. This screen defines the plan structure and trust path clearly.".appLocalized)
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
             }
@@ -131,20 +190,11 @@ struct PremiumView: View {
                         Text("Plans")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
-                        Text("Apple and Google will show the localized checkout price. Choose the plan that matches the billing action you want to take.")
+                        Text("These tiers are product previews for now. Real checkout and localized pricing will appear once Store billing is connected.".appLocalized)
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-
-                    Spacer(minLength: 0)
-
-                    Text("02")
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
                 }
 
                 VStack(spacing: 12) {
@@ -164,93 +214,73 @@ struct PremiumView: View {
                         Text("Actions")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
-                        Text(viewModel.session.isAuthenticated
-                             ? "Restore, renew, sync, and manage actions stay on the same billing surface."
-                             : "Create an account or sign in before buying so the purchase can be restored later.")
+                        Text("Use these actions to preview the purchase flow and account readiness without implying live billing.".appLocalized)
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-
-                    Spacer(minLength: 0)
-
-                    Text("03")
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
-                }
-
-                if isGuestSession {
-                    NavigationLink {
-                        AuthView(viewModel: viewModel)
-                    } label: {
-                        actionRow(
-                            title: "Create account",
-                            summary: "Attach purchases to an account before buying, restoring, or managing billing.",
-                            systemImage: "person.crop.circle.badge.checkmark"
-                        )
-                    }
-                    .buttonStyle(.plain)
                 }
 
                 Button {
                     notice = viewModel.session.isAuthenticated
-                        ? "Restore purchases is ready for the signed-in account. When store billing is live, prior purchases will come back from the same account."
-                        : "Sign in before restoring so the purchase can attach to an account."
+                        ? "Restore will use this signed-in account once Store billing is connected. For now, this is a readiness preview."
+                        : "Sign in first so future purchases can attach to your account when restore becomes available."
                 } label: {
                     actionRow(
                         title: "Restore purchases",
-                        summary: "Bring back a previous purchase on this device or another one.",
+                        summary: "Preview how past purchases will be recovered on this device or another one later.",
                         systemImage: "arrow.clockwise.circle.fill"
                     )
                 }
                 .buttonStyle(.plain)
 
                 Button {
-                    notice = "Manage subscription will open the system billing center when checkout is live."
+                    notice = "Manage subscription will open the system billing center once checkout is connected."
                 } label: {
                     actionRow(
                         title: "Manage subscription",
-                        summary: "Review renewal state, plan details, and cancellation options.",
+                        summary: "Preview renewal, plan details, and cancellation entry points.",
                         systemImage: "slider.horizontal.3"
                     )
                 }
                 .buttonStyle(.plain)
 
                 Button {
-                    notice = "Subscription status refreshed."
+                    notice = "Billing preview refreshed."
                 } label: {
                     actionRow(
                         title: "Sync status",
-                        summary: "Refresh the current billing state without leaving the screen.",
+                        summary: "Refresh the current billing preview without leaving the screen.",
                         systemImage: "arrow.triangle.2.circlepath"
                     )
                 }
                 .buttonStyle(.plain)
 
+                Text("Premium stays guided by the crew so the upgrade path feels clear and trustworthy, not sales-heavy.".appLocalized)
+                    .font(.footnote)
+                    .foregroundStyle(BrandTheme.muted)
+
                 Button {
                     if currentPlan.id == .freeLocal {
                         storedStatus = PremiumStatus.free.rawValue
-                        notice = "Free Local stays active on this device."
+                        notice = "Free local stays active on this device."
                     } else if currentStatus == .expired {
                         storedStatus = PremiumStatus.active.rawValue
-                        notice = "Renew now is selected for \(currentPlan.name). The status card now reads as recovered premium access."
+                        notice = AppLocalization.localized("%@ is selected as the next billing preview. The status card now reads as recovered access.", arguments: currentPlan.name.appLocalized)
                     } else {
                         storedStatus = currentPlan.id == .removeAds ? PremiumStatus.active.rawValue : PremiumStatus.trialing.rawValue
-                        notice = "Continue with \(currentPlan.name). The billing surface now reflects the current plan."
+                        notice = AppLocalization.localized("%@ is now the active plan preview on this screen.", arguments: currentPlan.name.appLocalized)
                     }
                 } label: {
                     actionRow(
                         title: currentPlan.id == .freeLocal
                             ? "Stay on free local"
-                            : currentStatus == .expired ? "Renew now" : "Continue with \(currentPlan.name)",
+                            : currentStatus == .expired ? "Renew now" : AppLocalization.localized("Preview %@", arguments: currentPlan.name.appLocalized),
                         summary: currentPlan.id == .freeLocal
                             ? "Keep the app local and light while billing stays disconnected."
                             : currentStatus == .expired
-                                ? "Recover premium access and keep restore plus billing management one tap away."
-                                : "Continue with the current plan and keep restore plus billing context visible.",
+                                ? "Preview the recovery path and keep restore plus billing context one tap away."
+                                : "Switch this screen to the selected plan preview and keep the trust context visible.",
                         systemImage: "checkmark.circle.fill"
                     )
                 }
@@ -267,20 +297,11 @@ struct PremiumView: View {
                         Text("Legal and trust")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
-                        Text("Privacy and terms stay one tap away from the paywall.")
+                        Text("Privacy and terms stay one tap away from the upgrade path.".appLocalized)
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-
-                    Spacer(minLength: 0)
-
-                    Text("04")
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
                 }
 
                 NavigationLink {
@@ -322,7 +343,7 @@ struct PremiumView: View {
                     Text("Status")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
-                    Text(message)
+                    Text(message.appLocalized)
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -343,10 +364,10 @@ struct PremiumView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary)
+                Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -370,19 +391,12 @@ struct PremiumView: View {
     private var sessionLabel: String {
         switch viewModel.session {
         case .signedOut:
-            return "Signed out"
+            return "Signed out".appLocalized
         case .guest:
-            return "Guest local"
+            return "Preview guest".appLocalized
         case .signedIn:
-            return "Signed in"
+            return "Signed in".appLocalized
         }
-    }
-
-    private var isGuestSession: Bool {
-        if case .guest = viewModel.session {
-            return true
-        }
-        return false
     }
 
     private var currentStatus: PremiumStatus {
@@ -408,10 +422,10 @@ private enum PremiumStatus: String {
 
     var label: String {
         switch self {
-        case .free: return "Free"
-        case .trialing: return "Trialing"
-        case .active: return "Active"
-        case .expired: return "Expired"
+        case .free: return "Free".appLocalized
+        case .trialing: return "Preview".appLocalized
+        case .active: return "Ready".appLocalized
+        case .expired: return "Needs review".appLocalized
         }
     }
 
@@ -426,30 +440,30 @@ private enum PremiumStatus: String {
 
     var badgeTitle: String {
         switch self {
-        case .free: return "Free local"
-        case .trialing: return "Trial in progress"
-        case .active: return "Premium active"
-        case .expired: return "Renewal needed"
+        case .free: return "Free local".appLocalized
+        case .trialing: return "Plan preview".appLocalized
+        case .active: return "Premium ready".appLocalized
+        case .expired: return "Renewal path".appLocalized
         }
     }
 
     var billingSourceLabel: String {
         switch self {
-        case .free: return "Local state"
-        case .trialing, .active, .expired: return "Store-ready"
+        case .free: return "Local state".appLocalized
+        case .trialing, .active, .expired: return "Store preview".appLocalized
         }
     }
 
     func detail(plan: PremiumPlan) -> String {
         switch self {
         case .free:
-            return "You are on \(plan.name). Free mode stays local, sponsor surfaces may remain visible, and account-backed restore starts after sign-in."
+            return AppLocalization.localized("%@ stays local in this build. Store billing, purchases, and restore are still pending integration.", arguments: plan.name.appLocalized)
         case .trialing:
-            return "You are on \(plan.name) as trialing. Billing is already attached and the trial window is active."
+            return AppLocalization.localized("%@ is selected as the current plan preview. Billing is not attached yet in this build.", arguments: plan.name.appLocalized)
         case .active:
-            return "You are on \(plan.name) as active. Restore, billing, and legal links should all stay one tap away."
+            return AppLocalization.localized("%@ is marked as the ready plan on this screen. Real checkout and restore still require store integration.", arguments: plan.name.appLocalized)
         case .expired:
-            return "The \(plan.name) plan is expired. Renewal, restore, and billing now read as recovery actions instead of activation actions."
+            return AppLocalization.localized("%@ is using the recovery preview. Renewal and restore will become real actions once billing is connected.", arguments: plan.name.appLocalized)
         }
     }
 }
@@ -460,7 +474,7 @@ private struct TagChip: View {
 
     var body: some View {
         Label {
-            Text(text)
+            Text(text.appLocalized)
         } icon: {
             Image(systemName: systemImage)
         }
@@ -498,12 +512,12 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
             id: .freeLocal,
             name: "Free Local",
             priceLabel: "$0",
-            summary: "Start free, stay on-device, and keep the experience light until you are ready for more.",
+            summary: "Current local mode with the main budgeting and tracking loop available on-device.",
             features: [
-                "Guest mode and local expense tracking",
-                "Dashboard overview",
-                "Light sponsor surfaces",
-                "No cloud sync or premium tools"
+                "Current: local ledger, dashboard, and budgets",
+                "Current: accounts, bills, and rules",
+                "Current: smart fill and receipt drafts",
+                "No cloud sync or store billing yet"
             ],
             isHighlighted: false
         ),
@@ -511,12 +525,12 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
             id: .removeAds,
             name: "Remove Ads",
             priceLabel: "$7.99 one-time",
-            summary: "A low-friction upgrade for users who want a quieter local experience.",
+            summary: "Planned one-time unlock for people who want a quieter local-only experience.",
             features: [
-                "Removes sponsor surfaces",
+                "Planned: removes sponsor surfaces",
                 "Keeps the app local-only",
-                "Does not unlock cloud sync",
-                "Restorable through the store account"
+                "Does not depend on cloud sync",
+                "Planned: restorable through the store account"
             ],
             isHighlighted: false
         ),
@@ -524,12 +538,12 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
             id: .pro,
             name: "Pro",
             priceLabel: "$4.99/month or $29.99/year",
-            summary: "The main upgrade for serious personal finance use. Annual should be the default choice.",
+            summary: "Planned main subscription once billing and cloud-backed features are connected.",
             features: [
-                "Cloud sync and cross-device restore",
-                "Receipt scan, AI insights, and exports",
-                "Recurring bills, accounts, and rules",
-                "Ad-free experience"
+                "Current: premium plan preview and guidance",
+                "Planned: cloud sync and cross-device restore",
+                "Planned: OCR receipts and deeper insights",
+                "Planned: ad-free experience and support upgrades"
             ],
             isHighlighted: true
         ),
@@ -537,12 +551,12 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
             id: .family,
             name: "Family",
             priceLabel: "$7.99/month or $49.99/year",
-            summary: "Shared spaces and household budgeting for people managing money together.",
+            summary: "Planned shared plan once household sync and collaboration are implemented.",
             features: [
-                "Everything in Pro",
-                "Shared spaces and collaboration",
-                "Family budgeting workflows",
-                "Higher-value upsell for active households"
+                "Everything planned in Pro",
+                "Planned: shared household space",
+                "Planned: family goals and collaboration",
+                "Planned: shared notifications and review loops"
             ],
             isHighlighted: false
         )
@@ -557,7 +571,7 @@ private struct PremiumPlanCard: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 8) {
-                        Text(plan.name)
+                        Text(plan.name.appLocalized)
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -574,14 +588,14 @@ private struct PremiumPlanCard: View {
                 Spacer(minLength: 0)
             }
 
-            Text(plan.summary)
+            Text(plan.summary.appLocalized)
                 .font(.subheadline)
                 .foregroundStyle(BrandTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
 
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(plan.features, id: \.self) { feature in
-                    Label(feature, systemImage: "checkmark.circle.fill")
+                    Label(feature.appLocalized, systemImage: "checkmark.circle.fill")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(BrandTheme.ink)
                         .fixedSize(horizontal: false, vertical: true)

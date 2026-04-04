@@ -3,7 +3,27 @@ import SwiftUI
 struct OnboardingView: View {
     let onContinue: () -> Void
 
+    private enum Step: Int, CaseIterable, Identifiable {
+        case basics
+        case goal
+        case preview
+
+        var id: Int { rawValue }
+
+        var title: String {
+            switch self {
+            case .basics:
+                return "Basics"
+            case .goal:
+                return "Goal"
+            case .preview:
+                return "Preview"
+            }
+        }
+    }
+
     @AppStorage("native.settings.language") private var language = "auto"
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
     @State private var monthlyIncome = ""
     @State private var fixedBills = ""
     @State private var currentBalance = ""
@@ -11,16 +31,18 @@ struct OnboardingView: View {
     @State private var goalTarget = ""
     @State private var goalTargetDate = Calendar.current.date(byAdding: .day, value: 90, to: .now) ?? .now
     @State private var persona: Persona = .youngProfessional
-    @State private var isPreviewVisible = false
+    @State private var step: Step = .basics
+
+    private var story: BrandNarrativeSpec {
+        BrandStoryCatalog.spec(for: .onboarding)
+    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                if isPreviewVisible, snapshot != nil {
-                    previewCard
-                } else {
-                    setupCard
-                }
+                heroCard
+                stepRail
+                currentStepCard
             }
             .padding(24)
         }
@@ -31,71 +53,128 @@ struct OnboardingView: View {
             }
             .ignoresSafeArea()
         )
-        .overlay(alignment: .topLeading) {
-            languagePicker
-                .padding(.leading, 24)
-                .padding(.top, 12)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                languagePicker
+            }
         }
     }
 
     private var heroCard: some View {
         SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                BrandBadge(text: "First win in under a minute", systemImage: "sparkles")
+            VStack(alignment: .leading, spacing: 18) {
+                BrandBadge(text: story.badgeText, systemImage: "sparkles")
 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("See your first safe-to-spend result fast")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(BrandTheme.ink)
+                HStack(alignment: .center, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Your first money win in 3 steps")
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(BrandTheme.ink)
 
-                    Text("Add income, fixed bills, and one goal. The result flips in place like a first-win card, and current balance stays optional.")
-                        .font(.subheadline)
-                        .foregroundStyle(BrandTheme.muted)
-                        .fixedSize(horizontal: false, vertical: true)
+                        Text("Start with income, fixed bills, and one goal. The crew guides the setup so the first plan feels quick and clear.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    BrandArtworkSurface {
+                        BrandAssetImage(
+                            source: story.sceneSource,
+                            fallbackSystemImage: "person.3.fill"
+                        )
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 108, height: 108)
+                    }
+                    .frame(width: 124, height: 124)
                 }
 
-                HStack(spacing: 12) {
-                    BrandMetricTile(title: "Setup", value: "Income + goal", systemImage: "bolt.fill")
-                    BrandMetricTile(title: "Result", value: "Safe to spend", systemImage: "banknote.fill")
-                    BrandMetricTile(title: "Mode", value: "Local first", systemImage: "iphone.gen3")
-                }
+                CharacterCrewRail(
+                    members: [
+                        CharacterCrewMember(
+                            title: "Tikki",
+                            role: "Plan guide",
+                            detail: "Keeps the setup short and useful.",
+                            character: .tikki,
+                            expression: .proud
+                        ),
+                        CharacterCrewMember(
+                            title: "Ludo",
+                            role: "Strategy guide",
+                            detail: "Turns a few inputs into a calmer weekly number.",
+                            character: .mei,
+                            expression: .thinking
+                        ),
+                        CharacterCrewMember(
+                            title: "Manchas",
+                            role: "Momentum keeper",
+                            detail: "Makes the first win feel friendly instead of technical.",
+                            character: .manchas,
+                            expression: .happy
+                        )
+                    ]
+                )
             }
         }
     }
 
-    private var setupCard: some View {
+    private var stepRail: some View {
+        SurfaceCard {
+            HStack(spacing: 10) {
+                stepButton(.basics, number: "01")
+                stepButton(.goal, number: "02")
+                stepButton(.preview, number: "03")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var currentStepCard: some View {
+        switch step {
+        case .basics:
+            basicsCard
+        case .goal:
+            goalCard
+        case .preview:
+            previewCard
+        }
+    }
+
+    private var basicsCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                BrandBadge(text: "First win in under a minute", systemImage: "sparkles")
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("See your first safe-to-spend result fast")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(BrandTheme.ink)
-
-                    Text("Add income, fixed bills, and one goal. The result flips in place like a first-win card, and current balance stays optional.")
-                        .font(.subheadline)
-                        .foregroundStyle(BrandTheme.muted)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                HStack(spacing: 12) {
-                    BrandMetricTile(title: "Setup", value: "Income + goal", systemImage: "bolt.fill")
-                    BrandMetricTile(title: "Result", value: "Safe to spend", systemImage: "banknote.fill")
-                    BrandMetricTile(title: "Mode", value: "Local first", systemImage: "iphone.gen3")
-                }
-
                 sectionHeader(
                     number: "01",
-                    title: "Build the first win",
-                    summary: "Fill the setup, flip to the result, then continue or edit anytime."
+                    title: "Start with the month",
+                    summary: "Just enough to estimate your first safe-to-spend number."
                 )
 
                 moneyField(title: "Monthly income", placeholder: "3000", text: $monthlyIncome)
-
                 moneyField(title: "Fixed bills", placeholder: "1200", text: $fixedBills)
-
                 moneyField(title: "Current balance", placeholder: "650", text: $currentBalance, allowsEmpty: true)
+
+                BrandFeatureRow(
+                    systemImage: "wand.and.stars",
+                    title: "Simple start",
+                    detail: "You do not need a full financial setup yet. Just the basics for the first useful result."
+                )
+
+                Button("Continue to goal") {
+                    step = .goal
+                }
+                .buttonStyle(PrimaryCTAStyle())
+                .disabled(!canAdvanceToGoal)
+            }
+        }
+    }
+
+    private var goalCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeader(
+                    number: "02",
+                    title: "Pick one goal",
+                    summary: "Choose the target that should shape your first weekly guardrail."
+                )
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Goal track")
@@ -110,8 +189,12 @@ struct OnboardingView: View {
                     .pickerStyle(.menu)
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.black.opacity(0.03))
+                    .background(BrandTheme.surfaceTint)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                    )
                 }
 
                 moneyField(title: "Goal target", placeholder: "800", text: $goalTarget)
@@ -121,17 +204,17 @@ struct OnboardingView: View {
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(BrandTheme.muted)
 
-                    DatePicker(
-                        "Goal target date",
-                        selection: $goalTargetDate,
-                        displayedComponents: .date
-                    )
-                    .datePickerStyle(.compact)
-                    .labelsHidden()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .background(Color.black.opacity(0.03))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    DatePicker("Goal target date", selection: $goalTargetDate, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(BrandTheme.surfaceTint)
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                        )
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -147,18 +230,18 @@ struct OnboardingView: View {
                     .pickerStyle(.segmented)
                 }
 
-                Button {
-                    isPreviewVisible = true
-                } label: {
-                    Label(
-                        isPreviewVisible
-                            ? "Refresh preview".appLocalized
-                            : "Show my first win".appLocalized,
-                        systemImage: "arrow.right.circle.fill"
-                    )
+                HStack(spacing: 12) {
+                    Button("Back") {
+                        step = .basics
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+
+                    Button("Show preview") {
+                        step = .preview
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+                    .disabled(snapshot == nil)
                 }
-                .buttonStyle(PrimaryCTAStyle())
-                .disabled(snapshot == nil)
             }
         }
     }
@@ -166,46 +249,135 @@ struct OnboardingView: View {
     private var previewCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                if let snapshot = snapshot {
+                sectionHeader(
+                    number: "03",
+                    title: "Review your first win",
+                    summary: "See the weekly number and the next move before entering the app."
+                )
+
+                if let snapshot {
                     BrandArtworkSurface {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Your first win")
-                                .font(.headline)
-                                .foregroundStyle(BrandTheme.ink)
+                            MascotSpeechCard(
+                                character: .mei,
+                                expression: .proud,
+                                title: "Ludo",
+                                message: snapshot.nextAction
+                            )
 
                             Text(currency(snapshot.safeToSpendWeekCents))
                                 .font(.system(size: 40, weight: .bold, design: .rounded))
                                 .foregroundStyle(BrandTheme.primary)
 
-                            BrandBadge(text: snapshot.goalTrack.title, systemImage: "arrow.triangle.branch")
+                            BrandBadge(text: "Safe to spend this week", systemImage: "banknote.fill")
 
-                            Text(snapshot.nextAction.appLocalized)
-                                .font(.subheadline)
-                                .foregroundStyle(BrandTheme.muted)
-                                .fixedSize(horizontal: false, vertical: true)
+                            HStack(spacing: 12) {
+                                BrandMetricTile(
+                                    title: "Goal reserve",
+                                    value: currency(snapshot.goalReserveCents),
+                                    systemImage: "target"
+                                )
+                                BrandMetricTile(
+                                    title: "Target date",
+                                    value: snapshot.goalTargetDate.formatted(.dateTime.month(.abbreviated).day()),
+                                    systemImage: "calendar"
+                                )
+                            }
 
-                            Text(AppLocalization.localized("Confidence %d%%", arguments: snapshot.confidence))
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(BrandTheme.muted)
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text(snapshot.persona.title.appLocalized)
+                                        .font(.footnote.weight(.semibold))
+                                        .foregroundStyle(BrandTheme.ink)
+                                    Spacer()
+                                    Text(AppLocalization.localized("Confidence %d%%", arguments: snapshot.confidence))
+                                        .font(.footnote.weight(.semibold))
+                                        .foregroundStyle(BrandTheme.muted)
+                                }
+
+                                ProgressView(value: snapshot.progressFraction)
+                                    .tint(BrandTheme.primary)
+                            }
                         }
                     }
 
                     HStack(spacing: 12) {
+                        Button("Back") {
+                            step = .goal
+                        }
+                        .buttonStyle(SecondaryCTAStyle())
+
                         Button {
                             onContinue()
                         } label: {
                             Label("Get started", systemImage: "arrow.right.circle.fill")
                         }
                         .buttonStyle(PrimaryCTAStyle())
-
-                        Button("Edit inputs") {
-                            isPreviewVisible = false
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
                     }
+                } else {
+                    emptyPreviewCard
                 }
             }
         }
+    }
+
+    private var emptyPreviewCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            BrandFeatureRow(
+                systemImage: "exclamationmark.triangle.fill",
+                title: "Finish the setup first",
+                detail: "Add income, bills, and one goal to generate the first preview."
+            )
+
+            Button("Back") {
+                step = .goal
+            }
+            .buttonStyle(SecondaryCTAStyle())
+        }
+    }
+
+    private func stepButton(_ target: Step, number: String) -> some View {
+        Button {
+            if target == .preview, snapshot == nil {
+                step = .goal
+            } else {
+                step = target
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(number)
+                    .font(.caption.weight(.bold))
+                Text(target.title.appLocalized)
+                    .font(.footnote.weight(.semibold))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
+            }
+            .foregroundStyle(step == target ? BrandTheme.primary : BrandTheme.ink)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(minHeight: 58, alignment: .leading)
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(step == target ? BrandTheme.accent.opacity(0.22) : BrandTheme.surfaceTint)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(step == target ? BrandTheme.primary.opacity(0.35) : BrandTheme.line.opacity(0.7), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var canAdvanceToGoal: Bool {
+        guard
+            let monthlyIncomeCents = parseMoneyCents(monthlyIncome),
+            monthlyIncomeCents > 0,
+            let fixedBillsCents = parseMoneyCents(fixedBills),
+            fixedBillsCents >= 0
+        else {
+            return false
+        }
+        return true
     }
 
     private var snapshot: FirstWinSnapshot? {
@@ -295,14 +467,14 @@ struct OnboardingView: View {
     }
 
     private func currency(_ cents: Int) -> String {
-        (Decimal(cents) / 100).formatted(.currency(code: "USD"))
+        (Decimal(cents) / 100).formatted(.currency(code: currencyCode))
     }
 
     private var languagePicker: some View {
         Menu {
-            Button("Auto") { language = "auto" }
-            Button("English") { language = "en" }
-            Button("Español") { language = "es" }
+            Button("Auto".appLocalized) { language = "auto" }
+            Button("English".appLocalized) { language = "en" }
+            Button("Español".appLocalized) { language = "es" }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "globe")
@@ -356,8 +528,12 @@ struct OnboardingView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .padding()
-                .background(Color.black.opacity(0.03))
+                .background(BrandTheme.surfaceTint)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                )
         }
     }
 }

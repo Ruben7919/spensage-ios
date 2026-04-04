@@ -66,6 +66,16 @@ struct GrowthEvent: Identifiable, Equatable {
     let systemImage: String
 }
 
+struct DashboardSavingsStrategy: Identifiable, Equatable {
+    let id: String
+    let title: String
+    let detail: String
+    let footnote: String
+    let badgeText: String
+    let badgeSystemImage: String
+    let systemImage: String
+}
+
 struct DashboardGrowthSnapshot: Equatable {
     enum RiskState {
         case calm
@@ -106,6 +116,7 @@ struct DashboardGrowthSnapshot: Equatable {
     let xpToNextLevel: Int
     let levelProgress: Double
     let riskState: RiskState
+    let strategies: [DashboardSavingsStrategy]
     let missions: [GrowthMission]
     let trophies: [GrowthTrophy]
     let highlightedTrophies: [GrowthTrophy]
@@ -159,7 +170,14 @@ enum GrowthSnapshotBuilder {
         case .guest:
             greetingTitle = "Your local growth loop".appLocalized
         case let .signedIn(email, _):
-            greetingTitle = AppLocalization.localized("Welcome back, %@", arguments: email)
+            let handle = email
+                .components(separatedBy: "@")
+                .first?
+                .replacingOccurrences(of: ".", with: " ")
+                .replacingOccurrences(of: "_", with: " ")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let displayName = handle?.isEmpty == false ? handle! : email
+            greetingTitle = AppLocalization.localized("Welcome back, %@", arguments: displayName)
         case .signedOut:
             greetingTitle = "Dashboard".appLocalized
         }
@@ -221,6 +239,11 @@ enum GrowthSnapshotBuilder {
             rules: rules.count,
             budgetHealthy: isBudgetHealthy
         )
+        let strategies = buildStrategies(
+            state: state,
+            ledger: ledger,
+            rules: rules
+        )
 
         let trophies = buildTrophies(
             state: state,
@@ -258,6 +281,7 @@ enum GrowthSnapshotBuilder {
             xpToNextLevel: xpToNextLevel,
             levelProgress: levelProgress,
             riskState: riskState,
+            strategies: strategies,
             missions: missions,
             trophies: trophies,
             highlightedTrophies: Array(trophies.filter(\.unlocked).prefix(3)),
@@ -356,6 +380,189 @@ enum GrowthSnapshotBuilder {
                 return lhs.progressRatio > rhs.progressRatio
             }
             .prefix(4)
+            .map { $0 }
+    }
+
+    private static func buildStrategies(
+        state: FinanceDashboardState?,
+        ledger: LocalFinanceLedger?,
+        rules: [RuleRecord]
+    ) -> [DashboardSavingsStrategy] {
+        guard let state else {
+            return []
+        }
+
+        let currencyCode = AppCurrencyFormat.currentCode()
+        let weeklySafeToSpend = safeToSpendWeek(for: state.budgetSnapshot.remaining, daysLeft: state.remainingDaysInMonth)
+        let hotspot = ledger?.discretionaryHotspots(limit: 1).first
+        let topMerchant = ledger?.merchantSuggestions(limit: 1).first
+        var candidates: [(priority: Int, strategy: DashboardSavingsStrategy)] = []
+
+        if state.transactionCount == 0 {
+            candidates.append(
+                (
+                    0,
+                    DashboardSavingsStrategy(
+                        id: "seed-ledger",
+                        title: "Seed the coach with three real expenses".appLocalized,
+                        detail: "Log groceries, transport, and one flexible purchase so the app can start spotting repeat behavior instead of guessing.".appLocalized,
+                        footnote: "The first savings suggestions become more reliable as soon as the local ledger has a few categories to compare.".appLocalized,
+                        badgeText: "3 entries".appLocalized,
+                        badgeSystemImage: "sparkles",
+                        systemImage: "square.and.pencil.circle.fill"
+                    )
+                )
+            )
+            return candidates.map(\.strategy)
+        }
+
+        if let topCategory = state.topCategory {
+            let categoryShare = share(of: topCategory.total, in: state.budgetSnapshot.monthlySpent)
+            if state.utilizationRatio >= 0.82 || categoryShare >= 0.34 {
+                let suggestedTrim = suggestedTrimAmount(
+                    averageExpense: state.averageExpense,
+                    topCategoryTotal: topCategory.total,
+                    hotspotAverage: hotspot?.averageAmount
+                )
+                let shareLabel = percentLabel(for: categoryShare)
+                let title = state.utilizationRatio >= 1
+                    ? AppLocalization.localized("Trim %@ first", arguments: topCategory.category.localizedTitle)
+                    : AppLocalization.localized("Cap %@ this week", arguments: topCategory.category.localizedTitle)
+
+                candidates.append(
+                    (
+                        state.utilizationRatio >= 1 ? 0 : 1,
+                        DashboardSavingsStrategy(
+                            id: "top-category-\(topCategory.id)",
+                            title: title,
+                            detail: AppLocalization.localized(
+                                "%@ is already %@ of monthly spend. A smaller week there protects the whole plan faster than trimming everywhere.",
+                                arguments: topCategory.category.localizedTitle,
+                                shareLabel
+                            ),
+                            footnote: AppLocalization.localized(
+                                "%d transaction%@ are already concentrated in %@.",
+                                arguments: topCategory.count,
+                                topCategory.count == 1 ? "" : "s",
+                                topCategory.category.localizedTitle.lowercased()
+                            ),
+                            badgeText: AppLocalization.localized("Keep %@", arguments: suggestedTrim.formatted(.currency(code: currencyCode))),
+                            badgeSystemImage: state.utilizationRatio >= 1 ? "shield.fill" : "leaf.fill",
+                            systemImage: topCategory.category.symbolName
+                        )
+                    )
+                )
+            }
+        }
+
+        if let hotspot {
+            candidates.append(
+                (
+                    state.utilizationRatio >= 1 ? 1 : 0,
+                    DashboardSavingsStrategy(
+                        id: "merchant-hotspot-\(hotspot.id)",
+                        title: AppLocalization.localized("Pause %@ once", arguments: hotspot.merchant),
+                        detail: AppLocalization.localized(
+                            "%@ showed up %@ for %@ this month. Skipping one visit buys breathing room immediately.",
+                            arguments: hotspot.merchant,
+                            hotspot.frequencyLabel,
+                            hotspot.totalAmount.formatted(.currency(code: currencyCode))
+                        ),
+                        footnote: AppLocalization.localized(
+                            "The average ticket there is %@, so one pause already changes the weekly pace.",
+                            arguments: hotspot.averageAmount.formatted(.currency(code: currencyCode))
+                        ),
+                        badgeText: AppLocalization.localized("Keep %@", arguments: hotspot.averageAmount.formatted(.currency(code: currencyCode))),
+                        badgeSystemImage: "pause.circle.fill",
+                        systemImage: hotspot.category.symbolName
+                    )
+                )
+            )
+        }
+
+        if state.budgetSnapshot.remaining > 0 {
+            let reserveAmount = suggestedReserveAmount(
+                income: state.budgetSnapshot.monthlyIncome,
+                remaining: state.budgetSnapshot.remaining
+            )
+            if reserveAmount >= 5 {
+                let adjustedWeekly = safeToSpendWeek(
+                    for: state.budgetSnapshot.remaining - reserveAmount,
+                    daysLeft: state.remainingDaysInMonth
+                )
+                candidates.append(
+                    (
+                        state.utilizationRatio >= 1 ? 3 : 1,
+                        DashboardSavingsStrategy(
+                            id: "reserve-buffer",
+                            title: "Lock a savings buffer now".appLocalized,
+                            detail: AppLocalization.localized(
+                                "Move %@ aside before the rest of the month absorbs it into daily spending.",
+                                arguments: reserveAmount.formatted(.currency(code: currencyCode))
+                            ),
+                            footnote: AppLocalization.localized(
+                                "%@ still stays safe for the next 7 days after that move.",
+                                arguments: adjustedWeekly.formatted(.currency(code: currencyCode))
+                            ),
+                            badgeText: AppLocalization.localized("Buffer %@", arguments: reserveAmount.formatted(.currency(code: currencyCode))),
+                            badgeSystemImage: "target",
+                            systemImage: "banknote.fill"
+                        )
+                    )
+                )
+            }
+        }
+
+        if rules.isEmpty, let topMerchant, topMerchant.frequency >= 2 {
+            candidates.append(
+                (
+                    2,
+                    DashboardSavingsStrategy(
+                        id: "merchant-rule-\(topMerchant.id)",
+                        title: AppLocalization.localized("Automate %@", arguments: topMerchant.merchant),
+                        detail: AppLocalization.localized(
+                            "%@ already appears %@. One merchant rule keeps the category clean without repeating the same edit.",
+                            arguments: topMerchant.merchant,
+                            topMerchant.frequencyLabel
+                        ),
+                        footnote: "Cleaner categories make the coach and future savings suggestions more reliable every week.".appLocalized,
+                        badgeText: "1 tap rule".appLocalized,
+                        badgeSystemImage: "sparkles",
+                        systemImage: "point.3.connected.trianglepath.dotted"
+                    )
+                )
+            )
+        }
+
+        if weeklySafeToSpend > 0, candidates.isEmpty {
+            candidates.append(
+                (
+                    0,
+                    DashboardSavingsStrategy(
+                        id: "protect-weekly-pace",
+                        title: "Protect the weekly pace".appLocalized,
+                        detail: AppLocalization.localized(
+                            "Stay close to %@ for the next 7 days so the month keeps feeling easy to steer.",
+                            arguments: weeklySafeToSpend.formatted(.currency(code: currencyCode))
+                        ),
+                        footnote: "Small adjustments now keep the dashboard in the calm zone and reduce end-of-month cleanup.".appLocalized,
+                        badgeText: AppLocalization.localized("Spend %@", arguments: weeklySafeToSpend.formatted(.currency(code: currencyCode))),
+                        badgeSystemImage: "calendar",
+                        systemImage: "gauge.with.dots.needle.bottom.50percent"
+                    )
+                )
+            )
+        }
+
+        return candidates
+            .sorted { lhs, rhs in
+                if lhs.priority != rhs.priority {
+                    return lhs.priority < rhs.priority
+                }
+                return lhs.strategy.id < rhs.strategy.id
+            }
+            .map(\.strategy)
+            .prefix(3)
             .map { $0 }
     }
 
@@ -566,6 +773,42 @@ enum GrowthSnapshotBuilder {
         }
 
         return nil
+    }
+
+    private static func safeToSpendWeek(for remaining: Decimal, daysLeft: Int) -> Decimal {
+        let safeDays = max(daysLeft, 1)
+        let perDay = remaining / Decimal(safeDays)
+        let weekly = perDay * Decimal(7)
+        return weekly > 0 ? weekly : 0
+    }
+
+    private static func share(of value: Decimal, in total: Decimal) -> Double {
+        guard total > 0 else { return 0 }
+        let lhs = NSDecimalNumber(decimal: value).doubleValue
+        let rhs = NSDecimalNumber(decimal: total).doubleValue
+        guard rhs > 0 else { return 0 }
+        return lhs / rhs
+    }
+
+    private static func percentLabel(for value: Double) -> String {
+        "\(Int((value * 100).rounded()))%"
+    }
+
+    private static func suggestedTrimAmount(
+        averageExpense: Decimal,
+        topCategoryTotal: Decimal,
+        hotspotAverage: Decimal?
+    ) -> Decimal {
+        let hotspotValue = hotspotAverage ?? 0
+        let categorySlice = topCategoryTotal * Decimal(string: "0.18")!
+        let baseline = max(averageExpense, hotspotValue)
+        return max(baseline, categorySlice)
+    }
+
+    private static func suggestedReserveAmount(income: Decimal, remaining: Decimal) -> Decimal {
+        let incomeCap = income * Decimal(string: "0.08")!
+        let remainingCap = remaining * Decimal(string: "0.25")!
+        return min(incomeCap, remainingCap)
     }
 }
 

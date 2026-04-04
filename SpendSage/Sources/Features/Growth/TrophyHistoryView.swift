@@ -196,3 +196,77 @@ struct TrophyHistoryView: View {
         }
     }
 }
+
+private struct GrowthTrophyPlate: View {
+    let trophy: GrowthTrophy
+    var size: CGFloat = 56
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(trophy.unlocked ? BrandTheme.heroGlowGradient : LinearGradient(
+                    colors: [BrandTheme.surfaceTint, BrandTheme.surface],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ))
+
+            if let image = BrandAssetCatalog.shared.image(for: BrandAssetCatalog.shared.badge(named: trophy.hybridBadgeAsset)) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(10)
+            } else {
+                Image(systemName: trophy.systemImage)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
+            }
+        }
+        .frame(width: size, height: size)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+        )
+    }
+}
+
+private struct DashboardTimelineRow: View {
+    let event: GrowthEvent
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(BrandTheme.accent.opacity(0.18))
+                Image(systemName: event.systemImage)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(BrandTheme.primary)
+            }
+            .frame(width: 42, height: 42)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(event.title.appLocalized)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(event.detail.appLocalized)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(event.occurredAt.formatted(date: .abbreviated, time: .omitted))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(BrandTheme.primary)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(BrandTheme.surfaceTint)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+        )
+    }
+}

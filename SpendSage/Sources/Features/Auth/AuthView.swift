@@ -4,7 +4,6 @@ import UIKit
 struct AuthView: View {
     @ObservedObject var viewModel: AppViewModel
     @AppStorage("native.settings.language") private var language = "auto"
-    @AppStorage("native.auth.rememberDevice") private var rememberDeviceOnSignIn = true
 
     enum Mode: String, CaseIterable, Identifiable {
         case signIn = "Sign in"
@@ -18,16 +17,12 @@ struct AuthView: View {
 
     enum Field: Hashable {
         case email
-        case password
-        case confirmPassword
         case code
         case newPassword
     }
 
     @State private var mode: Mode = .signIn
     @State private var email = ""
-    @State private var password = ""
-    @State private var confirmPassword = ""
     @State private var code = ""
     @State private var newPassword = ""
     @State private var isLoading = false
@@ -42,30 +37,34 @@ struct AuthView: View {
         return value
     }
 
+    private var authStory: BrandNarrativeSpec {
+        BrandStoryCatalog.spec(for: .auth)
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(spacing: 20) {
+                HStack {
+                    Spacer()
+                    languagePicker
+                }
+
                 if pendingInviteCode != nil {
                     invitePendingCard
                 }
-                emailCard
-                if mode == .signIn || mode == .createAccount {
-                    socialCard
-                }
-                if mode == .confirmAccount || mode == .resetRequest || mode == .resetConfirm {
-                    helpCard
-                }
 
-                if viewModel.authConfiguration.allowsGuestAccess && mode == .signIn {
-                    guestCard
-                }
+                authCard
 
                 if let notice = viewModel.notice {
                     statusCard(title: "Status", message: notice, systemImage: "checkmark.seal.fill")
                 }
             }
-            .padding(24)
+            .frame(maxWidth: 560)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 28)
         }
+        .scrollDismissesKeyboard(.interactively)
         .background(
             ZStack {
                 BrandTheme.canvas
@@ -73,142 +72,13 @@ struct AuthView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle(mode.rawValue.appLocalized)
-        .navigationBarTitleDisplayMode(.inline)
-        .overlay(alignment: .topLeading) {
-            languagePicker
-                .padding(.leading, 24)
-                .padding(.top, 12)
-        }
+        .toolbar(.hidden, for: .navigationBar)
     }
 
-    private var heroCard: some View {
+    private var authCard: some View {
         SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                BrandBadge(
-                    text: mode == .signIn ? "Sign in path" : "Create account path",
-                    systemImage: "lock.fill"
-                )
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(modeTitle.appLocalized)
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundStyle(BrandTheme.ink)
-
-                    Text(modeSubtitle.appLocalized)
-                        .font(.subheadline)
-                        .foregroundStyle(BrandTheme.muted)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                HStack(spacing: 12) {
-                    BrandMetricTile(
-                        title: "Flow",
-                        value: flowLabel.appLocalized,
-                        systemImage: "person.crop.circle"
-                    )
-                    BrandMetricTile(
-                        title: "Recovery",
-                        value: (mode == .resetConfirm ? "New password" : "Confirm / reset").appLocalized,
-                        systemImage: "lifepreserver.fill"
-                    )
-                }
-
-                HStack(spacing: 8) {
-                    if viewModel.authConfiguration.allowsGuestAccess {
-                        TagChip(text: "Guest available", systemImage: "iphone.gen3")
-                    }
-                    TagChip(text: "Apple & Google", systemImage: "person.crop.circle.badge.checkmark")
-                    TagChip(text: "Sync later", systemImage: "arrow.triangle.2.circlepath")
-                }
-            }
-        }
-    }
-
-    private var flowCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Pick the right flow")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text("Keep sign in, create account, confirm, and password recovery on the same entry surface.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Text("02")
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
-                }
-
-                HStack(spacing: 10) {
-                    modeButton(.signIn, systemImage: "person.fill.checkmark")
-                    modeButton(.createAccount, systemImage: "person.badge.plus")
-                }
-
-                HStack(spacing: 10) {
-                    modeButton(.confirmAccount, systemImage: "checkmark.seal.fill")
-                    modeButton(.resetRequest, systemImage: "key.fill")
-                }
-            }
-        }
-    }
-
-    private var invitePendingCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Invite pending")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text("You already have a pending invite code. Use the invited email, then confirm the code from your inbox to finish setup.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    BrandBadge(text: "Pending", systemImage: "person.badge.clock.fill")
-                }
-
-                HStack(spacing: 12) {
-                    BrandMetricTile(title: "Status", value: "Invite", systemImage: "envelope.badge.fill")
-                    BrandMetricTile(title: "Next step", value: "Confirm code", systemImage: "checkmark.seal.fill")
-                }
-            }
-        }
-    }
-
-    private var emailCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                BrandBadge(text: "SpendSage", systemImage: "sparkles")
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(modeTitle.appLocalized)
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundStyle(BrandTheme.ink)
-
-                    Text(modeSubtitle.appLocalized)
-                        .font(.subheadline)
-                        .foregroundStyle(BrandTheme.muted)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                HStack(spacing: 10) {
-                    modeButton(.signIn, systemImage: "person.fill.checkmark")
-                    modeButton(.createAccount, systemImage: "person.badge.plus")
-                }
+            VStack(alignment: .leading, spacing: 18) {
+                header
 
                 authField(
                     title: "Email",
@@ -218,30 +88,6 @@ struct AuthView: View {
                     contentType: .emailAddress,
                     isSecure: false
                 )
-
-                if mode == .signIn || mode == .createAccount {
-                    authField(
-                        title: "Password",
-                        placeholder: viewModel.authConfiguration.isHostedUIReady
-                            ? "Optional for browser sign in"
-                            : "Minimum 8 characters",
-                        text: $password,
-                        field: .password,
-                        contentType: .password,
-                        isSecure: true
-                    )
-                }
-
-                if mode == .createAccount {
-                    authField(
-                        title: "Confirm password",
-                        placeholder: "Re-enter password",
-                        text: $confirmPassword,
-                        field: .confirmPassword,
-                        contentType: .newPassword,
-                        isSecure: true
-                    )
-                }
 
                 if mode == .confirmAccount || mode == .resetConfirm {
                     authField(
@@ -265,39 +111,22 @@ struct AuthView: View {
                     )
                 }
 
-                if mode == .signIn {
-                    Toggle(isOn: $rememberDeviceOnSignIn) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Remember this device")
-                                .font(.headline)
-                                .foregroundStyle(BrandTheme.ink)
-                            Text("Keep future sign-ins calmer on this phone.")
-                                .font(.subheadline)
-                                .foregroundStyle(BrandTheme.muted)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
-                    .tint(BrandTheme.primary)
-                }
-
                 if let errorMessage {
-                    Text(errorMessage.appLocalized)
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Color(red: 0.72, green: 0.24, blue: 0.20))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    statusBanner(
+                        title: "Status",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: .red
+                    )
                 }
 
                 if let infoMessage {
-                    Text(infoMessage.appLocalized)
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Color(red: 0.16, green: 0.45, blue: 0.23))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.green.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    statusBanner(
+                        title: "Status",
+                        message: infoMessage,
+                        systemImage: "checkmark.seal.fill",
+                        tint: BrandTheme.primary
+                    )
                 }
 
                 Button(submitLabel.appLocalized) {
@@ -307,16 +136,33 @@ struct AuthView: View {
                 .disabled(isLoading || !canSubmit)
 
                 if mode == .confirmAccount {
-                    Button("Resend code") {
-                        infoMessage = "A fresh confirmation code will be sent to your email when the account service is connected.".appLocalized
+                    Button("Resend code".appLocalized) {
+                        infoMessage = "A new confirmation code will be sent when the account service is connected.".appLocalized
                         errorMessage = nil
                     }
                     .buttonStyle(SecondaryCTAStyle())
                 }
 
+                if mode == .signIn || mode == .createAccount {
+                    dividerLabel("Or continue with")
+
+                    VStack(spacing: 12) {
+                        socialButton(provider: .apple, title: "Continue with Apple", systemImage: "applelogo")
+                        socialButton(provider: .google, title: "Continue with Google", systemImage: "g.circle.fill")
+                    }
+
+                    Text(
+                        viewModel.authConfiguration.isHostedUIReady
+                            ? "Apple and Google open the secure cloud login and bring you back into the app."
+                            : "Apple and Google will activate as soon as the account provider is connected."
+                    )
+                    .font(.footnote)
+                    .foregroundStyle(BrandTheme.muted)
+                }
+
                 if isLoading {
-                    HStack(spacing: 8) {
-                        ProgressView()
+                    HStack(spacing: 10) {
+                        YarnLoadingIndicator(size: 18)
                         Text("Working on it…")
                             .font(.footnote)
                             .foregroundStyle(BrandTheme.muted)
@@ -327,202 +173,140 @@ struct AuthView: View {
                         .foregroundStyle(BrandTheme.muted)
                 }
 
-                HStack(spacing: 12) {
-                    if mode != .signIn {
-                        inlineModeLink("Back to sign in", target: .signIn)
-                    }
-                    if mode == .signIn {
-                        inlineModeLink("Forgot password?", target: .resetRequest)
-                    }
-                    if mode == .signIn {
-                        inlineModeLink("Need confirmation?", target: .confirmAccount)
-                    }
-                }
+                footerLinks
             }
         }
     }
 
-    private var socialCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(mode == .signIn ? "Continue with Apple or Google" : "Create with Apple or Google")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text(viewModel.authConfiguration.hostedUIFootnote.appLocalized)
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+    private var header: some View {
+        VStack(spacing: 14) {
+            MascotAvatarView(character: authStory.character, expression: authStory.expression, size: 92)
 
-                    Spacer(minLength: 0)
+            VStack(alignment: .center, spacing: 10) {
+                Text("SpendSage")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(BrandTheme.primary)
+                    .textCase(.uppercase)
 
-                    Text("03")
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
-                }
+                Text(modeTitle.appLocalized)
+                    .font(.system(size: 32, weight: .black, design: .rounded))
+                    .foregroundStyle(BrandTheme.ink)
+                    .multilineTextAlignment(.center)
 
-                HStack(spacing: 12) {
-                    Button {
-                        Task { await submitSocial(.google) }
-                    } label: {
-                        Label("Google", systemImage: "g.circle.fill")
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
-                    .disabled(isLoading || !supportsProvider(.google))
-
-                    Button {
-                        Task { await submitSocial(.apple) }
-                    } label: {
-                        Label("Apple", systemImage: "applelogo")
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
-                    .disabled(isLoading || !supportsProvider(.apple))
-                }
-
-                if !viewModel.authConfiguration.isHostedUIReady {
-                    Text("These buttons light up when your account provider is connected.")
-                        .font(.footnote)
-                        .foregroundStyle(BrandTheme.muted)
-                } else {
-                    Text(
-                        (
-                            mode == .signIn
-                                ? "Continue with Apple or Google to sign in through the browser, then come straight back to the app."
-                                : "Continue with Apple or Google to create the account in the browser and return here confirmed."
-                        ).appLocalized
-                    )
-                        .font(.footnote)
-                        .foregroundStyle(BrandTheme.muted)
-                }
-            }
-        }
-    }
-
-    private var helpCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Need help getting back in?")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text("Jump to the exact account route you need without leaving the same entry surface.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Text("04")
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(BrandTheme.accent.opacity(0.18), in: Capsule())
-                }
-
-                VStack(spacing: 10) {
-                    Button {
-                        mode = .confirmAccount
-                        infoMessage = nil
-                        errorMessage = nil
-                    } label: {
-                        routeRow(
-                            title: "Confirm account",
-                            summary: "Paste the code from your email and finish setup.",
-                            systemImage: "checkmark.seal.fill"
-                        )
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        mode = .resetRequest
-                        infoMessage = nil
-                        errorMessage = nil
-                    } label: {
-                        routeRow(
-                            title: "Reset password",
-                            summary: "Request a new code and choose a fresh password.",
-                            systemImage: "key.fill"
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-    }
-
-    private var guestCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Or keep it on this device")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text("Guest mode is the fastest way to try the app. You can sign in later when you want account-backed access.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    BrandBadge(text: "Local only", systemImage: "iphone.gen3")
-                }
-
-                Button {
-                    Task { await continueAsGuest() }
-                } label: {
-                    Label("Continue on this device", systemImage: "arrow.right.circle.fill")
-                }
-                .buttonStyle(PrimaryCTAStyle())
-                .disabled(isLoading)
-
-                Text("No account is required to explore the core experience.")
-                    .font(.footnote)
+                Text(modeSubtitle.appLocalized)
+                    .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var invitePendingCard: some View {
+        SurfaceCard {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "person.badge.clock.fill")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(BrandTheme.primary)
+                    .frame(width: 42, height: 42)
+                    .background(BrandTheme.primary.opacity(0.12))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Invite pending")
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+                    Text("Use the invited email and confirm the code from your inbox.")
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    private var footerLinks: some View {
+        FlowStack(spacing: 14, rowSpacing: 10) {
+            switch mode {
+            case .signIn:
+                inlineModeLink("Create account", target: .createAccount)
+                inlineModeLink("Forgot password?", target: .resetRequest)
+
+            case .createAccount:
+                inlineModeLink("Back to sign in", target: .signIn)
+                inlineModeLink("Confirm account", target: .confirmAccount)
+
+            case .confirmAccount:
+                inlineModeLink("Back to sign in", target: .signIn)
+                inlineModeLink("Forgot password?", target: .resetRequest)
+
+            case .resetRequest:
+                inlineModeLink("Back to sign in", target: .signIn)
+                inlineModeLink("Confirm account", target: .confirmAccount)
+
+            case .resetConfirm:
+                inlineModeLink("Back to sign in", target: .signIn)
+                inlineModeLink("Request another code", target: .resetRequest)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+    }
+
+    @ViewBuilder
+    private func socialButton(provider: SocialProvider, title: String, systemImage: String) -> some View {
+        Button {
+            Task { await submitSocial(provider) }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: systemImage)
+                    .font(.headline.weight(.semibold))
+                    .frame(width: 22)
+                Text(title.appLocalized)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .buttonStyle(SecondaryCTAStyle())
+        .disabled(isLoading || !supportsProvider(provider))
+    }
+
+    private func dividerLabel(_ title: String) -> some View {
+        HStack(spacing: 12) {
+            Rectangle()
+                .fill(BrandTheme.line.opacity(0.8))
+                .frame(height: 1)
+
+            Text(title.appLocalized)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(BrandTheme.muted)
+
+            Rectangle()
+                .fill(BrandTheme.line.opacity(0.8))
+                .frame(height: 1)
         }
     }
 
     private var submitLabel: String {
         switch mode {
         case .signIn:
-            return viewModel.authConfiguration.isHostedUIReady ? "Continue" : "Sign in"
+            return "Continue"
         case .createAccount:
             return "Create account"
         case .confirmAccount:
-            return "Confirm account"
+            return "Confirm"
         case .resetRequest:
-            return "Send reset code"
+            return "Send code"
         case .resetConfirm:
-            return "Save new password"
+            return "Save password"
         }
     }
 
     private var canSubmit: Bool {
-        if viewModel.authConfiguration.isHostedUIReady && (mode == .signIn || mode == .createAccount) {
-            return isValidEmail(email)
-        }
         switch mode {
-        case .signIn:
+        case .signIn, .createAccount, .resetRequest:
             return isValidEmail(email)
-                && password.count >= viewModel.authConfiguration.minimumPasswordLength
-        case .createAccount:
-            return isValidEmail(email)
-                && password.count >= viewModel.authConfiguration.minimumPasswordLength
-                && password == confirmPassword
         case .confirmAccount:
             return isValidEmail(email) && !code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        case .resetRequest:
-            return isValidEmail(email)
         case .resetConfirm:
             return isValidEmail(email)
                 && !code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -531,39 +315,30 @@ struct AuthView: View {
     }
 
     private var validationHint: String? {
-        if viewModel.authConfiguration.isHostedUIReady && (mode == .signIn || mode == .createAccount) {
-            return "You will finish this step in a secure browser session.".appLocalized
-        }
         if !isValidEmail(email) {
-            return "Use a valid email address.".appLocalized
+            return "Use a valid email address."
         }
-        if mode == .resetRequest {
+        switch mode {
+        case .signIn, .createAccount:
+            return "You will finish this step in a secure browser session."
+        case .confirmAccount:
+            return code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? "Paste the confirmation code from your inbox."
+                : nil
+        case .resetRequest:
             return nil
-        }
-        if mode == .confirmAccount && code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Paste the confirmation code from your inbox.".appLocalized
-        }
-        if mode == .resetConfirm && code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Paste the reset code from your inbox.".appLocalized
-        }
-        if mode == .resetConfirm && newPassword.count < viewModel.authConfiguration.minimumPasswordLength {
-            return AppLocalization.localized(
-                "Password must be at least %d characters.",
-                arguments: viewModel.authConfiguration.minimumPasswordLength
-            )
-        }
-        if mode == .signIn || mode == .createAccount {
-            if password.count < viewModel.authConfiguration.minimumPasswordLength {
+        case .resetConfirm:
+            if code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return "Paste the reset code from your inbox."
+            }
+            if newPassword.count < viewModel.authConfiguration.minimumPasswordLength {
                 return AppLocalization.localized(
                     "Password must be at least %d characters.",
                     arguments: viewModel.authConfiguration.minimumPasswordLength
                 )
             }
-            if mode == .createAccount && password != confirmPassword {
-                return "Passwords must match.".appLocalized
-            }
+            return nil
         }
-        return nil
     }
 
     private func supportsProvider(_ provider: SocialProvider) -> Bool {
@@ -584,9 +359,9 @@ struct AuthView: View {
         do {
             switch mode {
             case .signIn:
-                try await viewModel.signIn(email: email, password: password)
+                try await viewModel.signIn(email: email, password: "")
             case .createAccount:
-                try await viewModel.createAccount(email: email, password: password)
+                try await viewModel.createAccount(email: email, password: "")
                 infoMessage = "Account created. If confirmation is required, use the code from your inbox.".appLocalized
                 mode = .confirmAccount
             case .confirmAccount:
@@ -624,117 +399,33 @@ struct AuthView: View {
         }
     }
 
-    private func continueAsGuest() async {
-        isLoading = true
-        errorMessage = nil
-        infoMessage = nil
-        defer { isLoading = false }
-        await viewModel.continueAsGuest()
-    }
-
     private var modeTitle: String {
         switch mode {
         case .signIn:
-            return "Sign in to an existing account"
+            return "Sign in"
         case .createAccount:
-            return "Create a new account"
+            return "Create your account"
         case .confirmAccount:
-            return "Confirm your account"
+            return "Confirm your email"
         case .resetRequest:
-            return "Request a reset code"
+            return "Reset your password"
         case .resetConfirm:
-            return "Set a new password"
+            return "Choose a new password"
         }
     }
 
     private var modeSubtitle: String {
         switch mode {
         case .signIn:
-            return "Use your email or a hosted provider to return to an existing account. Remember-device and recovery stay on the same entry surface."
+            return "Keep your plan, progress, and history synced with one account."
         case .createAccount:
-            return "Create a new account, confirm it if needed, and keep the setup ready for restore and sync later."
+            return "Start with your email and finish in one secure step."
         case .confirmAccount:
-            return "Use the email that received the code, paste it here, and finish setup without leaving the same auth surface."
+            return "Paste the code from your inbox and finish setup."
         case .resetRequest:
-            return "Ask for a reset code here, then continue directly into the new-password step on the same surface."
+            return "Request a code and keep recovery simple."
         case .resetConfirm:
-            return "Paste the reset code and choose a new password so you can go straight back to sign in."
-        }
-    }
-
-    private var flowLabel: String {
-        switch mode {
-        case .signIn:
-            return "Existing account"
-        case .createAccount:
-            return "New account"
-        case .confirmAccount:
-            return "Confirmation"
-        case .resetRequest, .resetConfirm:
-            return "Recovery"
-        }
-    }
-
-    private var primaryCardTitle: String {
-        switch mode {
-        case .signIn:
-            return "Use your email"
-        case .createAccount:
-            return "Create your account"
-        case .confirmAccount:
-            return "Confirm your account"
-        case .resetRequest:
-            return "Request a reset code"
-        case .resetConfirm:
-            return "Choose a new password"
-        }
-    }
-
-    private var primaryCardSummary: String {
-        switch mode {
-        case .signIn:
-            return "Sign in returns to an existing account. Create account starts a new one."
-        case .createAccount:
-            return "Create account starts a new account. Confirmation can happen from this same auth surface."
-        case .confirmAccount:
-            return "Use the invited or registered email, then paste the confirmation code from your inbox."
-        case .resetRequest:
-            return "We will send a reset code to the email address tied to your account."
-        case .resetConfirm:
-            return "Paste the reset code and set the password you want to use from now on."
-        }
-    }
-
-    @ViewBuilder
-    private func modeButton(_ target: Mode, systemImage: String) -> some View {
-        if target == mode {
-            Button {
-                mode = target
-                errorMessage = nil
-                infoMessage = nil
-            } label: {
-                Label {
-                    Text(target.rawValue.appLocalized)
-                } icon: {
-                    Image(systemName: systemImage)
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(PrimaryCTAStyle())
-        } else {
-            Button {
-                mode = target
-                errorMessage = nil
-                infoMessage = nil
-            } label: {
-                Label {
-                    Text(target.rawValue.appLocalized)
-                } icon: {
-                    Image(systemName: systemImage)
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(SecondaryCTAStyle())
+            return "Choose a new password and return to sign in."
         }
     }
 
@@ -744,6 +435,9 @@ struct AuthView: View {
             mode = target
             errorMessage = nil
             infoMessage = nil
+            if target != .resetConfirm {
+                code = ""
+            }
         }
         .font(.footnote.weight(.semibold))
         .foregroundStyle(BrandTheme.primary)
@@ -751,9 +445,9 @@ struct AuthView: View {
 
     private var languagePicker: some View {
         Menu {
-            Button("Auto") { language = "auto" }
-            Button("English") { language = "en" }
-            Button("Español") { language = "es" }
+            Button("Auto".appLocalized) { language = "auto" }
+            Button("English".appLocalized) { language = "en" }
+            Button("Español".appLocalized) { language = "es" }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "globe")
@@ -798,95 +492,50 @@ struct AuthView: View {
             .textContentType(contentType)
             .focused($focusedField, equals: field)
             .padding()
-            .background(Color.black.opacity(0.03))
+            .background(BrandTheme.surfaceTint)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
         }
     }
 
-    @ViewBuilder
-    private func routeRow(title: String, summary: String, systemImage: String) -> some View {
-        HStack(alignment: .top, spacing: 14) {
+    private func statusBanner(title: String, message: String, systemImage: String, tint: Color) -> some View {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: systemImage)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(BrandTheme.primary)
-                .frame(width: 42, height: 42)
-                .background(BrandTheme.accent.opacity(0.18))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(tint)
+                .frame(width: 28, height: 28)
+                .background(tint.opacity(0.12), in: Circle())
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(title.appLocalized)
-                    .font(.headline)
+                    .font(.footnote.weight(.bold))
                     .foregroundStyle(BrandTheme.ink)
-                Text(summary.appLocalized)
-                    .font(.subheadline)
+                Text(message.appLocalized)
+                    .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             Spacer(minLength: 0)
-
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.bold))
-                .foregroundStyle(BrandTheme.muted)
-                .padding(.top, 6)
         }
         .padding(14)
-        .background(BrandTheme.surfaceTint, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .background(BrandTheme.surfaceTint)
         .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(tint.opacity(0.22), lineWidth: 1)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private func statusCard(title: String, message: String, systemImage: String) -> some View {
-        SurfaceCard {
-            HStack(alignment: .top, spacing: 14) {
-                Image(systemName: systemImage)
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(BrandTheme.primary)
-                    .frame(width: 42, height: 42)
-                    .background(BrandTheme.accent.opacity(0.18))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title.appLocalized)
-                        .font(.headline)
-                        .foregroundStyle(BrandTheme.ink)
-                    Text(message.appLocalized)
-                        .font(.subheadline)
-                        .foregroundStyle(BrandTheme.muted)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer(minLength: 0)
-            }
-        }
+        statusBanner(title: title, message: message, systemImage: systemImage, tint: BrandTheme.primary)
     }
 
     private func isValidEmail(_ value: String) -> Bool {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.contains("@") && trimmed.contains(".")
-    }
-}
-
-private struct TagChip: View {
-    let text: String
-    let systemImage: String
-
-    var body: some View {
-        Label {
-            Text(text.appLocalized)
-        } icon: {
-            Image(systemName: systemImage)
-        }
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(BrandTheme.primary)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(BrandTheme.surfaceTint, in: Capsule())
-        .overlay(
-            Capsule(style: .continuous)
-                .stroke(BrandTheme.line.opacity(0.85), lineWidth: 1)
-        )
     }
 }

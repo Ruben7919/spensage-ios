@@ -21,6 +21,7 @@ struct ConfirmAccountView: View {
             }
             .padding(24)
         }
+        .scrollDismissesKeyboard(.interactively)
         .background(
             ZStack {
                 BrandTheme.canvas
@@ -28,7 +29,7 @@ struct ConfirmAccountView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Confirm Account")
+        .navigationTitle("Confirm account".appLocalized)
         .navigationBarTitleDisplayMode(.inline)
         .overlay(alignment: .topLeading) {
             languagePicker
@@ -39,21 +40,27 @@ struct ConfirmAccountView: View {
 
     private var headerCard: some View {
         SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                BrandBadge(text: "Security checkpoint", systemImage: "checkmark.shield.fill")
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top, spacing: 14) {
+                    MascotAvatarView(character: .mei, expression: .proud, size: 76)
 
-                Text("Confirm your account")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundStyle(BrandTheme.ink)
+                    VStack(alignment: .leading, spacing: 10) {
+                        BrandBadge(text: "Security checkpoint", systemImage: "checkmark.shield.fill")
 
-                Text("Use the email that received the invite or signup code, then finish setup from the inbox.")
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
+                        Text("Confirm account".appLocalized)
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text("Use the email that received the code, paste it here, and finish setup without leaving the same auth surface.".appLocalized)
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
 
                 HStack(spacing: 12) {
-                    BrandMetricTile(title: "Step", value: "2 of 2", systemImage: "number.circle.fill")
-                    BrandMetricTile(title: "Delivery", value: "Email code", systemImage: "envelope.fill")
+                    BrandMetricTile(title: "Step", value: "2 of 2".appLocalized, systemImage: "number.circle.fill")
+                    BrandMetricTile(title: "Delivery", value: "Email code".appLocalized, systemImage: "envelope.fill")
                 }
             }
         }
@@ -206,8 +213,12 @@ struct ConfirmAccountView: View {
                 .textContentType(contentType)
                 .keyboardType(keyboard)
                 .padding()
-                .background(Color.black.opacity(0.03))
+                .background(BrandTheme.surfaceTint)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                )
         }
     }
 }

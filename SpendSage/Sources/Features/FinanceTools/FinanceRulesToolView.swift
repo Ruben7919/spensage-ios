@@ -49,7 +49,8 @@ struct FinanceRulesToolView: View {
                     eyebrow: "Auto-categorization",
                     title: "Rules",
                     summary: "Create lightweight merchant rules so local imports and receipt drafts land in the right category automatically. Keep useful rules active, pause the noisy ones, and edit without rebuilding the whole match.",
-                    systemImage: "slider.horizontal.3"
+                    systemImage: "slider.horizontal.3",
+                    surface: .rules
                 )
 
                 if let notice = viewModel.notice {
@@ -210,7 +211,7 @@ struct FinanceRulesToolView: View {
             }
             .padding(24)
         }
-        .background(BrandTheme.canvas)
+        .background(FinanceScreenBackground())
         .navigationTitle("Rules")
         .navigationBarTitleDisplayMode(.inline)
         .task {

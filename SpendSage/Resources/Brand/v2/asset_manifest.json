@@ -63,7 +63,23 @@
     "guide_07_first_win_mei": "guide_07_first_win_mei_v2.png",
     "guide_08_daily_checkin_manchas": "guide_08_daily_checkin_manchas_v2.png",
     "guide_09_weekly_boss_tikki_manchas": "guide_09_weekly_boss_tikki_manchas_v2.png",
-    "guide_10_premium_trial_mei": "guide_10_premium_trial_mei_v2.png"
+    "guide_10_premium_trial_mei": "guide_10_premium_trial_mei_v2.png",
+    "guide_11_budget_wizard_steps_mei": "guide_11_budget_wizard_steps_mei_v2.png",
+    "guide_12_budget_review_family_tikki_manchas": "guide_12_budget_review_family_tikki_manchas_v2.png",
+    "guide_13_subscription_hydra_manchas": "guide_13_subscription_hydra_manchas_v2.png",
+    "guide_14_bill_radar_tikki": "guide_14_bill_radar_tikki_v2.png",
+    "guide_15_emergency_fund_shield_mei": "guide_15_emergency_fund_shield_mei_v2.png",
+    "guide_16_family_mission_board_team": "guide_16_family_mission_board_team_v2.png",
+    "guide_17_landing_hero_team": "guide_17_landing_hero_team_v2.png",
+    "guide_18_landing_trust_shield_mei": "guide_18_landing_trust_shield_mei_v2.png",
+    "guide_19_pricing_cards_tikki": "guide_19_pricing_cards_tikki_v2.png",
+    "guide_20_subscription_checkout_manchas": "guide_20_subscription_checkout_manchas_v2.png",
+    "guide_21_profile_identity_ludo": "guide_21_profile_identity_ludo_v2.png",
+    "guide_22_help_center_ludo": "guide_22_help_center_ludo_v2.png",
+    "guide_23_rules_automation_ludo": "guide_23_rules_automation_ludo_v2.png",
+    "guide_24_advanced_tools_manchas": "guide_24_advanced_tools_manchas_v2.png",
+    "guide_25_splash_team": "guide_25_splash_team_v2.png",
+    "guide_26_loading_yarn_team": "guide_26_loading_yarn_team_v2.png"
   },
   "badges": [
     "badge_savings_v2.png",
@@ -100,7 +116,8 @@
   "logo": {
     "mark": "logo_mark_rosette_v2.png",
     "appIcon": "app_icon_v2.png",
+    "appIconDark": "app_icon_dark_v2.png",
+    "appIconTinted": "app_icon_tinted_v2.png",
     "wordmark": "wordmark_v2.png"
   }
 }
-

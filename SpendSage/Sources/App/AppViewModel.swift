@@ -47,6 +47,7 @@ final class AppViewModel: ObservableObject {
         case profile
         case advanced = "advanced"
         case support
+        case help
         case legal
         case brand = "brand"
         case budget = "budget"
@@ -105,7 +106,9 @@ final class AppViewModel: ObservableObject {
         switch session {
         case .signedOut:
             return .auth
-        case .guest, .signedIn:
+        case .guest:
+            return .auth
+        case .signedIn:
             return .app
         }
     }
@@ -328,8 +331,8 @@ final class AppViewModel: ObservableObject {
                 session = .signedOut
             case "app", "shell":
                 hasCompletedOnboarding = true
-                if case .signedOut = session {
-                    session = .guest
+                if !session.isAuthenticated {
+                    session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
                 }
             default:
                 break
@@ -339,8 +342,8 @@ final class AppViewModel: ObservableObject {
         if let tabOverride = environment["SPENDSAGE_DEBUG_TAB"]?.lowercased(),
            let tab = AppTab(rawValue: tabOverride) {
             hasCompletedOnboarding = true
-            if case .signedOut = session {
-                session = .guest
+            if !session.isAuthenticated {
+                session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
             }
             selectedTab = tab
         }
@@ -348,8 +351,8 @@ final class AppViewModel: ObservableObject {
         if let routeOverride = environment["SPENDSAGE_DEBUG_ROUTE"]?.lowercased(),
            let route = DebugRoute(rawValue: routeOverride) {
             hasCompletedOnboarding = true
-            if case .signedOut = session {
-                session = .guest
+            if !session.isAuthenticated {
+                session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
             }
             selectedTab = .settings
             debugRoute = route

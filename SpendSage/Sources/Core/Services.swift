@@ -35,21 +35,13 @@ struct PreviewAuthService: AuthServicing {
     }
 
     func signIn(email: String, password: String) async throws -> SessionState {
-        try AuthValidation.validate(
-            email: email,
-            password: password,
-            minimumPasswordLength: configuration.minimumPasswordLength
-        )
+        try AuthValidation.validate(email: email)
         try await Task.sleep(for: .milliseconds(150))
         return .signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: nil)
     }
 
     func createAccount(email: String, password: String) async throws -> SessionState {
-        try AuthValidation.validate(
-            email: email,
-            password: password,
-            minimumPasswordLength: configuration.minimumPasswordLength
-        )
+        try AuthValidation.validate(email: email)
         try await Task.sleep(for: .milliseconds(180))
         return .signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: "Email")
     }

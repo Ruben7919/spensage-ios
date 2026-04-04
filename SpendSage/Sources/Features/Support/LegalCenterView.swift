@@ -216,7 +216,7 @@ struct LegalCenterView: View {
         .overlay(alignment: .top) {
             BrandBackdropView()
         }
-        .navigationTitle("Legal Center")
+        .navigationTitle("Legal Center".appLocalized)
         .navigationBarTitleDisplayMode(.inline)
         .overlay(alignment: .bottom) {
             if copiedLinks {
@@ -241,7 +241,7 @@ struct LegalCenterView: View {
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Open privacy, support, and terms pages that match this local-first build without leaving the app.")
+                Text("Open privacy, support, and terms pages that match the connected account experience without leaving the app.")
                     .foregroundStyle(BrandTheme.muted)
 
                 BrandArtworkSurface {

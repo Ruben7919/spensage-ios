@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FinanceBillsToolView: View {
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
 
     @State private var title = ""
     @State private var amount = ""
@@ -95,7 +96,10 @@ struct FinanceBillsToolView: View {
                     eyebrow: "Recurring cash flow",
                     title: "Bills",
                     summary: "Track upcoming due dates, record payments, and keep monthly obligations in the same local ledger. Surface the bills that are due soon or late before they turn into surprises.",
-                    systemImage: "calendar.badge.clock"
+                    systemImage: "calendar.badge.clock",
+                    character: .tikki,
+                    expression: .warning,
+                    sceneKey: "guide_14_bill_radar_tikki"
                 )
 
                 if let notice = viewModel.notice {
@@ -119,7 +123,7 @@ struct FinanceBillsToolView: View {
                             )
                             BrandMetricTile(
                                 title: "Monthly total",
-                                value: totalMonthlyBills.formatted(.currency(code: "USD")),
+                                value: totalMonthlyBills.formatted(.currency(code: currencyCode)),
                                 systemImage: "dollarsign.gauge.chart.leftthird.topthird.rightthird"
                             )
                             BrandMetricTile(
@@ -144,8 +148,8 @@ struct FinanceBillsToolView: View {
                                 systemImage: "bell.badge.fill",
                                 title: "Needs attention",
                                 detail: overdueCount > 0
-                                    ? "\(overdueCount) bill is late and should be handled first."
-                                    : "\(dueSoonCount) bill is due soon, so the next payment should be easy to spot."
+                                    ? AppLocalization.localized("%d bill is late and should be handled first.", arguments: overdueCount)
+                                    : AppLocalization.localized("%d bill is due soon, so the next payment should be easy to spot.", arguments: dueSoonCount)
                             )
                         } else {
                             BrandFeatureRow(
@@ -174,10 +178,21 @@ struct FinanceBillsToolView: View {
                                         Text(suggestion.merchant)
                                             .font(.headline)
                                             .foregroundStyle(BrandTheme.ink)
-                                        Text("\(suggestion.sampleCount) matches · every ~\(suggestion.cadenceDays) days")
+                                        Text(
+                                            AppLocalization.localized(
+                                                "%d matches · every ~%d days",
+                                                arguments: suggestion.sampleCount,
+                                                suggestion.cadenceDays
+                                            )
+                                        )
                                             .font(.footnote)
                                             .foregroundStyle(BrandTheme.muted)
-                                        Text("Next due \(suggestion.nextExpectedAt.formatted(date: .abbreviated, time: .omitted))")
+                                        Text(
+                                            AppLocalization.localized(
+                                                "Next due %@",
+                                                arguments: suggestion.nextExpectedAt.formatted(date: .abbreviated, time: .omitted)
+                                            )
+                                        )
                                             .font(.footnote)
                                             .foregroundStyle(BrandTheme.muted)
                                     }
@@ -185,7 +200,7 @@ struct FinanceBillsToolView: View {
                                     Spacer()
 
                                     VStack(alignment: .trailing, spacing: 8) {
-                                        Text(suggestion.averageAmount.formatted(.currency(code: "USD")))
+                                        Text(suggestion.averageAmount.formatted(.currency(code: currencyCode)))
                                             .font(.headline)
                                             .foregroundStyle(BrandTheme.ink)
                                         Button("Track") {
@@ -273,7 +288,7 @@ struct FinanceBillsToolView: View {
                                 .foregroundStyle(BrandTheme.muted)
 
                             Stepper(value: $dueDay, in: 1...31) {
-                                Text("Every month on day \(dueDay)")
+                                Text(AppLocalization.localized("Every month on day %d", arguments: dueDay))
                                     .foregroundStyle(BrandTheme.ink)
                             }
                         }
@@ -285,7 +300,7 @@ struct FinanceBillsToolView: View {
 
                             Picker("Category", selection: $category) {
                                 ForEach(ExpenseCategory.allCases) { item in
-                                    Label(item.rawValue, systemImage: item.symbolName)
+                                    Label(item.localizedTitle, systemImage: item.symbolName)
                                         .tag(item)
                                 }
                             }
@@ -310,7 +325,7 @@ struct FinanceBillsToolView: View {
             }
             .padding(24)
         }
-        .background(BrandTheme.canvas)
+        .background(FinanceScreenBackground())
         .navigationTitle("Bills")
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -338,7 +353,7 @@ struct FinanceBillsToolView: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(bill.amount, format: .currency(code: "USD"))
+                    Text(bill.amount, format: .currency(code: currencyCode))
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
 
@@ -348,7 +363,7 @@ struct FinanceBillsToolView: View {
                 }
             }
 
-            HStack(spacing: 8) {
+            FlowStack(spacing: 8, rowSpacing: 8) {
                 billChip(title: status.localizedTitle, systemImage: status.symbolName, color: statusColor(status))
                 billChip(
                     title: isPaused ? "Paused" : "Active",
@@ -366,15 +381,17 @@ struct FinanceBillsToolView: View {
 
                 if let lastPaidAt = bill.lastPaidAt {
                     billChip(
-                        title: "Paid \(lastPaidAt.formatted(date: .abbreviated, time: .omitted))",
+                        title: AppLocalization.localized(
+                            "Paid %@",
+                            arguments: lastPaidAt.formatted(date: .abbreviated, time: .omitted)
+                        ),
                         systemImage: "checkmark.circle.fill",
                         color: BrandTheme.primary
                     )
                 }
-                Spacer()
             }
 
-            HStack(spacing: 10) {
+            FlowStack(spacing: 10, rowSpacing: 10) {
                 Button("Log payment") {
                     Task { await viewModel.payBill(bill.id) }
                 }
@@ -392,8 +409,6 @@ struct FinanceBillsToolView: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
-
-                Spacer()
 
                 Button(role: .destructive) {
                     Task { await viewModel.deleteBill(bill.id) }
@@ -451,18 +466,22 @@ struct FinanceBillsToolView: View {
     }
 
     private func billChip(title: String, systemImage: String, color: Color) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(color)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(color.opacity(0.12))
-            .clipShape(Capsule())
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.caption.weight(.semibold))
+            Text(title.appLocalized)
+                .font(.caption.weight(.semibold))
+        }
+        .foregroundStyle(color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(color.opacity(0.12))
+        .clipShape(Capsule())
     }
 
     private func saveBill() async {
         guard let amountValue = FinanceToolFormatting.decimal(from: amount) else {
-            errorMessage = "Enter a valid amount."
+            errorMessage = "Enter a valid amount.".appLocalized
             return
         }
 

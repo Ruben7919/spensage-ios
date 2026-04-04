@@ -55,12 +55,13 @@ private struct RecentSupportPacket: Identifiable {
 
 struct SupportCenterView: View {
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
 
     @Environment(\.openURL) private var openURL
 
     @State private var issueType: SupportIssueType = .bug
     @State private var priority: SupportPriority = .medium
-    @State private var subject = "SpendSage support request"
+    @State private var subject = "SpendSage support request".appLocalized
     @State private var detail = ""
     @State private var includeDiagnostics = true
     @State private var copiedState = false
@@ -81,12 +82,52 @@ struct SupportCenterView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                FinanceToolsHeaderCard(
-                    eyebrow: "Support-ready packet",
-                    title: "Support Center",
-                    summary: "Describe the issue, package a local summary, and share a cleaner troubleshooting packet from this device. Priority, category, and recent context stay visible so you can write a better report faster.",
-                    systemImage: "lifepreserver.fill"
-                )
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack(alignment: .top, spacing: 14) {
+                            MascotAvatarView(character: .manchas, expression: .thinking, size: 76)
+
+                            VStack(alignment: .leading, spacing: 10) {
+                                BrandBadge(text: "Support-ready packet", systemImage: "lifepreserver.fill")
+
+                                Text("Support Center")
+                                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                                    .foregroundStyle(BrandTheme.ink)
+
+                                Text("Manchas packages the issue clearly, Tikki frames the fastest fix, and Ludo keeps the troubleshooting route readable.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(BrandTheme.muted)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+
+                        CharacterCrewRail(
+                            members: [
+                                CharacterCrewMember(
+                                    title: "Tikki",
+                                    role: "Fast fix",
+                                    detail: "Helps you frame the issue in one clear step.",
+                                    character: .tikki,
+                                    expression: .proud
+                                ),
+                                CharacterCrewMember(
+                                    title: "Ludo",
+                                    role: "Troubleshooting guide",
+                                    detail: "Keeps the route from issue to resolution short and understandable.",
+                                    character: .mei,
+                                    expression: .thinking
+                                ),
+                                CharacterCrewMember(
+                                    title: "Manchas",
+                                    role: "Packet calm",
+                                    detail: "Keeps the report easy to read and audit.",
+                                    character: .manchas,
+                                    expression: .thinking
+                                )
+                            ]
+                        )
+                    }
+                }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
@@ -94,7 +135,10 @@ struct SupportCenterView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        HStack(spacing: 12) {
+                        LazyVGrid(
+                            columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                            spacing: 12
+                        ) {
                             BrandMetricTile(title: "Expenses", value: "\(viewModel.dashboardState?.transactionCount ?? 0)", systemImage: "receipt.fill")
                             BrandMetricTile(title: "Accounts", value: "\(viewModel.accounts.count)", systemImage: "creditcard.fill")
                             BrandMetricTile(title: "Rules", value: "\(viewModel.rules.count)", systemImage: "line.3.horizontal.decrease.circle.fill")
@@ -114,8 +158,8 @@ struct SupportCenterView: View {
                         )
                         BrandFeatureRow(
                             systemImage: "icloud.slash.fill",
-                            title: "Local only for now",
-                            detail: "Tickets stay on this device in the free build. Cloud history and sync-style ticketing are intentionally hidden until premium sign-in is available."
+                            title: "Account packet history later",
+                            detail: "This packet is generated on-device today. Backend ticket history and shared support state can plug into the same surface later."
                         )
                     }
                 }
@@ -130,7 +174,11 @@ struct SupportCenterView: View {
                             BrandFeatureRow(
                                 systemImage: "receipt.fill",
                                 title: recentExpense.title,
-                                detail: "\(recentExpense.category) · \(recentExpense.amount.formatted(.currency(code: "USD")))"
+                                detail: AppLocalization.localized(
+                                    "%@ · %@",
+                                    arguments: recentExpense.category.appLocalized,
+                                    recentExpense.amount.formatted(.currency(code: currencyCode))
+                                )
                             )
                         }
 
@@ -138,7 +186,11 @@ struct SupportCenterView: View {
                             BrandFeatureRow(
                                 systemImage: "calendar.badge.clock",
                                 title: nextBill.title,
-                                detail: "Next due \(FinanceToolFormatting.dueDateText(for: nextBill, ledger: viewModel.ledger)) · \(nextBill.amount.formatted(.currency(code: "USD")))"
+                                detail: AppLocalization.localized(
+                                    "Next due %@ · %@",
+                                    arguments: FinanceToolFormatting.dueDateText(for: nextBill, ledger: viewModel.ledger),
+                                    nextBill.amount.formatted(.currency(code: currencyCode))
+                                )
                             )
                         }
 
@@ -147,12 +199,17 @@ struct SupportCenterView: View {
                             BrandFeatureRow(
                                 systemImage: "slider.horizontal.3",
                                 title: topRule.merchantKeyword,
-                                detail: AppLocalization.localized(
-                                    "%@ · %d matching transaction%@",
-                                    arguments: topRule.category.localizedTitle,
-                                    matches,
-                                    matches == 1 ? "" : "s"
-                                )
+                                detail: matches == 1
+                                    ? AppLocalization.localized(
+                                        "%@ · %d matching transaction",
+                                        arguments: topRule.category.localizedTitle,
+                                        matches
+                                    )
+                                    : AppLocalization.localized(
+                                        "%@ · %d matching transactions",
+                                        arguments: topRule.category.localizedTitle,
+                                        matches
+                                    )
                             )
                         }
                     }
@@ -164,19 +221,47 @@ struct SupportCenterView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Picker("Priority", selection: $priority) {
-                            ForEach(SupportPriority.allCases) { value in
-                                Text(value.localizedTitle).tag(value)
-                            }
-                        }
-                        .pickerStyle(.segmented)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Priority")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(BrandTheme.muted)
 
-                        Picker("Issue type", selection: $issueType) {
-                            ForEach(SupportIssueType.allCases) { type in
-                                Text(type.localizedTitle).tag(type)
+                            Picker("Priority", selection: $priority) {
+                                ForEach(SupportPriority.allCases) { value in
+                                    Text(value.localizedTitle).tag(value)
+                                }
                             }
+                            .pickerStyle(.menu)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(BrandTheme.surfaceTint)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                            )
                         }
-                        .pickerStyle(.segmented)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Issue type")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(BrandTheme.muted)
+
+                            Picker("Issue type", selection: $issueType) {
+                                ForEach(SupportIssueType.allCases) { type in
+                                    Text(type.localizedTitle).tag(type)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(BrandTheme.surfaceTint)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                            )
+                        }
 
                         FinanceField(
                             label: "Subject",
@@ -245,6 +330,7 @@ struct SupportCenterView: View {
                             }
                         }
                         .buttonStyle(.plain)
+
                     }
                 }
 
@@ -335,7 +421,7 @@ struct SupportCenterView: View {
                     .padding(.bottom, 18)
             }
         }
-        .navigationTitle("Support Center")
+        .navigationTitle("Support Center".appLocalized)
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -367,7 +453,7 @@ struct SupportCenterView: View {
         let packet = RecentSupportPacket(
             issueType: issueType,
             priority: priority,
-            subject: subject.isEmpty ? "SpendSage support request" : subject,
+            subject: subject.isEmpty ? "SpendSage support request".appLocalized : subject,
             includeDiagnostics: includeDiagnostics
         )
         recentPackets.insert(packet, at: 0)

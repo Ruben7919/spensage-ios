@@ -20,7 +20,9 @@ enum SessionState: Equatable {
         switch self {
         case .signedOut:
             return false
-        case .guest, .signedIn:
+        case .guest:
+            return false
+        case .signedIn:
             return true
         }
     }

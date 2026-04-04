@@ -21,8 +21,8 @@ struct HelpCenterView: View {
     private let topics: [HelpTopic] = [
         HelpTopic(
             id: "setupFamily",
-            title: "How should I start in local mode?",
-            detail: "Continue as guest if you want a fast private start. Your ledger stays on this iPhone until you decide to sign in and unlock cloud-linked features.",
+            title: "How should I start with my account?",
+            detail: "Create or sign in to your SpendSage account first, then set your budget and first goal so the app can personalize the next step.",
             systemImage: "iphone.gen3"
         ),
         HelpTopic(
@@ -64,12 +64,58 @@ struct HelpCenterView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                FinanceToolsHeaderCard(
-                    eyebrow: "Guided help",
-                    title: "Help Center",
-                    summary: "Practical answers for budgeting, local-first setup, and where to go next when you need support or legal clarity.",
-                    systemImage: "questionmark.circle.fill"
-                )
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack(alignment: .top, spacing: 14) {
+                            MascotAvatarView(character: .mei, expression: .happy, size: 76)
+
+                            VStack(alignment: .leading, spacing: 10) {
+                                BrandBadge(text: "Guided help", systemImage: "questionmark.circle.fill")
+
+                                Text("Help Center")
+                                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                                    .foregroundStyle(BrandTheme.ink)
+
+                                Text("Ludo leads the quick answers, Tikki clarifies setup choices, and Manchas keeps the next step practical.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(BrandTheme.muted)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+
+                        BrandScenePanel(
+                            sceneKey: "guide_22_help_center_ludo",
+                            fallbackSystemImage: "questionmark.circle.fill",
+                            height: 184
+                        )
+
+                        CharacterCrewRail(
+                            members: [
+                                CharacterCrewMember(
+                                    title: "Tikki",
+                                    role: "Setup coach",
+                                    detail: "Turns confusing setup questions into short actions.",
+                                    character: .tikki,
+                                    expression: .thinking
+                                ),
+                                CharacterCrewMember(
+                                    title: "Ludo",
+                                    role: "Help guide",
+                                    detail: "Answers the common questions without making the app feel like a manual.",
+                                    character: .mei,
+                                    expression: .happy
+                                ),
+                                CharacterCrewMember(
+                                    title: "Manchas",
+                                    role: "Support calm",
+                                    detail: "Keeps the answers practical and steady.",
+                                    character: .manchas,
+                                    expression: .happy
+                                )
+                            ]
+                        )
+                    }
+                }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
@@ -77,7 +123,10 @@ struct HelpCenterView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        HStack(spacing: 12) {
+                        LazyVGrid(
+                            columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                            spacing: 12
+                        ) {
                             BrandMetricTile(title: "Mode", value: "Local-first", systemImage: "lock.fill")
                             BrandMetricTile(title: "Budget", value: "Guided", systemImage: "chart.bar.xaxis")
                             BrandMetricTile(title: "Support", value: "Packet-ready", systemImage: "paperplane.fill")
@@ -150,7 +199,7 @@ struct HelpCenterView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Move from guidance into action with support and legal paths that match this local-first build.")
+                        Text("Move from guidance into action with support and legal paths that match the connected account experience.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
 
@@ -186,7 +235,7 @@ struct HelpCenterView: View {
         .overlay(alignment: .top) {
             BrandBackdropView()
         }
-        .navigationTitle("Help Center")
+        .navigationTitle("Help Center".appLocalized)
         .navigationBarTitleDisplayMode(.inline)
     }
 

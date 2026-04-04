@@ -398,6 +398,25 @@ struct CategoryBreakdown: Identifiable, Codable, Equatable {
     let count: Int
 }
 
+struct MerchantAutofillSuggestion: Identifiable, Equatable {
+    let id: String
+    let merchant: String
+    let category: ExpenseCategory
+    let lastAmount: Decimal
+    let averageAmount: Decimal
+    let totalAmount: Decimal
+    let frequency: Int
+    let latestDate: Date
+    let lastNote: String?
+
+    var frequencyLabel: String {
+        if frequency == 1 {
+            return AppLocalization.localized("%d time", arguments: frequency)
+        }
+        return AppLocalization.localized("%d times", arguments: frequency)
+    }
+}
+
 struct FinanceDashboardState: Equatable {
     let budgetSnapshot: BudgetSnapshot
     let recentExpenses: [ExpenseItem]
@@ -732,6 +751,110 @@ struct LocalFinanceLedger: Codable, Equatable {
     func inferredCategory(for merchant: String) -> ExpenseCategory? {
         let normalized = merchant.lowercased()
         return rules.first(where: { $0.isEnabled && normalized.contains($0.merchantKeyword.lowercased()) })?.category
+    }
+
+    func merchantSuggestions(limit: Int = 6) -> [MerchantAutofillSuggestion] {
+        let grouped = Dictionary(grouping: expenses) { normalizedMerchantKey(for: $0.merchant) }
+
+        return grouped
+            .compactMap { key, records in
+                merchantSuggestion(from: records, key: key)
+            }
+            .sorted { lhs, rhs in
+                if lhs.frequency != rhs.frequency {
+                    return lhs.frequency > rhs.frequency
+                }
+                if lhs.totalAmount != rhs.totalAmount {
+                    return lhs.totalAmount > rhs.totalAmount
+                }
+                return lhs.latestDate > rhs.latestDate
+            }
+            .prefix(limit)
+            .map { $0 }
+    }
+
+    func merchantSuggestions(matching query: String, limit: Int = 4) -> [MerchantAutofillSuggestion] {
+        let normalizedQuery = normalizedMerchantKey(for: query)
+        guard !normalizedQuery.isEmpty else { return merchantSuggestions(limit: limit) }
+
+        return merchantSuggestions(limit: max(limit * 2, 8))
+            .filter { suggestion in
+                suggestion.id.contains(normalizedQuery) || normalizedMerchantKey(for: suggestion.merchant).contains(normalizedQuery)
+            }
+            .prefix(limit)
+            .map { $0 }
+    }
+
+    func autofillSuggestion(for merchant: String) -> MerchantAutofillSuggestion? {
+        let normalizedQuery = normalizedMerchantKey(for: merchant)
+        guard !normalizedQuery.isEmpty else { return nil }
+
+        if let exact = merchantSuggestions(limit: 24).first(where: { $0.id == normalizedQuery }) {
+            return exact
+        }
+
+        return merchantSuggestions(matching: merchant, limit: 1).first
+    }
+
+    func discretionaryHotspots(limit: Int = 3) -> [MerchantAutofillSuggestion] {
+        let watchedCategories: Set<ExpenseCategory> = [.dining, .coffee, .shopping]
+        return merchantSuggestions(limit: 24)
+            .filter { suggestion in
+                watchedCategories.contains(suggestion.category) && suggestion.frequency >= 2
+            }
+            .sorted { lhs, rhs in
+                if lhs.totalAmount != rhs.totalAmount {
+                    return lhs.totalAmount > rhs.totalAmount
+                }
+                return lhs.frequency > rhs.frequency
+            }
+            .prefix(limit)
+            .map { $0 }
+    }
+
+    func exactMerchantMatch(for merchant: String) -> MerchantAutofillSuggestion? {
+        let normalizedQuery = normalizedMerchantKey(for: merchant)
+        guard !normalizedQuery.isEmpty else { return nil }
+        return merchantSuggestions(limit: 24).first(where: { $0.id == normalizedQuery })
+    }
+
+    private func merchantSuggestion(from records: [ExpenseRecord], key: String) -> MerchantAutofillSuggestion? {
+        guard !key.isEmpty else { return nil }
+        let sorted = records.sorted { $0.date > $1.date }
+        guard let latest = sorted.first else { return nil }
+
+        let category = Dictionary(grouping: sorted, by: \.category)
+            .max { lhs, rhs in
+                if lhs.value.count != rhs.value.count {
+                    return lhs.value.count < rhs.value.count
+                }
+                let lhsTotal = lhs.value.reduce(Decimal.zero) { $0 + $1.amount }
+                let rhsTotal = rhs.value.reduce(Decimal.zero) { $0 + $1.amount }
+                return lhsTotal < rhsTotal
+            }?
+            .key ?? latest.category
+
+        let totalAmount = sorted.reduce(Decimal.zero) { $0 + $1.amount }
+        let averageAmount = totalAmount / Decimal(max(sorted.count, 1))
+
+        return MerchantAutofillSuggestion(
+            id: key,
+            merchant: latest.merchant,
+            category: inferredCategory(for: latest.merchant) ?? category,
+            lastAmount: latest.amount,
+            averageAmount: averageAmount,
+            totalAmount: totalAmount,
+            frequency: sorted.count,
+            latestDate: latest.date,
+            lastNote: latest.note
+        )
+    }
+
+    private func normalizedMerchantKey(for merchant: String) -> String {
+        merchant
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
     }
 }
 

@@ -51,13 +51,13 @@ struct BudgetWizardView: View {
     }
 
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
 
     @State private var step: WizardStep = .income
     @State private var income = ""
     @State private var budget = ""
     @State private var note: String?
     @State private var isPresentingGuide = false
-    @State private var hasPresentedInitialGuide = false
 
     private var parsedIncome: Decimal? {
         Decimal(string: income.replacingOccurrences(of: ",", with: "."))
@@ -128,12 +128,6 @@ struct BudgetWizardView: View {
             if let ledger = viewModel.ledger {
                 income = NSDecimalNumber(decimal: ledger.monthlyIncome).stringValue
                 budget = NSDecimalNumber(decimal: ledger.monthlyBudget).stringValue
-            }
-
-            guard !hasPresentedInitialGuide else { return }
-            hasPresentedInitialGuide = true
-            if !GuideProgressStore.isSeen(.budgetWizard) {
-                isPresentingGuide = true
             }
         }
     }
@@ -213,7 +207,7 @@ struct BudgetWizardView: View {
                     if let suggestedBudget {
                         BrandMetricTile(
                             title: "Suggested safe budget",
-                            value: suggestedBudget.formatted(.currency(code: "USD")),
+                            value: suggestedBudget.formatted(.currency(code: currencyCode)),
                             systemImage: "leaf.fill"
                         )
                     }
@@ -237,12 +231,12 @@ struct BudgetWizardView: View {
                     HStack(spacing: 12) {
                         BrandMetricTile(
                             title: "Income",
-                            value: (parsedIncome ?? 0).formatted(.currency(code: "USD")),
+                            value: (parsedIncome ?? 0).formatted(.currency(code: currencyCode)),
                             systemImage: "banknote.fill"
                         )
                         BrandMetricTile(
                             title: "Projected buffer",
-                            value: projectedRemaining.formatted(.currency(code: "USD")),
+                            value: projectedRemaining.formatted(.currency(code: currencyCode)),
                             systemImage: "shield.lefthalf.filled"
                         )
                     }
@@ -267,22 +261,22 @@ struct BudgetWizardView: View {
                     ) {
                         BrandMetricTile(
                             title: "Income",
-                            value: (parsedIncome ?? 0).formatted(.currency(code: "USD")),
+                            value: (parsedIncome ?? 0).formatted(.currency(code: currencyCode)),
                             systemImage: "banknote.fill"
                         )
                         BrandMetricTile(
                             title: "Budget",
-                            value: (parsedBudget ?? 0).formatted(.currency(code: "USD")),
+                            value: (parsedBudget ?? 0).formatted(.currency(code: currencyCode)),
                             systemImage: "chart.bar.fill"
                         )
                         BrandMetricTile(
                             title: "Buffer",
-                            value: projectedRemaining.formatted(.currency(code: "USD")),
+                            value: projectedRemaining.formatted(.currency(code: currencyCode)),
                             systemImage: "lock.shield.fill"
                         )
                         BrandMetricTile(
                             title: "Mode",
-                            value: viewModel.session == .guest ? "Guest local" : "Signed in",
+                            value: viewModel.session.isAuthenticated ? "Signed in".appLocalized : "Account required".appLocalized,
                             systemImage: "iphone.gen3"
                         )
                     }
@@ -323,11 +317,11 @@ struct BudgetWizardView: View {
 
     private func budgetField(title: String, value: Binding<String>, placeholder: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(BrandTheme.muted)
 
-            TextField(placeholder, text: value)
+            TextField(placeholder.appLocalized, text: value)
                 .keyboardType(.decimalPad)
                 .padding()
                 .background(BrandTheme.surfaceTint)
@@ -350,7 +344,7 @@ struct BudgetWizardView: View {
                 .buttonStyle(SecondaryCTAStyle())
             }
 
-            Button(primaryTitle) {
+            Button(primaryTitle.appLocalized) {
                 if isFinal {
                     Task { await save() }
                 } else {
@@ -367,12 +361,12 @@ struct BudgetWizardView: View {
 
     private func save() async {
         guard let incomeValue = parsedIncome, let budgetValue = parsedBudget else {
-            note = "Use valid decimal numbers."
+            note = "Use valid decimal numbers.".appLocalized
             return
         }
 
         guard incomeValue > 0, budgetValue > 0 else {
-            note = "Income and budget must be greater than zero."
+            note = "Income and budget must be greater than zero.".appLocalized
             return
         }
 

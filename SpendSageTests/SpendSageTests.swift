@@ -12,7 +12,8 @@ struct SpendSageTests {
     @Test
     func signedOutIsNotAuthenticated() {
         #expect(SessionState.signedOut.isAuthenticated == false)
-        #expect(SessionState.guest.isAuthenticated == true)
+        #expect(SessionState.guest.isAuthenticated == false)
+        #expect(SessionState.signedIn(email: "test@spendsage.ai", provider: "Email").isAuthenticated == true)
     }
 
     @Test

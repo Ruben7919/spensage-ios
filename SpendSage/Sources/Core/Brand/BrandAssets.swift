@@ -11,6 +11,17 @@ enum BrandCharacterID: String, CaseIterable, Codable, Hashable {
     case tikki
     case mei
     case manchas
+
+    var narrativeName: String {
+        switch self {
+        case .tikki:
+            return "Tikki".appLocalized
+        case .mei:
+            return "Ludo".appLocalized
+        case .manchas:
+            return "Manchas".appLocalized
+        }
+    }
 }
 
 enum BrandExpression: String, CaseIterable, Codable, Hashable {
@@ -104,6 +115,15 @@ final class BrandAssetCatalog {
         let fallback = manifest.guides.values.sorted().first
         guard let fileName = manifest.guides[key] ?? fallback else { return nil }
         return BrandAssetSource(category: .guides, fileName: fileName, version: version)
+    }
+
+    func guideIfAvailable(_ key: String) -> BrandAssetSource? {
+        guard let fileName = manifest.guides[key] else { return nil }
+        return BrandAssetSource(category: .guides, fileName: fileName, version: version)
+    }
+
+    func guide(fileName: String) -> BrandAssetSource {
+        BrandAssetSource(category: .guides, fileName: fileName, version: version)
     }
 
     func logo(_ kind: BrandLogoKind) -> BrandAssetSource {

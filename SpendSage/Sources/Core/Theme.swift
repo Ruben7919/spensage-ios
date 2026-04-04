@@ -98,6 +98,35 @@ enum BrandTheme {
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
+
+    static let heroSurfaceGradient = LinearGradient(
+        colors: [
+            primary.opacity(0.96),
+            Color.adaptive(
+                light: UIColor(red: 0.14, green: 0.57, blue: 0.56, alpha: 1),
+                dark: UIColor(red: 0.12, green: 0.26, blue: 0.28, alpha: 1)
+            ),
+            Color.adaptive(
+                light: UIColor(red: 0.29, green: 0.66, blue: 0.63, alpha: 1),
+                dark: UIColor(red: 0.09, green: 0.18, blue: 0.20, alpha: 1)
+            )
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let success = Color.adaptive(
+        light: UIColor(red: 0.12, green: 0.58, blue: 0.36, alpha: 1),
+        dark: UIColor(red: 0.36, green: 0.78, blue: 0.58, alpha: 1)
+    )
+    static let warning = Color.adaptive(
+        light: UIColor(red: 0.83, green: 0.56, blue: 0.16, alpha: 1),
+        dark: UIColor(red: 0.94, green: 0.74, blue: 0.34, alpha: 1)
+    )
+    static let danger = Color.adaptive(
+        light: UIColor(red: 0.79, green: 0.28, blue: 0.24, alpha: 1),
+        dark: UIColor(red: 0.94, green: 0.53, blue: 0.47, alpha: 1)
+    )
 }
 
 struct PrimaryCTAStyle: ButtonStyle {

@@ -83,14 +83,14 @@ struct AuthConfiguration: Equatable {
     static let preview = AuthConfiguration(
         mode: .localPreview,
         appName: "SpendSage",
-        allowsGuestAccess: true,
+        allowsGuestAccess: false,
         emailPasswordEnabled: true,
         minimumPasswordLength: 8,
         supportedSocialProviders: SocialProvider.allCases,
         hostedUI: nil,
         previewEmailDomain: "spendsage.preview",
-        localPreviewFootnote: "Sign in to keep your plan, access, and progress connected to your account.",
-        hostedUIFootnote: "Apple and Google sign in are available on supported accounts."
+        localPreviewFootnote: "Your account is the home of your plan, progress, and personalization.",
+        hostedUIFootnote: "Apple and Google sign in are available as fast account entry points."
     )
 
     static func liveFromBundle(_ bundle: Bundle = .main) -> AuthConfiguration? {
@@ -123,7 +123,7 @@ struct AuthConfiguration: Equatable {
         return AuthConfiguration(
             mode: .hostedUI,
             appName: "SpendSage AI",
-            allowsGuestAccess: true,
+            allowsGuestAccess: false,
             emailPasswordEnabled: true,
             minimumPasswordLength: 8,
             supportedSocialProviders: SocialProvider.allCases,
@@ -139,7 +139,7 @@ struct AuthConfiguration: Equatable {
                 tokenPath: "/oauth2/token"
             ),
             previewEmailDomain: "spendsage.ai",
-            localPreviewFootnote: "You can continue on this device or use your SpendSage account.",
+            localPreviewFootnote: "Sign in with your SpendSage account to keep your plan, profile, and restore path together.",
             hostedUIFootnote: "Apple and Google sign in use Cognito Hosted UI with a secure browser session."
         )
     }

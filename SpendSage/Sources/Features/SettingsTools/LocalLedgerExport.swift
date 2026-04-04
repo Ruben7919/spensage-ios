@@ -42,25 +42,25 @@ enum LocalLedgerExportComposer {
         let lastUpdated = viewModel.ledger?.updatedAt.formatted(date: .abbreviated, time: .shortened) ?? "Not yet saved".appLocalized
 
         var lines = [
-            "SpendSage local summary",
-            "Exported: \(Date.now.formatted(date: .abbreviated, time: .shortened))",
-            "Session: \(sessionMode)",
-            "Profile: \(profile.fullName) · \(profile.householdName)",
-            "Email: \(profile.email)",
-            "Country: \(profile.countryCode)",
-            "Marketing opt-in: \(profile.marketingOptIn ? "Enabled" : "Disabled")",
-            "Accounts: \(accountsCount)",
-            "Bills: \(billsCount)",
-            "Rules: \(rulesCount)",
-            "Expenses: \(expensesCount)",
-            "Last local update: \(lastUpdated)"
+            "SpendSage local summary".appLocalized,
+            AppLocalization.localized("Exported: %@", arguments: Date.now.formatted(date: .abbreviated, time: .shortened)),
+            AppLocalization.localized("Session: %@", arguments: sessionMode),
+            AppLocalization.localized("Profile: %@ · %@", arguments: profile.fullName, profile.householdName),
+            AppLocalization.localized("Email: %@", arguments: profile.email),
+            AppLocalization.localized("Country: %@", arguments: profile.countryCode),
+            AppLocalization.localized("Marketing opt-in: %@", arguments: profile.marketingOptIn ? "Enabled".appLocalized : "Disabled".appLocalized),
+            AppLocalization.localized("Accounts: %d", arguments: accountsCount),
+            AppLocalization.localized("Bills: %d", arguments: billsCount),
+            AppLocalization.localized("Rules: %d", arguments: rulesCount),
+            AppLocalization.localized("Expenses: %d", arguments: expensesCount),
+            AppLocalization.localized("Last local update: %@", arguments: lastUpdated)
         ]
 
         if let snapshot = state?.budgetSnapshot {
-            lines.append("Income: \(currency(snapshot.monthlyIncome))")
-            lines.append("Budget: \(currency(snapshot.monthlyBudget))")
-            lines.append("Spent: \(currency(snapshot.monthlySpent))")
-            lines.append("Remaining: \(currency(snapshot.remaining))")
+            lines.append(AppLocalization.localized("Income: %@", arguments: currency(snapshot.monthlyIncome)))
+            lines.append(AppLocalization.localized("Budget: %@", arguments: currency(snapshot.monthlyBudget)))
+            lines.append(AppLocalization.localized("Spent: %@", arguments: currency(snapshot.monthlySpent)))
+            lines.append(AppLocalization.localized("Remaining: %@", arguments: currency(snapshot.remaining)))
         }
 
         if let topCategory = state?.topCategory {
@@ -114,12 +114,12 @@ enum LocalLedgerExportComposer {
     ) -> String {
         let trimmedDetail = detail.trimmingCharacters(in: .whitespacesAndNewlines)
         var sections = [
-            "SpendSage support packet",
-            "Issue type: \(issueType)",
-            "Subject: \(subject.trimmingCharacters(in: .whitespacesAndNewlines))",
+            "SpendSage support packet".appLocalized,
+            AppLocalization.localized("Issue type: %@", arguments: issueType),
+            AppLocalization.localized("Subject: %@", arguments: subject.trimmingCharacters(in: .whitespacesAndNewlines)),
             "",
-            "Details:",
-            trimmedDetail.isEmpty ? "No extra details provided." : trimmedDetail
+            "Details:".appLocalized,
+            trimmedDetail.isEmpty ? "No extra details provided.".appLocalized : trimmedDetail
         ]
 
         if includeDiagnostics {
@@ -128,7 +128,7 @@ enum LocalLedgerExportComposer {
         }
 
         sections.append("")
-        sections.append("Public support: \(PublicLegalLinks.support.absoluteString)")
+        sections.append(AppLocalization.localized("Public support: %@", arguments: PublicLegalLinks.support.absoluteString))
         return sections.joined(separator: "\n")
     }
 
@@ -137,7 +137,7 @@ enum LocalLedgerExportComposer {
         case .signedOut:
             return "Signed out".appLocalized
         case .guest:
-            return "Guest local mode".appLocalized
+            return "Preview guest mode".appLocalized
         case let .signedIn(email, provider):
             if let provider, !provider.isEmpty {
                 return AppLocalization.localized("Signed in as %@ via %@", arguments: email, provider)
@@ -147,6 +147,6 @@ enum LocalLedgerExportComposer {
     }
 
     static func currency(_ value: Decimal) -> String {
-        value.formatted(.currency(code: "USD"))
+        AppCurrencyFormat.format(value)
     }
 }

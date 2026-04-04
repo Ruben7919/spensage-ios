@@ -22,6 +22,7 @@ struct ResetPasswordView: View {
             }
             .padding(24)
         }
+        .scrollDismissesKeyboard(.interactively)
         .background(
             ZStack {
                 BrandTheme.canvas
@@ -29,7 +30,7 @@ struct ResetPasswordView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Reset Password")
+        .navigationTitle("Reset password".appLocalized)
         .navigationBarTitleDisplayMode(.inline)
         .overlay(alignment: .topLeading) {
             languagePicker
@@ -40,21 +41,27 @@ struct ResetPasswordView: View {
 
     private var headerCard: some View {
         SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                BrandBadge(text: "Account recovery", systemImage: "key.fill")
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top, spacing: 14) {
+                    MascotAvatarView(character: .tikki, expression: .thinking, size: 76)
 
-                Text("Reset your password")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundStyle(BrandTheme.ink)
+                    VStack(alignment: .leading, spacing: 10) {
+                        BrandBadge(text: "Reset password", systemImage: "key.fill")
 
-                Text("Request a reset code for an existing account, then choose a new password to get back in.")
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
+                        Text("Reset password".appLocalized)
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text("Ask for a reset code here, then continue directly into the new-password step on the same surface.".appLocalized)
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
 
                 HStack(spacing: 12) {
-                    BrandMetricTile(title: "Step", value: "2-stage", systemImage: "number.circle.fill")
-                    BrandMetricTile(title: "Recovery", value: "Secure", systemImage: "lock.rotation")
+                    BrandMetricTile(title: "Step", value: "2-stage".appLocalized, systemImage: "number.circle.fill")
+                    BrandMetricTile(title: "Recovery", value: "Secure".appLocalized, systemImage: "lock.rotation")
                 }
             }
         }
@@ -216,8 +223,12 @@ struct ResetPasswordView: View {
             .textContentType(contentType)
             .keyboardType(keyboard)
             .padding()
-            .background(Color.black.opacity(0.03))
+            .background(BrandTheme.surfaceTint)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
         }
     }
 }

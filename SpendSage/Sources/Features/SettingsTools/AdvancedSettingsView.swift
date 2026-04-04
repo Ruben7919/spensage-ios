@@ -63,12 +63,12 @@ struct AdvancedSettingsView: View {
                 ) {
                     BrandMetricTile(
                         title: "Overlay",
-                        value: debugOverlayEnabled ? "On" : "Off",
+                        value: debugOverlayEnabled ? "On".appLocalized : "Off".appLocalized,
                         systemImage: "circle.grid.3x3.fill"
                     )
                     BrandMetricTile(
                         title: "Diagnostics",
-                        value: includeDiagnostics ? "On" : "Off",
+                        value: includeDiagnostics ? "On".appLocalized : "Off".appLocalized,
                         systemImage: "doc.text.magnifyingglass"
                     )
                     BrandMetricTile(
@@ -78,20 +78,16 @@ struct AdvancedSettingsView: View {
                     )
                     BrandMetricTile(
                         title: "Scope",
-                        value: "On device",
+                        value: "On device".appLocalized,
                         systemImage: "lock.fill"
                     )
                 }
 
-                BrandArtworkSurface {
-                    BrandAssetImage(
-                        source: BrandAssetCatalog.shared.guide("guide_06_sharing_family_manchas"),
-                        fallbackSystemImage: "slider.horizontal.3"
-                    )
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 200)
-                }
+                BrandScenePanel(
+                    sceneKey: "guide_24_advanced_tools_manchas",
+                    fallbackSystemImage: "slider.horizontal.3",
+                    height: 200
+                )
             }
         }
     }

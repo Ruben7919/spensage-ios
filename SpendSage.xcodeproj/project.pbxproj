@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		004836954D89D6E877467C3A /* guide_24_advanced_tools_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4909CB413F9E590B6E748C44 /* guide_24_advanced_tools_manchas_v2.png */; };
 		0083CC041DF393B4AFD5080A /* guide_06_sharing_family_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 06C282CB03BDEC6AEF44B9C5 /* guide_06_sharing_family_manchas_v2.png */; };
 		02C6DDAE3EB1ABFCFBF4C91E /* HostedUIAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20799AB6E9D49FDE20443E9 /* HostedUIAuthService.swift */; };
 		04E00FF56F15EBE2816E0EFB /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785F4A4F7DC3D1425773B754 /* HelpCenterView.swift */; };
@@ -16,6 +17,8 @@
 		11D4EDED70C86DB7D2566D40 /* guide_16_family_mission_board_team_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D34F0CB2B678B65728E704E /* guide_16_family_mission_board_team_v2.png */; };
 		1297C5EB241903AF0BABCDB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4C99B87AC3D4FD5B02CB8C6A /* Localizable.strings */; };
 		1471A33FCC39E0845D2459AE /* guide_15_emergency_fund_shield_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 982D4114C1EC443CF5F589B0 /* guide_15_emergency_fund_shield_mei_v2.png */; };
+		163578777B41DCF6A2A0FC5F /* ExperienceComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5981C773A60F2DADC1E80E7B /* ExperienceComponents.swift */; };
+		16A32504BA5C649D391C39B1 /* MascotExperienceComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE1210A9F294B7F39DB6F2D /* MascotExperienceComponents.swift */; };
 		17EBFD7F7D5C568DFA011E37 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABD400C4F74E75F803BAFC /* Models.swift */; };
 		1A39E8A6890D71AA0AE136C4 /* guide_13_subscription_hydra_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 879896D4090BAF21D8382509 /* guide_13_subscription_hydra_manchas_v2.png */; };
 		1BFAC9F2D1D8FBF19FBE8052 /* LocalLedgerExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32229B7B2F800571C744726E /* LocalLedgerExport.swift */; };
@@ -34,11 +37,13 @@
 		2C79A673121DD0E5826340D8 /* manchas_warning_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 343675A1190A132B36BB1EBE /* manchas_warning_v2.png */; };
 		2DC48FEE7581A00FF9087E18 /* ConfirmAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07CC2A6F29FF5CDF041CF122 /* ConfirmAccountView.swift */; };
 		2EB29CB1121A96A1465D209C /* guide_02_log_expense_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = A511C8E9FCC26A2D46E74E8E /* guide_02_log_expense_manchas_v2.png */; };
+		2EEDC13EE0959F9789EA5EE9 /* guide_26_loading_yarn_team_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 77338DCA49A69EB2F0830792 /* guide_26_loading_yarn_team_v2.png */; };
 		30CC4427086325546CBEFE6A /* SpendSageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C815B84250314C2A948D50C /* SpendSageApp.swift */; };
 		314224FD0FC0F6682AF9F444 /* badge_sharing_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 378620C0690A616199A2C0E9 /* badge_sharing_v2.png */; };
 		3670C685389907A51DF26B33 /* badge_boss_fight_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D5B69B0FEBEE21F1A351DB7B /* badge_boss_fight_v2.png */; };
 		3728D313064AF5547716224D /* tikki_shocked_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 892E229A6B0A3521B629B4C9 /* tikki_shocked_v2.png */; };
 		396CC1814EFDE8EE92647C33 /* guide_08_daily_checkin_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9D0C1A2BE8999CC797CEA6DE /* guide_08_daily_checkin_manchas_v2.png */; };
+		39C47AD77DD4044A0F8385F5 /* guide_25_splash_team_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D64A1E343A7B2A8D900694D6 /* guide_25_splash_team_v2.png */; };
 		3FE7B310989B98BD69678336 /* mei_happy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0EA5F8005ABD9F3AFD3D0533 /* mei_happy_v2.png */; };
 		41272B5D248649B61D7C367C /* manchas_happy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 47666EACB35D65453210294C /* manchas_happy_v2.png */; };
 		4404D795880F86C1125D6917 /* mei_love_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 91D094C74AA70ED5B5BDD719 /* mei_love_v2.png */; };
@@ -69,6 +74,7 @@
 		68B17B5FED39DD6438F6AA71 /* acc_hologram_charts_magnifier_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 880A65382CE97B752CBFCC0A /* acc_hologram_charts_magnifier_v2.png */; };
 		6A7708B2F5103A9CCFC04D88 /* mei_sleepy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0670165A10A90A31703E4200 /* mei_sleepy_v2.png */; };
 		748A230A2F9398A3A9D02B41 /* ExpensesCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C24351BCC0914DF6508A0 /* ExpensesCenterView.swift */; };
+		74E67A929DC71D863D2EFABC /* guide_21_profile_identity_ludo_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 17BB41FBBB25D087C86ECE68 /* guide_21_profile_identity_ludo_v2.png */; };
 		77843C280365837DC6797467 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23BFBEACF79B0FDCC1A81A6 /* OnboardingView.swift */; };
 		7883824A9181C09919A5380F /* BudgetWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4BECA3A82774A38C48D3E3 /* BudgetWizardView.swift */; };
 		78FD6FF7284FE22A88BCE118 /* FinanceReceiptScanToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975B357AB70EED51E253E86B /* FinanceReceiptScanToolView.swift */; };
@@ -92,6 +98,7 @@
 		90729DDE223995E1CAD0EFDD /* acc_receipt_scan_beam_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 094260DEB3E03665653E57E2 /* acc_receipt_scan_beam_v2.png */; };
 		913F7F3BB80FF05CB5AF32D2 /* badge_ai_insights_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6484EA58C0651098BBA4EBF9 /* badge_ai_insights_v2.png */; };
 		91E731398ADCE401D5B7B1F6 /* FinanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC5D00895B952997D987883 /* FinanceModels.swift */; };
+		923780D32BAFAE1DB62DF5DD /* app_icon_tinted_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = A1A1593B44B0AF3E92938E23 /* app_icon_tinted_v2.png */; };
 		93A5A96EF2B3A5812249918F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */; };
 		9530C8BBEF430A2B30F885CC /* badge_goals_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 381690D6AA9297592598EC3A /* badge_goals_v2.png */; };
 		970786DA41BB24AC236F80E0 /* badge_recovery_mode_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BF97127EEC9ABE5F58F3976 /* badge_recovery_mode_v2.png */; };
@@ -103,6 +110,7 @@
 		A00BC835A937F9EF119972B6 /* guide_10_premium_trial_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 53028644B920BAD667473DCA /* guide_10_premium_trial_mei_v2.png */; };
 		A04E5EE473BA9699A0BFA40F /* mei_warning_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5BDD4046567E2758D2FBE557 /* mei_warning_v2.png */; };
 		A14E5B6B21BADE70EC7F687F /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B314CADFCED6D85AF660846D /* AppRootView.swift */; };
+		A2DF8D44AC0AE36303F3FA67 /* CuteLoadingComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E3F84D36D3AA4812BB3D79 /* CuteLoadingComponents.swift */; };
 		A30437ECD8F41BABB4A42203 /* FinanceCsvImportToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB5D74645DF4C38E921764 /* FinanceCsvImportToolView.swift */; };
 		A45A022AE99A11335AFB290E /* BrandComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4814CA0146FBD47E788B58D9 /* BrandComponents.swift */; };
 		A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87421858D2F5088C6CDD796E /* FinanceStore.swift */; };
@@ -111,7 +119,9 @@
 		AAEB7D01E712F4A2C7B8EDB0 /* mei_excited_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ED9FC2B123E911909B373D9 /* mei_excited_v2.png */; };
 		AB2296AC9A01E51AD8D2089C /* manchas_angry_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0683344F3860FA14F10363A3 /* manchas_angry_v2.png */; };
 		ABA71B8C879D5ED55FED6FB5 /* guide_07_first_win_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9112931606581AFC35F6638B /* guide_07_first_win_mei_v2.png */; };
+		ACAD378E80ADFC46E2F85EAB /* BrandStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC05C996D8DF40D500F2777C /* BrandStory.swift */; };
 		ADDAF24DAE772F38566306B3 /* manchas_neutral_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9756F9FE063E1099AFF7B0B8 /* manchas_neutral_v2.png */; };
+		AED083756FE4631D3475EBD2 /* ReceiptVisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BC0CDC4EFA3A8AB7D5249 /* ReceiptVisionService.swift */; };
 		AFC44BB846CDF66F5FEE2D7C /* mei_angry_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 376F7F2404E91AF75E89CCED /* mei_angry_v2.png */; };
 		B080CCDE88FE108A3976B497 /* badge_level_up_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 510A9603A5754D7EF0CB477F /* badge_level_up_v2.png */; };
 		B3FAD3530E5C3545269E681F /* Guides.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA553B6500B3D28724615D2F /* Guides.swift */; };
@@ -136,6 +146,7 @@
 		DD5EF1AA1AA2C0479F642F48 /* PreviewFinanceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */; };
 		DDB676037694904B3200DF10 /* mei_shocked_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0FA52659E4112BAB6EB0B /* mei_shocked_v2.png */; };
 		DE5D447306B02BC086076ED6 /* LegalCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19D129F26CE378A5B66A57DC /* LegalCenterView.swift */; };
+		E23872066D5DD6A6F8D73B6B /* guide_22_help_center_ludo_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F0AE2C1EA8C7025EA368BF5 /* guide_22_help_center_ludo_v2.png */; };
 		E25034002BAE44787628E3C6 /* guide_14_bill_radar_tikki_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3C9EC4535CCE8895E6F6EFA1 /* guide_14_bill_radar_tikki_v2.png */; };
 		E25A6E367BEDBD1C79DB67A4 /* tikki_angry_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = CA56DF4650B5021F47704B05 /* tikki_angry_v2.png */; };
 		E30FD45D36AE9FF7582B0794 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E05C5BF495CA177EAE3510 /* DashboardView.swift */; };
@@ -147,11 +158,15 @@
 		E808C62D35AF1A4E666758F8 /* tikki_thinking_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8AA28564D2854E1BAE58B808 /* tikki_thinking_v2.png */; };
 		E9DAD4C151A3D2FCBD608678 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978311B951262001E5361352 /* PremiumView.swift */; };
 		EACB7A6A1ACF088F9ADFA30F /* guide_09_weekly_boss_tikki_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C1E64C438F1553E4639812E3 /* guide_09_weekly_boss_tikki_manchas_v2.png */; };
+		EB6DF32594016F90A8BCD728 /* guide_23_rules_automation_ludo_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 80E8DA0C08C679AF223D73F9 /* guide_23_rules_automation_ludo_v2.png */; };
+		EC9FE9E3AF1E789DD8C2FBCD /* FlowStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D12FFE285DD4830D2F7B3D2 /* FlowStack.swift */; };
+		ECB63BFF8235833AC79E2A56 /* app_icon_dark_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C65D3EB1639597D338721CE9 /* app_icon_dark_v2.png */; };
 		F041F9A2211E2F6A273FFD2D /* badge_trial_starter_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 68A962C994F5DE5697471F65 /* badge_trial_starter_v2.png */; };
 		F344FC8A5262BA300A86C6F7 /* acc_calculator_notebook_coin_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = B07B0A36C4437FF6DABFD08D /* acc_calculator_notebook_coin_v2.png */; };
 		F54EF749BC540E5FBF036647 /* mei_proud_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = DE55C3D98F865BE3049CAA23 /* mei_proud_v2.png */; };
 		F6AE0A61C32FE8A8903427BD /* app_icon_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */; };
 		F6B4536F6F60E2EB56759A8B /* guide_18_landing_trust_shield_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2033E37D418EDB7A5CB1ED5F /* guide_18_landing_trust_shield_mei_v2.png */; };
+		F6D4F13256E68E49F659F817 /* ReceiptVisionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1238852B64244DC049D08D /* ReceiptVisionServiceTests.swift */; };
 		FB19B404E1F4529356C0489D /* wordmark_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C48A2C6F56D93D7DCF485CA /* wordmark_v2.png */; };
 		FDC9CF4BAB873272B35E87BB /* FinanceAccountsToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EA145E6EEC82916F75C622 /* FinanceAccountsToolView.swift */; };
 		FFB288A14F62765FDCBFAC77 /* tikki_sleepy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CD7057B2906325234B32F64 /* tikki_sleepy_v2.png */; };
@@ -182,10 +197,12 @@
 		0E17F16160A75590F982D8F7 /* badge_quest_daily_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_quest_daily_v2.png; sourceTree = "<group>"; };
 		0E1BE112CF5E024F291765EC /* guide_01_dashboard_game_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_01_dashboard_game_manchas_v2.png; sourceTree = "<group>"; };
 		0EA5F8005ABD9F3AFD3D0533 /* mei_happy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_happy_v2.png; sourceTree = "<group>"; };
+		0FE1210A9F294B7F39DB6F2D /* MascotExperienceComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MascotExperienceComponents.swift; sourceTree = "<group>"; };
 		1053B33502C1AAC11F427D5C /* guide_20_subscription_checkout_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_20_subscription_checkout_manchas_v2.png; sourceTree = "<group>"; };
 		1169E0D96A6C65EC1687F228 /* manchas_proud_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_proud_v2.png; sourceTree = "<group>"; };
 		11BBA3D8FF7A9D47779934EC /* acc_warning_triangle_lightning_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_warning_triangle_lightning_v2.png; sourceTree = "<group>"; };
 		1288CDB648EC0EE60433AA28 /* asset_manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = asset_manifest.json; sourceTree = "<group>"; };
+		17BB41FBBB25D087C86ECE68 /* guide_21_profile_identity_ludo_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_21_profile_identity_ludo_v2.png; sourceTree = "<group>"; };
 		19D129F26CE378A5B66A57DC /* LegalCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalCenterView.swift; sourceTree = "<group>"; };
 		1AE2F76BDDB3352DE57B540F /* BrandAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssets.swift; sourceTree = "<group>"; };
 		1C48A2C6F56D93D7DCF485CA /* wordmark_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wordmark_v2.png; sourceTree = "<group>"; };
@@ -204,9 +221,11 @@
 		381690D6AA9297592598EC3A /* badge_goals_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_goals_v2.png; sourceTree = "<group>"; };
 		395612E2903C037F30684D06 /* acc_gift_box_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_gift_box_v2.png; sourceTree = "<group>"; };
 		3C9EC4535CCE8895E6F6EFA1 /* guide_14_bill_radar_tikki_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_14_bill_radar_tikki_v2.png; sourceTree = "<group>"; };
+		42E3F84D36D3AA4812BB3D79 /* CuteLoadingComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuteLoadingComponents.swift; sourceTree = "<group>"; };
 		43615E6FC9EF243440A82D03 /* manchas_excited_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_excited_v2.png; sourceTree = "<group>"; };
 		47666EACB35D65453210294C /* manchas_happy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_happy_v2.png; sourceTree = "<group>"; };
 		4814CA0146FBD47E788B58D9 /* BrandComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandComponents.swift; sourceTree = "<group>"; };
+		4909CB413F9E590B6E748C44 /* guide_24_advanced_tools_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_24_advanced_tools_manchas_v2.png; sourceTree = "<group>"; };
 		4BF4494C2C9263636ABAA42A /* badge_security_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_security_v2.png; sourceTree = "<group>"; };
 		4C99B87AC3D4FD5B02CB8C6A /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4CD7057B2906325234B32F64 /* tikki_sleepy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_sleepy_v2.png; sourceTree = "<group>"; };
@@ -216,11 +235,14 @@
 		53028644B920BAD667473DCA /* guide_10_premium_trial_mei_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_10_premium_trial_mei_v2.png; sourceTree = "<group>"; };
 		541EB56F619104E174DEEFC0 /* badge_promo_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_promo_v2.png; sourceTree = "<group>"; };
 		54B4C2EA2A96E843D0264B1F /* acc_wallet_card_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_wallet_card_v2.png; sourceTree = "<group>"; };
+		5981C773A60F2DADC1E80E7B /* ExperienceComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperienceComponents.swift; sourceTree = "<group>"; };
 		5BDD4046567E2758D2FBE557 /* mei_warning_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_warning_v2.png; sourceTree = "<group>"; };
+		5D12FFE285DD4830D2F7B3D2 /* FlowStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowStack.swift; sourceTree = "<group>"; };
 		5D3A812673FCF633E5AD7A82 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5DFAEECDA8CD17DF4B0E80CC /* logo_mark_rosette_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo_mark_rosette_v2.png; sourceTree = "<group>"; };
 		5E2EABFC6AEB991E51874149 /* manchas_thinking_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_thinking_v2.png; sourceTree = "<group>"; };
 		5ED9FC2B123E911909B373D9 /* mei_excited_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_excited_v2.png; sourceTree = "<group>"; };
+		5F0AE2C1EA8C7025EA368BF5 /* guide_22_help_center_ludo_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_22_help_center_ludo_v2.png; sourceTree = "<group>"; };
 		5FC5D00895B952997D987883 /* FinanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceModels.swift; sourceTree = "<group>"; };
 		63E04732FD9E469418EE3975 /* badge_savings_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_savings_v2.png; sourceTree = "<group>"; };
 		6484EA58C0651098BBA4EBF9 /* badge_ai_insights_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_ai_insights_v2.png; sourceTree = "<group>"; };
@@ -238,10 +260,13 @@
 		6D34F0CB2B678B65728E704E /* guide_16_family_mission_board_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_16_family_mission_board_team_v2.png; sourceTree = "<group>"; };
 		6D4BECA3A82774A38C48D3E3 /* BudgetWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetWizardView.swift; sourceTree = "<group>"; };
 		73E3C4474402F5037300D8ED /* badge_consistency_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_consistency_v2.png; sourceTree = "<group>"; };
+		77338DCA49A69EB2F0830792 /* guide_26_loading_yarn_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_26_loading_yarn_team_v2.png; sourceTree = "<group>"; };
 		7845E9A91B6C587A2C6B48B7 /* TrophyHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrophyHistoryView.swift; sourceTree = "<group>"; };
 		785F4A4F7DC3D1425773B754 /* HelpCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpCenterView.swift; sourceTree = "<group>"; };
 		7C165C936A00E089518582FE /* tikki_neutral_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_neutral_v2.png; sourceTree = "<group>"; };
+		7D8BC0CDC4EFA3A8AB7D5249 /* ReceiptVisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptVisionService.swift; sourceTree = "<group>"; };
 		7FD463CBF88A570CC373ACAF /* badge_safe_to_spend_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_safe_to_spend_v2.png; sourceTree = "<group>"; };
+		80E8DA0C08C679AF223D73F9 /* guide_23_rules_automation_ludo_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_23_rules_automation_ludo_v2.png; sourceTree = "<group>"; };
 		8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageTests.swift; sourceTree = "<group>"; };
 		82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_v2.png; sourceTree = "<group>"; };
 		87421858D2F5088C6CDD796E /* FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceStore.swift; sourceTree = "<group>"; };
@@ -273,6 +298,7 @@
 		9D3AEF1794D4F1F9FB3A5132 /* GrowthSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthSnapshot.swift; sourceTree = "<group>"; };
 		9FBC5889CBCCFDF8175100DF /* manchas_confused_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_confused_v2.png; sourceTree = "<group>"; };
 		A17C24351BCC0914DF6508A0 /* ExpensesCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpensesCenterView.swift; sourceTree = "<group>"; };
+		A1A1593B44B0AF3E92938E23 /* app_icon_tinted_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_tinted_v2.png; sourceTree = "<group>"; };
 		A1CBDFBEA5BC1FA2D5E04F09 /* tikki_excited_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_excited_v2.png; sourceTree = "<group>"; };
 		A20839DBFC007023E8C5F905 /* GuideSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideSheet.swift; sourceTree = "<group>"; };
 		A2D0FA52659E4112BAB6EB0B /* mei_shocked_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_shocked_v2.png; sourceTree = "<group>"; };
@@ -294,17 +320,21 @@
 		C21073C0C9AA6223F9F37057 /* mei_neutral_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_neutral_v2.png; sourceTree = "<group>"; };
 		C3BBD9C9389B38F4A67936B4 /* acc_trophy_star_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_trophy_star_v2.png; sourceTree = "<group>"; };
 		C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewFinanceData.swift; sourceTree = "<group>"; };
+		C65D3EB1639597D338721CE9 /* app_icon_dark_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_dark_v2.png; sourceTree = "<group>"; };
 		CA56DF4650B5021F47704B05 /* tikki_angry_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_angry_v2.png; sourceTree = "<group>"; };
+		CC05C996D8DF40D500F2777C /* BrandStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandStory.swift; sourceTree = "<group>"; };
 		CED414330125E63F549BE0AC /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
 		CF636AE08A9FDCCDF51460A3 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		D20799AB6E9D49FDE20443E9 /* HostedUIAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedUIAuthService.swift; sourceTree = "<group>"; };
 		D2CB5D74645DF4C38E921764 /* FinanceCsvImportToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCsvImportToolView.swift; sourceTree = "<group>"; };
 		D580D8C19B9AB6A19F40056F /* guide_17_landing_hero_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_17_landing_hero_team_v2.png; sourceTree = "<group>"; };
 		D5B69B0FEBEE21F1A351DB7B /* badge_boss_fight_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_boss_fight_v2.png; sourceTree = "<group>"; };
+		D64A1E343A7B2A8D900694D6 /* guide_25_splash_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_25_splash_team_v2.png; sourceTree = "<group>"; };
 		D7EA145E6EEC82916F75C622 /* FinanceAccountsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceAccountsToolView.swift; sourceTree = "<group>"; };
 		D99D734B1727A89137ADB2A2 /* guide_03_budgets_tikki_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_03_budgets_tikki_v2.png; sourceTree = "<group>"; };
 		DBE7F426A63A571AE1C649B2 /* manchas_sleepy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_sleepy_v2.png; sourceTree = "<group>"; };
 		DBE89991A8F54D1CE2F4D27A /* tikki_sad_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_sad_v2.png; sourceTree = "<group>"; };
+		DC1238852B64244DC049D08D /* ReceiptVisionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptVisionServiceTests.swift; sourceTree = "<group>"; };
 		DE55C3D98F865BE3049CAA23 /* mei_proud_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_proud_v2.png; sourceTree = "<group>"; };
 		DE70A775400DDF0E3CBF1306 /* badge_streak_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_streak_v2.png; sourceTree = "<group>"; };
 		E175C0F00D3BFE3E05056D15 /* AddExpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
@@ -361,6 +391,14 @@
 			path = v2;
 			sourceTree = "<group>";
 		};
+		15659EA95AFCDBA0DAF936CF /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				7D8BC0CDC4EFA3A8AB7D5249 /* ReceiptVisionService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		1B129884E74155ABC09C42F8 /* Expenses */ = {
 			isa = PBXGroup;
 			children = (
@@ -392,6 +430,7 @@
 			children = (
 				2EAA70C86EF69DD1AC280342 /* BrandAssetImage.swift */,
 				1AE2F76BDDB3352DE57B540F /* BrandAssets.swift */,
+				CC05C996D8DF40D500F2777C /* BrandStory.swift */,
 			);
 			path = Brand;
 			sourceTree = "<group>";
@@ -420,6 +459,7 @@
 				C8E9CA6F064F9DBD4953442D /* Guides */,
 				09B22F592D9E53961A6E26E9 /* Localization */,
 				982784B8B26FBF2C67EE94B5 /* PreviewData */,
+				15659EA95AFCDBA0DAF936CF /* Services */,
 				88EC4787DA5650A6C7B20A9F /* Storage */,
 			);
 			path = Core;
@@ -439,6 +479,10 @@
 			isa = PBXGroup;
 			children = (
 				4814CA0146FBD47E788B58D9 /* BrandComponents.swift */,
+				42E3F84D36D3AA4812BB3D79 /* CuteLoadingComponents.swift */,
+				5981C773A60F2DADC1E80E7B /* ExperienceComponents.swift */,
+				5D12FFE285DD4830D2F7B3D2 /* FlowStack.swift */,
+				0FE1210A9F294B7F39DB6F2D /* MascotExperienceComponents.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -544,6 +588,12 @@
 				2033E37D418EDB7A5CB1ED5F /* guide_18_landing_trust_shield_mei_v2.png */,
 				1C943812C888E3649FB12721 /* guide_19_pricing_cards_tikki_v2.png */,
 				1053B33502C1AAC11F427D5C /* guide_20_subscription_checkout_manchas_v2.png */,
+				17BB41FBBB25D087C86ECE68 /* guide_21_profile_identity_ludo_v2.png */,
+				5F0AE2C1EA8C7025EA368BF5 /* guide_22_help_center_ludo_v2.png */,
+				80E8DA0C08C679AF223D73F9 /* guide_23_rules_automation_ludo_v2.png */,
+				4909CB413F9E590B6E748C44 /* guide_24_advanced_tools_manchas_v2.png */,
+				D64A1E343A7B2A8D900694D6 /* guide_25_splash_team_v2.png */,
+				77338DCA49A69EB2F0830792 /* guide_26_loading_yarn_team_v2.png */,
 			);
 			path = guides;
 			sourceTree = "<group>";
@@ -551,6 +601,8 @@
 		8DFC002C4657564069F8B84A /* logo */ = {
 			isa = PBXGroup;
 			children = (
+				C65D3EB1639597D338721CE9 /* app_icon_dark_v2.png */,
+				A1A1593B44B0AF3E92938E23 /* app_icon_tinted_v2.png */,
 				82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */,
 				5DFAEECDA8CD17DF4B0E80CC /* logo_mark_rosette_v2.png */,
 				1C48A2C6F56D93D7DCF485CA /* wordmark_v2.png */,
@@ -693,6 +745,7 @@
 		D63995B83E0ABA1D6AF79F35 /* SpendSageTests */ = {
 			isa = PBXGroup;
 			children = (
+				DC1238852B64244DC049D08D /* ReceiptVisionServiceTests.swift */,
 				8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */,
 			);
 			path = SpendSageTests;
@@ -839,6 +892,8 @@
 				BF39D786A0B6089967ABB8E4 /* acc_trophy_star_v2.png in Resources */,
 				D97365A599A2623E035CBCB1 /* acc_wallet_card_v2.png in Resources */,
 				6774303E61BA886C94A15DAB /* acc_warning_triangle_lightning_v2.png in Resources */,
+				ECB63BFF8235833AC79E2A56 /* app_icon_dark_v2.png in Resources */,
+				923780D32BAFAE1DB62DF5DD /* app_icon_tinted_v2.png in Resources */,
 				F6AE0A61C32FE8A8903427BD /* app_icon_v2.png in Resources */,
 				54778A0605C6E1DFED6AD518 /* asset_manifest.json in Resources */,
 				913F7F3BB80FF05CB5AF32D2 /* badge_ai_insights_v2.png in Resources */,
@@ -891,6 +946,12 @@
 				F6B4536F6F60E2EB56759A8B /* guide_18_landing_trust_shield_mei_v2.png in Resources */,
 				59DD44AF2E83C6059C98A1D6 /* guide_19_pricing_cards_tikki_v2.png in Resources */,
 				1E3FF07028AD55E759042E65 /* guide_20_subscription_checkout_manchas_v2.png in Resources */,
+				74E67A929DC71D863D2EFABC /* guide_21_profile_identity_ludo_v2.png in Resources */,
+				E23872066D5DD6A6F8D73B6B /* guide_22_help_center_ludo_v2.png in Resources */,
+				EB6DF32594016F90A8BCD728 /* guide_23_rules_automation_ludo_v2.png in Resources */,
+				004836954D89D6E877467C3A /* guide_24_advanced_tools_manchas_v2.png in Resources */,
+				39C47AD77DD4044A0F8385F5 /* guide_25_splash_team_v2.png in Resources */,
+				2EEDC13EE0959F9789EA5EE9 /* guide_26_loading_yarn_team_v2.png in Resources */,
 				C7774AF9FCA3292049521C41 /* logo_mark_rosette_v2.png in Resources */,
 				AB2296AC9A01E51AD8D2089C /* manchas_angry_v2.png in Resources */,
 				8372F74D3DFD4FA61F319A04 /* manchas_confused_v2.png in Resources */,
@@ -951,10 +1012,13 @@
 				5154AF9E6F213923B5C3A85F /* BrandAssets.swift in Sources */,
 				A45A022AE99A11335AFB290E /* BrandComponents.swift in Sources */,
 				9BF510400E05D1A4B72ECA8A /* BrandGalleryView.swift in Sources */,
+				ACAD378E80ADFC46E2F85EAB /* BrandStory.swift in Sources */,
 				7883824A9181C09919A5380F /* BudgetWizardView.swift in Sources */,
 				2DC48FEE7581A00FF9087E18 /* ConfirmAccountView.swift in Sources */,
+				A2DF8D44AC0AE36303F3FA67 /* CuteLoadingComponents.swift in Sources */,
 				E30FD45D36AE9FF7582B0794 /* DashboardView.swift in Sources */,
 				748A230A2F9398A3A9D02B41 /* ExpensesCenterView.swift in Sources */,
+				163578777B41DCF6A2A0FC5F /* ExperienceComponents.swift in Sources */,
 				FDC9CF4BAB873272B35E87BB /* FinanceAccountsToolView.swift in Sources */,
 				28DAA76C5037D75DEC8EDDEC /* FinanceBillsToolView.swift in Sources */,
 				A30437ECD8F41BABB4A42203 /* FinanceCsvImportToolView.swift in Sources */,
@@ -963,6 +1027,7 @@
 				CB8F42A6511C41025ABF0910 /* FinanceRulesToolView.swift in Sources */,
 				A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */,
 				24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */,
+				EC9FE9E3AF1E789DD8C2FBCD /* FlowStack.swift in Sources */,
 				82DEEAED45406847C6ACBF4B /* GrowthSnapshot.swift in Sources */,
 				2180ED9BE745BCC430A6B38C /* GuideSheet.swift in Sources */,
 				B3FAD3530E5C3545269E681F /* Guides.swift in Sources */,
@@ -971,12 +1036,14 @@
 				DCE0492B5DA8A93842388CF6 /* InsightsView.swift in Sources */,
 				DE5D447306B02BC086076ED6 /* LegalCenterView.swift in Sources */,
 				1BFAC9F2D1D8FBF19FBE8052 /* LocalLedgerExport.swift in Sources */,
+				16A32504BA5C649D391C39B1 /* MascotExperienceComponents.swift in Sources */,
 				17EBFD7F7D5C568DFA011E37 /* Models.swift in Sources */,
 				BFB1C3C45472B438B680F918 /* NativeAppShellView.swift in Sources */,
 				77843C280365837DC6797467 /* OnboardingView.swift in Sources */,
 				E9DAD4C151A3D2FCBD608678 /* PremiumView.swift in Sources */,
 				DD5EF1AA1AA2C0479F642F48 /* PreviewFinanceData.swift in Sources */,
 				5F087A9A789816CA3D0374CB /* ProfileView.swift in Sources */,
+				AED083756FE4631D3475EBD2 /* ReceiptVisionService.swift in Sources */,
 				52978F026A957FCC3741603E /* ResetPasswordView.swift in Sources */,
 				D84782692819883735AEBC17 /* Services.swift in Sources */,
 				8190DE8A0F0ADDF37A21E9A0 /* SettingsView.swift in Sources */,
@@ -991,6 +1058,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6D4F13256E68E49F659F817 /* ReceiptVisionServiceTests.swift in Sources */,
 				65B04B25CFA84CFF4DB53DCF /* SpendSageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1079,7 +1147,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 8;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1184,7 +1252,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 8;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_NS_ASSERTIONS = NO;

@@ -29,11 +29,15 @@ enum AuthError: LocalizedError, Equatable {
 }
 
 enum AuthValidation {
-    static func validate(email: String, password: String, minimumPasswordLength: Int) throws {
+    static func validate(email: String) throws {
         let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmedEmail.contains("@"), trimmedEmail.contains(".") else {
             throw AuthError.invalidEmail
         }
+    }
+
+    static func validate(email: String, password: String, minimumPasswordLength: Int) throws {
+        try validate(email: email)
         guard password.count >= minimumPasswordLength else {
             throw AuthError.weakPassword(minimum: minimumPasswordLength)
         }
