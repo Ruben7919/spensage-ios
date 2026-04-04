@@ -107,4 +107,5 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - 2026-04-03: Visual QA screenshots were refreshed for `Onboarding`, `Auth`, `Dashboard`, `Accounts`, `Bills`, `CSV Import`, `Budget Wizard`, and `Support`.
 - 2026-04-03: The app is effectively pre-TestFlight ready for internal UI/product validation, but an external beta should still wait for remaining placeholder scenes and clearer mock/live boundaries in a few advanced tools.
 - 2026-04-03: Internal TestFlight build `1.0 (7)` was archived and uploaded successfully to App Store Connect for internal processing.
+- 2026-04-04: Internal TestFlight build `1.0 (8)` was archived and uploaded after the Xcode 26 icon migration, splash/loading refresh, and final local art polish.
 - 2026-04-04: Generated and integrated final local guide artwork for `Profile`, `Help`, `Rules`, and `Advanced` using the official mascot sprite library and registered them in the brand manifest.

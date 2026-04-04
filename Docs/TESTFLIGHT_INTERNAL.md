@@ -1,12 +1,12 @@
 # SpendSage Internal TestFlight Notes
 
-Last updated: 2026-04-03
+Last updated: 2026-04-04
 
 ## Build
 
 - App: `SpendSage`
 - Version: `1.0`
-- Build: `7`
+- Build: `8`
 - Bundle ID: `com.spendsage.ai`
 - Team ID: `YU855NB22W`
 
@@ -16,10 +16,11 @@ Last updated: 2026-04-03
 - Upload completed successfully to App Store Connect
 - TestFlight scope: internal testing only
 - Current state: waiting for App Store Connect processing to finish
+- Notes: build `8` includes the Xcode 26 universal `AppIcon` with `Any`, `Dark`, and `Tinted` variants plus refreshed launch/loading artwork
 
 ## Archive Paths
 
-- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-7.xcarchive`
+- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-8.xcarchive`
 - Export options: `/Users/rubenlazaro/Projects/spensage-ios/build/ExportOptions-TestFlight-Internal.plist`
 
 ## Internal QA Focus
@@ -28,10 +29,11 @@ Last updated: 2026-04-03
 2. Validate the main B2C loop: onboarding, dashboard, quick expense capture, receipt draft, and premium messaging.
 3. Validate secondary tools on smaller iPhones: accounts, bills, CSV import, budget wizard, help, and support.
 4. Confirm Spanish-first copy is consistent enough for internal review and note any remaining mixed-language strings.
-5. Confirm the app never implies live backend, OCR, billing, or sync capabilities that are not active yet.
+5. Confirm the app never implies live backend, billing, or sync capabilities that are not active yet beyond the current local/OCR scope.
+6. Validate home screen icon rendering under default, dark, and tinted icon appearances on an iOS 26 device.
 
 ## Known Pre-External-Beta Gaps
 
-- Secondary surfaces still depend on prompt-based art in `Rules`, `Profile`, `Help`, and `Advanced`.
-- `Receipt Scan` still needs one more honesty pass to keep the non-OCR behavior explicit.
+- Home screen icon variants should still be checked on physical hardware under `Any`, `Dark`, and `Tinted` appearances.
+- `Receipt Scan` still needs real-device validation against varied receipts before external beta.
 - A deeper long-scroll visual QA pass is still recommended after internal feedback.
