@@ -6,7 +6,7 @@ Last updated: 2026-04-04
 
 - App: `SpendSage`
 - Version: `1.0`
-- Build: `8`
+- Build: `9`
 - Bundle ID: `com.spendsage.ai`
 - Team ID: `YU855NB22W`
 
@@ -16,11 +16,11 @@ Last updated: 2026-04-04
 - Upload completed successfully to App Store Connect
 - TestFlight scope: internal testing only
 - Current state: waiting for App Store Connect processing to finish
-- Notes: build `8` includes the Xcode 26 universal `AppIcon` with `Any`, `Dark`, and `Tinted` variants plus refreshed launch/loading artwork
+- Notes: build `9` includes the Xcode 26 universal `AppIcon` with `Any`, `Dark`, and `Tinted` variants, refreshed launch/loading artwork, and the full seasonal mascot sprite pack wired into runtime asset resolution
 
 ## Archive Paths
 
-- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-8.xcarchive`
+- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-9.xcarchive`
 - Export options: `/Users/rubenlazaro/Projects/spensage-ios/build/ExportOptions-TestFlight-Internal.plist`
 
 ## Internal QA Focus
