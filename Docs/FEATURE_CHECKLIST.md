@@ -25,6 +25,7 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - [x] Final pre-TestFlight visual QA across all main and secondary routes
 - [x] Root tabs now use simpler inline navigation chrome instead of large-title duplication
 - [x] Internal TestFlight archive and upload
+- [x] Internal TestFlight build `1.0 (10)` uploaded with the repaired three-mascot icon and final route QA pass
 - [x] Shareable celebration overlay for level-ups and badges
 - [x] One-time in-app review prompt policy tied to positive progress moments
 
@@ -132,3 +133,4 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - 2026-04-05: Refreshed visual QA for `Inicio`, `Gastos`, `Análisis`, `Ajustes`, and celebration states after the final i18n/navigation polish pass.
 - 2026-04-05: Rebuilt the app icon as a three-mascot peeking composition for the Xcode 26 `Any`, `Dark`, and `Tinted` icon variants, then refreshed a full route QA pass covering onboarding, auth, the 5 root tabs, celebration state, and the main deep-link settings/support tools.
 - 2026-04-05: Final polish reduced heavy legal/profile/advanced heroes, surfaced receipt scan actions in the first fold, removed more internal-looking `preview` copy from user-facing screens, and tightened the celebration overlay before the next internal TestFlight upload.
+- 2026-04-05: Internal TestFlight build `1.0 (10)` uploaded successfully after removing alpha from the Xcode 26 icon assets and re-running the full route QA repair pass.
