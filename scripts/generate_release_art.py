@@ -143,6 +143,10 @@ def draw_yarn_ball(draw: ImageDraw.ImageDraw, center: tuple[int, int], radius: i
     draw.arc((x - radius - 24, y - 8, x + radius + 42, y + radius + 48), start=12, end=94, fill=fill + (255,), width=6)
 
 
+def save_without_alpha(image: Image.Image, path: Path) -> None:
+    image.convert("RGB").save(path)
+
+
 def create_app_icon() -> Image.Image:
     canvas = vertical_gradient(ICON_SIZE, (29, 117, 118), (194, 240, 232))
     add_glow(canvas, (236, 232), 230, (177, 238, 231), 154)
@@ -338,7 +342,7 @@ def write_universal_appicon_set(any_icon: Image.Image, dark_icon: Image.Image, t
     }
     for filename, image in outputs.items():
         path = APPICON_ROOT / filename
-        image.save(path)
+        save_without_alpha(image, path)
         print(f"updated {path}")
 
     contents = {
@@ -407,7 +411,7 @@ def main() -> None:
     }
     for filename, image in logo_outputs.items():
         path = LOGO_ROOT / filename
-        image.save(path)
+        save_without_alpha(image, path)
         print(f"generated {path}")
 
     write_universal_appicon_set(icon, icon_dark, icon_tinted)
