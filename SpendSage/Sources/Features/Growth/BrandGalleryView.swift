@@ -108,6 +108,31 @@ struct BrandGalleryView: View {
                                             .font(.caption.weight(.semibold))
                                             .foregroundStyle(BrandTheme.primary)
                                     }
+
+                                    let characterPreviews = seasonCharacterPreviewSources(for: season)
+                                    if !characterPreviews.isEmpty {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            Text("Mascotas del evento")
+                                                .font(.caption.weight(.semibold))
+                                                .foregroundStyle(BrandTheme.muted)
+
+                                            HStack(spacing: 8) {
+                                                ForEach(Array(characterPreviews.enumerated()), id: \.offset) { _, source in
+                                                    BrandAssetImage(
+                                                        source: source,
+                                                        fallbackSystemImage: "sparkles"
+                                                    )
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 64, height: 50)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                            .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
 
                                 Spacer()
@@ -329,6 +354,20 @@ struct BrandGalleryView: View {
     private func seasonalPreviewSource(for season: BrandSeasonDefinition) -> BrandAssetSource? {
         let key = season.guideOverrides[season.spotlightGuideKey] ?? season.spotlightGuideKey
         return catalog.guideIfAvailable(key) ?? catalog.guideIfAvailable(season.spotlightGuideKey)
+    }
+
+    private func seasonCharacterPreviewSources(for season: BrandSeasonDefinition) -> [BrandAssetSource] {
+        let keys: [String]
+        switch season.id {
+        case .halloween:
+            keys = ["guide_27_tikki_halloween", "guide_28_mei_halloween", "guide_29_manchas_halloween"]
+        case .winterHolidays:
+            keys = ["guide_30_tikki_holiday", "guide_31_mei_holiday", "guide_32_manchas_holiday"]
+        case .newYear:
+            keys = ["guide_33_tikki_new_year", "guide_34_mei_new_year", "guide_35_manchas_new_year"]
+        }
+
+        return keys.compactMap { catalog.guideIfAvailable($0) }
     }
 
     private func seasonDateLabel(for season: BrandSeasonDefinition) -> String {

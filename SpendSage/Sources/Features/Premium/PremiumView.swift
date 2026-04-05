@@ -33,7 +33,7 @@ struct PremiumView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Premium")
+        .navigationTitle("Planes")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -52,8 +52,8 @@ struct PremiumView: View {
 
                     Text(
                         viewModel.session.isAuthenticated
-                            ? "Elige el nivel que quieres activar después. Los detalles de facturación quedan abajo si los necesitas."
-                            : "Compara planes primero. Luego inicia sesión si quieres compras y restauración ligadas a tu cuenta."
+                            ? "Elige el nivel que quieres activar después. Si necesitas ayuda con pagos o restauración, la encuentras más abajo."
+                            : "Compara planes primero. Luego inicia sesión si quieres que tus compras y restauración queden ligadas a tu cuenta."
                     )
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
@@ -96,7 +96,7 @@ struct PremiumView: View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
                 notice = viewModel.session.isAuthenticated
-                    ? "Restaurar usará esta cuenta cuando la facturación de Store quede conectada."
+                    ? "Restaurar usará esta cuenta cuando activemos los pagos de App Store."
                     : "Inicia sesión primero para que futuras compras queden ligadas a tu cuenta cuando restaurar esté disponible."
             } label: {
                 actionRow(
@@ -108,7 +108,7 @@ struct PremiumView: View {
             .buttonStyle(.plain)
 
             Button {
-                notice = "Gestionar suscripción abrirá el centro de facturación del sistema cuando checkout esté conectado."
+                notice = "Gestionar suscripción abrirá la sección de pagos del sistema cuando activemos ese flujo."
             } label: {
                 actionRow(
                     title: "Gestionar suscripción",
@@ -217,11 +217,11 @@ struct PremiumView: View {
         case .removeAds:
             storedPlanID = PremiumPlan.ID.removeAds.rawValue
             storedStatus = PremiumStatus.active.rawValue
-            notice = AppLocalization.localized("%@ quedó como la vista previa del desbloqueo único.", arguments: plan.name.appLocalized)
+            notice = AppLocalization.localized("%@ quedó seleccionado como mejora única para esta cuenta.", arguments: plan.name.appLocalized)
         case .pro, .family:
             storedPlanID = plan.id.rawValue
             storedStatus = currentStatus == .expired ? PremiumStatus.active.rawValue : PremiumStatus.trialing.rawValue
-            notice = AppLocalization.localized("%@ quedó como la vista previa de suscripción seleccionada.", arguments: plan.name.appLocalized)
+            notice = AppLocalization.localized("%@ quedó seleccionado como el plan principal de esta cuenta.", arguments: plan.name.appLocalized)
         }
     }
 
@@ -276,21 +276,21 @@ private enum PremiumStatus: String {
 
     var billingSourceLabel: String {
         switch self {
-        case .free: return "Local state".appLocalized
-        case .trialing, .active, .expired: return "Store preview".appLocalized
+        case .free: return "Estado local".appLocalized
+        case .trialing, .active, .expired: return "Vista previa de Store".appLocalized
         }
     }
 
     func detail(plan: PremiumPlan) -> String {
         switch self {
         case .free:
-            return AppLocalization.localized("%@ se mantiene local en esta build. La facturación de Store, las compras y la restauración siguen pendientes de integración.", arguments: plan.name.appLocalized)
+            return AppLocalization.localized("%@ se mantiene local por ahora. Los pagos, compras y restauración desde App Store todavía no están activos.", arguments: plan.name.appLocalized)
         case .trialing:
-            return AppLocalization.localized("%@ está seleccionado como la vista previa actual. La facturación todavía no está conectada en esta build.", arguments: plan.name.appLocalized)
+            return AppLocalization.localized("%@ está seleccionado en esta vista. Los pagos todavía no están activos en esta versión.", arguments: plan.name.appLocalized)
         case .active:
-            return AppLocalization.localized("%@ aparece como el plan listo en esta pantalla. El checkout real y la restauración todavía requieren integración con Store.", arguments: plan.name.appLocalized)
+            return AppLocalization.localized("%@ aparece como el plan listo en esta pantalla. Los pagos reales y la restauración se activarán cuando conectemos App Store.", arguments: plan.name.appLocalized)
         case .expired:
-            return AppLocalization.localized("%@ está usando la vista previa de recuperación. Renovar y restaurar serán acciones reales cuando la facturación quede conectada.", arguments: plan.name.appLocalized)
+            return AppLocalization.localized("%@ está mostrando la ruta de recuperación. Renovar y restaurar serán acciones reales cuando activemos los pagos.", arguments: plan.name.appLocalized)
         }
     }
 }
@@ -317,10 +317,10 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
             id: .freeLocal,
             name: "Local gratis",
             priceLabel: "$0",
-            summary: "La base local-first.",
+            summary: "La base gratuita.",
             features: [
-                "Presupuesto y registro en el dispositivo",
-                "Todavía no hay sincronización en la nube ni facturación de tienda"
+                "Presupuesto y registro en este dispositivo",
+                "Todavía no hay sincronización en la nube ni pagos activos"
             ],
             isHighlighted: false
         ),
@@ -328,10 +328,10 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
             id: .removeAds,
             name: "Quitar anuncios",
             priceLabel: "$7.99 pago único",
-            summary: "Una mejora local más tranquila.",
+            summary: "Una compra única para usar la app sin anuncios.",
             features: [
                 "Quita las superficies patrocinadas",
-                "Mantiene la app local-first"
+                "Mantiene la app en modo local"
             ],
             isHighlighted: false
         ),
@@ -339,10 +339,10 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
             id: .pro,
             name: "Pro",
             priceLabel: "$4.99/mes o $29.99/año",
-            summary: "La suscripción premium principal.",
+            summary: "Más automatización, más claridad y respaldo en la nube.",
             features: [
                 "Sincronización en la nube y restauración entre dispositivos",
-                "OCR de recibos e insights más profundos"
+                "Escaneo inteligente de recibos y análisis más profundos"
             ],
             isHighlighted: true
         ),
@@ -352,7 +352,7 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
             priceLabel: "$7.99/mes o $49.99/año",
             summary: "Un plan compartido para el hogar.",
             features: [
-                "Todo lo previsto en Pro",
+                "Todo lo incluido en Pro",
                 "Espacio y metas compartidas del hogar"
             ],
             isHighlighted: false

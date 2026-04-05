@@ -117,4 +117,6 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - 2026-04-04: Reworked the main shell so `Scan` is the center CTA, removed `Premium` from the main tab bar, and simplified the root screens with inline navigation chrome.
 - 2026-04-04: `Receipt Scan` now behaves as a true 3-step wizard and protects user-edited category/date values from being overwritten by late OCR/autofill passes.
 - 2026-04-04: `Expenses` was shortened into summary + recent activity + folded tools, `Add expense` now leads with the form, and the dashboard trophy shelf no longer requires horizontal swiping.
-- 2026-04-04: QA screenshots were refreshed for splash, auth, dashboard, scan, insights, settings, and premium; the visible top folds are materially cleaner, though a full below-the-fold i18n pass still remains.
+- 2026-04-04: QA screenshots were refreshed for splash, auth, dashboard, scan, insights, settings, and premium; the visible top folds are materially cleaner.
+- 2026-04-04: Added explicit seasonal calendar docs plus shipped Halloween, Holiday, and New Year character guide packs so event art is now auditable beyond the team splash/loading scenes.
+- 2026-04-04: Shipped a full seasonal sprite pack for all mascot expressions, wired it into `BrandAssetCatalog.character(...)`, and documented manual browser prompts plus regeneration scripts for future art passes.

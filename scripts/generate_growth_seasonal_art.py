@@ -267,6 +267,110 @@ def create_team_scene(theme: str, loading: bool) -> Image.Image:
     return canvas
 
 
+def draw_coin_stack(draw: ImageDraw.ImageDraw, base_center: tuple[int, int], count: int, accent: tuple[int, int, int]) -> None:
+    x, y = base_center
+    for index in range(count):
+        offset_y = y - index * 14
+        draw.rounded_rectangle(
+            (x - 42, offset_y - 14, x + 42, offset_y + 12),
+            radius=12,
+            fill=(255, 229, 164, 255),
+            outline=(224, 177, 74, 255),
+            width=3,
+        )
+        draw.ellipse((x - 14, offset_y - 8, x + 14, offset_y + 16), fill=accent + (255,), outline=(255, 250, 234, 255), width=3)
+
+
+def draw_savings_panel(
+    canvas: Image.Image,
+    box: tuple[int, int, int, int],
+    accent: tuple[int, int, int],
+    secondary: tuple[int, int, int],
+) -> None:
+    rounded_panel(canvas, box, (250, 252, 251, 232), (210, 228, 225, 255), radius=36)
+    draw = ImageDraw.Draw(canvas)
+    x0, y0, x1, y1 = box
+
+    draw.rounded_rectangle((x0 + 28, y0 + 28, x1 - 28, y0 + 112), radius=24, fill=(255, 249, 236, 255), outline=(226, 225, 214, 255), width=2)
+    draw.rounded_rectangle((x0 + 56, y0 + 60, x1 - 104, y0 + 82), radius=10, fill=(229, 240, 238, 255))
+    draw.rounded_rectangle((x0 + 56, y0 + 60, x0 + int((x1 - x0) * 0.62), y0 + 82), radius=10, fill=accent + (255,))
+    draw.ellipse((x1 - 92, y0 + 44, x1 - 44, y0 + 92), fill=secondary + (255,))
+
+    for row, width_scale in enumerate((0.72, 0.58, 0.8), start=0):
+        top = y0 + 152 + row * 92
+        draw.rounded_rectangle((x0 + 30, top, x1 - 30, top + 68), radius=20, fill=(248, 251, 250, 255), outline=(219, 231, 228, 255), width=2)
+        draw.ellipse((x0 + 56, top + 18, x0 + 92, top + 54), fill=accent + (255,))
+        draw.rounded_rectangle((x0 + 114, top + 18, x1 - 94, top + 34), radius=8, fill=(225, 236, 236, 255))
+        draw.rounded_rectangle((x0 + 114, top + 42, x1 - 126, top + 56), radius=8, fill=(237, 242, 242, 255))
+        bar_right = x0 + 114 + int((x1 - x0 - 208) * width_scale)
+        draw.rounded_rectangle((x0 + 114, top + 42, bar_right, top + 56), radius=8, fill=secondary + (255,))
+
+
+def create_character_spotlight(theme: str, character_id: str) -> Image.Image:
+    if theme == "halloween":
+        top = (246, 232, 219)
+        bottom = (69, 75, 90)
+        accent = (255, 160, 78)
+        secondary = (116, 203, 173)
+        glow = (255, 197, 124)
+        character_map = {
+            "tikki": "tikki_confused_v2.png",
+            "mei": "mei_warning_v2.png",
+            "manchas": "manchas_warning_v2.png",
+        }
+    elif theme == "holiday":
+        top = (232, 246, 244)
+        bottom = (255, 245, 236)
+        accent = (222, 90, 90)
+        secondary = (97, 180, 151)
+        glow = (255, 214, 164)
+        character_map = {
+            "tikki": "tikki_proud_v2.png",
+            "mei": "mei_proud_v2.png",
+            "manchas": "manchas_excited_v2.png",
+        }
+    else:
+        top = (229, 242, 250)
+        bottom = (255, 242, 229)
+        accent = (93, 170, 210)
+        secondary = (255, 184, 84)
+        glow = (255, 216, 152)
+        character_map = {
+            "tikki": "tikki_excited_v2.png",
+            "mei": "mei_excited_v2.png",
+            "manchas": "manchas_proud_v2.png",
+        }
+
+    canvas = gradient_background(GUIDE_SIZE, top, bottom)
+    add_glow(canvas, (280, 236), 250, glow, 118)
+    add_glow(canvas, (1234, 248), 260, glow, 104)
+    rounded_panel(canvas, (108, 108, 1428, 916), (251, 252, 251, 228), (208, 228, 225, 255), radius=72)
+    rounded_panel(canvas, (154, 170, 700, 856), (247, 250, 249, 240), (214, 228, 226, 255), radius=48)
+    draw_savings_panel(canvas, (188, 214, 666, 812), accent, secondary)
+    paste_character(canvas, character_map[character_id], (736, 176, 1382, 888), shadow_alpha=72)
+    draw = ImageDraw.Draw(canvas)
+
+    if theme == "halloween":
+        draw_pumpkin(draw, (244, 848), 34)
+        draw_pumpkin(draw, (1288, 844), 32)
+        draw_firework(draw, (1160, 194), 28, (255, 206, 125))
+        add_sparkles(canvas, [(244, 170), (454, 202), (878, 196), (1288, 230), (1326, 706)], (255, 204, 114))
+    elif theme == "holiday":
+        draw_gift(draw, (210, 784, 304, 880), (220, 92, 92))
+        draw_gift(draw, (1204, 786, 1298, 880), (96, 176, 148))
+        for point in [(234, 168), (418, 220), (836, 188), (1192, 206), (1318, 250), (1284, 708)]:
+            draw_snowflake(draw, point, 18, (255, 255, 255))
+        add_sparkles(canvas, [(312, 210), (536, 198), (1114, 214), (1334, 694)], (255, 210, 128))
+    else:
+        draw_coin_stack(draw, (252, 850), 3, accent)
+        draw_coin_stack(draw, (1268, 848), 2, secondary)
+        draw_firework(draw, (1072, 176), 36, (255, 196, 96))
+        draw_firework(draw, (1242, 214), 28, accent)
+        add_sparkles(canvas, [(298, 188), (488, 214), (864, 190), (1174, 210), (1328, 694)], (255, 214, 132))
+
+    return canvas
+
+
 def create_event_badge(theme: str) -> Image.Image:
     canvas = Image.new("RGBA", (BADGE_SIZE, BADGE_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(canvas)
@@ -320,6 +424,15 @@ def main() -> None:
         "guide_25_splash_team_holiday_v2.png": create_team_scene("holiday", loading=False),
         "guide_26_loading_yarn_team_halloween_v2.png": create_team_scene("halloween", loading=True),
         "guide_26_loading_yarn_team_holiday_v2.png": create_team_scene("holiday", loading=True),
+        "guide_27_tikki_halloween_v2.png": create_character_spotlight("halloween", "tikki"),
+        "guide_28_mei_halloween_v2.png": create_character_spotlight("halloween", "mei"),
+        "guide_29_manchas_halloween_v2.png": create_character_spotlight("halloween", "manchas"),
+        "guide_30_tikki_holiday_v2.png": create_character_spotlight("holiday", "tikki"),
+        "guide_31_mei_holiday_v2.png": create_character_spotlight("holiday", "mei"),
+        "guide_32_manchas_holiday_v2.png": create_character_spotlight("holiday", "manchas"),
+        "guide_33_tikki_new_year_v2.png": create_character_spotlight("newyear", "tikki"),
+        "guide_34_mei_new_year_v2.png": create_character_spotlight("newyear", "mei"),
+        "guide_35_manchas_new_year_v2.png": create_character_spotlight("newyear", "manchas"),
     }
 
     for filename, image in guide_outputs.items():

@@ -169,7 +169,7 @@ private struct ReceiptScanDockButton: View {
                 )
                 .shadow(color: BrandTheme.shadow.opacity(0.2), radius: 16, x: 0, y: 10)
 
-                Text("Scan")
+                Text("Escanear")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(BrandTheme.primary)
             }

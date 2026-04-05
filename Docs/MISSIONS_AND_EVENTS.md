@@ -49,3 +49,4 @@ Last updated: 2026-04-04
 ## Prompting note
 
 - Any future event art should keep the official `tikki`, `mei`, and `manchas` sprite families intact, with no extra limbs and no off-model anatomy.
+- For shipped windows, scene swaps, and the explicit seasonal art inventory, see `/Users/rubenlazaro/Projects/spensage-ios/Docs/SEASONAL_EVENT_CALENDAR.md`.

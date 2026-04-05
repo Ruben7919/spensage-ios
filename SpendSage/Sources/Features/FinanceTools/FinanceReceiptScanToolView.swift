@@ -134,14 +134,14 @@ struct FinanceReceiptScanToolView: View {
             .padding(24)
         }
         .background(FinanceScreenBackground())
-        .navigationTitle("Receipt Scan")
+        .navigationTitle("Escaneo de recibos")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     isPresentingGuide = true
                 } label: {
-                    Label("Guide", systemImage: "questionmark.circle")
+                    Label("Guía", systemImage: "questionmark.circle")
                         .font(.subheadline.weight(.semibold))
                 }
                 .tint(BrandTheme.primary)
@@ -216,7 +216,7 @@ struct FinanceReceiptScanToolView: View {
 
                     HStack(spacing: 8) {
                         BrandBadge(
-                            text: "Step \(currentStep.number) of \(ReceiptWizardStep.allCases.count)",
+                            text: "Paso \(currentStep.number) de \(ReceiptWizardStep.allCases.count)",
                             systemImage: currentStep.systemImage
                         )
 
@@ -272,7 +272,7 @@ struct FinanceReceiptScanToolView: View {
                     stepHeader(
                         for: .capture,
                         title: "Empieza con el recibo",
-                        summary: "Toma una foto clara o importa una desde Fotos. Si necesitas rapidez antes que OCR, puedes continuar sin imagen."
+                        summary: "Toma una foto clara o importa una desde Fotos. Si solo quieres registrar el gasto rápido, también puedes seguir sin imagen."
                     )
 
                     ReceiptImagePreviewCard(
@@ -327,20 +327,20 @@ struct FinanceReceiptScanToolView: View {
 
                     BrandFeatureRow(
                         systemImage: "sun.max.fill",
-                        title: "Use even lighting",
-                        detail: "Avoid glare and hard shadows so totals and merchant names stay easy to read."
+                        title: "Usa luz pareja",
+                        detail: "Evita reflejos y sombras duras para que el total y el comercio se lean mejor."
                     )
 
                     BrandFeatureRow(
                         systemImage: "viewfinder",
-                        title: "Fill the frame",
-                        detail: "Keep the receipt flat and centered. Extra background lowers OCR quality."
+                        title: "Llena el encuadre",
+                        detail: "Mantén el recibo plano y centrado. Mucho fondo extra baja la calidad del OCR."
                     )
 
                     BrandFeatureRow(
                         systemImage: "square.and.pencil",
-                        title: "You still review the draft",
-                        detail: "SpendSage prefills locally, but nothing is saved until you confirm it."
+                        title: "Tú confirmas el borrador",
+                        detail: "SpendSage completa sugerencias en el dispositivo, pero nada se guarda hasta que tú lo confirmes."
                     )
                 }
             }
@@ -356,7 +356,7 @@ struct FinanceReceiptScanToolView: View {
                         title: "Confirma el autollenado",
                         summary: capturedImage == nil
                             ? "No hay foto adjunta, así que este paso es manual. Completa lo esencial y continúa."
-                            : "El OCR ya hizo un primer pase sobre comercio, total y fecha. Corrige lo que veas raro antes de revisar."
+                            : "SpendSage ya leyó la foto y llenó una primera versión de comercio, total y fecha. Corrige lo que veas raro antes de revisar."
                     )
 
                     if capturedImage != nil || isLoadingPhoto {
@@ -374,7 +374,7 @@ struct FinanceReceiptScanToolView: View {
                             systemImage: "text.viewfinder",
                             tint: BrandTheme.primary,
                             title: "Leyendo el recibo",
-                            summary: "SpendSage está ejecutando OCR en el dispositivo y mantendrá sincronizados los campos editables con las coincidencias más seguras."
+                            summary: "SpendSage está leyendo la foto en el dispositivo y completará los campos con las coincidencias más seguras."
                         )
                     } else if let receiptAnalysis, receiptAnalysis.hasDetectedValues {
                         receiptCallout(
@@ -396,11 +396,11 @@ struct FinanceReceiptScanToolView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "sparkles")
                                 .foregroundStyle(.orange)
-                            Text(AppLocalization.localized("Rule suggestion: %@", arguments: suggestedCategory.localizedTitle))
+                            Text(AppLocalization.localized("Sugerencia de regla: %@", arguments: suggestedCategory.localizedTitle))
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(BrandTheme.ink)
                             Spacer()
-                            Button("Use") {
+                            Button("Usar") {
                                 applySuggestedCategory(suggestedCategory)
                             }
                             .buttonStyle(.bordered)
@@ -412,9 +412,9 @@ struct FinanceReceiptScanToolView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
 
-                    FinanceField(label: "Merchant", placeholder: "Blue Bottle Coffee", text: $merchant)
+                    FinanceField(label: "Comercio", placeholder: "Blue Bottle Coffee", text: $merchant)
                     FinanceField(
-                        label: "Amount",
+                        label: "Monto",
                         placeholder: "8.75",
                         text: $amount,
                         keyboard: .decimalPad,
@@ -422,11 +422,11 @@ struct FinanceReceiptScanToolView: View {
                     )
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Category")
+                        Text("Categoría")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.muted)
 
-                        Picker("Category", selection: $category) {
+                        Picker("Categoría", selection: $category) {
                             ForEach(ExpenseCategory.allCases) { item in
                                 Label(item.localizedTitle, systemImage: item.symbolName)
                                     .tag(item)
@@ -435,12 +435,12 @@ struct FinanceReceiptScanToolView: View {
                         .pickerStyle(.menu)
                     }
 
-                    DatePicker("Receipt date", selection: $date, displayedComponents: .date)
+                    DatePicker("Fecha del recibo", selection: $date, displayedComponents: .date)
                         .tint(BrandTheme.primary)
 
                     FinanceMultilineField(
-                        label: "Note",
-                        placeholder: "Add line items, reimbursement context, or anything you want to remember later.",
+                        label: "Nota",
+                        placeholder: "Añade productos, contexto de reembolso o cualquier detalle que quieras recordar después.",
                         text: $note
                     )
 
@@ -451,7 +451,7 @@ struct FinanceReceiptScanToolView: View {
                     }
 
                     HStack(spacing: 12) {
-                        Button("Back") {
+                        Button("Atrás") {
                             transitionToStep(.capture)
                         }
                         .buttonStyle(SecondaryCTAStyle())
@@ -483,42 +483,42 @@ struct FinanceReceiptScanToolView: View {
                     stepHeader(
                         for: .review,
                         title: "Revisa una vez y guarda",
-                        summary: "Esta es la última comprobación antes de escribir el gasto en tu ledger local."
+                        summary: "Esta es la última comprobación antes de guardar el gasto en tu registro local."
                     )
 
                     draftPreviewRow
 
                     VStack(spacing: 12) {
                         reviewRow(
-                            title: "Merchant",
-                            value: merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Missing" : merchant,
+                            title: "Comercio",
+                            value: merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Falta" : merchant,
                             systemImage: "building.2.crop.circle"
                         )
                         reviewRow(
-                            title: "Amount",
-                            value: parsedAmount?.formatted(.currency(code: currencyCode)) ?? "Missing",
+                            title: "Monto",
+                            value: parsedAmount?.formatted(.currency(code: currencyCode)) ?? "Falta",
                             systemImage: "dollarsign.circle"
                         )
                         reviewRow(
-                            title: "Category",
+                            title: "Categoría",
                             value: category.localizedTitle,
                             systemImage: category.symbolName
                         )
                         reviewRow(
-                            title: "Date",
+                            title: "Fecha",
                             value: date.formatted(date: .abbreviated, time: .omitted),
                             systemImage: "calendar"
                         )
                         reviewRow(
-                            title: "Source",
-                            value: captureSource?.title ?? "Manual draft".appLocalized,
+                            title: "Origen",
+                            value: captureSource?.title ?? "Borrador manual".appLocalized,
                             systemImage: captureSource?.systemImage ?? "square.and.pencil"
                         )
                     }
 
                     if !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Note")
+                            Text("Nota")
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(BrandTheme.muted)
                             Text(note)
@@ -537,12 +537,12 @@ struct FinanceReceiptScanToolView: View {
                             .foregroundStyle(.red)
                     }
 
-                    Text("Saved receipts stay on this device in this build. Nothing syncs until you choose a different product path.")
+                    Text("Lo que guardes aquí se queda en este dispositivo. Nada se comparte ni se sincroniza todavía.")
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
 
                     HStack(spacing: 12) {
-                        Button("Back") {
+                        Button("Atrás") {
                             transitionToStep(.autofill)
                         }
                         .buttonStyle(SecondaryCTAStyle())
@@ -551,7 +551,7 @@ struct FinanceReceiptScanToolView: View {
                             Task { await saveDraft() }
                         } label: {
                             ReceiptActionLabel(
-                                title: isSavingDraft ? "Saving locally..." : "Save expense",
+                                title: isSavingDraft ? "Guardando localmente..." : "Guardar gasto",
                                 systemImage: isSavingDraft ? "hourglass" : "tray.and.arrow.down.fill",
                                 style: .primary
                             )
@@ -566,7 +566,7 @@ struct FinanceReceiptScanToolView: View {
             if capturedImage != nil {
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("Attached receipt")
+                        Text("Recibo adjunto")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -595,7 +595,7 @@ struct FinanceReceiptScanToolView: View {
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Reuse local merchant memory only when it actually helps the current draft.")
+                Text("Usa la memoria local de comercios solo cuando de verdad ayude a este borrador.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
 
@@ -640,7 +640,7 @@ struct FinanceReceiptScanToolView: View {
 
                         Spacer()
 
-                        Button("Use") {
+                        Button("Usar") {
                             applyMerchantSuggestion(suggestion, includeMerchant: false)
                         }
                         .buttonStyle(.borderedProminent)
@@ -662,7 +662,7 @@ struct FinanceReceiptScanToolView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Latest expense template")
+                            Text("Último gasto como plantilla")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
                             Text("\(latest.title) · \(latest.category.appLocalized) · \(latest.amount.formatted(.currency(code: currencyCode)))")
@@ -672,7 +672,7 @@ struct FinanceReceiptScanToolView: View {
 
                         Spacer()
 
-                        Button("Use") {
+                        Button("Usar") {
                             applyTemplate(from: latest)
                         }
                         .buttonStyle(.borderedProminent)
@@ -682,7 +682,7 @@ struct FinanceReceiptScanToolView: View {
 
                 if !merchantSuggestions.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Known merchants" : "Matching merchants")
+                        Text(merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Comercios conocidos" : "Coincidencias")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.muted)
 
@@ -716,14 +716,14 @@ struct FinanceReceiptScanToolView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    Text("OCR preview")
+                    Text("Texto detectado")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                     Spacer()
-                    BrandBadge(text: capturedImage == nil ? "Manual" : "On device", systemImage: "text.viewfinder")
+                    BrandBadge(text: capturedImage == nil ? "Manual" : "En el dispositivo", systemImage: "text.viewfinder")
                 }
 
-                Text("Read this only when something looks off. Most receipts should need just a quick field check above.")
+                Text("Ábrelo solo si algo se ve raro. La mayoría de recibos debería necesitar solo una revisión rápida arriba.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
 
@@ -756,7 +756,7 @@ struct FinanceReceiptScanToolView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(merchant.isEmpty ? "Merchant preview" : merchant)
+                Text(merchant.isEmpty ? "Vista previa del comercio" : merchant)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
@@ -764,7 +764,7 @@ struct FinanceReceiptScanToolView: View {
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
 
-                Text(capturedImage == nil ? "Manual draft with no receipt image attached." : "Receipt image attached for final verification.")
+                Text(capturedImage == nil ? "Borrador manual sin imagen adjunta." : "Imagen del recibo adjunta para la verificación final.")
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
             }
@@ -786,7 +786,7 @@ struct FinanceReceiptScanToolView: View {
 
     private func stepHeader(for step: ReceiptWizardStep, title: String, summary: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            BrandBadge(text: "Step \(step.number)", systemImage: step.systemImage)
+            BrandBadge(text: "Paso \(step.number)", systemImage: step.systemImage)
             Text(title)
                 .font(.headline)
                 .foregroundStyle(BrandTheme.ink)
@@ -873,7 +873,7 @@ struct FinanceReceiptScanToolView: View {
     private func goToReview() {
         guard !isAnalyzingReceipt else { return }
         guard canSave else {
-            errorMessage = "Add a merchant and a valid amount before reviewing."
+            errorMessage = "Agrega un comercio y un monto válidos antes de revisar."
             return
         }
         transitionToStep(.review)
@@ -895,7 +895,7 @@ struct FinanceReceiptScanToolView: View {
             amount = "8.75"
             category = .coffee
             date = .now
-            note = "Local-first receipt draft from an in-store purchase."
+            note = "Local-first receipt draft from an in-store purchase.".appLocalized
         }
         resetDraftLocks()
         clearTransientState()
@@ -996,26 +996,26 @@ struct FinanceReceiptScanToolView: View {
                 let data = try await photoPickerItem.loadTransferable(type: Data.self),
                 let image = UIImage(data: data)
             else {
-                errorMessage = "The selected photo could not be loaded."
+                errorMessage = "No se pudo cargar la foto seleccionada."
                 return
             }
 
             attachImage(image, source: .photos)
         } catch {
-            errorMessage = "We could not import that image from Photos."
+            errorMessage = "No pudimos importar esa imagen desde Fotos."
         }
     }
 
     private func saveDraft() async {
         guard let amountValue = parsedAmount, amountValue > 0 else {
-            errorMessage = "Enter a valid amount."
+            errorMessage = "Ingresa un monto válido."
             transitionToStep(.autofill)
             return
         }
 
         let trimmedMerchant = merchant.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedMerchant.isEmpty else {
-            errorMessage = "Add a merchant before saving."
+            errorMessage = "Agrega un comercio antes de guardar."
             transitionToStep(.autofill)
             return
         }
@@ -1133,11 +1133,11 @@ private enum ReceiptWizardStep: Int, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .capture:
-            return "Capture".appLocalized
+            return "Captura".appLocalized
         case .autofill:
-            return "Autofill".appLocalized
+            return "Autollenado".appLocalized
         case .review:
-            return "Review".appLocalized
+            return "Revisión".appLocalized
         }
     }
 
@@ -1166,18 +1166,18 @@ private enum ReceiptCaptureSource {
     var title: String {
         switch self {
         case .camera:
-            return "Camera capture".appLocalized
+            return "Captura con cámara".appLocalized
         case .photos:
-            return "Imported photo".appLocalized
+            return "Foto importada".appLocalized
         }
     }
 
     var metricLabel: String {
         switch self {
         case .camera:
-            return "Camera".appLocalized
+            return "Cámara".appLocalized
         case .photos:
-            return "Photos".appLocalized
+            return "Fotos".appLocalized
         }
     }
 
@@ -1220,7 +1220,7 @@ private struct ReceiptScanStatusDescriptor {
 
     static let reviewReady = ReceiptScanStatusDescriptor(
         title: "Paso 3: Listo para guardar".appLocalized,
-        summary: "Los campos clave ya están listos. Revisa una vez y guarda el gasto en tu ledger local.".appLocalized,
+        summary: "Los campos clave ya están listos. Revisa una vez y guarda el gasto en tu registro local.".appLocalized,
         systemImage: "checkmark.circle.fill",
         tint: BrandTheme.primary
     )
@@ -1234,7 +1234,7 @@ private struct ReceiptScanStatusDescriptor {
 
     static let analyzing = ReceiptScanStatusDescriptor(
         title: "Leyendo recibo".appLocalized,
-        summary: "SpendSage está usando OCR en el dispositivo para detectar comercio, total y fecha antes de que revises el borrador.".appLocalized,
+        summary: "SpendSage está leyendo la foto en el dispositivo para detectar comercio, total y fecha antes de que revises el borrador.".appLocalized,
         systemImage: "text.viewfinder",
         tint: BrandTheme.primary
     )
@@ -1243,7 +1243,7 @@ private struct ReceiptScanStatusDescriptor {
         ReceiptScanStatusDescriptor(
             title: "Borrador guardado".appLocalized,
             summary: AppLocalization.localized(
-                "%@ se añadió al ledger local. Empieza el siguiente recibo cuando quieras.",
+                "%@ se añadió a tu registro local. Empieza el siguiente recibo cuando quieras.",
                 arguments: summary
             ),
             systemImage: "tray.and.arrow.down.fill",
@@ -1253,7 +1253,7 @@ private struct ReceiptScanStatusDescriptor {
 
     static func failed(_ message: String) -> ReceiptScanStatusDescriptor {
         ReceiptScanStatusDescriptor(
-            title: "Needs attention".appLocalized,
+            title: "Necesita atención".appLocalized,
             summary: message,
             systemImage: "exclamationmark.triangle.fill",
             tint: .red
@@ -1397,7 +1397,7 @@ private struct ReceiptImagePreviewCard: View {
 
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 6) {
-                            Label(source?.title ?? "Receipt image", systemImage: source?.systemImage ?? "photo")
+                            Label(source?.title ?? "Imagen del recibo", systemImage: source?.systemImage ?? "photo")
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(BrandTheme.primary)
 
@@ -1406,7 +1406,7 @@ private struct ReceiptImagePreviewCard: View {
                                 .foregroundStyle(BrandTheme.muted)
 
                             if let capturedAt {
-                                Text("Updated \(capturedAt.formatted(date: .abbreviated, time: .shortened))")
+                                Text(AppLocalization.localized("Updated %@", arguments: capturedAt.formatted(date: .abbreviated, time: .shortened)))
                                     .font(.footnote)
                                     .foregroundStyle(BrandTheme.muted)
                             }
@@ -1414,7 +1414,7 @@ private struct ReceiptImagePreviewCard: View {
 
                         Spacer()
 
-                        Button("Remove") {
+                        Button("Quitar") {
                             onRemove()
                         }
                         .font(.footnote.weight(.semibold))
@@ -1426,11 +1426,11 @@ private struct ReceiptImagePreviewCard: View {
 
                         YarnLoadingIndicator(size: 22)
 
-                        Text("Importing image...")
+                        Text("Importando imagen...")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("We are preparing the selected photo so the wizard can move into the autofill step.")
+                        Text("Estamos preparando la foto seleccionada para que el flujo pase al paso de autollenado.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .multilineTextAlignment(.center)
@@ -1445,11 +1445,11 @@ private struct ReceiptImagePreviewCard: View {
                             .background(BrandTheme.accent.opacity(0.18))
                             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
 
-                        Text("No receipt image attached")
+                        Text("No hay imagen de recibo adjunta")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Use the camera for a fresh capture, import a photo from your library, or continue manually if you only need a quick expense entry.")
+                        Text("Usa la cámara para una captura nueva, importa una foto desde tu biblioteca o sigue manualmente si solo necesitas un gasto rápido.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .multilineTextAlignment(.center)
@@ -1485,7 +1485,7 @@ private struct ReceiptSnapshotRow: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Label(source?.title ?? "Receipt image", systemImage: source?.systemImage ?? "photo")
+                Label(source?.title ?? "Imagen del recibo", systemImage: source?.systemImage ?? "photo")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(BrandTheme.primary)
 
@@ -1495,7 +1495,7 @@ private struct ReceiptSnapshotRow: View {
                         .foregroundStyle(BrandTheme.muted)
                 }
 
-                Text("Kept only as context for this wizard. The saved expense still stays local-first.")
+                Text("Se conserva solo como contexto de este flujo. El gasto guardado sigue siendo local-first.")
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)

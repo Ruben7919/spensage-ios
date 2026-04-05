@@ -21,7 +21,7 @@ final class AppViewModel: ObservableObject {
             switch self {
             case .dashboard: return "Dashboard".appLocalized
             case .expenses: return "Expenses".appLocalized
-            case .scan: return "Scan".appLocalized
+            case .scan: return "Escanear".appLocalized
             case .insights: return "Insights".appLocalized
             case .settings: return "Settings".appLocalized
             }

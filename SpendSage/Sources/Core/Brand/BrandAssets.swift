@@ -6,6 +6,17 @@ enum BrandSeasonID: String, CaseIterable, Codable, Hashable {
     case halloween
     case winterHolidays
     case newYear
+
+    var characterAssetSuffix: String {
+        switch self {
+        case .halloween:
+            return "halloween"
+        case .winterHolidays:
+            return "holiday"
+        case .newYear:
+            return "new_year"
+        }
+    }
 }
 
 struct BrandSeasonWindow: Hashable {
@@ -255,10 +266,19 @@ final class BrandAssetCatalog {
     var activeVersion: BrandVersion { version }
     var activeManifest: BrandAssetManifest { manifest }
 
-    func character(_ id: BrandCharacterID, expression: BrandExpression = .neutral) -> BrandAssetSource? {
+    func character(_ id: BrandCharacterID, expression: BrandExpression = .neutral, on date: Date = .now) -> BrandAssetSource? {
         guard let character = manifest.characters[id.rawValue] else { return nil }
-        let fileName = character.expressions[expression.rawValue] ?? character.base
-        return BrandAssetSource(category: .characters, fileName: fileName, version: version)
+        let baseFileName = character.expressions[expression.rawValue] ?? character.base
+
+        if let activeSeason = BrandSeasonCatalog.activeSeason(on: date) {
+            let seasonalFileName = "\(id.rawValue)_\(expression.rawValue)_\(activeSeason.id.characterAssetSuffix)_v2.png"
+            let seasonalSource = BrandAssetSource(category: .characters, fileName: seasonalFileName, version: version)
+            if url(for: seasonalSource) != nil {
+                return seasonalSource
+            }
+        }
+
+        return BrandAssetSource(category: .characters, fileName: baseFileName, version: version)
     }
 
     func guide(_ key: String) -> BrandAssetSource? {
