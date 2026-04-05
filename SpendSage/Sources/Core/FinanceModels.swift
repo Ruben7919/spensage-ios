@@ -338,8 +338,8 @@ struct ProfileRecord: Codable, Equatable {
     var marketingOptIn: Bool
 
     static let `default` = ProfileRecord(
-        fullName: "SpendSage User",
-        householdName: "My Household",
+        fullName: "Usuario SpendSage",
+        householdName: "Mi hogar",
         email: "hello@spendsage.ai",
         countryCode: "US",
         marketingOptIn: false

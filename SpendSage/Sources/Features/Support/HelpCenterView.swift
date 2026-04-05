@@ -21,40 +21,40 @@ struct HelpCenterView: View {
     private let topics: [HelpTopic] = [
         HelpTopic(
             id: "setupFamily",
-            title: "How should I start with my account?",
-            detail: "Create or sign in to your SpendSage account first, then set your budget and first goal so the app can personalize the next step.",
+            title: "¿Cómo debería empezar con mi cuenta?",
+            detail: "Crea o inicia sesión en tu cuenta de SpendSage primero, luego define tu presupuesto y tu primera meta para que la app pueda personalizar el siguiente paso.",
             systemImage: "iphone.gen3"
         ),
         HelpTopic(
             id: "budgets",
-            title: "What does the budget wizard actually change?",
-            detail: "It saves your monthly income and monthly budget locally. Dashboard and Insights then use those values to calculate remaining safe budget, utilization, and pacing.",
+            title: "¿Qué cambia realmente el asistente de presupuesto?",
+            detail: "Guarda localmente tu ingreso mensual y tu presupuesto mensual. Inicio y Análisis usan esos valores para calcular margen restante, utilización y ritmo.",
             systemImage: "wand.and.stars"
         ),
         HelpTopic(
             id: "scanAutosave",
-            title: "Why are some advanced tools unavailable here?",
-            detail: "Some tools depend on account access or connected services. Until those are enabled, the app keeps the freemium path focused on private on-device workflows.",
+            title: "¿Por qué algunas herramientas avanzadas no están disponibles aquí?",
+            detail: "Algunas herramientas dependen de acceso de cuenta o servicios conectados. Hasta que eso esté activo, la app mantiene el camino freemium enfocado en flujos privados dentro del dispositivo.",
             systemImage: "lock.shield.fill"
         ),
         HelpTopic(
             id: "insightsLanguage",
-            title: "Where do I tune the experience?",
-            detail: "Use Settings for language, currency, theme, and reminders. Advanced Settings is where you inspect exports, diagnostics, and support-ready packets.",
+            title: "¿Dónde ajusto la experiencia?",
+            detail: "Usa Ajustes para idioma, moneda, tema y recordatorios. Ajustes avanzados es donde revisas exportaciones, diagnósticos y paquetes listos para soporte.",
             systemImage: "slider.horizontal.3"
         ),
         HelpTopic(
             id: "security",
-            title: "How do support and legal handoff work?",
-            detail: "Support packets are generated locally and shared only when you choose. Legal Center opens the public privacy, terms, and support documents for the current environment.",
+            title: "¿Cómo funciona el paso a soporte y legal?",
+            detail: "Los paquetes de soporte se generan localmente y solo se comparten cuando tú decides hacerlo. El Centro legal abre los documentos de privacidad, términos y soporte de esta build.",
             systemImage: "lifepreserver.fill"
         )
     ]
 
     private let flow: [HelpFlowStep] = [
-        HelpFlowStep(id: 1, title: "Start with budget basics", detail: "Open the budget wizard, set income and budget, then review your remaining safe budget."),
-        HelpFlowStep(id: 2, title: "Build your local ledger", detail: "Add expenses, accounts, bills, and rules to make summaries and exports more accurate."),
-        HelpFlowStep(id: 3, title: "Use support-ready handoff", detail: "If something feels off, open Support Center and generate a packet before reaching out."),
+        HelpFlowStep(id: 1, title: "Empieza por el presupuesto", detail: "Abre el asistente, define ingreso y presupuesto y luego revisa tu margen restante."),
+        HelpFlowStep(id: 2, title: "Construye tu libro local", detail: "Agrega gastos, cuentas, facturas y reglas para que los resúmenes y exportaciones sean más útiles."),
+        HelpFlowStep(id: 3, title: "Usa el soporte cuando haga falta", detail: "Si algo se siente raro, abre el Centro de soporte y genera un paquete antes de escribir."),
     ]
 
     init(viewModel: AppViewModel? = nil) {
@@ -70,13 +70,13 @@ struct HelpCenterView: View {
                             MascotAvatarView(character: .mei, expression: .happy, size: 76)
 
                             VStack(alignment: .leading, spacing: 10) {
-                                BrandBadge(text: "Guided help", systemImage: "questionmark.circle.fill")
+                                BrandBadge(text: "Ayuda rápida", systemImage: "questionmark.circle.fill")
 
-                                Text("Help Center")
+                                Text("Centro de ayuda")
                                     .font(.system(size: 32, weight: .bold, design: .rounded))
                                     .foregroundStyle(BrandTheme.ink)
 
-                                Text("Ludo leads the quick answers, Tikki clarifies setup choices, and Manchas keeps the next step practical.")
+                                Text("Encuentra la respuesta rápida, abre soporte si hace falta y revisa lo legal solo cuando realmente lo necesites.")
                                     .font(.subheadline)
                                     .foregroundStyle(BrandTheme.muted)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -88,59 +88,12 @@ struct HelpCenterView: View {
                             fallbackSystemImage: "questionmark.circle.fill",
                             height: 184
                         )
-
-                        CharacterCrewRail(
-                            members: [
-                                CharacterCrewMember(
-                                    title: "Tikki",
-                                    role: "Setup coach",
-                                    detail: "Turns confusing setup questions into short actions.",
-                                    character: .tikki,
-                                    expression: .thinking
-                                ),
-                                CharacterCrewMember(
-                                    title: "Ludo",
-                                    role: "Help guide",
-                                    detail: "Answers the common questions without making the app feel like a manual.",
-                                    character: .mei,
-                                    expression: .happy
-                                ),
-                                CharacterCrewMember(
-                                    title: "Manchas",
-                                    role: "Support calm",
-                                    detail: "Keeps the answers practical and steady.",
-                                    character: .manchas,
-                                    expression: .happy
-                                )
-                            ]
-                        )
                     }
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Quick start")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        LazyVGrid(
-                            columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                            spacing: 12
-                        ) {
-                            BrandMetricTile(title: "Mode", value: "Local-first", systemImage: "lock.fill")
-                            BrandMetricTile(title: "Budget", value: "Guided", systemImage: "chart.bar.xaxis")
-                            BrandMetricTile(title: "Support", value: "Packet-ready", systemImage: "paperplane.fill")
-                        }
-
-                        Text("The smoothest setup is to define your budget first, then add expenses, and only use support or legal tools when you actually need them.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-                }
-
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Frequently asked")
+                        Text("Preguntas frecuentes")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -153,7 +106,7 @@ struct HelpCenterView: View {
                             } label: {
                                 FinanceToolRowLabel(
                                     title: topic.title,
-                                    summary: "Tap to expand the guided answer.",
+                                    summary: "Toca para abrir la respuesta.",
                                     systemImage: topic.systemImage
                                 )
                             }
@@ -165,29 +118,28 @@ struct HelpCenterView: View {
                     }
                 }
 
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("Recommended flow")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
+                ExperienceDisclosureCard(
+                    title: "Ruta recomendada",
+                    summary: "Déjala cerrada si ya conoces la app. Ábrela solo si quieres el orden sugerido para empezar.",
+                    character: .tikki,
+                    expression: .thinking
+                ) {
+                    ForEach(flow) { step in
+                        HStack(alignment: .top, spacing: 12) {
+                            Text("\(step.id)")
+                                .font(.headline.weight(.bold))
+                                .foregroundStyle(.white)
+                                .frame(width: 30, height: 30)
+                                .background(BrandTheme.primary)
+                                .clipShape(Circle())
 
-                        ForEach(flow) { step in
-                            HStack(alignment: .top, spacing: 12) {
-                                Text("\(step.id)")
-                                    .font(.headline.weight(.bold))
-                                    .foregroundStyle(.white)
-                                    .frame(width: 30, height: 30)
-                                    .background(BrandTheme.primary)
-                                    .clipShape(Circle())
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(step.title.appLocalized)
-                                        .font(.headline)
-                                        .foregroundStyle(BrandTheme.ink)
-                                    Text(step.detail.appLocalized)
-                                        .font(.subheadline)
-                                        .foregroundStyle(BrandTheme.muted)
-                                }
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(step.title.appLocalized)
+                                    .font(.headline)
+                                    .foregroundStyle(BrandTheme.ink)
+                                Text(step.detail.appLocalized)
+                                    .font(.subheadline)
+                                    .foregroundStyle(BrandTheme.muted)
                             }
                         }
                     }
@@ -195,11 +147,11 @@ struct HelpCenterView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("Need more help?")
+                        Text("Más ayuda")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Move from guidance into action with support and legal paths that match the connected account experience.")
+                        Text("Pasa de la respuesta rápida a la acción con rutas claras hacia soporte y documentos legales.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
 
@@ -208,8 +160,8 @@ struct HelpCenterView: View {
                                 SupportCenterView(viewModel: viewModel)
                             } label: {
                                 helpRouteLabel(
-                                    title: "Open Support Center",
-                                    summary: "Create a packet, copy diagnostics, and open an email draft.",
+                                    title: "Abrir Centro de soporte",
+                                    summary: "Crea un paquete, copia el diagnóstico y abre un borrador de correo.",
                                     systemImage: "lifepreserver.fill"
                                 )
                             }
@@ -220,8 +172,8 @@ struct HelpCenterView: View {
                             LegalCenterView()
                         } label: {
                             helpRouteLabel(
-                                title: "Open Legal Center",
-                                summary: "Review privacy, terms, and public support links.",
+                                title: "Abrir Centro legal",
+                                summary: "Revisa privacidad, términos y los enlaces públicos de soporte.",
                                 systemImage: "doc.text.fill"
                             )
                         }
@@ -236,7 +188,7 @@ struct HelpCenterView: View {
         .overlay(alignment: .top) {
             BrandBackdropView()
         }
-        .navigationTitle("Help Center".appLocalized)
+        .navigationTitle("Centro de ayuda")
         .navigationBarTitleDisplayMode(.inline)
     }
 

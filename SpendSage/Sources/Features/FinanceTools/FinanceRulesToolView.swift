@@ -46,9 +46,9 @@ struct FinanceRulesToolView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 FinanceToolsHeaderCard(
-                    eyebrow: "Auto-categorization",
-                    title: "Rules",
-                    summary: "Create lightweight merchant rules so local imports and receipt drafts land in the right category automatically. Keep useful rules active, pause the noisy ones, and edit without rebuilding the whole match.",
+                    eyebrow: "Autocategorización",
+                    title: "Reglas",
+                    summary: "Crea reglas ligeras por comercio para que importaciones locales y borradores de recibos caigan solos en la categoría correcta. Mantén activas las útiles, pausa las ruidosas y edítalas sin reconstruir todo.",
                     systemImage: "slider.horizontal.3",
                     surface: .rules
                 )
@@ -59,7 +59,7 @@ struct FinanceRulesToolView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Rules performance")
+                        Text("Rendimiento de reglas")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -68,22 +68,22 @@ struct FinanceRulesToolView: View {
                             spacing: 12
                         ) {
                             BrandMetricTile(
-                                title: "Rules",
+                                title: "Reglas",
                                 value: "\(viewModel.rules.count)",
                                 systemImage: "line.3.horizontal.decrease.circle.fill"
                             )
                             BrandMetricTile(
-                                title: "Matches",
+                                title: "Coincidencias",
                                 value: "\(matchedTransactions)",
                                 systemImage: "wand.and.stars"
                             )
                             BrandMetricTile(
-                                title: "Active",
+                                title: "Activas",
                                 value: "\(activeRuleCount)",
                                 systemImage: "play.circle.fill"
                             )
                             BrandMetricTile(
-                                title: "Paused",
+                                title: "Pausadas",
                                 value: "\(disabledRuleCount)",
                                 systemImage: "pause.circle.fill"
                             )
@@ -91,27 +91,27 @@ struct FinanceRulesToolView: View {
 
                         BrandFeatureRow(
                             systemImage: "square.and.pencil",
-                            title: "Edit-friendly",
-                            detail: "Changing a rule keeps the merchant keyword around, while pause lets you keep it ready for later instead of deleting it outright."
+                            title: "Fácil de editar",
+                            detail: "Al editar una regla conservas la palabra clave del comercio, y pausar la deja lista para después sin tener que borrarla."
                         )
                     }
                 }
 
                 if viewModel.rules.isEmpty {
                     FinanceEmptyStateCard(
-                        title: "No rules yet",
-                        summary: "Add merchant keywords like Uber, Whole Foods, or Apple to keep imported expenses cleaner.",
+                        title: "Todavía no hay reglas",
+                        summary: "Agrega palabras clave de comercios como Uber, Supermaxi o Apple para mantener más limpios los gastos importados.",
                         systemImage: "wand.and.rays.inverse"
                     )
                 } else {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Active automation rules")
+                            Text("Reglas activas")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
 
                             if activeRules.isEmpty {
-                                Text("No active rules right now. Paused rules stay visible below.")
+                                Text("No hay reglas activas ahora mismo. Las pausadas siguen visibles abajo.")
                                     .font(.footnote)
                                     .foregroundStyle(BrandTheme.muted)
                             }
@@ -130,11 +130,11 @@ struct FinanceRulesToolView: View {
                 if !pausedRules.isEmpty {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Paused rules")
+                            Text("Reglas pausadas")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
 
-                            Text("Paused rules stay saved and can be resumed without rewriting the merchant match.")
+                            Text("Las reglas pausadas se guardan y pueden retomarse sin reescribir la coincidencia del comercio.")
                                 .font(.footnote)
                                 .foregroundStyle(BrandTheme.muted)
 
@@ -151,20 +151,20 @@ struct FinanceRulesToolView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
-                        Text(editingRuleID == nil ? "Add rule" : "Edit rule")
+                        Text(editingRuleID == nil ? "Agregar regla" : "Editar regla")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        FinanceField(label: "Rule name", placeholder: "Ride share", text: $name)
+                        FinanceField(label: "Nombre de la regla", placeholder: "Viaje compartido", text: $name)
 
-                        FinanceField(label: "Merchant contains", placeholder: "Uber", text: $merchantContains)
+                        FinanceField(label: "El comercio contiene", placeholder: "Uber", text: $merchantContains)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Category")
+                            Text("Categoría")
                                 .font(.footnote.weight(.semibold))
                                 .foregroundStyle(BrandTheme.muted)
 
-                            Picker("Category", selection: $category) {
+                            Picker("Categoría", selection: $category) {
                                 ForEach(ExpenseCategory.allCases) { item in
                                     Label(item.rawValue, systemImage: item.symbolName)
                                         .tag(item)
@@ -174,14 +174,14 @@ struct FinanceRulesToolView: View {
                         }
 
                         FinanceField(
-                            label: "Payment method (optional)",
-                            placeholder: "Apple Pay, Visa, cash...",
+                            label: "Método de pago (opcional)",
+                            placeholder: "Apple Pay, Visa, efectivo...",
                             text: $paymentMethod
                         )
 
                         FinanceMultilineField(
-                            label: "Note / context (optional)",
-                            placeholder: "Optional context for this rule",
+                            label: "Nota o contexto (opcional)",
+                            placeholder: "Contexto opcional de esta regla",
                             text: $note
                         )
 
@@ -191,17 +191,17 @@ struct FinanceRulesToolView: View {
                                 .foregroundStyle(.red)
                         }
 
-                        Text("Active rules keep matching silently. Paused rules stay saved for later, so you can bring them back instead of rewriting them.")
+                        Text("Las reglas activas siguen emparejando en silencio. Las pausadas quedan guardadas para después, así que puedes traerlas de vuelta sin reescribirlas.")
                             .font(.footnote)
                             .foregroundStyle(BrandTheme.muted)
 
-                        Button(editingRuleID == nil ? "Save rule" : "Save changes") {
+                        Button(editingRuleID == nil ? "Guardar regla" : "Guardar cambios") {
                             Task { await saveRule() }
                         }
                         .buttonStyle(PrimaryCTAStyle())
 
                         if editingRuleID != nil {
-                            Button("Cancel edit") {
+                            Button("Cancelar edición") {
                                 resetForm()
                             }
                             .buttonStyle(SecondaryCTAStyle())
@@ -212,7 +212,7 @@ struct FinanceRulesToolView: View {
             .padding(24)
         }
         .background(FinanceScreenBackground())
-        .navigationTitle("Rules")
+        .navigationTitle("Reglas")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel.ledger == nil {
@@ -237,7 +237,7 @@ struct FinanceRulesToolView: View {
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
 
-                    Text(AppLocalization.localized("%d matching local transaction%@", arguments: matches, matches == 1 ? "" : "s"))
+                    Text(AppLocalization.localized("%d transacción%@ local%@ coinciden", arguments: matches, matches == 1 ? "" : "es", matches == 1 ? "" : "n"))
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -250,7 +250,7 @@ struct FinanceRulesToolView: View {
                         .foregroundStyle(BrandTheme.primary)
 
                     ruleChip(
-                        title: rule.isEnabled ? "Active" : "Paused",
+                        title: rule.isEnabled ? "Activa" : "Pausada",
                         systemImage: rule.isEnabled ? "play.circle.fill" : "pause.circle.fill",
                         color: rule.isEnabled ? BrandTheme.primary : .orange
                     )

@@ -19,11 +19,11 @@ final class AppViewModel: ObservableObject {
 
         var title: String {
             switch self {
-            case .dashboard: return "Dashboard".appLocalized
-            case .expenses: return "Expenses".appLocalized
-            case .scan: return "Escanear".appLocalized
-            case .insights: return "Insights".appLocalized
-            case .settings: return "Settings".appLocalized
+            case .dashboard: return "Inicio"
+            case .expenses: return "Gastos"
+            case .scan: return "Escanear"
+            case .insights: return "Análisis"
+            case .settings: return "Ajustes"
             }
         }
 
@@ -60,14 +60,19 @@ final class AppViewModel: ObservableObject {
     @Published var scanFlowID = UUID()
     @Published var dashboardState: FinanceDashboardState?
     @Published var ledger: LocalFinanceLedger?
+    @Published var growthSnapshot: DashboardGrowthSnapshot?
     @Published var isPresentingAddExpense = false
     @Published var isPresentingBudgetWizard = false
     @Published var notice: String?
     @Published var debugRoute: DebugRoute?
+    @Published var activeCelebration: GrowthCelebration?
+    @Published var reviewPromptToken: UUID?
 
     private let authService: AuthServicing
     private let financeStore: FinanceDashboardStoring
     private let onboardingKey = "native_onboarding_completed"
+    private var queuedCelebrations: [GrowthCelebration] = []
+    private var shouldPromptForReviewAfterCelebrations = false
 
     init(
         authService: AuthServicing = DefaultAuthService.make(),
@@ -148,11 +153,16 @@ final class AppViewModel: ObservableObject {
         session = .signedOut
         dashboardState = nil
         ledger = nil
+        growthSnapshot = nil
         isPresentingAddExpense = false
         isPresentingBudgetWizard = false
         scanFlowID = UUID()
         selectedTab = .dashboard
         debugRoute = nil
+        activeCelebration = nil
+        queuedCelebrations.removeAll()
+        shouldPromptForReviewAfterCelebrations = false
+        reviewPromptToken = nil
     }
 
     func startScanFlow() {
@@ -161,9 +171,15 @@ final class AppViewModel: ObservableObject {
     }
 
     func refreshDashboard() async {
+        let previousGrowthSnapshot = growthSnapshot
         let ledger = await financeStore.loadLedger(for: session)
+        let state = ledger.dashboardState()
         self.ledger = ledger
-        dashboardState = ledger.dashboardState()
+        dashboardState = state
+
+        let newGrowthSnapshot = makeGrowthSnapshot(state: state, ledger: ledger)
+        growthSnapshot = newGrowthSnapshot
+        handleGrowthUpdates(previous: previousGrowthSnapshot, current: newGrowthSnapshot)
     }
 
     func presentAddExpense() {
@@ -184,7 +200,7 @@ final class AppViewModel: ObservableObject {
 
     func addExpense(_ draft: ExpenseDraft) async {
         guard draft.isValid else {
-            notice = "Add a merchant name and a positive amount.".appLocalized
+            notice = "Agrega un comercio y un monto positivo.".appLocalized
             return
         }
 
@@ -254,7 +270,7 @@ final class AppViewModel: ObservableObject {
 
     func addRule(_ draft: RuleDraft) async {
         guard draft.isValid else {
-            notice = "Add a merchant keyword before saving a rule.".appLocalized
+            notice = "Agrega una palabra clave del comercio antes de guardar una regla.".appLocalized
             return
         }
 
@@ -283,7 +299,7 @@ final class AppViewModel: ObservableObject {
 
     func importExpenses(_ drafts: [ExpenseDraft]) async {
         guard !drafts.isEmpty else {
-            notice = "There are no expenses ready to import.".appLocalized
+            notice = "No hay gastos listos para importar.".appLocalized
             return
         }
 
@@ -296,6 +312,78 @@ final class AppViewModel: ObservableObject {
         await financeStore.saveProfile(profile, for: session)
         notice = "Profile preferences saved on this device.".appLocalized
         await refreshDashboard()
+    }
+
+    func dismissCelebration() {
+        activeCelebration = nil
+        presentNextCelebrationIfNeeded()
+    }
+
+    func consumeReviewPrompt() {
+        reviewPromptToken = nil
+        AppReviewPromptPolicy.markPrompted()
+    }
+
+    var queuedCelebrationCount: Int {
+        queuedCelebrations.count
+    }
+
+    private func makeGrowthSnapshot(state: FinanceDashboardState?, ledger: LocalFinanceLedger?) -> DashboardGrowthSnapshot {
+        GrowthSnapshotBuilder.build(
+            session: session,
+            state: state,
+            ledger: ledger,
+            accounts: accounts,
+            bills: bills,
+            rules: rules,
+            profile: profile
+        )
+    }
+
+    private func handleGrowthUpdates(previous: DashboardGrowthSnapshot?, current: DashboardGrowthSnapshot) {
+        guard let previous else { return }
+
+        enqueueCelebrations(GrowthCelebrationBuilder.build(previous: previous, current: current))
+
+        guard AppReviewPromptPolicy.shouldPrompt(previous: previous, current: current) else {
+            return
+        }
+
+        if activeCelebration != nil || !queuedCelebrations.isEmpty {
+            shouldPromptForReviewAfterCelebrations = true
+        } else {
+            reviewPromptToken = UUID()
+        }
+    }
+
+    private func enqueueCelebrations(_ celebrations: [GrowthCelebration]) {
+        guard !celebrations.isEmpty else { return }
+
+        var knownIDs = Set(queuedCelebrations.map(\.id))
+        if let activeCelebration {
+            knownIDs.insert(activeCelebration.id)
+        }
+
+        let filtered = celebrations.filter { knownIDs.insert($0.id).inserted }
+        guard !filtered.isEmpty else { return }
+
+        queuedCelebrations.append(contentsOf: filtered)
+        presentNextCelebrationIfNeeded()
+    }
+
+    private func presentNextCelebrationIfNeeded() {
+        guard activeCelebration == nil else { return }
+
+        if let next = queuedCelebrations.first {
+            queuedCelebrations.removeFirst()
+            activeCelebration = next
+            return
+        }
+
+        if shouldPromptForReviewAfterCelebrations {
+            shouldPromptForReviewAfterCelebrations = false
+            reviewPromptToken = UUID()
+        }
     }
 
     private func applyDebugLaunchOverrides() {
@@ -364,6 +452,56 @@ final class AppViewModel: ObservableObject {
             }
             selectedTab = .settings
             debugRoute = route
+        }
+
+        if let celebrationOverride = environment["SPENDSAGE_DEBUG_CELEBRATION"]?.lowercased() {
+            activeCelebration = debugCelebration(for: celebrationOverride)
+        }
+    }
+
+    private func debugCelebration(for value: String) -> GrowthCelebration? {
+        switch value {
+        case "level", "levelup":
+            return GrowthCelebration(
+                id: "debug-level-6",
+                kind: .levelUp,
+                title: "Nivel 6",
+                message: "Subiste de nivel y tu loop se siente más fuerte.",
+                detail: "La app ya tiene suficiente señal para darte recomendaciones más claras y un progreso más visible.",
+                badgeAsset: "badge_level_up_v2.png",
+                systemImage: "bolt.fill",
+                rewardXP: nil,
+                reachedLevel: 6,
+                shareText: "Subí al nivel 6 en SpendSage."
+            )
+        case "mission":
+            return GrowthCelebration(
+                id: "debug-mission-ledger",
+                kind: .missionCompleted,
+                title: "Cinco gastos registrados",
+                message: "Misión completada. 80 XP listos para tu progreso.",
+                detail: "Tu libro local ya tiene suficiente movimiento para que el coach lea mejor tus hábitos.",
+                badgeAsset: "badge_quest_daily_v2.png",
+                systemImage: "checkmark.circle.fill",
+                rewardXP: 80,
+                reachedLevel: nil,
+                shareText: "Completé una misión en SpendSage."
+            )
+        case "trophy", "badge":
+            return GrowthCelebration(
+                id: "debug-trophy-rookie",
+                kind: .trophyUnlocked,
+                title: "Libro novato",
+                message: "Desbloqueaste un nuevo badge.",
+                detail: "Tu primer logro ya está visible y ahora el loop de ahorro tiene un punto de partida claro.",
+                badgeAsset: "badge_savings_v2.png",
+                systemImage: "sparkles",
+                rewardXP: nil,
+                reachedLevel: nil,
+                shareText: "Desbloqueé un badge en SpendSage."
+            )
+        default:
+            return nil
         }
     }
 }

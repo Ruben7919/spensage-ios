@@ -10,10 +10,10 @@ struct BrandGalleryView: View {
     @State private var selectedGuide: GuideDefinition?
 
     private let swatches: [GallerySwatch] = [
-        GallerySwatch(name: "Background", color: BrandTheme.background),
+        GallerySwatch(name: "Fondo", color: BrandTheme.background),
         GallerySwatch(name: "Canvas", color: BrandTheme.canvas),
-        GallerySwatch(name: "Primary", color: BrandTheme.primary),
-        GallerySwatch(name: "Accent", color: BrandTheme.accent),
+        GallerySwatch(name: "Primario", color: BrandTheme.primary),
+        GallerySwatch(name: "Acento", color: BrandTheme.accent),
         GallerySwatch(name: "Ink", color: BrandTheme.ink),
         GallerySwatch(name: "Glow", color: BrandTheme.glow)
     ]
@@ -27,9 +27,9 @@ struct BrandGalleryView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 FinanceToolsHeaderCard(
-                    eyebrow: "Brand system",
-                    title: "Brand Gallery",
-                    summary: "A live gallery of the visual building blocks used across SpendSage: palette, mascots, guides, badges, and product storytelling surfaces. The manifest framing keeps the icon, expression, badge, and guide system easy to audit.",
+                    eyebrow: "Sistema de marca",
+                    title: "Galería de marca",
+                    summary: "Una vista interna de paleta, mascotas, guías, badges e iconos para auditar que el lenguaje visual de SpendSage siga consistente.",
                     systemImage: "swatchpalette.fill",
                     character: .tikki,
                     expression: .proud,
@@ -38,34 +38,34 @@ struct BrandGalleryView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Manifest framing")
+                        Text("Manifiesto visual")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
                         BrandBadge(text: "Manifest \(manifest.version.rawValue.uppercased())", systemImage: "bookmark.fill")
 
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                            BrandMetricTile(title: "Version", value: manifest.version.rawValue.uppercased(), systemImage: "bookmark.fill")
-                            BrandMetricTile(title: "Characters", value: "\(manifest.characters.count)", systemImage: "person.3.fill")
-                            BrandMetricTile(title: "Guides", value: "\(manifest.guides.count)", systemImage: "book.pages.fill")
+                            BrandMetricTile(title: "Versión", value: manifest.version.rawValue.uppercased(), systemImage: "bookmark.fill")
+                            BrandMetricTile(title: "Personajes", value: "\(manifest.characters.count)", systemImage: "person.3.fill")
+                            BrandMetricTile(title: "Guías", value: "\(manifest.guides.count)", systemImage: "book.pages.fill")
                             BrandMetricTile(title: "Badges", value: "\(manifest.badges.count)", systemImage: "seal.fill")
                         }
 
                         BrandFeatureRow(
                             systemImage: "sparkles.rectangle.stack.fill",
-                            title: "Guide-ready system",
-                            detail: "Mascot expressions, badge art, and guide scenes all come from the same manifest, so the product language stays consistent."
+                            title: "Sistema auditable",
+                            detail: "Expresiones, badges y escenas salen del mismo manifiesto para que el icono y los personajes se mantengan coherentes."
                         )
                     }
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Seasonal packs")
+                        Text("Temporadas")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Date-based art swaps for dashboard, splash, and loading now come from a small catalog instead of one-off conditions.")
+                        Text("Los cambios visuales por temporada salen de un catálogo pequeño y mantenible, no de condiciones sueltas.")
                             .foregroundStyle(BrandTheme.muted)
 
                         ForEach(BrandSeasonCatalog.seasons, id: \.id) { season in
@@ -85,9 +85,9 @@ struct BrandGalleryView: View {
                                             .foregroundStyle(BrandTheme.ink)
 
                                         if activeSeason?.id == season.id {
-                                            BrandBadge(text: "Live".appLocalized, systemImage: "sparkles")
+                                            BrandBadge(text: "Activa".appLocalized, systemImage: "sparkles")
                                         } else if nextSeason?.season.id == season.id {
-                                            BrandBadge(text: "Next".appLocalized, systemImage: "calendar")
+                                            BrandBadge(text: "Siguiente".appLocalized, systemImage: "calendar")
                                         }
                                     }
 
@@ -152,7 +152,7 @@ struct BrandGalleryView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 18) {
-                        Text("Brand pack")
+                        Text("Pack principal")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -173,7 +173,7 @@ struct BrandGalleryView: View {
                                             .aspectRatio(contentMode: .fit)
                                             .frame(height: 28)
 
-                                        Text("The same bundled brand assets used across guides, badges, mascots, and product storytelling.")
+                                        Text("Los mismos assets de marca que usa la app para guías, badges, personajes y escenas.")
                                             .font(.subheadline)
                                             .foregroundStyle(BrandTheme.muted)
                                     }
@@ -191,7 +191,7 @@ struct BrandGalleryView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Color system")
+                        Text("Sistema de color")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 

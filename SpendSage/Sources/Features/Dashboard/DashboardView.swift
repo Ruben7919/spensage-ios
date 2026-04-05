@@ -20,8 +20,8 @@ struct DashboardView: View {
                     recentSpendCard(for: state)
 
                     ExperienceDisclosureCard(
-                        title: "Power view",
-                        summary: "Bills and deeper money analysis stay here, while the game loop remains visible above.",
+                        title: "Vista avanzada",
+                        summary: "Las facturas y la lectura más profunda del dinero viven aquí, mientras el loop principal queda visible arriba.",
                         character: .tikki,
                         expression: .thinking
                     ) {
@@ -42,7 +42,7 @@ struct DashboardView: View {
             .padding(.bottom, 40)
         }
         .background(FinanceScreenBackground())
-        .navigationTitle("Dashboard")
+        .navigationTitle("Inicio")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel.dashboardState == nil {
@@ -62,7 +62,7 @@ struct DashboardView: View {
     }
 
     private var growthSnapshot: DashboardGrowthSnapshot {
-        GrowthSnapshotBuilder.build(
+        viewModel.growthSnapshot ?? GrowthSnapshotBuilder.build(
             session: viewModel.session,
             state: viewModel.dashboardState,
             ledger: viewModel.ledger,
@@ -75,37 +75,37 @@ struct DashboardView: View {
 
     private var heroCard: some View {
         JourneyHeroCard(
-            eyebrow: "Daily money loop",
+            eyebrow: "Ciclo diario del dinero",
             title: growthSnapshot.greetingTitle,
-            summary: "Start with one clear number, one next move, and the part of the month that needs attention now.",
+            summary: "Empieza con un número claro, un siguiente paso y la parte del mes que necesita atención ahora.",
             character: .manchas,
             expression: dashboardExpression,
             sceneKey: "guide_01_dashboard_game_manchas",
             scenePrompt: nil,
             metrics: [
                 BrandHeroMetric(
-                    title: "This week",
+                    title: "Esta semana",
                     value: weeklySafeToSpendValue,
                     systemImage: "banknote.fill"
                 ),
                 BrandHeroMetric(
-                    title: "Streak",
+                    title: "Racha",
                     value: "\(growthSnapshot.streakDays)d",
                     systemImage: "flame.fill"
                 ),
                 BrandHeroMetric(
-                    title: "Days left",
+                    title: "Días restantes",
                     value: "\(viewModel.dashboardState?.remainingDaysInMonth ?? 0)",
                     systemImage: "calendar"
                 )
             ]
         ) {
-            Button("Add expense") {
+            Button("Agregar gasto") {
                 viewModel.presentAddExpense()
             }
             .buttonStyle(PrimaryCTAStyle())
 
-            Button("Budget wizard") {
+            Button("Asistente de presupuesto") {
                 viewModel.presentBudgetWizard()
             }
             .buttonStyle(SecondaryCTAStyle())
@@ -120,14 +120,14 @@ struct DashboardView: View {
                 Button {
                     onOpenGuide()
                 } label: {
-                    Label("Open dashboard guide", systemImage: "questionmark.circle")
+                    Label("Abrir guía de inicio", systemImage: "questionmark.circle")
                 }
                 .buttonStyle(SecondaryCTAStyle())
             } else {
                 Button {
                     isPresentingGuide = true
                 } label: {
-                    Label("Open dashboard guide", systemImage: "questionmark.circle")
+                    Label("Abrir guía de inicio", systemImage: "questionmark.circle")
                 }
                 .buttonStyle(SecondaryCTAStyle())
             }
@@ -136,23 +136,23 @@ struct DashboardView: View {
 
     private func todayCard(for state: FinanceDashboardState) -> some View {
         ExperienceSectionCard(
-            title: "Today",
+            title: "Hoy",
             summary: growthSnapshot.coachBody,
             badgeText: growthSnapshot.riskState.label,
             badgeSystemImage: "sparkles"
         ) {
             BrandFeatureRow(
                 systemImage: "banknote.fill",
-                title: "Safe to spend now",
+                title: "Disponible ahora",
                 detail: AppLocalization.localized(
-                    "You still have %@ left in the monthly plan.",
+                    "Todavía tienes %@ disponibles dentro del plan mensual.",
                     arguments: state.budgetSnapshot.remaining.formatted(.currency(code: currencyCode))
                 )
             )
 
             BrandFeatureRow(
                 systemImage: "arrow.triangle.branch",
-                title: "Best next move",
+                title: "Mejor siguiente paso",
                 detail: growthSnapshot.coachAction
             )
 
@@ -163,16 +163,16 @@ struct DashboardView: View {
 
     private func strategyCard(growth: DashboardGrowthSnapshot) -> some View {
         GuidedSectionCard(
-            title: "Savings playbook",
-            summary: "A short list of local moves that can protect cash without turning the dashboard into a dense report.",
+            title: "Plan de ahorro",
+            summary: "Una lista corta de movimientos locales que protegen tu dinero sin convertir inicio en un reporte denso.",
             character: .mei,
             expression: growth.riskState == .urgent ? .warning : .thinking,
             systemImage: "brain.head.profile"
         ) {
             if growth.strategies.isEmpty {
                 FinanceEmptyStateCard(
-                    title: "Savings strategies will show up here",
-                    summary: "Once the ledger has a little more history, the coach will surface the best money-saving move for this week.",
+                    title: "Las estrategias de ahorro aparecerán aquí",
+                    summary: "Cuando el libro tenga un poco más de historia, el coach mostrará el mejor movimiento para esta semana.",
                     systemImage: "sparkles"
                 )
             } else {
@@ -216,8 +216,8 @@ struct DashboardView: View {
 
     private func missionSummaryCard(growth: DashboardGrowthSnapshot) -> some View {
         GuidedSectionCard(
-            title: "Quest board",
-            summary: "Keep one active mission, the live event, and the newest trophies visible without turning the dashboard into a wall of game UI.",
+            title: "Tablero de misiones",
+            summary: "Mantén visible una misión activa, el evento vivo y los logros más nuevos sin convertir inicio en una pared de UI de juego.",
             character: .manchas,
             expression: .excited,
             systemImage: "checklist"
@@ -226,10 +226,10 @@ struct DashboardView: View {
                 columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                 spacing: 12
             ) {
-                BrandMetricTile(title: "Level", value: "\(growth.level)", systemImage: "bolt.fill")
+                BrandMetricTile(title: "Nivel", value: "\(growth.level)", systemImage: "bolt.fill")
                 BrandMetricTile(title: "XP", value: "\(growth.totalXP)", systemImage: "sparkles")
-                BrandMetricTile(title: "Next unlock", value: "\(growth.xpToNextLevel) XP", systemImage: "arrow.up.forward")
-                BrandMetricTile(title: "Trophies", value: "\(growth.trophies.filter { $0.unlocked }.count)", systemImage: "trophy.fill")
+                BrandMetricTile(title: "Siguiente desbloqueo", value: "\(growth.xpToNextLevel) XP", systemImage: "arrow.up.forward")
+                BrandMetricTile(title: "Logros", value: "\(growth.trophies.filter { $0.unlocked }.count)", systemImage: "trophy.fill")
             }
 
             ProgressView(value: growth.levelProgress)
@@ -241,8 +241,8 @@ struct DashboardView: View {
 
             if growth.missions.isEmpty {
                 FinanceEmptyStateCard(
-                    title: "No missions yet",
-                    summary: "Add your first activity and the game loop will wake up here.",
+                    title: "Todavía no hay misiones",
+                    summary: "Agrega tu primera actividad y el loop del juego se activará aquí.",
                     systemImage: "sparkles"
                 )
             } else {
@@ -259,7 +259,7 @@ struct DashboardView: View {
                                         .fixedSize(horizontal: false, vertical: true)
 
                                     if mission.isSeasonal {
-                                        BrandBadge(text: "Event".appLocalized, systemImage: "wand.and.stars")
+                                        BrandBadge(text: "Evento", systemImage: "wand.and.stars")
                                     }
                                 }
 
@@ -314,8 +314,8 @@ struct DashboardView: View {
                 if growth.missions.count > 1 {
                     BrandFeatureRow(
                         systemImage: "checklist.checked",
-                        title: AppLocalization.localized("%d more missions available", arguments: growth.missions.count - 1),
-                        detail: "Open trophy history to see every mission, unlock path, and event reward in one place."
+                        title: AppLocalization.localized("%d misiones más disponibles", arguments: growth.missions.count - 1),
+                        detail: "Abre el historial de logros para ver cada misión, ruta de desbloqueo y recompensa de evento en un solo lugar."
                     )
                 }
             }
@@ -326,8 +326,8 @@ struct DashboardView: View {
                 TrophyHistoryView(viewModel: viewModel)
             } label: {
                 QuickActionTile(
-                    title: "Open trophy history",
-                    detail: "See every unlocked badge, progress target, and the longer timeline on a separate screen.",
+                    title: "Abrir historial de logros",
+                    detail: "Mira cada badge desbloqueado, el objetivo de progreso y la línea de tiempo completa en otra pantalla.",
                     systemImage: "trophy.fill"
                 )
             }
@@ -337,8 +337,8 @@ struct DashboardView: View {
 
     private var billsSection: some View {
         ExperienceSectionCard(
-            title: "Bills radar",
-            summary: "Upcoming due dates stay tucked away until you need them.",
+            title: "Radar de facturas",
+            summary: "Las próximas fechas de vencimiento se quedan guardadas hasta que las necesites.",
             badgeText: "\(viewModel.bills.count)",
             badgeSystemImage: "calendar.badge.clock"
         ) {
@@ -354,9 +354,9 @@ struct DashboardView: View {
 
     private func categorySection(for state: FinanceDashboardState) -> some View {
         ExperienceSectionCard(
-            title: "Category pressure",
-            summary: "The top categories are the fastest way to see where the month is leaning.",
-            badgeText: state.topCategory?.category.localizedTitle ?? "Mix",
+            title: "Presión por categoría",
+            summary: "Las categorías principales son la forma más rápida de ver hacia dónde se inclina el mes.",
+            badgeText: state.topCategory?.category.localizedTitle ?? "Mixto",
             badgeSystemImage: state.topCategory?.category.symbolName ?? "chart.pie.fill"
         ) {
             ForEach(state.categoryBreakdown.prefix(4)) { item in
@@ -384,9 +384,9 @@ struct DashboardView: View {
 
     private var loadingCard: some View {
         MascotLoadingCard(
-            badgeText: "Loading dashboard",
-            title: "Loading dashboard",
-            summary: "Pulling together the local ledger, coach guidance, and category signals.",
+            badgeText: "Cargando inicio",
+            title: "Cargando inicio",
+            summary: "Estamos reuniendo el libro local, la guía del coach y las señales por categoría.",
             character: .manchas,
             expression: .excited
         )
@@ -430,9 +430,9 @@ struct DashboardView: View {
 
     private func categoryCountLabel(for count: Int) -> String {
         if count == 1 {
-            return AppLocalization.localized("%d transaction", arguments: count)
+            return AppLocalization.localized("%d transacción", arguments: count)
         }
-        return AppLocalization.localized("%d transactions", arguments: count)
+        return AppLocalization.localized("%d transacciones", arguments: count)
     }
 
     private func localizedCategoryName(_ rawValue: String) -> String {
@@ -505,11 +505,11 @@ struct DashboardView: View {
 
         return VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Trophy shelf")
+                Text("Vitrina de logros")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
                 Spacer()
-                Text("\(growth.trophies.filter { $0.unlocked }.count) unlocked")
+                Text(AppLocalization.localized("%d desbloqueados", arguments: growth.trophies.filter { $0.unlocked }.count))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(BrandTheme.primary)
             }
@@ -525,7 +525,7 @@ struct DashboardView: View {
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(BrandTheme.ink)
                             .lineLimit(2)
-                        Text(trophy.unlocked ? "Unlocked".appLocalized : trophy.progressText)
+                        Text(trophy.unlocked ? "Desbloqueado" : trophy.progressText)
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
                     }
@@ -543,8 +543,8 @@ struct DashboardView: View {
 
     private func recentSpendCard(for state: FinanceDashboardState) -> some View {
         GuidedSectionCard(
-            title: "Recent activity",
-            summary: "Your latest entries and the shape of the month in one place.",
+            title: "Actividad reciente",
+            summary: "Tus últimos movimientos y la forma del mes en un solo lugar.",
             character: .mei,
             expression: .thinking,
             systemImage: "list.bullet.rectangle"
@@ -554,12 +554,12 @@ struct DashboardView: View {
                 spacing: 12
             ) {
                 BrandMetricTile(
-                    title: "Spent",
+                    title: "Gastado",
                     value: state.budgetSnapshot.monthlySpent.formatted(.currency(code: currencyCode)),
                     systemImage: "creditcard.fill"
                 )
                 BrandMetricTile(
-                    title: "Average",
+                    title: "Promedio",
                     value: state.averageExpense.formatted(.currency(code: currencyCode)),
                     systemImage: "chart.bar.fill"
                 )
@@ -567,8 +567,8 @@ struct DashboardView: View {
 
             if state.recentExpenses.isEmpty {
                 FinanceEmptyStateCard(
-                    title: "Add the first expense",
-                    summary: "Once the ledger moves, your recent activity and category signals will show up here.",
+                    title: "Agrega el primer gasto",
+                    summary: "Cuando el libro se mueva, aquí aparecerán tu actividad reciente y las señales por categoría.",
                     systemImage: "square.and.pencil"
                 )
             } else {

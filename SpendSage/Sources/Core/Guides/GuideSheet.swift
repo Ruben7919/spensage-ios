@@ -65,7 +65,7 @@ struct GuideSheet: View {
             Spacer()
 
             Button("Close".appLocalized) {
-                close(markSeen: false)
+                close(markSeen: true)
             }
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(BrandTheme.primary)

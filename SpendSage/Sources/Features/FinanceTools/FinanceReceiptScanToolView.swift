@@ -110,13 +110,38 @@ struct FinanceReceiptScanToolView: View {
         return lines.joined(separator: "\n")
     }
 
+    private var prefersCompactGuidance: Bool {
+        GuideProgressStore.isSeen(.scan) || (viewModel.dashboardState?.transactionCount ?? 0) >= 3
+    }
+
+    private var statusSummaryText: String {
+        guard prefersCompactGuidance else { return currentStatus.summary }
+
+        if errorMessage != nil || isSavingDraft || isAnalyzingReceipt || lastSavedSummary != nil {
+            return currentStatus.summary
+        }
+
+        switch currentStep {
+        case .capture:
+            return "Foto primero. También puedes seguir sin imagen.".appLocalized
+        case .autofill:
+            return "Corrige comercio, monto y fecha antes de revisar.".appLocalized
+        case .review:
+            return canSave
+                ? "Última revisión y guardado local.".appLocalized
+                : "Falta comercio o monto para guardar.".appLocalized
+        }
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 FinanceToolsHeaderCard(
                     eyebrow: "Tres pasos rápidos",
                     title: "Escaneo de recibos",
-                    summary: "Toma la foto, confirma el autollenado y revisa una vez antes de guardar localmente.",
+                    summary: prefersCompactGuidance
+                        ? "Foto, confirma y guarda. El detalle extra queda escondido hasta que lo necesites."
+                        : "Toma la foto, confirma el autollenado y revisa una vez antes de guardar localmente.",
                     systemImage: "camera.viewfinder",
                     character: .mei,
                     expression: .thinking,
@@ -125,6 +150,10 @@ struct FinanceReceiptScanToolView: View {
 
                 if let notice = viewModel.notice {
                     FinanceNoticeCard(message: notice)
+                }
+
+                if currentStep == .capture {
+                    captureQuickStartCard
                 }
 
                 wizardStatusCard
@@ -209,7 +238,7 @@ struct FinanceReceiptScanToolView: View {
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text(currentStatus.summary)
+                    Text(statusSummaryText)
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -264,15 +293,15 @@ struct FinanceReceiptScanToolView: View {
     }
 
     private var captureStepCard: some View {
-        let photoPickerTitle = capturedImage == nil ? "Importar desde Fotos" : "Reemplazar desde Fotos"
-
         return VStack(alignment: .leading, spacing: 20) {
             SurfaceCard {
                 VStack(alignment: .leading, spacing: 16) {
                     stepHeader(
                         for: .capture,
                         title: "Empieza con el recibo",
-                        summary: "Toma una foto clara o importa una desde Fotos. Si solo quieres registrar el gasto rápido, también puedes seguir sin imagen."
+                        summary: prefersCompactGuidance
+                            ? "Toma o importa el recibo. Si quieres velocidad, sigue sin foto."
+                            : "Toma una foto clara o importa una desde Fotos. Si solo quieres registrar el gasto rápido, también puedes seguir sin imagen."
                     )
 
                     ReceiptImagePreviewCard(
@@ -282,67 +311,60 @@ struct FinanceReceiptScanToolView: View {
                         isBusy: isLoadingPhoto,
                         onRemove: removeAttachedImage
                     )
-
-                    VStack(spacing: 12) {
-                        Button {
-                            openCamera()
-                        } label: {
-                            ReceiptActionLabel(
-                                title: capturedImage == nil ? "Escanear recibo" : "Escanear de nuevo",
-                                systemImage: capturedImage == nil ? "doc.viewfinder" : "arrow.clockwise.circle.fill",
-                                style: .primary
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        PhotosPicker(selection: $photoPickerItem, matching: .images) {
-                            ReceiptActionLabel(
-                                title: photoPickerTitle,
-                                systemImage: "photo.on.rectangle",
-                                style: .secondary
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        HStack(spacing: 12) {
-                            Button("Continuar sin foto") {
-                                transitionToStep(.autofill)
-                            }
-                            .buttonStyle(SecondaryCTAStyle())
-
-                            Button("Usar borrador de ejemplo") {
-                                loadSampleDraft()
-                            }
-                            .buttonStyle(SecondaryCTAStyle())
-                        }
-                    }
                 }
             }
 
-            SurfaceCard {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text("Consejos para la foto")
-                        .font(.headline)
-                        .foregroundStyle(BrandTheme.ink)
+            photoTipsCard
+        }
+    }
 
-                    BrandFeatureRow(
-                        systemImage: "sun.max.fill",
-                        title: "Usa luz pareja",
-                        detail: "Evita reflejos y sombras duras para que el total y el comercio se lean mejor."
-                    )
+    private var captureQuickStartCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                CompactSectionHeader(
+                    title: "Empieza aquí",
+                    detail: "La acción principal ya queda visible: foto, importación o borrador rápido."
+                )
 
-                    BrandFeatureRow(
-                        systemImage: "viewfinder",
-                        title: "Llena el encuadre",
-                        detail: "Mantén el recibo plano y centrado. Mucho fondo extra baja la calidad del OCR."
-                    )
+                captureActionsStack
+            }
+        }
+    }
 
-                    BrandFeatureRow(
-                        systemImage: "square.and.pencil",
-                        title: "Tú confirmas el borrador",
-                        detail: "SpendSage completa sugerencias en el dispositivo, pero nada se guarda hasta que tú lo confirmes."
-                    )
+    private var captureActionsStack: some View {
+        let photoPickerTitle = capturedImage == nil ? "Importar desde Fotos" : "Reemplazar desde Fotos"
+
+        return VStack(spacing: 12) {
+            Button {
+                openCamera()
+            } label: {
+                ReceiptActionLabel(
+                    title: capturedImage == nil ? "Escanear recibo" : "Escanear de nuevo",
+                    systemImage: capturedImage == nil ? "doc.viewfinder" : "arrow.clockwise.circle.fill",
+                    style: .primary
+                )
+            }
+            .buttonStyle(.plain)
+
+            PhotosPicker(selection: $photoPickerItem, matching: .images) {
+                ReceiptActionLabel(
+                    title: photoPickerTitle,
+                    systemImage: "photo.on.rectangle",
+                    style: .secondary
+                )
+            }
+            .buttonStyle(.plain)
+
+            HStack(spacing: 12) {
+                Button("Continuar sin foto") {
+                    transitionToStep(.autofill)
                 }
+                .buttonStyle(SecondaryCTAStyle())
+
+                Button("Usar borrador de ejemplo") {
+                    loadSampleDraft()
+                }
+                .buttonStyle(SecondaryCTAStyle())
             }
         }
     }
@@ -355,8 +377,12 @@ struct FinanceReceiptScanToolView: View {
                         for: .autofill,
                         title: "Confirma el autollenado",
                         summary: capturedImage == nil
-                            ? "No hay foto adjunta, así que este paso es manual. Completa lo esencial y continúa."
-                            : "SpendSage ya leyó la foto y llenó una primera versión de comercio, total y fecha. Corrige lo que veas raro antes de revisar."
+                            ? (prefersCompactGuidance
+                                ? "No hay foto, así que aquí completas lo esencial."
+                                : "No hay foto adjunta, así que este paso es manual. Completa lo esencial y continúa.")
+                            : (prefersCompactGuidance
+                                ? "Revisa comercio, monto y fecha antes de pasar al guardado."
+                                : "SpendSage ya leyó la foto y llenó una primera versión de comercio, total y fecha. Corrige lo que veas raro antes de revisar.")
                     )
 
                     if capturedImage != nil || isLoadingPhoto {
@@ -581,6 +607,51 @@ struct FinanceReceiptScanToolView: View {
         }
     }
 
+    private var photoTipsCard: some View {
+        Group {
+            if prefersCompactGuidance {
+                ExperienceDisclosureCard(
+                    title: "Consejos para la foto",
+                    summary: "Ábrelos solo si el OCR falla o si la captura sale dudosa.",
+                    character: .mei,
+                    expression: .thinking
+                ) {
+                    photoTipsContent
+                }
+            } else {
+                SurfaceCard {
+                    photoTipsContent
+                }
+            }
+        }
+    }
+
+    private var photoTipsContent: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Consejos para la foto")
+                .font(.headline)
+                .foregroundStyle(BrandTheme.ink)
+
+            BrandFeatureRow(
+                systemImage: "sun.max.fill",
+                title: "Usa luz pareja",
+                detail: "Evita reflejos y sombras duras para que el total y el comercio se lean mejor."
+            )
+
+            BrandFeatureRow(
+                systemImage: "viewfinder",
+                title: "Llena el encuadre",
+                detail: "Mantén el recibo plano y centrado. Mucho fondo extra baja la calidad del OCR."
+            )
+
+            BrandFeatureRow(
+                systemImage: "square.and.pencil",
+                title: "Tú confirmas el borrador",
+                detail: "SpendSage completa sugerencias en el dispositivo, pero nada se guarda hasta que tú lo confirmes."
+            )
+        }
+    }
+
     private var shouldShowSmartFillSupport: Bool {
         receiptAnalysis?.hasDetectedValues == true
             || merchantAutofillSuggestion != nil
@@ -595,7 +666,9 @@ struct FinanceReceiptScanToolView: View {
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Usa la memoria local de comercios solo cuando de verdad ayude a este borrador.")
+                Text(prefersCompactGuidance
+                    ? "Usa estos atajos solo si te ahorran tiempo en este borrador."
+                    : "Usa la memoria local de comercios solo cuando de verdad ayude a este borrador.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
 
@@ -713,36 +786,53 @@ struct FinanceReceiptScanToolView: View {
     }
 
     private var ocrPreviewCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("Texto detectado")
-                        .font(.headline)
-                        .foregroundStyle(BrandTheme.ink)
-                    Spacer()
-                    BrandBadge(text: capturedImage == nil ? "Manual" : "En el dispositivo", systemImage: "text.viewfinder")
+        Group {
+            if prefersCompactGuidance {
+                ExperienceDisclosureCard(
+                    title: "Texto detectado",
+                    summary: "Ábrelo solo si algo se ve raro en el autollenado.",
+                    character: .mei,
+                    expression: .thinking
+                ) {
+                    ocrPreviewContent
                 }
-
-                Text("Ábrelo solo si algo se ve raro. La mayoría de recibos debería necesitar solo una revisión rápida arriba.")
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-
-                ScrollView {
-                    Text(extractedTextPreview)
-                        .font(.system(.footnote, design: .monospaced))
-                        .foregroundStyle(BrandTheme.ink)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
+            } else {
+                SurfaceCard {
+                    ocrPreviewContent
                 }
-                .frame(minHeight: 150)
-                .padding(14)
-                .background(BrandTheme.surfaceTint)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
-                )
             }
+        }
+    }
+
+    private var ocrPreviewContent: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Text("Texto detectado")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Spacer()
+                BrandBadge(text: capturedImage == nil ? "Manual" : "En el dispositivo", systemImage: "text.viewfinder")
+            }
+
+            Text("Ábrelo solo si algo se ve raro. La mayoría de recibos debería necesitar solo una revisión rápida arriba.")
+                .font(.subheadline)
+                .foregroundStyle(BrandTheme.muted)
+
+            ScrollView {
+                Text(extractedTextPreview)
+                    .font(.system(.footnote, design: .monospaced))
+                    .foregroundStyle(BrandTheme.ink)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .frame(minHeight: 150)
+            .padding(14)
+            .background(BrandTheme.surfaceTint)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
         }
     }
 

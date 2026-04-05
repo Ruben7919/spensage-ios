@@ -4,7 +4,7 @@ struct TrophyHistoryView: View {
     @ObservedObject var viewModel: AppViewModel
 
     private var growthSnapshot: DashboardGrowthSnapshot {
-        GrowthSnapshotBuilder.build(
+        viewModel.growthSnapshot ?? GrowthSnapshotBuilder.build(
             session: viewModel.session,
             state: viewModel.dashboardState,
             ledger: viewModel.ledger,
@@ -19,6 +19,7 @@ struct TrophyHistoryView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 heroCard
+                missionCollection
                 trophyCollection
                 trophyTimeline
                 trophyFootnotes
@@ -37,38 +38,38 @@ struct TrophyHistoryView: View {
         .overlay(alignment: .top) {
             BrandBackdropView()
         }
-        .navigationTitle("Trophy History")
+        .navigationTitle("Historial de logros")
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var heroCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                BrandBadge(text: "\(growthSnapshot.trophies.filter(\.unlocked).count) unlocked", systemImage: "trophy.fill")
+                BrandBadge(text: AppLocalization.localized("%d desbloqueados", arguments: growthSnapshot.trophies.filter(\.unlocked).count), systemImage: "trophy.fill")
 
-                Text("Trophy collection")
+                Text("Colección de logros")
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Track the wins that make the finance loop feel alive: streaks, budgeting, clean categories, and stronger daily habits.")
+                Text("Sigue los logros que hacen que el loop financiero se sienta vivo: rachas, presupuesto sano, categorías limpias y hábitos más fuertes.")
                     .foregroundStyle(BrandTheme.muted)
 
                 LazyVGrid(
                     columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                     spacing: 12
                 ) {
-                    BrandMetricTile(title: "Level", value: "\(growthSnapshot.level)", systemImage: "bolt.fill")
+                    BrandMetricTile(title: "Nivel", value: "\(growthSnapshot.level)", systemImage: "bolt.fill")
                     BrandMetricTile(title: "XP", value: "\(growthSnapshot.totalXP)", systemImage: "sparkles")
-                    BrandMetricTile(title: "Unlocked", value: "\(growthSnapshot.trophies.filter(\.unlocked).count)", systemImage: "rosette")
-                    BrandMetricTile(title: "Next level", value: "\(growthSnapshot.xpToNextLevel) XP", systemImage: "arrow.up.forward")
+                    BrandMetricTile(title: "Desbloqueados", value: "\(growthSnapshot.trophies.filter(\.unlocked).count)", systemImage: "rosette")
+                    BrandMetricTile(title: "Siguiente nivel", value: "\(growthSnapshot.xpToNextLevel) XP", systemImage: "arrow.up.forward")
                 }
 
                 BrandArtworkSurface {
                     MascotSpeechCard(
                         character: .manchas,
                         expression: .proud,
-                        title: "Progress lives here",
-                        message: "Trophies and streaks reflect the habits already visible in your local ledger."
+                        title: "El progreso vive aquí",
+                        message: "Los logros y las rachas reflejan los hábitos que ya se ven en tu libro local."
                     )
                 }
             }
@@ -79,8 +80,8 @@ struct TrophyHistoryView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeading(
-                    title: "Collection",
-                    detail: "Unlocked trophies stay bright; the rest expose progress toward the next visible milestone."
+                    title: "Colección",
+                    detail: "Los logros desbloqueados se quedan brillantes; el resto muestra el progreso hacia la siguiente meta visible."
                 )
 
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
@@ -91,7 +92,7 @@ struct TrophyHistoryView: View {
 
                                 Spacer(minLength: 0)
 
-                                Text(trophy.unlocked ? "Unlocked".appLocalized : trophy.progressText.appLocalized)
+                                Text(trophy.unlocked ? "Desbloqueado" : trophy.progressText.appLocalized)
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
                             }
@@ -112,10 +113,78 @@ struct TrophyHistoryView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(BrandTheme.primary)
                             } else {
-                                Text(AppLocalization.localized("Next unlock at %@", arguments: trophy.progressText.appLocalized))
+                                Text(AppLocalization.localized("Siguiente desbloqueo en %@", arguments: trophy.progressText.appLocalized))
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(BrandTheme.muted)
                             }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                .fill(BrandTheme.surfaceTint)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private var missionCollection: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeading(
+                    title: "Misiones",
+                    detail: "Aquí ves el tablero completo: lo que ya cerraste, lo que está listo y lo que todavía empuja tu progreso."
+                )
+
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
+                    ForEach(growthSnapshot.allMissions) { mission in
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(alignment: .top) {
+                                GrowthMissionBadgeView(mission: mission, size: 52)
+
+                                Spacer(minLength: 0)
+
+                                BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
+                            }
+
+                            Text(mission.title.appLocalized)
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
+
+                            Text(mission.detail.appLocalized)
+                                .font(.subheadline)
+                                .foregroundStyle(BrandTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            ProgressView(value: mission.progressRatio)
+                                .tint(mission.status == .completed ? BrandTheme.primary : BrandTheme.muted.opacity(0.8))
+
+                            HStack {
+                                Text("\(mission.progressText) · \(mission.rewardXP) XP")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(BrandTheme.primary)
+
+                                Spacer()
+
+                                if mission.isSeasonal {
+                                    BrandBadge(text: "Evento", systemImage: "wand.and.stars")
+                                } else {
+                                    Text(mission.cadenceLabel.appLocalized)
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(BrandTheme.muted)
+                                }
+                            }
+
+                            Text(mission.coachNote.appLocalized)
+                                .font(.footnote)
+                                .foregroundStyle(BrandTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(16)
@@ -137,8 +206,8 @@ struct TrophyHistoryView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeading(
-                    title: "Timeline",
-                    detail: "A simple event stream built from unlocked trophies, category momentum, and coach prompts."
+                    title: "Línea de tiempo",
+                    detail: "Una secuencia simple de eventos construida con logros, momentum de categorías y señales del coach."
                 )
 
                 if growthSnapshot.events.isEmpty {
@@ -156,13 +225,13 @@ struct TrophyHistoryView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 12) {
                 sectionHeading(
-                    title: "How trophies are earned",
-                    detail: "Trophies react to the habits visible in your current ledger and help turn routine finance work into a repeatable loop."
+                    title: "Cómo se consiguen",
+                    detail: "Los logros reaccionan a los hábitos visibles en tu libro actual y convierten la rutina financiera en un loop repetible."
                 )
 
-                Label("Add expenses consistently to grow streak-based badges faster.", systemImage: "flame.fill")
-                Label("Accounts, bills, and rules unlock deeper trophies because the dashboard sees more of the month.", systemImage: "square.stack.3d.up")
-                Label("A clean budget and regular review flow usually unlock the most visible wins first.", systemImage: "checkmark.seal.fill")
+                Label("Registrar gastos con constancia acelera los badges basados en rachas.", systemImage: "flame.fill")
+                Label("Cuentas, facturas y reglas desbloquean logros más profundos porque el dashboard ve mejor el mes.", systemImage: "square.stack.3d.up")
+                Label("Un presupuesto limpio y una revisión frecuente suelen abrir primero las victorias más visibles.", systemImage: "checkmark.seal.fill")
             }
             .foregroundStyle(BrandTheme.ink)
         }
@@ -170,10 +239,10 @@ struct TrophyHistoryView: View {
 
     private var emptyTimeline: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("No trophy events yet")
+            Text("Todavía no hay eventos")
                 .font(.headline)
                 .foregroundStyle(BrandTheme.ink)
-            Text("The first expense usually unlocks the first visible event in this timeline.")
+            Text("El primer gasto suele desbloquear el primer evento visible en esta línea de tiempo.")
                 .font(.subheadline)
                 .foregroundStyle(BrandTheme.muted)
         }

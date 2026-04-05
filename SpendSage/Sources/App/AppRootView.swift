@@ -1,7 +1,9 @@
 import SwiftUI
+import StoreKit
 
 struct AppRootView: View {
     @ObservedObject var viewModel: AppViewModel
+    @Environment(\.requestReview) private var requestReview
     @State private var showLaunchExperience = true
 
     private var shouldShowSplash: Bool {
@@ -46,6 +48,18 @@ struct AppRootView: View {
                     .transition(.opacity.combined(with: .scale(scale: 1.02)))
                     .zIndex(10)
             }
+
+            if let celebration = viewModel.activeCelebration {
+                GrowthCelebrationOverlay(
+                    celebration: celebration,
+                    queuedCount: viewModel.queuedCelebrationCount
+                ) {
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                        viewModel.dismissCelebration()
+                    }
+                }
+                .zIndex(30)
+            }
         }
         .task {
             guard shouldShowSplash else {
@@ -61,6 +75,11 @@ struct AppRootView: View {
             withAnimation(.easeInOut(duration: 0.32)) {
                 showLaunchExperience = false
             }
+        }
+        .onChange(of: viewModel.reviewPromptToken) { _, token in
+            guard token != nil else { return }
+            requestReview()
+            viewModel.consumeReviewPrompt()
         }
     }
 

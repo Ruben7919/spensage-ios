@@ -33,9 +33,9 @@ struct AddExpenseView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     FinanceToolsHeaderCard(
-                        eyebrow: "Quick capture",
-                        title: "Add expense",
-                        summary: "Enter the merchant and amount first. Smart fill appears only when it can save you time.",
+                        eyebrow: "Captura rápida",
+                        title: "Agregar gasto",
+                        summary: "Empieza por el comercio y el monto. El llenado inteligente aparece solo cuando realmente te ahorra tiempo.",
                         systemImage: "plus.circle.fill",
                         character: .manchas,
                         expression: .happy,
@@ -45,12 +45,12 @@ struct AddExpenseView: View {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
                             FinanceField(
-                                label: "Merchant or title",
-                                placeholder: "Supermarket",
+                                label: "Comercio o título",
+                                placeholder: "Supermercado",
                                 text: $merchant
                             )
                             FinanceField(
-                                label: "Amount",
+                                label: "Monto",
                                 placeholder: "24.50",
                                 text: $amount,
                                 keyboard: .decimalPad,
@@ -58,11 +58,11 @@ struct AddExpenseView: View {
                             )
 
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Category")
+                                Text("Categoría")
                                     .font(.footnote.weight(.semibold))
                                     .foregroundStyle(BrandTheme.muted)
 
-                                Picker("Category", selection: $category) {
+                                Picker("Categoría", selection: $category) {
                                     ForEach(ExpenseCategory.allCases) { item in
                                         Label(item.localizedTitle, systemImage: item.symbolName)
                                             .tag(item)
@@ -72,15 +72,15 @@ struct AddExpenseView: View {
                             }
 
                             DatePicker(selection: $date, displayedComponents: .date) {
-                                Text("Date")
+                                Text("Fecha")
                                     .font(.footnote.weight(.semibold))
                                     .foregroundStyle(BrandTheme.muted)
                             }
                             .tint(BrandTheme.primary)
 
                             FinanceField(
-                                label: "Note",
-                                placeholder: "Optional note",
+                                label: "Nota",
+                                placeholder: "Nota opcional",
                                 text: $note,
                                 capitalization: .sentences
                             )
@@ -101,7 +101,7 @@ struct AddExpenseView: View {
                             .foregroundStyle(.red)
                     }
 
-                    Button("Save expense") {
+                    Button("Guardar gasto") {
                         Task { await saveExpense() }
                     }
                     .buttonStyle(PrimaryCTAStyle())
@@ -111,11 +111,11 @@ struct AddExpenseView: View {
                 .padding(20)
             }
             .background(FinanceScreenBackground())
-            .navigationTitle("Add expense")
+            .navigationTitle("Agregar gasto")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("Cancelar") {
                         viewModel.dismissAddExpense()
                     }
                 }
@@ -148,14 +148,14 @@ struct AddExpenseView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("Draft preview")
+                    Text("Vista previa del borrador")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                     Spacer()
-                    BrandBadge(text: "Local draft", systemImage: "iphone.gen3")
+                    BrandBadge(text: "Borrador local", systemImage: "iphone.gen3")
                 }
 
-                Text("Review the merchant, category, and amount before saving.")
+                Text("Revisa el comercio, la categoría y el monto antes de guardar.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
 
@@ -169,7 +169,7 @@ struct AddExpenseView: View {
                     .frame(width: 42, height: 42)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(merchant.isEmpty ? "Merchant" : merchant)
+                        Text(merchant.isEmpty ? "Comercio" : merchant)
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
                         Text(category.localizedTitle)
@@ -191,14 +191,14 @@ struct AddExpenseView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    Text("Smart fill")
+                    Text("Llenado inteligente")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                     Spacer()
-                    BrandBadge(text: "1 tap", systemImage: "sparkles")
+                    BrandBadge(text: "1 toque", systemImage: "sparkles")
                 }
 
-                Text("Reuse the category, amount, and note from a known merchant so logging stays fast.")
+                Text("Reutiliza la categoría, el monto y la nota de un comercio conocido para registrar más rápido.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -230,7 +230,7 @@ struct AddExpenseView: View {
 
                         Spacer()
 
-                        Button("Use") {
+                        Button("Usar") {
                             applySuggestion(suggestion, includeMerchant: false)
                         }
                         .buttonStyle(.borderedProminent)
@@ -247,7 +247,7 @@ struct AddExpenseView: View {
 
                 if !merchantSuggestions.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Recent merchants" : "Matching merchants")
+                        Text(merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Comercios recientes" : "Comercios relacionados")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.muted)
 
@@ -309,7 +309,7 @@ struct AddExpenseView: View {
 
     private func saveExpense() async {
         guard let amountValue = Decimal(string: amount) else {
-            errorMessage = "Enter a valid amount.".appLocalized
+            errorMessage = "Ingresa un monto válido.".appLocalized
             return
         }
 

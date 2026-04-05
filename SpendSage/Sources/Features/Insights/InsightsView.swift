@@ -172,6 +172,10 @@ struct InsightsView: View {
         Array(ExpenseCategory.allCases.prefix(6))
     }
 
+    private var prefersCompactInsights: Bool {
+        GuideProgressStore.isSeen(.insights) || recentExpenses.count >= 5
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
@@ -183,8 +187,10 @@ struct InsightsView: View {
                     chartCard
                     categoryCard(for: currentState)
                     ExperienceDisclosureCard(
-                        title: "Ludo's deeper tools",
-                        summary: "Planner edits, exports, and related tools stay here when you want more control.",
+                        title: "Herramientas extra de Ludo",
+                        summary: prefersCompactInsights
+                            ? "Planificador, exportaciones y herramientas relacionadas se quedan ocultas hasta que las necesites."
+                            : "Planificador, exportaciones y herramientas relacionadas viven aquí cuando quieres más control.",
                         character: .mei,
                         expression: .thinking
                     ) {
@@ -207,15 +213,15 @@ struct InsightsView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Insights".appLocalized)
+        .navigationTitle("Análisis")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {
             GuideSheet(guide: GuideLibrary.guide(.insights))
         }
-        .onChange(of: selectedPeriod) { _ in
+        .onChange(of: selectedPeriod) {
             selectedChartIndex = nil
         }
-        .onChange(of: selectedMetric) { _ in
+        .onChange(of: selectedMetric) {
             selectedChartIndex = nil
         }
         .task {
@@ -239,13 +245,16 @@ struct InsightsView: View {
     private var heroCard: some View {
         BrandStoryCard(
             surface: .insights,
-            title: "Insights",
-            message: "See what changed, which category needs attention, and which next move makes the month easier to control.",
+            title: "Análisis",
+            message: prefersCompactInsights
+                ? "Toca una barra para ver el valor exacto y abre detalle solo si algo pide acción."
+                : "Mira qué cambió, qué categoría necesita atención y cuál es el siguiente paso que hace el mes más fácil de controlar.",
             highlights: [
                 selectedPeriod.title,
                 selectedMetric.title,
-                currentState.map { paceLabel(for: $0) } ?? "Loading".appLocalized
-            ]
+                currentState.map { paceLabel(for: $0) } ?? "Cargando"
+            ],
+            showsNarrativeFooter: !prefersCompactInsights
         )
     }
 
@@ -253,18 +262,20 @@ struct InsightsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
-                    title: "Range and focus",
-                    detail: "Choose the time window and the number you want to understand."
+                    title: "Rango y foco",
+                    detail: prefersCompactInsights
+                        ? "Elige la ventana y el número que quieres mirar."
+                        : "Elige la ventana de tiempo y el número que quieres entender."
                 )
 
-                Picker("Period", selection: $selectedPeriod) {
+                Picker("Periodo", selection: $selectedPeriod) {
                     ForEach(InsightsPeriod.allCases) { period in
                         Text(period.title).tag(period)
                     }
                 }
                 .pickerStyle(.segmented)
 
-                Picker("Metric", selection: $selectedMetric) {
+                Picker("Métrica", selection: $selectedMetric) {
                     ForEach(InsightsMetric.allCases) { metric in
                         Text(metric.title).tag(metric)
                     }
@@ -278,8 +289,10 @@ struct InsightsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
-                    title: "What matters right now",
-                    detail: "Keep the summary practical: total, remaining room, and one clear pace check."
+                    title: "Lo importante ahora",
+                    detail: prefersCompactInsights
+                        ? "Total, margen restante y un chequeo de ritmo."
+                        : "Mantén el resumen práctico: total, margen restante y una lectura clara del ritmo."
                 )
 
                 LazyVGrid(
@@ -287,22 +300,22 @@ struct InsightsView: View {
                     spacing: 12
                 ) {
                     BrandMetricTile(
-                        title: "Selected total",
+                        title: "Total elegido",
                         value: filteredMetricTotal.formatted(.currency(code: currencyCode)),
                         systemImage: selectedMetric.systemImage
                     )
                     BrandMetricTile(
-                        title: "Remaining",
+                        title: "Restante",
                         value: state.budgetSnapshot.remaining.formatted(.currency(code: currencyCode)),
                         systemImage: "banknote.fill"
                     )
                     BrandMetricTile(
-                        title: "Savings rate",
-                        value: savingsRate.map { String(format: "%.0f%%", $0 * 100) } ?? "n/a".appLocalized,
+                        title: "Tasa de ahorro",
+                        value: savingsRate.map { String(format: "%.0f%%", $0 * 100) } ?? "n/d",
                         systemImage: "percent"
                     )
                     BrandMetricTile(
-                        title: "Net worth",
+                        title: "Patrimonio",
                         value: netWorthTotal.formatted(.currency(code: currencyCode)),
                         systemImage: "scale.3d"
                     )
@@ -310,7 +323,7 @@ struct InsightsView: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Budget pace")
+                        Text("Ritmo del presupuesto")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(BrandTheme.ink)
 
@@ -325,9 +338,9 @@ struct InsightsView: View {
                         .tint(BrandTheme.primary)
 
                     HStack {
-                        Text(AppLocalization.localized("Spend/day %@", arguments: spendPerDay.formatted(.currency(code: currencyCode))))
+                        Text(AppLocalization.localized("Gasto/día %@", arguments: spendPerDay.formatted(.currency(code: currencyCode))))
                         Spacer()
-                        Text(AppLocalization.localized("Budget/day %@", arguments: budgetPerDay.formatted(.currency(code: currencyCode))))
+                        Text(AppLocalization.localized("Presupuesto/día %@", arguments: budgetPerDay.formatted(.currency(code: currencyCode))))
                     }
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(BrandTheme.muted)
@@ -336,7 +349,7 @@ struct InsightsView: View {
                 if let nextBill {
                     BrandFeatureRow(
                         systemImage: "calendar.badge.clock",
-                        title: "Next bill",
+                        title: "Próxima factura",
                         detail: "\(nextBill.title) · \(FinanceToolFormatting.dueDateText(for: nextBill, ledger: ledger))"
                     )
                 }
@@ -355,35 +368,37 @@ struct InsightsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
-                    title: "Main chart",
-                    detail: "Use the chart for the quick pattern. Open trend detail when you want the full read."
+                    title: "Gráfico principal",
+                    detail: prefersCompactInsights
+                        ? "Toca una barra para ver el valor exacto."
+                        : "Usa el gráfico para ver el patrón rápido. Abre el detalle solo si quieres la lectura completa."
                 )
 
                 if selectedSeries.isEmpty {
                     BrandFeatureRow(
                         systemImage: "chart.bar.fill",
-                        title: "No chart signal yet",
-                        detail: "Add a few expenses and the chart will start showing a clearer pattern."
+                        title: "Todavía no hay señal",
+                        detail: "Agrega algunos gastos y el gráfico empezará a mostrar un patrón más claro."
                     )
                 } else {
                     if let selectedChartPoint {
                         BrandFeatureRow(
                             systemImage: selectedMetric.systemImage,
-                            title: AppLocalization.localized("%@ selected", arguments: selectedChartPoint.label),
+                            title: AppLocalization.localized("%@ seleccionado", arguments: selectedChartPoint.label),
                             detail: formattedChartValue(selectedChartPoint.value)
                         )
                     } else {
                         BrandFeatureRow(
                             systemImage: "hand.tap.fill",
-                            title: "Touch a bar",
-                            detail: "The exact value appears here when you press a bucket."
+                            title: "Toca una barra",
+                            detail: "El valor exacto aparece aquí cuando presionas un bloque."
                         )
                     }
 
                     Chart(selectedSeries) { row in
                         BarMark(
-                            x: .value("Bucket", row.index),
-                            y: .value("Value", row.value)
+                            x: .value("Bloque", row.index),
+                            y: .value("Valor", row.value)
                         )
                         .foregroundStyle(selectedChartIndex == row.index ? BrandTheme.accent : BrandTheme.primary)
                         .opacity(selectedChartIndex == nil || selectedChartIndex == row.index ? 1 : 0.45)
@@ -438,8 +453,8 @@ struct InsightsView: View {
                         )
                     } label: {
                         QuickActionTile(
-                            title: "Open trend detail",
-                            detail: "See average spend, strongest month, and every recent bucket on a separate screen.",
+                            title: "Abrir tendencia",
+                            detail: "Mira el gasto promedio, el mejor mes y cada bloque reciente en una pantalla aparte.",
                             systemImage: "chart.bar.xaxis"
                         )
                     }
@@ -453,15 +468,17 @@ struct InsightsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
-                    title: "Category pressure",
-                    detail: "Start with the top categories here. Open the detail view when you want the full breakdown."
+                    title: "Presión por categoría",
+                    detail: prefersCompactInsights
+                        ? "Empieza por las categorías más pesadas."
+                        : "Empieza por las categorías principales. Abre el detalle cuando quieras el desglose completo."
                 )
 
                 if categoryBreakdown.isEmpty {
                     BrandFeatureRow(
                         systemImage: "square.grid.2x2.fill",
-                        title: "No category signal yet",
-                        detail: "The first expenses will reveal where the budget is tilting."
+                        title: "Todavía no hay categorías",
+                        detail: "Los primeros gastos van a revelar hacia dónde se inclina el presupuesto."
                     )
                 } else {
                     ForEach(Array(categoryBreakdown.prefix(3))) { category in
@@ -510,8 +527,8 @@ struct InsightsView: View {
                     )
                 } label: {
                     QuickActionTile(
-                        title: "Open category detail",
-                        detail: "See the full category list and all next-step prompts on a separate screen.",
+                        title: "Abrir categorías",
+                        detail: "Mira la lista completa de categorías y las recomendaciones en una pantalla aparte.",
                         systemImage: "list.bullet.rectangle.portrait"
                     )
                 }
@@ -524,8 +541,8 @@ struct InsightsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
-                    title: "Budget planner",
-                    detail: "Turn the analysis into one realistic budget action."
+                    title: "Planificador",
+                    detail: "Convierte el análisis en una acción realista sobre tu presupuesto."
                 )
 
                 LazyVGrid(
@@ -562,17 +579,17 @@ struct InsightsView: View {
                 }
 
                 HStack(spacing: 12) {
-                    Button("Apply suggested mix") {
+                    Button("Aplicar mezcla sugerida") {
                         budgetDraft = suggestedBudgetDraft(from: state)
-                        plannerNotice = "Suggested category mix loaded.".appLocalized
+                        plannerNotice = "Se cargó la mezcla sugerida."
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    Button("Save local budget") {
+                    Button("Guardar presupuesto local") {
                         Task {
                             let totalBudget = parsedBudgetDraftTotal()
                             guard totalBudget > 0 else {
-                                plannerNotice = "Add at least one category amount before saving.".appLocalized
+                                plannerNotice = "Agrega al menos un monto por categoría antes de guardar."
                                 return
                             }
 
@@ -580,13 +597,13 @@ struct InsightsView: View {
                                 monthlyIncome: state.budgetSnapshot.monthlyIncome,
                                 monthlyBudget: totalBudget
                             )
-                            plannerNotice = "Local budget updated from planner categories.".appLocalized
+                            plannerNotice = "El presupuesto local se actualizó desde el planificador."
                         }
                     }
                     .buttonStyle(PrimaryCTAStyle())
                 }
 
-                Button("Open budget wizard") {
+                Button("Abrir asistente de presupuesto") {
                     viewModel.presentBudgetWizard()
                 }
                 .buttonStyle(SecondaryCTAStyle())
@@ -604,35 +621,35 @@ struct InsightsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
-                    title: "Summary and next move",
-                    detail: "Keep the takeaway clear and the recommendation easy to act on."
+                    title: "Resumen y siguiente paso",
+                    detail: "Mantén la lectura clara y la recomendación fácil de ejecutar."
                 )
 
-                Button("Generate suggestions") {
+                Button("Generar sugerencias") {
                     generatedInsight = generatedSuggestion(for: state)
                 }
                 .buttonStyle(PrimaryCTAStyle())
 
                 if let generatedInsight {
-                    BrandFeatureRow(systemImage: "sparkles", title: "Summary", detail: generatedInsight.summary)
+                    BrandFeatureRow(systemImage: "sparkles", title: "Resumen", detail: generatedInsight.summary)
 
                     ForEach(generatedInsight.alerts, id: \.self) { alert in
-                        BrandFeatureRow(systemImage: "exclamationmark.triangle.fill", title: "Alert", detail: alert)
+                        BrandFeatureRow(systemImage: "exclamationmark.triangle.fill", title: "Alerta", detail: alert)
                     }
 
                     ForEach(generatedInsight.actions, id: \.self) { action in
-                        BrandFeatureRow(systemImage: "checkmark.circle.fill", title: "Action", detail: action)
+                        BrandFeatureRow(systemImage: "checkmark.circle.fill", title: "Acción", detail: action)
                     }
                 }
 
                 HStack(spacing: 12) {
-                    Button("Copy summary") {
-                        copyExport(LocalLedgerExportComposer.readableSummary(viewModel: viewModel), label: "Summary export copied")
+                    Button("Copiar resumen") {
+                        copyExport(LocalLedgerExportComposer.readableSummary(viewModel: viewModel), label: "Resumen copiado")
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    Button("Copy snapshot") {
-                        copyExport(LocalLedgerExportComposer.jsonSnapshot(viewModel: viewModel), label: "Snapshot export copied")
+                    Button("Copiar snapshot") {
+                        copyExport(LocalLedgerExportComposer.jsonSnapshot(viewModel: viewModel), label: "Snapshot copiado")
                     }
                     .buttonStyle(SecondaryCTAStyle())
                 }
@@ -644,16 +661,16 @@ struct InsightsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
-                    title: "Related tools",
-                    detail: "Open a deeper tool only when the analysis tells you it matters."
+                    title: "Herramientas relacionadas",
+                    detail: "Abre una herramienta más profunda solo cuando el análisis te diga que vale la pena."
                 )
 
                 NavigationLink {
                     FinanceBillsToolView(viewModel: viewModel)
                 } label: {
                     QuickActionTile(
-                        title: "Bills",
-                        detail: "Check recurring obligations and due dates.",
+                        title: "Facturas",
+                        detail: "Revisa obligaciones recurrentes y fechas de vencimiento.",
                         systemImage: "calendar.badge.clock"
                     )
                 }
@@ -663,8 +680,8 @@ struct InsightsView: View {
                     FinanceAccountsToolView(viewModel: viewModel)
                 } label: {
                     QuickActionTile(
-                        title: "Accounts",
-                        detail: "Review balances and debt exposure.",
+                        title: "Cuentas",
+                        detail: "Revisa saldos y exposición a deuda.",
                         systemImage: "wallet.pass.fill"
                     )
                 }
@@ -674,8 +691,8 @@ struct InsightsView: View {
                     FinanceRulesToolView(viewModel: viewModel)
                 } label: {
                     QuickActionTile(
-                        title: "Rules",
-                        detail: "Clean recurring merchants and categories.",
+                        title: "Reglas",
+                        detail: "Limpia comerciantes recurrentes y categorías.",
                         systemImage: "line.3.horizontal.decrease.circle.fill"
                     )
                 }
@@ -686,9 +703,9 @@ struct InsightsView: View {
 
     private var loadingCard: some View {
         MascotLoadingCard(
-            badgeText: "Loading insights",
-            title: "Loading insights",
-            summary: "We are preparing your local analysis.",
+            badgeText: "Cargando análisis",
+            title: "Cargando análisis",
+            summary: "Estamos preparando tu lectura local.",
             character: .mei,
             expression: .thinking
         )
@@ -701,7 +718,7 @@ struct InsightsView: View {
     }
 
     private var strongestMonthLabel: String {
-        monthlyTrendRows.max { $0.net < $1.net }?.label ?? "n/a".appLocalized
+        monthlyTrendRows.max { $0.net < $1.net }?.label ?? "n/d"
     }
 
     private func share(for category: CategoryBreakdown, total: Decimal) -> Double {
@@ -712,9 +729,9 @@ struct InsightsView: View {
 
     private func categoryCountLabel(for count: Int) -> String {
         if count == 1 {
-            return AppLocalization.localized("%d transaction", arguments: count)
+            return "\(count) transacción"
         }
-        return AppLocalization.localized("%d transactions", arguments: count)
+        return "\(count) transacciones"
     }
 
     private func formattedChartValue(_ value: Double) -> String {
@@ -727,7 +744,12 @@ struct InsightsView: View {
             return
         }
 
-        let plotArea = geometry[proxy.plotAreaFrame]
+        guard let plotFrame = proxy.plotFrame else {
+            selectedChartIndex = nil
+            return
+        }
+
+        let plotArea = geometry[plotFrame]
         guard plotArea.contains(location) else {
             selectedChartIndex = nil
             return
@@ -757,24 +779,24 @@ struct InsightsView: View {
     private func generatedSuggestion(for state: FinanceDashboardState) -> GeneratedInsightResult {
         if state.transactionCount == 0 {
             return GeneratedInsightResult(
-                summary: "Start with one expense so Insights can generate a more specific summary.".appLocalized,
-                alerts: ["No transactions are available yet for pacing or category pressure.".appLocalized],
-                actions: ["Add your first expense to unlock the full analysis.".appLocalized]
+                summary: "Empieza con un gasto para que Análisis pueda generar un resumen más específico.".appLocalized,
+                alerts: ["Todavía no hay transacciones disponibles para leer el ritmo ni la presión por categoría.".appLocalized],
+                actions: ["Agrega tu primer gasto para desbloquear el análisis completo.".appLocalized]
             )
         }
 
         if state.utilizationRatio >= 1 {
             return GeneratedInsightResult(
-                summary: "You are already over budget this month. Trim the top category first and review the next bill before adding new discretionary spend.".appLocalized,
+                summary: "Ya estás por encima del presupuesto este mes. Recorta primero la categoría principal y revisa la próxima factura antes de sumar gasto discrecional.".appLocalized,
                 alerts: [
-                    "Monthly utilization is already above budget.".appLocalized,
+                    "La utilización mensual ya está por encima del presupuesto.".appLocalized,
                     state.topCategory.map {
-                        AppLocalization.localized("%@ is the heaviest category right now.", arguments: $0.category.localizedTitle)
-                    } ?? "The top category is adding the strongest pressure.".appLocalized
+                        AppLocalization.localized("%@ es la categoría más pesada ahora mismo.", arguments: $0.category.localizedTitle)
+                    } ?? "La categoría principal es la que más presión está sumando.".appLocalized
                 ],
                 actions: [
-                    "Reduce one discretionary purchase in the top category today.".appLocalized,
-                    "Review the next bill before the next spend decision.".appLocalized
+                    "Reduce hoy una compra discrecional dentro de la categoría principal.".appLocalized,
+                    "Revisa la próxima factura antes de la siguiente decisión de gasto.".appLocalized
                 ]
             )
         }
@@ -794,18 +816,18 @@ struct InsightsView: View {
                     )
                 ],
                 actions: [
-                    "Hold this category flat for the next few days.".appLocalized,
-                    "Open the budget wizard if the current cap feels unrealistic.".appLocalized
+                    "Mantén esta categoría estable durante los próximos días.".appLocalized,
+                    "Abre el asistente de presupuesto si el tope actual se siente irreal.".appLocalized
                 ]
             )
         }
 
         return GeneratedInsightResult(
-            summary: "The month is still calm. Use this window to clean categories, review recurring bills, and lock one budget decision.".appLocalized,
-            alerts: ["The ledger looks stable enough to plan ahead instead of reacting.".appLocalized],
+            summary: "El mes sigue tranquilo. Aprovecha esta ventana para limpiar categorías, revisar facturas recurrentes y fijar una decisión de presupuesto.".appLocalized,
+            alerts: ["El libro se ve lo bastante estable como para planificar en vez de reaccionar.".appLocalized],
             actions: [
-                "Clean one recurring merchant rule.".appLocalized,
-                "Lock one budget decision while the month is still calm.".appLocalized
+                "Limpia una regla de comercio recurrente.".appLocalized,
+                "Fija una decisión de presupuesto mientras el mes sigue tranquilo.".appLocalized
             ]
         )
     }
@@ -836,15 +858,15 @@ struct InsightsView: View {
 
     private func paceLabel(for state: FinanceDashboardState) -> String {
         if state.transactionCount == 0 {
-            return "Kickoff".appLocalized
+            return "Inicio"
         }
         if state.utilizationRatio < 0.82 {
-            return "Calm pace".appLocalized
+            return "Ritmo tranquilo"
         }
         if state.utilizationRatio < 1 {
-            return "Watch pace".appLocalized
+            return "Ritmo en observación"
         }
-        return "Over budget".appLocalized
+        return "Sobre presupuesto"
     }
 
     private func insightRows(for state: FinanceDashboardState) -> [InsightRow] {
@@ -854,8 +876,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "first-expense",
-                    title: "Add the first expense",
-                    detail: "One transaction unlocks pacing, category mix, and a more useful monthly analysis.",
+                    title: "Agrega el primer gasto",
+                    detail: "Una transacción desbloquea el ritmo, la mezcla por categoría y un análisis mensual más útil.",
                     systemImage: "plus.circle.fill"
                 )
             )
@@ -865,8 +887,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "over-budget",
-                    title: "Trim the top category",
-                    detail: "Spending is already above the current budget track, so the fastest relief is usually in the largest bucket.",
+                    title: "Recorta la categoría principal",
+                    detail: "El gasto ya está por encima del ritmo actual, así que el alivio más rápido suele vivir en el bloque más grande.",
                     systemImage: "exclamationmark.triangle.fill"
                 )
             )
@@ -874,8 +896,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "watch-pace",
-                    title: "Watch the pace",
-                    detail: "The month is heating up; one small trim or one bill review keeps the plan comfortable.",
+                    title: "Vigila el ritmo",
+                    detail: "El mes se está calentando; un pequeño recorte o una revisión de facturas mantiene el plan cómodo.",
                     systemImage: "speedometer"
                 )
             )
@@ -885,8 +907,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "create-rule",
-                    title: "Create a merchant rule",
-                    detail: "Repeated merchants are still manual, so the next rule will clean up the ledger quickly.",
+                    title: "Crea una regla de comercio",
+                    detail: "Los comercios repetidos siguen siendo manuales, así que la siguiente regla va a limpiar el libro rápidamente.",
                     systemImage: "slider.horizontal.3"
                 )
             )
@@ -896,8 +918,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "add-bill",
-                    title: "Make obligations visible",
-                    detail: "Recurring bills are still hidden. Add one so the app can warn you earlier.",
+                    title: "Haz visibles las obligaciones",
+                    detail: "Las facturas recurrentes siguen ocultas. Agrega una para que la app pueda avisarte antes.",
                     systemImage: "calendar.badge.clock"
                 )
             )
@@ -907,8 +929,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "add-account",
-                    title: "Add another account bucket",
-                    detail: "A second account or cash bucket gives the analysis a fuller local snapshot.",
+                    title: "Agrega otra cuenta",
+                    detail: "Una segunda cuenta o bolsillo de efectivo le da al análisis una foto local mucho más completa.",
                     systemImage: "wallet.pass.fill"
                 )
             )
@@ -918,8 +940,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "steady",
-                    title: "Keep the rhythm",
-                    detail: "The analysis already has enough signal. Keep feeding it clean transactions and the month will stay readable.",
+                    title: "Mantén el ritmo",
+                    detail: "El análisis ya tiene suficiente señal. Sigue alimentándolo con transacciones limpias y el mes se mantendrá legible.",
                     systemImage: "checkmark.seal.fill"
                 )
             )
@@ -972,18 +994,18 @@ private struct InsightsTrendDetailView: View {
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
                         CompactSectionHeader(
-                            title: "Trend detail",
-                            detail: "This screen carries the extra context so the main Insights view can stay lighter."
+                            title: "Tendencia",
+                            detail: "Aquí ves el contexto extra del rango actual sin cargar la pantalla principal."
                         )
 
                         HStack(spacing: 12) {
                             BrandMetricTile(
-                                title: "Avg spend",
+                                title: "Promedio",
                                 value: averageMonthlySpend.formatted(.currency(code: currencyCode)),
                                 systemImage: "chart.line.uptrend.xyaxis"
                             )
                             BrandMetricTile(
-                                title: "Best month",
+                                title: "Mejor mes",
                                 value: strongestMonthLabel,
                                 systemImage: "trophy.fill"
                             )
@@ -995,8 +1017,8 @@ private struct InsightsTrendDetailView: View {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
                             CompactSectionHeader(
-                                title: "Current range buckets",
-                                detail: "Each bucket shows the exact \(metric.title.lowercased()) total in the selected range."
+                                title: "Bloques del rango",
+                                detail: "Cada bloque muestra el total exacto de \(metric.title.lowercased()) en el rango elegido."
                             )
 
                             ForEach(series) { point in
@@ -1010,8 +1032,8 @@ private struct InsightsTrendDetailView: View {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
                             CompactSectionHeader(
-                                title: "Six-month view",
-                                detail: "Recent monthly spend and net flow stay here instead of crowding the main chart."
+                                title: "Vista de seis meses",
+                                detail: "El gasto mensual reciente y el flujo neto viven aquí en vez de cargar el gráfico principal."
                             )
 
                             ForEach(monthlyTrendRows) { row in
@@ -1028,7 +1050,7 @@ private struct InsightsTrendDetailView: View {
                                             .foregroundStyle(BrandTheme.ink)
                                     }
 
-                                    detailRow(title: "Net", value: formattedCurrency(row.net))
+                                    detailRow(title: "Neto", value: formattedCurrency(row.net))
                                 }
                             }
                         }
@@ -1046,7 +1068,7 @@ private struct InsightsTrendDetailView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Trend detail".appLocalized)
+        .navigationTitle("Tendencia")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -1083,15 +1105,15 @@ private struct InsightsCategoryDetailView: View {
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
                         CompactSectionHeader(
-                            title: "Category detail",
-                            detail: "Full category pressure and the supporting prompts live here instead of the main screen."
+                            title: "Categorías",
+                            detail: "Aquí vive la presión completa por categoría y las recomendaciones asociadas."
                         )
 
                         if categories.isEmpty {
                             BrandFeatureRow(
                                 systemImage: "square.grid.2x2.fill",
-                                title: "No categories yet",
-                                detail: "Add a few expenses and the category breakdown will appear here."
+                                title: "Todavía no hay categorías",
+                                detail: "Agrega algunos gastos y el desglose aparecerá aquí."
                             )
                         } else {
                             ForEach(categories) { category in
@@ -1129,8 +1151,8 @@ private struct InsightsCategoryDetailView: View {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
                             CompactSectionHeader(
-                                title: "Next prompts",
-                                detail: "These are the follow-up actions that were removed from the main Insights screen."
+                                title: "Siguientes pasos",
+                                detail: "Estas son las acciones recomendadas que nacen del análisis actual."
                             )
 
                             ForEach(rows) { row in
@@ -1155,7 +1177,7 @@ private struct InsightsCategoryDetailView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Category detail".appLocalized)
+        .navigationTitle("Categorías")
         .navigationBarTitleDisplayMode(.inline)
     }
 

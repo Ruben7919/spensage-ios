@@ -2,6 +2,7 @@ import Foundation
 import Testing
 @testable import SpendSage
 
+@MainActor
 struct BrandSeasonalAssetTests {
     @Test
     func halloweenMascotVariantResolvesFromCatalog() throws {

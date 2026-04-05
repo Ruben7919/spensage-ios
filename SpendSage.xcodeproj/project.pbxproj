@@ -14,6 +14,8 @@
 		040AB4A634B8A98012D85C16 /* mei_confused_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = B291D10D922DA2C3CAB124B7 /* mei_confused_halloween_v2.png */; };
 		04E00FF56F15EBE2816E0EFB /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785F4A4F7DC3D1425773B754 /* HelpCenterView.swift */; };
 		0689ECECCDF54FDA4380B2EE /* mei_sleepy_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3954217E6907EF6D3986C5BF /* mei_sleepy_holiday_v2.png */; };
+		0833EC92F4DD4250CE70795E /* TERMS_OF_USE.md in Resources */ = {isa = PBXBuildFile; fileRef = 427DFD1A51BFEB9401B6A3C7 /* TERMS_OF_USE.md */; };
+		0CCE1F9E354612AD4728AEF3 /* GrowthCelebrationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724CAD834E961BCD51737BF6 /* GrowthCelebrationOverlay.swift */; };
 		0CF388EE6F179A2C7AFDFA12 /* tikki_proud_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5DE16CC95AAD576F149687D5 /* tikki_proud_holiday_v2.png */; };
 		0EAE95164DEB712524A583F8 /* mei_sleepy_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 993B748ABC71197CD26D72E1 /* mei_sleepy_halloween_v2.png */; };
 		0F23374C3FFF9B892C7C0270 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E9688AB4D62C4797F2C444 /* AppViewModel.swift */; };
@@ -31,12 +33,14 @@
 		170139122CA2B8A9880D6DE8 /* tikki_excited_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 247BFEB92E56194464BDFE4A /* tikki_excited_holiday_v2.png */; };
 		17EBFD7F7D5C568DFA011E37 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABD400C4F74E75F803BAFC /* Models.swift */; };
 		18649C377C6561EC08728B72 /* manchas_love_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6B22377117E5CA77415496A0 /* manchas_love_holiday_v2.png */; };
+		199E1A30C5CDA340DEDB8C97 /* GrowthCelebrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849574DD6B6ABAA23CB11EE0 /* GrowthCelebrationTests.swift */; };
 		1A39E8A6890D71AA0AE136C4 /* guide_13_subscription_hydra_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 879896D4090BAF21D8382509 /* guide_13_subscription_hydra_manchas_v2.png */; };
 		1BFAC9F2D1D8FBF19FBE8052 /* LocalLedgerExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32229B7B2F800571C744726E /* LocalLedgerExport.swift */; };
 		1CE14497B68CA6E4954F9024 /* badge_savings_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 63E04732FD9E469418EE3975 /* badge_savings_v2.png */; };
 		1E170DFAD77A4548B4BE5A58 /* tikki_excited_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D2018C326731561886A613BE /* tikki_excited_halloween_v2.png */; };
 		1E3FF07028AD55E759042E65 /* guide_20_subscription_checkout_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1053B33502C1AAC11F427D5C /* guide_20_subscription_checkout_manchas_v2.png */; };
 		1EDAB963E4B94727860B6295 /* tikki_proud_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 32D571FF86AFF17DD600166C /* tikki_proud_v2.png */; };
+		1EDFE1B083DE5D7FD31C1AAF /* GrowthCelebration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816A9A7F99699404E0C20D7B /* GrowthCelebration.swift */; };
 		2075B4BAD8CFC8E86497DF21 /* manchas_love_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 88014219EB3F0992C86B6B8F /* manchas_love_v2.png */; };
 		2180ED9BE745BCC430A6B38C /* GuideSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20839DBFC007023E8C5F905 /* GuideSheet.swift */; };
 		24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659DC0EB3BB892E509CF9D7E /* FinanceToolSupportViews.swift */; };
@@ -209,12 +213,14 @@
 		AD95EF834654F6643CA13CE5 /* tikki_sleepy_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = F557B34C6BDD13EE62F5F00A /* tikki_sleepy_new_year_v2.png */; };
 		ADD63B673A654A2006CEB1C7 /* tikki_happy_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0DD23F3C90218D96502EA5DC /* tikki_happy_holiday_v2.png */; };
 		ADDAF24DAE772F38566306B3 /* manchas_neutral_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9756F9FE063E1099AFF7B0B8 /* manchas_neutral_v2.png */; };
+		ADE850E4D7DEE1CD95A9A747 /* SUPPORT_AND_CONTACT.md in Resources */ = {isa = PBXBuildFile; fileRef = F3D4E77E93F8B42DBA06E3F1 /* SUPPORT_AND_CONTACT.md */; };
 		AE15CE553FD3D218B5A480E7 /* mei_angry_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 267E3B0B95A74A57931BB74F /* mei_angry_halloween_v2.png */; };
 		AED083756FE4631D3475EBD2 /* ReceiptVisionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BC0CDC4EFA3A8AB7D5249 /* ReceiptVisionService.swift */; };
 		AFC44BB846CDF66F5FEE2D7C /* mei_angry_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 376F7F2404E91AF75E89CCED /* mei_angry_v2.png */; };
 		B080CCDE88FE108A3976B497 /* badge_level_up_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 510A9603A5754D7EF0CB477F /* badge_level_up_v2.png */; };
 		B22DCE06C16EFC4684EDD3C1 /* badge_event_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = E1A244CF4AF4D88482D5D4AA /* badge_event_new_year_v2.png */; };
 		B2635C7CEBE82A8FCD305FC7 /* manchas_sleepy_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D51B070E4E9B7B1D532109F2 /* manchas_sleepy_halloween_v2.png */; };
+		B393384CC54D6138EF46B46B /* GrowthProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0077448ACF207FCAFC08DE1B /* GrowthProgressStore.swift */; };
 		B3FAD3530E5C3545269E681F /* Guides.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA553B6500B3D28724615D2F /* Guides.swift */; };
 		B46D59A3AD0468E9B116E0D5 /* badge_streak_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = DE70A775400DDF0E3CBF1306 /* badge_streak_v2.png */; };
 		B4C9B5856641CDB0A7672003 /* mei_thinking_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = F1D35519F695338481DE4E91 /* mei_thinking_halloween_v2.png */; };
@@ -235,14 +241,17 @@
 		CAEBD1C710415CD9923F6137 /* mei_excited_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = BCF8212078808CC13E17ACBD /* mei_excited_holiday_v2.png */; };
 		CAFAD932AC11D8DC3FEEEBD1 /* manchas_warning_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 28F25B4E1CC50BB71E17705A /* manchas_warning_new_year_v2.png */; };
 		CB8F42A6511C41025ABF0910 /* FinanceRulesToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED13FEEB87E9B10AC5DCBD3B /* FinanceRulesToolView.swift */; };
+		CBD799FCE7BC50AE0190AE86 /* LegalDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = F37AE3D67532FB77808B3980 /* LegalDocuments.swift */; };
 		CBE2746FD7C4EC60C3F99317 /* manchas_happy_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 7D2BA7961F378FB4EE2DCAE4 /* manchas_happy_holiday_v2.png */; };
 		CC4DB3950510E7E841FD5C88 /* manchas_warning_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0295A1B6243B6C20ADF1CAA6 /* manchas_warning_halloween_v2.png */; };
 		CC7C69A3C62FF0841BCE7979 /* badge_no_spend_day_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 927048F7599BE8F4BF4D2A3B /* badge_no_spend_day_v2.png */; };
 		CCB98DD783FDD6BDD0B01946 /* manchas_thinking_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 597263E2F2D715427D1A22F3 /* manchas_thinking_new_year_v2.png */; };
 		CE29B5B0C020C934651E2912 /* mei_warning_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C7EE7F5280A10507BD9E9A82 /* mei_warning_new_year_v2.png */; };
+		CF8F46152A3C517362F243B2 /* PRIVACY_POLICY.md in Resources */ = {isa = PBXBuildFile; fileRef = D4E9C34EC371737926614ABA /* PRIVACY_POLICY.md */; };
 		CFEDF48A4FDA77EFC6FAD2B4 /* manchas_shocked_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 694EB7074F11A82FAD2A8FFB /* manchas_shocked_v2.png */; };
 		D17E009C8F39426F3D0CA3F5 /* manchas_neutral_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4788562B18D0FA17AE03D59A /* manchas_neutral_new_year_v2.png */; };
 		D32B4986C1306208E18755C2 /* guide_12_budget_review_family_tikki_manchas_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = EE54CD72F5015E9537F73A54 /* guide_12_budget_review_family_tikki_manchas_v2.png */; };
+		D4AC84409117247C82C3CD14 /* BETA_NOTICE_AND_DISCLOSURES.md in Resources */ = {isa = PBXBuildFile; fileRef = 7F2934138AE36700A47D2D0E /* BETA_NOTICE_AND_DISCLOSURES.md */; };
 		D4C44A8FC7EA81DF37FBD5E0 /* manchas_sad_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4E72AC8C2C1E9A3F76994A46 /* manchas_sad_halloween_v2.png */; };
 		D5A63F5297E1DC9294373C18 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6921A66E622A020378A8781E /* InfoPlist.strings */; };
 		D764D9C93EF0CF5DCD3B181C /* tikki_shocked_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = E81AE9CC1FD4CA763E7BCD0F /* tikki_shocked_holiday_v2.png */; };
@@ -310,6 +319,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0077448ACF207FCAFC08DE1B /* GrowthProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthProgressStore.swift; sourceTree = "<group>"; };
 		02576402B4D9548B912CF835 /* NativeAppShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAppShellView.swift; sourceTree = "<group>"; };
 		0295A1B6243B6C20ADF1CAA6 /* manchas_warning_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_warning_halloween_v2.png; sourceTree = "<group>"; };
 		039D7C15321E29FD4FE163EA /* manchas_sleepy_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_sleepy_new_year_v2.png; sourceTree = "<group>"; };
@@ -382,6 +392,7 @@
 		3B9732E88A890107243795EB /* manchas_love_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_love_new_year_v2.png; sourceTree = "<group>"; };
 		3C9EC4535CCE8895E6F6EFA1 /* guide_14_bill_radar_tikki_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_14_bill_radar_tikki_v2.png; sourceTree = "<group>"; };
 		3CFB976CA179049E2DCA1420 /* guide_25_splash_team_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_25_splash_team_holiday_v2.png; sourceTree = "<group>"; };
+		427DFD1A51BFEB9401B6A3C7 /* TERMS_OF_USE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TERMS_OF_USE.md; sourceTree = "<group>"; };
 		42E3F84D36D3AA4812BB3D79 /* CuteLoadingComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuteLoadingComponents.swift; sourceTree = "<group>"; };
 		43615E6FC9EF243440A82D03 /* manchas_excited_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_excited_v2.png; sourceTree = "<group>"; };
 		454FC091F898ECB120BCE662 /* guide_25_splash_team_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_25_splash_team_halloween_v2.png; sourceTree = "<group>"; };
@@ -443,6 +454,7 @@
 		6D34F0CB2B678B65728E704E /* guide_16_family_mission_board_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_16_family_mission_board_team_v2.png; sourceTree = "<group>"; };
 		6D4BECA3A82774A38C48D3E3 /* BudgetWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetWizardView.swift; sourceTree = "<group>"; };
 		7125420B0727FF718EB4F7D7 /* mei_warning_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_warning_halloween_v2.png; sourceTree = "<group>"; };
+		724CAD834E961BCD51737BF6 /* GrowthCelebrationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthCelebrationOverlay.swift; sourceTree = "<group>"; };
 		73E3C4474402F5037300D8ED /* badge_consistency_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_consistency_v2.png; sourceTree = "<group>"; };
 		74947FA8850AFB9B9AD5F316 /* manchas_sad_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_sad_new_year_v2.png; sourceTree = "<group>"; };
 		76FC7B2653C650C7FEA35567 /* mei_sleepy_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_sleepy_new_year_v2.png; sourceTree = "<group>"; };
@@ -455,12 +467,15 @@
 		7C165C936A00E089518582FE /* tikki_neutral_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_neutral_v2.png; sourceTree = "<group>"; };
 		7D2BA7961F378FB4EE2DCAE4 /* manchas_happy_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_happy_holiday_v2.png; sourceTree = "<group>"; };
 		7D8BC0CDC4EFA3A8AB7D5249 /* ReceiptVisionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptVisionService.swift; sourceTree = "<group>"; };
+		7F2934138AE36700A47D2D0E /* BETA_NOTICE_AND_DISCLOSURES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BETA_NOTICE_AND_DISCLOSURES.md; sourceTree = "<group>"; };
 		7FD463CBF88A570CC373ACAF /* badge_safe_to_spend_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_safe_to_spend_v2.png; sourceTree = "<group>"; };
 		80E8DA0C08C679AF223D73F9 /* guide_23_rules_automation_ludo_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_23_rules_automation_ludo_v2.png; sourceTree = "<group>"; };
+		816A9A7F99699404E0C20D7B /* GrowthCelebration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthCelebration.swift; sourceTree = "<group>"; };
 		81AC3F0BFEAB1120D31917A5 /* badge_event_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_event_holiday_v2.png; sourceTree = "<group>"; };
 		8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageTests.swift; sourceTree = "<group>"; };
 		82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_v2.png; sourceTree = "<group>"; };
 		847604C8966C8CE67D228AEE /* mei_confused_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_confused_holiday_v2.png; sourceTree = "<group>"; };
+		849574DD6B6ABAA23CB11EE0 /* GrowthCelebrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthCelebrationTests.swift; sourceTree = "<group>"; };
 		85F97639538CC7EB23FB4B46 /* manchas_confused_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_confused_new_year_v2.png; sourceTree = "<group>"; };
 		8662A40DE43E368DF4023A53 /* tikki_happy_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_happy_new_year_v2.png; sourceTree = "<group>"; };
 		87421858D2F5088C6CDD796E /* FinanceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceStore.swift; sourceTree = "<group>"; };
@@ -556,6 +571,7 @@
 		D287721E4041278C7BEC945F /* manchas_excited_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_excited_holiday_v2.png; sourceTree = "<group>"; };
 		D2CB5D74645DF4C38E921764 /* FinanceCsvImportToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinanceCsvImportToolView.swift; sourceTree = "<group>"; };
 		D3BB7F67212BD249745DF5B8 /* mei_love_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_love_new_year_v2.png; sourceTree = "<group>"; };
+		D4E9C34EC371737926614ABA /* PRIVACY_POLICY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIVACY_POLICY.md; sourceTree = "<group>"; };
 		D51B070E4E9B7B1D532109F2 /* manchas_sleepy_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_sleepy_halloween_v2.png; sourceTree = "<group>"; };
 		D53F874D27AC22FD1BE1C4B8 /* mei_sad_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_sad_halloween_v2.png; sourceTree = "<group>"; };
 		D580D8C19B9AB6A19F40056F /* guide_17_landing_hero_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_17_landing_hero_team_v2.png; sourceTree = "<group>"; };
@@ -591,7 +607,9 @@
 		F16CA60ECBB38428C4E22675 /* tikki_angry_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_angry_holiday_v2.png; sourceTree = "<group>"; };
 		F1D35519F695338481DE4E91 /* mei_thinking_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_thinking_halloween_v2.png; sourceTree = "<group>"; };
 		F275BE7F6CC8CC4E21804DEF /* mei_excited_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_excited_new_year_v2.png; sourceTree = "<group>"; };
+		F37AE3D67532FB77808B3980 /* LegalDocuments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalDocuments.swift; sourceTree = "<group>"; };
 		F3B24BF2E6CF26600BC87CD9 /* badge_quest_weekly_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_quest_weekly_v2.png; sourceTree = "<group>"; };
+		F3D4E77E93F8B42DBA06E3F1 /* SUPPORT_AND_CONTACT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SUPPORT_AND_CONTACT.md; sourceTree = "<group>"; };
 		F557B34C6BDD13EE62F5F00A /* tikki_sleepy_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_sleepy_new_year_v2.png; sourceTree = "<group>"; };
 		F6E05C5BF495CA177EAE3510 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		F8E13AFF5CEBA7D22F139610 /* manchas_thinking_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_thinking_halloween_v2.png; sourceTree = "<group>"; };
@@ -662,6 +680,17 @@
 			path = Expenses;
 			sourceTree = "<group>";
 		};
+		1C9CC39C945B07543D589980 /* Legal */ = {
+			isa = PBXGroup;
+			children = (
+				7F2934138AE36700A47D2D0E /* BETA_NOTICE_AND_DISCLOSURES.md */,
+				D4E9C34EC371737926614ABA /* PRIVACY_POLICY.md */,
+				F3D4E77E93F8B42DBA06E3F1 /* SUPPORT_AND_CONTACT.md */,
+				427DFD1A51BFEB9401B6A3C7 /* TERMS_OF_USE.md */,
+			);
+			path = Legal;
+			sourceTree = "<group>";
+		};
 		1EFF120122F6FFF76F8E3E72 /* Premium */ = {
 			isa = PBXGroup;
 			children = (
@@ -693,6 +722,7 @@
 			isa = PBXGroup;
 			children = (
 				89985226F3D7B000843752AB /* BrandGalleryView.swift */,
+				724CAD834E961BCD51737BF6 /* GrowthCelebrationOverlay.swift */,
 				9D3AEF1794D4F1F9FB3A5132 /* GrowthSnapshot.swift */,
 				7845E9A91B6C587A2C6B48B7 /* TrophyHistoryView.swift */,
 			);
@@ -710,7 +740,9 @@
 				2F847507D28B40B87D9298F2 /* Brand */,
 				439FAC31D754D6BDBCCA5018 /* Components */,
 				A8083AF293910F6CCF2E0EAB /* Config */,
+				477CD9B86C43525FD8DC3536 /* Growth */,
 				C8E9CA6F064F9DBD4953442D /* Guides */,
+				EE2C143751B4EEADC514F8AA /* Legal */,
 				09B22F592D9E53961A6E26E9 /* Localization */,
 				982784B8B26FBF2C67EE94B5 /* PreviewData */,
 				15659EA95AFCDBA0DAF936CF /* Services */,
@@ -739,6 +771,15 @@
 				0FE1210A9F294B7F39DB6F2D /* MascotExperienceComponents.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		477CD9B86C43525FD8DC3536 /* Growth */ = {
+			isa = PBXGroup;
+			children = (
+				816A9A7F99699404E0C20D7B /* GrowthCelebration.swift */,
+				0077448ACF207FCAFC08DE1B /* GrowthProgressStore.swift */,
+			);
+			path = Growth;
 			sourceTree = "<group>";
 		};
 		55917ABE3F391F5EC9EEDA28 /* App */ = {
@@ -1126,6 +1167,7 @@
 			isa = PBXGroup;
 			children = (
 				6902A39AC1EB9CDDD5E6F785 /* BrandSeasonalAssetTests.swift */,
+				849574DD6B6ABAA23CB11EE0 /* GrowthCelebrationTests.swift */,
 				DC1238852B64244DC049D08D /* ReceiptVisionServiceTests.swift */,
 				8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */,
 			);
@@ -1164,6 +1206,14 @@
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
+		EE2C143751B4EEADC514F8AA /* Legal */ = {
+			isa = PBXGroup;
+			children = (
+				F37AE3D67532FB77808B3980 /* LegalDocuments.swift */,
+			);
+			path = Legal;
+			sourceTree = "<group>";
+		};
 		EE59D1387E7C148E1E644E1B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -1172,6 +1222,7 @@
 				4C99B87AC3D4FD5B02CB8C6A /* Localizable.strings */,
 				FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */,
 				88362C512CBB16E72B7A54C7 /* Brand */,
+				1C9CC39C945B07543D589980 /* Legal */,
 			);
 			name = Resources;
 			path = SpendSage/Resources;
@@ -1262,9 +1313,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */,
+				D4AC84409117247C82C3CD14 /* BETA_NOTICE_AND_DISCLOSURES.md in Resources */,
 				D5A63F5297E1DC9294373C18 /* InfoPlist.strings in Resources */,
 				1297C5EB241903AF0BABCDB9 /* Localizable.strings in Resources */,
+				CF8F46152A3C517362F243B2 /* PRIVACY_POLICY.md in Resources */,
 				93A5A96EF2B3A5812249918F /* PrivacyInfo.xcprivacy in Resources */,
+				ADE850E4D7DEE1CD95A9A747 /* SUPPORT_AND_CONTACT.md in Resources */,
+				0833EC92F4DD4250CE70795E /* TERMS_OF_USE.md in Resources */,
 				F344FC8A5262BA300A86C6F7 /* acc_calculator_notebook_coin_v2.png in Resources */,
 				63C6E1A11E502FF3A3FAFA95 /* acc_gift_box_v2.png in Resources */,
 				68B17B5FED39DD6438F6AA71 /* acc_hologram_charts_magnifier_v2.png in Resources */,
@@ -1535,6 +1590,9 @@
 				A5F0AF220D1EE49965542838 /* FinanceStore.swift in Sources */,
 				24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */,
 				EC9FE9E3AF1E789DD8C2FBCD /* FlowStack.swift in Sources */,
+				1EDFE1B083DE5D7FD31C1AAF /* GrowthCelebration.swift in Sources */,
+				0CCE1F9E354612AD4728AEF3 /* GrowthCelebrationOverlay.swift in Sources */,
+				B393384CC54D6138EF46B46B /* GrowthProgressStore.swift in Sources */,
 				82DEEAED45406847C6ACBF4B /* GrowthSnapshot.swift in Sources */,
 				2180ED9BE745BCC430A6B38C /* GuideSheet.swift in Sources */,
 				B3FAD3530E5C3545269E681F /* Guides.swift in Sources */,
@@ -1542,6 +1600,7 @@
 				02C6DDAE3EB1ABFCFBF4C91E /* HostedUIAuthService.swift in Sources */,
 				DCE0492B5DA8A93842388CF6 /* InsightsView.swift in Sources */,
 				DE5D447306B02BC086076ED6 /* LegalCenterView.swift in Sources */,
+				CBD799FCE7BC50AE0190AE86 /* LegalDocuments.swift in Sources */,
 				1BFAC9F2D1D8FBF19FBE8052 /* LocalLedgerExport.swift in Sources */,
 				16A32504BA5C649D391C39B1 /* MascotExperienceComponents.swift in Sources */,
 				17EBFD7F7D5C568DFA011E37 /* Models.swift in Sources */,
@@ -1566,6 +1625,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E69CE8E8F10B302A01F33D25 /* BrandSeasonalAssetTests.swift in Sources */,
+				199E1A30C5CDA340DEDB8C97 /* GrowthCelebrationTests.swift in Sources */,
 				F6D4F13256E68E49F659F817 /* ReceiptVisionServiceTests.swift in Sources */,
 				65B04B25CFA84CFF4DB53DCF /* SpendSageTests.swift in Sources */,
 			);
@@ -1655,7 +1715,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1760,7 +1820,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_NS_ASSERTIONS = NO;

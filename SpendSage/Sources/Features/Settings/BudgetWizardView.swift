@@ -8,20 +8,20 @@ struct BudgetWizardView: View {
 
         var title: String {
             switch self {
-            case .income: return "Income baseline"
-            case .target: return "Budget target"
-            case .review: return "Review plan"
+            case .income: return "Base de ingresos"
+            case .target: return "Objetivo de presupuesto"
+            case .review: return "Revisión del plan"
             }
         }
 
         var body: String {
             switch self {
             case .income:
-                return "Start with the monthly income that actually lands in your hands so the rest of the plan stays honest."
+                return "Empieza con el ingreso mensual que realmente llega a tus manos para que el resto del plan se mantenga honesto."
             case .target:
-                return "Choose a spending ceiling you can realistically defend. The goal is control, not punishment."
+                return "Elige un tope de gasto que realmente puedas sostener. La meta es control, no castigo."
             case .review:
-                return "Check the plan before saving so the month feels intentional from day one."
+                return "Revisa el plan antes de guardarlo para que el mes se sienta intencional desde el primer día."
             }
         }
 
@@ -106,16 +106,16 @@ struct BudgetWizardView: View {
                 .padding(24)
             }
             .background(BrandTheme.canvas)
-            .navigationTitle("Budget Wizard")
+            .navigationTitle("Presupuesto")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") {
+                    Button("Cerrar") {
                         viewModel.dismissBudgetWizard()
                     }
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Guide") {
+                    Button("Guía") {
                         isPresentingGuide = true
                     }
                 }
@@ -135,13 +135,13 @@ struct BudgetWizardView: View {
     private var heroCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                BrandBadge(text: "3-step setup", systemImage: "wand.and.stars")
+                BrandBadge(text: "Configuración en 3 pasos", systemImage: "wand.and.stars")
 
-                Text("Budget wizard")
+                Text("Asistente de presupuesto")
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Set income, choose a monthly target, and review the plan before it becomes the default frame for the app.")
+                Text("Define ingresos, elige un objetivo mensual y revisa el plan antes de que se convierta en la base por defecto de la app.")
                     .foregroundStyle(BrandTheme.muted)
 
                 BrandArtworkSurface {
@@ -167,7 +167,7 @@ struct BudgetWizardView: View {
     private var progressCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Progress")
+                Text("Progreso")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
@@ -194,64 +194,64 @@ struct BudgetWizardView: View {
         case .income:
             SurfaceCard {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Step 1 · Monthly income")
+                    Text("Paso 1 · Ingreso mensual")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text("Use the amount that normally lands after taxes or fees so the rest of the budget stays grounded.")
+                    Text("Usa el monto que normalmente te queda después de impuestos o comisiones para que el resto del presupuesto se mantenga realista.")
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
 
-                    budgetField(title: "Monthly income", value: $income, placeholder: "4200")
+                    budgetField(title: "Ingreso mensual", value: $income, placeholder: "4200")
 
                     if let suggestedBudget {
                         BrandMetricTile(
-                            title: "Suggested safe budget",
+                            title: "Presupuesto sugerido",
                             value: suggestedBudget.formatted(.currency(code: currencyCode)),
                             systemImage: "leaf.fill"
                         )
                     }
 
-                    stepControls(primaryTitle: "Next")
+                    stepControls(primaryTitle: "Siguiente")
                 }
             }
         case .target:
             SurfaceCard {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Step 2 · Target budget")
+                    Text("Paso 2 · Presupuesto objetivo")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text("Choose the amount you want the month to run on. This becomes the ceiling the dashboard and coach cues work against.")
+                    Text("Elige el monto con el que quieres que corra el mes. Este será el techo sobre el que trabajan el dashboard y las sugerencias del coach.")
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
 
-                    budgetField(title: "Monthly budget", value: $budget, placeholder: "2800")
+                    budgetField(title: "Presupuesto mensual", value: $budget, placeholder: "2800")
 
                     HStack(spacing: 12) {
                         BrandMetricTile(
-                            title: "Income",
+                            title: "Ingreso",
                             value: (parsedIncome ?? 0).formatted(.currency(code: currencyCode)),
                             systemImage: "banknote.fill"
                         )
                         BrandMetricTile(
-                            title: "Projected buffer",
+                            title: "Colchón proyectado",
                             value: projectedRemaining.formatted(.currency(code: currencyCode)),
                             systemImage: "shield.lefthalf.filled"
                         )
                     }
 
-                    stepControls(primaryTitle: "Review")
+                    stepControls(primaryTitle: "Revisar")
                 }
             }
         case .review:
             SurfaceCard {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Step 3 · Review the plan")
+                    Text("Paso 3 · Revisa el plan")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
 
-                    Text("This summary is what the dashboard will use to frame safe-to-spend, progress, and next actions.")
+                    Text("Este resumen es lo que usará el dashboard para calcular disponible, progreso y siguientes pasos.")
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
 
@@ -260,34 +260,34 @@ struct BudgetWizardView: View {
                         spacing: 12
                     ) {
                         BrandMetricTile(
-                            title: "Income",
+                            title: "Ingreso",
                             value: (parsedIncome ?? 0).formatted(.currency(code: currencyCode)),
                             systemImage: "banknote.fill"
                         )
                         BrandMetricTile(
-                            title: "Budget",
+                            title: "Presupuesto",
                             value: (parsedBudget ?? 0).formatted(.currency(code: currencyCode)),
                             systemImage: "chart.bar.fill"
                         )
                         BrandMetricTile(
-                            title: "Buffer",
+                            title: "Colchón",
                             value: projectedRemaining.formatted(.currency(code: currencyCode)),
                             systemImage: "lock.shield.fill"
                         )
                         BrandMetricTile(
-                            title: "Mode",
-                            value: viewModel.session.isAuthenticated ? "Signed in".appLocalized : "Account required".appLocalized,
+                            title: "Modo",
+                            value: viewModel.session.isAuthenticated ? "Sesión iniciada" : "Cuenta obligatoria",
                             systemImage: "iphone.gen3"
                         )
                     }
 
                     BrandFeatureRow(
                         systemImage: "checkmark.circle.fill",
-                        title: "You can change this later",
-                        detail: "Budget Wizard is a setup aid, not a one-time lock. You can reopen it from Settings whenever the month changes."
+                        title: "Puedes cambiarlo después",
+                        detail: "El asistente es una ayuda de configuración, no un candado único. Puedes abrirlo otra vez desde Ajustes cuando el mes cambie."
                     )
 
-                    stepControls(primaryTitle: "Save local budget", isFinal: true)
+                    stepControls(primaryTitle: "Guardar presupuesto local", isFinal: true)
                 }
             }
         }
@@ -296,20 +296,20 @@ struct BudgetWizardView: View {
     private var summaryCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("What happens next")
+                Text("Qué pasa después")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
                 BrandFeatureRow(
                     systemImage: "house.fill",
-                    title: "Dashboard gets recalibrated",
-                    detail: "Safe-to-spend, monthly progress, and coach cues will use this budget right away."
+                    title: "Inicio se recalibra",
+                    detail: "Disponible para gastar, progreso mensual y señales del coach usarán este presupuesto de inmediato."
                 )
 
                 BrandFeatureRow(
                     systemImage: "sparkles.rectangle.stack.fill",
-                    title: "Missions get sharper",
-                    detail: "Goals become clearer when the app knows the spending ceiling you want to defend."
+                    title: "Las misiones se afilan",
+                    detail: "Las metas se vuelven más claras cuando la app conoce el techo de gasto que quieres defender."
                 )
             }
         }
@@ -336,7 +336,7 @@ struct BudgetWizardView: View {
     private func stepControls(primaryTitle: String, isFinal: Bool = false) -> some View {
         HStack(spacing: 12) {
             if step != .income {
-                Button("Back") {
+                Button("Atrás") {
                     withAnimation(.spring(response: 0.28, dampingFraction: 0.92)) {
                         step = WizardStep(rawValue: step.rawValue - 1) ?? .income
                     }
@@ -361,12 +361,12 @@ struct BudgetWizardView: View {
 
     private func save() async {
         guard let incomeValue = parsedIncome, let budgetValue = parsedBudget else {
-            note = "Use valid decimal numbers.".appLocalized
+            note = "Usa números decimales válidos.".appLocalized
             return
         }
 
         guard incomeValue > 0, budgetValue > 0 else {
-            note = "Income and budget must be greater than zero.".appLocalized
+            note = "Ingreso y presupuesto deben ser mayores que cero.".appLocalized
             return
         }
 

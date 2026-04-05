@@ -1,6 +1,6 @@
 # SpendSage iOS Feature Checklist
 
-Last updated: 2026-04-04
+Last updated: 2026-04-05
 
 ## Goal
 
@@ -22,9 +22,11 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - [x] Mascot system integrated across the main surfaces
 - [x] Spanish-first copy consistency across the core screens and touched finance/support routes
 - [x] Currency setting honored across all user-facing financial surfaces
-- [-] Final pre-TestFlight visual QA across all main and secondary routes
+- [x] Final pre-TestFlight visual QA across all main and secondary routes
 - [x] Root tabs now use simpler inline navigation chrome instead of large-title duplication
 - [x] Internal TestFlight archive and upload
+- [x] Shareable celebration overlay for level-ups and badges
+- [x] One-time in-app review prompt policy tied to positive progress moments
 
 ### Onboarding and Auth
 
@@ -50,10 +52,12 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 
 - [x] Local dashboard with safe-to-spend and mission loop
 - [x] Local savings playbook / strategy engine in dashboard
-- [-] Insights simplified for B2C reading instead of report-heavy copy
+- [x] Insights simplified for B2C reading instead of report-heavy copy
 - [x] Chart tap state now exposes exact selected values instead of a decorative-only chart
 - [ ] Savings strategy suggestions surfaced consistently beyond dashboard
 - [ ] Goal coaching and saving recommendations polished end-to-end
+- [x] Mission XP now feeds the visible progression loop
+- [x] Mission and badge progress stay locally durable instead of vanishing with later state edits
 
 ### Monetization Readiness
 
@@ -121,3 +125,10 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - 2026-04-04: Added explicit seasonal calendar docs plus shipped Halloween, Holiday, and New Year character guide packs so event art is now auditable beyond the team splash/loading scenes.
 - 2026-04-04: Shipped a full seasonal sprite pack for all mascot expressions, wired it into `BrandAssetCatalog.character(...)`, and documented manual browser prompts plus regeneration scripts for future art passes.
 - 2026-04-04: Internal TestFlight build `1.0 (9)` was archived and uploaded successfully with the seasonal sprite runtime pack, Xcode 26 icon variants, and the latest B2C shell/scan polish.
+- 2026-04-05: Added a full celebration overlay for level-up, badge unlock, and mission completion moments, including share-to-social support and an app-review prompt policy that only triggers after meaningful positive progress.
+- 2026-04-05: Simplified and translated the main navigation surfaces again, covering `Inicio`, `Gastos`, `Análisis`, `Ajustes`, `Agregar gasto`, the budget wizard, and the first-run guides with a cleaner Spanish-first UX.
+- 2026-04-05: Trophy History now exposes the full mission board, not just badges, so the growth loop is visible beyond the dashboard top fold.
+- 2026-04-05: Growth progress now persists locally for completed missions and unlocked trophies, and mission reward XP is reflected in the visible progression level instead of being decorative-only.
+- 2026-04-05: Refreshed visual QA for `Inicio`, `Gastos`, `Análisis`, `Ajustes`, and celebration states after the final i18n/navigation polish pass.
+- 2026-04-05: Rebuilt the app icon as a three-mascot peeking composition for the Xcode 26 `Any`, `Dark`, and `Tinted` icon variants, then refreshed a full route QA pass covering onboarding, auth, the 5 root tabs, celebration state, and the main deep-link settings/support tools.
+- 2026-04-05: Final polish reduced heavy legal/profile/advanced heroes, surfaced receipt scan actions in the first fold, removed more internal-looking `preview` copy from user-facing screens, and tightened the celebration overlay before the next internal TestFlight upload.

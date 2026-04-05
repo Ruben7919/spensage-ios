@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,6 +60,64 @@ def paste_sprite(canvas: Image.Image, filename: str, box: tuple[int, int, int, i
     canvas.alpha_composite(sprite, (x, y))
 
 
+def cropped_sprite(filename: str) -> Image.Image:
+    sprite = Image.open(CHAR_ROOT / filename).convert("RGBA")
+    bbox = sprite.getbbox()
+    if bbox is None:
+        return sprite
+    return sprite.crop(bbox)
+
+
+def relative_crop(
+    sprite: Image.Image,
+    left: float = 0.0,
+    top: float = 0.0,
+    right: float = 1.0,
+    bottom: float = 1.0,
+) -> Image.Image:
+    width, height = sprite.size
+    crop_box = (
+        int(width * left),
+        int(height * top),
+        int(width * right),
+        int(height * bottom),
+    )
+    return sprite.crop(crop_box)
+
+
+def paste_peeking_sprite(
+    canvas: Image.Image,
+    filename: str,
+    box: tuple[int, int, int, int],
+    *,
+    crop: tuple[float, float, float, float],
+    mirror: bool = False,
+    tint: tuple[int, int, int] | None = None,
+    alpha_scale: float = 1.0,
+) -> None:
+    sprite = cropped_sprite(filename)
+    sprite = relative_crop(sprite, *crop)
+    if mirror:
+        sprite = ImageOps.mirror(sprite)
+    if tint is not None:
+        _, _, _, alpha = sprite.split()
+        alpha = alpha.point(lambda value: int(max(0, min(255, value * alpha_scale))))
+        tinted = Image.new("RGBA", sprite.size, tint + (0,))
+        tinted.putalpha(alpha)
+        sprite = tinted
+    elif alpha_scale != 1.0:
+        red, green, blue, alpha = sprite.split()
+        alpha = alpha.point(lambda value: int(max(0, min(255, value * alpha_scale))))
+        sprite = Image.merge("RGBA", (red, green, blue, alpha))
+
+    target_w = box[2] - box[0]
+    target_h = box[3] - box[1]
+    sprite.thumbnail((target_w, target_h), Image.LANCZOS)
+    x = box[0] + (target_w - sprite.width) // 2
+    y = box[1] + (target_h - sprite.height) // 2
+    canvas.alpha_composite(sprite, (x, y))
+
+
 def tint_sprite(filename: str, fill: tuple[int, int, int], alpha_scale: float = 1.0) -> Image.Image:
     sprite = Image.open(CHAR_ROOT / filename).convert("RGBA")
     r, g, b, a = sprite.split()
@@ -86,63 +144,121 @@ def draw_yarn_ball(draw: ImageDraw.ImageDraw, center: tuple[int, int], radius: i
 
 
 def create_app_icon() -> Image.Image:
-    canvas = vertical_gradient(ICON_SIZE, (17, 89, 92), (126, 211, 199))
-    add_glow(canvas, (290, 232), 250, (178, 236, 229), 165)
-    add_glow(canvas, (752, 742), 260, (255, 224, 162), 125)
+    canvas = vertical_gradient(ICON_SIZE, (29, 117, 118), (194, 240, 232))
+    add_glow(canvas, (236, 232), 230, (177, 238, 231), 154)
+    add_glow(canvas, (780, 236), 228, (255, 227, 179), 128)
+    add_glow(canvas, (276, 784), 244, (171, 212, 246), 118)
+    add_glow(canvas, (676, 624), 236, (255, 219, 138), 108)
     draw = ImageDraw.Draw(canvas)
 
-    add_shadow(canvas, (288, 700, 836, 848), alpha=88)
-    draw_coin(draw, (768, 738), 118)
-    add_glow(canvas, (768, 738), 168, (255, 219, 138), 110)
+    draw.rounded_rectangle((86, 86, 938, 938), radius=258, fill=(249, 252, 251, 46), outline=(255, 255, 255, 34), width=4)
+    draw.rounded_rectangle((118, 118, 906, 906), radius=238, outline=(240, 248, 247, 28), width=3)
 
-    paste_sprite(canvas, "tikki_proud_v2.png", (132, 164, 826, 900))
-    add_glow(canvas, (480, 368), 210, (255, 235, 196), 78)
+    add_shadow(canvas, (400, 434, 790, 818), alpha=102)
+    draw_coin(draw, (596, 586), 144)
+    add_glow(canvas, (596, 586), 186, (255, 218, 135), 118)
+
+    paste_peeking_sprite(
+        canvas,
+        "tikki_excited_v2.png",
+        (-92, 24, 382, 440),
+        crop=(0.08, 0.0, 0.72, 0.67),
+    )
+    paste_peeking_sprite(
+        canvas,
+        "mei_excited_v2.png",
+        (636, 12, 1112, 436),
+        crop=(0.18, 0.0, 0.95, 0.67),
+    )
+    paste_peeking_sprite(
+        canvas,
+        "manchas_excited_v2.png",
+        (-80, 566, 404, 1044),
+        crop=(0.08, 0.0, 0.76, 0.69),
+    )
+
+    draw.rounded_rectangle((420, 430, 776, 742), radius=156, outline=(255, 255, 255, 34), width=3)
+    draw_yarn_ball(draw, (720, 742), 52, (96, 179, 191))
+    add_glow(canvas, (720, 742), 84, (173, 236, 227), 96)
     return canvas
 
 
 def create_app_icon_dark() -> Image.Image:
-    canvas = vertical_gradient(ICON_SIZE, (14, 28, 35), (31, 64, 77))
-    add_glow(canvas, (286, 218), 240, (82, 166, 171), 110)
-    add_glow(canvas, (760, 744), 210, (240, 176, 92), 88)
+    canvas = vertical_gradient(ICON_SIZE, (13, 32, 39), (42, 79, 89))
+    add_glow(canvas, (238, 236), 218, (77, 160, 167), 102)
+    add_glow(canvas, (786, 228), 212, (227, 181, 102), 86)
+    add_glow(canvas, (274, 790), 220, (88, 138, 166), 88)
+    add_glow(canvas, (618, 594), 210, (241, 188, 104), 86)
     draw = ImageDraw.Draw(canvas)
 
-    draw.rounded_rectangle((118, 116, 906, 908), radius=244, outline=(236, 246, 245, 34), width=5)
-    add_shadow(canvas, (284, 700, 846, 850), alpha=118)
-    draw_coin(draw, (766, 740), 118)
-    add_glow(canvas, (766, 740), 154, (255, 214, 125), 92)
+    draw.rounded_rectangle((90, 90, 934, 934), radius=256, fill=(245, 250, 248, 18), outline=(236, 246, 245, 34), width=4)
+    draw.rounded_rectangle((120, 120, 904, 904), radius=238, outline=(236, 246, 245, 22), width=3)
 
-    paste_sprite(canvas, "tikki_proud_v2.png", (128, 156, 824, 906))
-    add_glow(canvas, (488, 362), 196, (255, 232, 197), 52)
+    add_shadow(canvas, (404, 438, 790, 818), alpha=116)
+    draw_coin(draw, (598, 588), 144)
+    add_glow(canvas, (598, 588), 174, (255, 214, 125), 92)
+
+    paste_peeking_sprite(
+        canvas,
+        "tikki_excited_v2.png",
+        (-92, 28, 384, 444),
+        crop=(0.08, 0.0, 0.72, 0.67),
+    )
+    paste_peeking_sprite(
+        canvas,
+        "mei_excited_v2.png",
+        (636, 16, 1110, 438),
+        crop=(0.18, 0.0, 0.95, 0.67),
+    )
+    paste_peeking_sprite(
+        canvas,
+        "manchas_excited_v2.png",
+        (-82, 568, 404, 1046),
+        crop=(0.08, 0.0, 0.76, 0.69),
+    )
+
+    draw.rounded_rectangle((420, 432, 778, 744), radius=156, outline=(255, 255, 255, 26), width=3)
+    draw_yarn_ball(draw, (724, 744), 52, (95, 164, 177))
+    add_glow(canvas, (724, 744), 80, (95, 164, 177), 74)
     return canvas
 
 
 def create_app_icon_tinted() -> Image.Image:
-    canvas = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (36, 63, 72, 255))
-    add_glow(canvas, (512, 270), 280, (84, 156, 162), 108)
-    add_glow(canvas, (736, 760), 190, (255, 205, 122), 70)
+    canvas = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (37, 66, 74, 255))
+    add_glow(canvas, (512, 300), 282, (84, 156, 162), 96)
+    add_glow(canvas, (612, 604), 218, (255, 205, 122), 62)
     draw = ImageDraw.Draw(canvas)
 
     draw.rounded_rectangle((112, 112, 912, 912), radius=240, outline=(255, 255, 255, 36), width=5)
-    draw.ellipse((618, 586, 876, 844), fill=(244, 233, 214, 255))
-    draw.ellipse((646, 614, 848, 816), outline=(36, 63, 72, 255), width=18)
-    draw.line((748, 666, 748, 764), fill=(36, 63, 72, 255), width=18)
-    draw.line((704, 716, 792, 716), fill=(36, 63, 72, 255), width=18)
+    draw.rounded_rectangle((144, 144, 880, 880), radius=220, outline=(255, 255, 255, 20), width=3)
+    draw.ellipse((424, 412, 776, 764), fill=(244, 233, 214, 255))
+    draw.ellipse((470, 458, 730, 718), outline=(37, 66, 74, 255), width=18)
+    draw.line((600, 516, 600, 660), fill=(37, 66, 74, 255), width=18)
+    draw.line((534, 588, 666, 588), fill=(37, 66, 74, 255), width=18)
 
-    silhouette = tint_sprite("tikki_proud_v2.png", (244, 233, 214))
-    silhouette.thumbnail((670, 740), Image.LANCZOS)
-    dest_x = 136 + (670 - silhouette.width) // 2
-    dest_y = 160 + (740 - silhouette.height)
-    canvas.alpha_composite(silhouette, (dest_x, dest_y))
+    paste_peeking_sprite(
+        canvas,
+        "tikki_excited_v2.png",
+        (-98, 34, 380, 430),
+        crop=(0.08, 0.0, 0.72, 0.67),
+        tint=(244, 233, 214),
+    )
+    paste_peeking_sprite(
+        canvas,
+        "mei_excited_v2.png",
+        (634, 22, 1108, 426),
+        crop=(0.18, 0.0, 0.95, 0.67),
+        tint=(244, 233, 214),
+    )
+    paste_peeking_sprite(
+        canvas,
+        "manchas_excited_v2.png",
+        (-84, 570, 400, 1038),
+        crop=(0.08, 0.0, 0.76, 0.69),
+        tint=(244, 233, 214),
+    )
 
-    # Simple whisker/eye accents to keep the tinted icon legible at small sizes.
-    eye_y = 448
-    draw.ellipse((442, eye_y, 474, eye_y + 28), fill=(36, 63, 72, 255))
-    draw.ellipse((530, eye_y, 562, eye_y + 28), fill=(36, 63, 72, 255))
-    draw.line((488, 500, 504, 514), fill=(36, 63, 72, 255), width=10)
-    draw.line((474, 530, 390, 518), fill=(36, 63, 72, 255), width=8)
-    draw.line((474, 552, 392, 560), fill=(36, 63, 72, 255), width=8)
-    draw.line((528, 530, 610, 518), fill=(36, 63, 72, 255), width=8)
-    draw.line((528, 552, 610, 560), fill=(36, 63, 72, 255), width=8)
+    draw_yarn_ball(draw, (738, 744), 44, (244, 233, 214))
     return canvas
 
 

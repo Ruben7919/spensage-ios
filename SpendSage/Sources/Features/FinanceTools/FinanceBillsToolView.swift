@@ -93,9 +93,9 @@ struct FinanceBillsToolView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 FinanceToolsHeaderCard(
-                    eyebrow: "Recurring cash flow",
-                    title: "Bills",
-                    summary: "Track upcoming due dates, record payments, and keep monthly obligations in the same local ledger. Surface the bills that are due soon or late before they turn into surprises.",
+                    eyebrow: "Flujo recurrente",
+                    title: "Facturas",
+                    summary: "Sigue próximos vencimientos, registra pagos y mantén obligaciones mensuales en el mismo libro local. Haz visibles las facturas próximas o atrasadas antes de que sorprendan.",
                     systemImage: "calendar.badge.clock",
                     character: .tikki,
                     expression: .warning,
@@ -108,7 +108,7 @@ struct FinanceBillsToolView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Bills overview")
+                        Text("Resumen de facturas")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -117,27 +117,27 @@ struct FinanceBillsToolView: View {
                             spacing: 12
                         ) {
                             BrandMetricTile(
-                                title: "Tracked bills",
+                                title: "Facturas seguidas",
                                 value: "\(viewModel.bills.count)",
                                 systemImage: "doc.text.fill"
                             )
                             BrandMetricTile(
-                                title: "Monthly total",
+                                title: "Total mensual",
                                 value: totalMonthlyBills.formatted(.currency(code: currencyCode)),
                                 systemImage: "dollarsign.gauge.chart.leftthird.topthird.rightthird"
                             )
                             BrandMetricTile(
-                                title: "Due soon",
+                                title: "Por vencer",
                                 value: "\(dueSoonCount)",
                                 systemImage: "clock.badge.exclamationmark.fill"
                             )
                             BrandMetricTile(
-                                title: "Overdue",
+                                title: "Atrasadas",
                                 value: "\(overdueCount)",
                                 systemImage: "exclamationmark.triangle.fill"
                             )
                             BrandMetricTile(
-                                title: "Autopay",
+                                title: "Autopago",
                                 value: "\(autopayCount)",
                                 systemImage: "repeat.circle.fill"
                             )
@@ -146,16 +146,16 @@ struct FinanceBillsToolView: View {
                         if overdueCount > 0 || dueSoonCount > 0 {
                             BrandFeatureRow(
                                 systemImage: "bell.badge.fill",
-                                title: "Needs attention",
+                                title: "Necesita atención",
                                 detail: overdueCount > 0
-                                    ? AppLocalization.localized("%d bill is late and should be handled first.", arguments: overdueCount)
-                                    : AppLocalization.localized("%d bill is due soon, so the next payment should be easy to spot.", arguments: dueSoonCount)
+                                    ? AppLocalization.localized("%d factura está atrasada y debe resolverse primero.", arguments: overdueCount)
+                                    : AppLocalization.localized("%d factura vence pronto, así que el próximo pago debería verse fácil.", arguments: dueSoonCount)
                             )
                         } else {
                             BrandFeatureRow(
                                 systemImage: "checkmark.circle.fill",
-                                title: "Stable for now",
-                                detail: "No bills are late or due soon, so the recurring queue is calm."
+                                title: "Estable por ahora",
+                                detail: "No hay facturas atrasadas ni por vencer, así que la cola recurrente está tranquila."
                             )
                         }
                     }
@@ -164,11 +164,11 @@ struct FinanceBillsToolView: View {
                 if !billSuggestions.isEmpty {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Detected from your history")
+                            Text("Detectadas en tu historial")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
 
-                            Text("Recurring merchants from recent local expenses can become tracked bills in one tap.")
+                            Text("Los comercios recurrentes de tus gastos recientes pueden convertirse en facturas seguidas con un toque.")
                                 .font(.subheadline)
                                 .foregroundStyle(BrandTheme.muted)
 
@@ -180,7 +180,7 @@ struct FinanceBillsToolView: View {
                                             .foregroundStyle(BrandTheme.ink)
                                         Text(
                                             AppLocalization.localized(
-                                                "%d matches · every ~%d days",
+                                                "%d coincidencias · cada ~%d días",
                                                 arguments: suggestion.sampleCount,
                                                 suggestion.cadenceDays
                                             )
@@ -189,7 +189,7 @@ struct FinanceBillsToolView: View {
                                             .foregroundStyle(BrandTheme.muted)
                                         Text(
                                             AppLocalization.localized(
-                                                "Next due %@",
+                                                "Próximo vencimiento %@",
                                                 arguments: suggestion.nextExpectedAt.formatted(date: .abbreviated, time: .omitted)
                                             )
                                         )
@@ -203,7 +203,7 @@ struct FinanceBillsToolView: View {
                                         Text(suggestion.averageAmount.formatted(.currency(code: currencyCode)))
                                             .font(.headline)
                                             .foregroundStyle(BrandTheme.ink)
-                                        Button("Track") {
+                                        Button("Seguir") {
                                             Task { await trackSuggestion(suggestion) }
                                         }
                                         .buttonStyle(.bordered)
@@ -217,19 +217,19 @@ struct FinanceBillsToolView: View {
 
                 if viewModel.bills.isEmpty {
                     FinanceEmptyStateCard(
-                        title: "No recurring bills",
-                        summary: "Add rent, subscriptions, utilities, or any repeating payment so you can mark them paid from one place.",
+                        title: "No hay facturas recurrentes",
+                        summary: "Agrega renta, suscripciones, servicios o cualquier pago repetido para poder marcarlos pagados desde un solo lugar.",
                         systemImage: "calendar.badge.plus"
                     )
                 } else {
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Active bills")
+                            Text("Facturas activas")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
 
                             if activeBills.isEmpty {
-                                Text("No active bills right now. Paused bills stay below and can be resumed any time.")
+                                Text("No hay facturas activas ahora mismo. Las pausadas siguen abajo y pueden retomarse en cualquier momento.")
                                     .font(.footnote)
                                     .foregroundStyle(BrandTheme.muted)
                             }

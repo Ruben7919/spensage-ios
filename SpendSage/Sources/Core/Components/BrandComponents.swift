@@ -410,6 +410,7 @@ struct BrandStoryCard: View {
     let title: String
     let message: String
     var highlights: [String] = []
+    var showsNarrativeFooter = true
 
     private var spec: BrandNarrativeSpec {
         BrandStoryCatalog.spec(for: surface)
@@ -449,16 +450,18 @@ struct BrandStoryCard: View {
                     BrandPromptPlaceholder(character: spec.character, prompt: prompt)
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
-                    StoryTag(
-                        text: "\(spec.character.narrativeName) · \(spec.roleTitle.appLocalized)",
-                        systemImage: "person.fill"
-                    )
+                if showsNarrativeFooter {
+                    VStack(alignment: .leading, spacing: 8) {
+                        StoryTag(
+                            text: "\(spec.character.narrativeName) · \(spec.roleTitle.appLocalized)",
+                            systemImage: "person.fill"
+                        )
 
-                    Text(spec.roleSummary.appLocalized)
-                        .font(.footnote)
-                        .foregroundStyle(BrandTheme.muted)
-                        .fixedSize(horizontal: false, vertical: true)
+                        Text(spec.roleSummary.appLocalized)
+                            .font(.footnote)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
 
                 if !highlights.isEmpty {

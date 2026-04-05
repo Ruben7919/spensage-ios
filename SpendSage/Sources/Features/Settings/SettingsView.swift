@@ -8,6 +8,290 @@ struct SettingsView: View {
     @AppStorage("native.settings.language") private var language = "auto"
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
+    @AppStorage("native.settings.localDebugOverlay") private var debugOverlayEnabled = false
+    @State private var showingGuideReplay = false
+
+    private var sessionModeLabel: String {
+        switch viewModel.session {
+        case .signedOut:
+            return "Sesión cerrada"
+        case .guest:
+            return "Vista previa"
+        case let .signedIn(email, provider):
+            if provider == "Preview" {
+                return "Cuenta"
+            }
+            return email.components(separatedBy: "@").first ?? "Sesión iniciada"
+        }
+    }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                overviewCard
+                personalizeCard
+                accountAndHelpCard
+                moreCard
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
+        }
+        .background(BrandTheme.canvas)
+        .overlay(alignment: .top) {
+            BrandBackdropView()
+        }
+        .sheet(isPresented: $showingGuideReplay) {
+            GuideSheet(guide: GuideLibrary.guide(.dashboard))
+        }
+        .navigationTitle("Ajustes")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var overviewCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                SettingsSummaryHeader(
+                    badge: "Configuración simple",
+                    title: "Ajustes",
+                    summary: "Mantén esta área corta. Abre una sección solo cuando quieras cambiar cómo se ve, suena o te recuerda algo la app.",
+                    character: .tikki,
+                    expression: .proud
+                )
+
+                LazyVGrid(
+                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                    spacing: 12
+                ) {
+                    BrandMetricTile(title: "Modo", value: sessionModeLabel, systemImage: "person.crop.circle")
+                    BrandMetricTile(title: "Idioma", value: AppLocalization.menuLabel(for: language), systemImage: "globe")
+                    BrandMetricTile(title: "Moneda", value: currency, systemImage: "dollarsign.circle.fill")
+                    BrandMetricTile(title: "Tema", value: settingsThemeDisplayName(theme), systemImage: "paintpalette.fill")
+                }
+            }
+        }
+    }
+
+    private var personalizeCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Configuración de la app")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                Text("Separa lo básico de los recordatorios para que la pantalla principal se sienta más liviana y fácil de revisar.")
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                NavigationLink {
+                    SettingsPreferencesView()
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Apariencia y región",
+                        summary: "Idioma, moneda y tema viven aquí.",
+                        systemImage: "paintpalette.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    SettingsNotificationsView()
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Notificaciones y calma",
+                        summary: "Recordatorios, horas de silencio y sonido quedan juntos.",
+                        systemImage: "bell.badge.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+
+                Button("Abrir asistente de presupuesto") {
+                    viewModel.presentBudgetWizard()
+                }
+                .buttonStyle(PrimaryCTAStyle())
+            }
+        }
+    }
+
+    private var accountAndHelpCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Cuenta y ayuda")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                NavigationLink {
+                    ProfileView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Perfil",
+                        summary: "Identidad, nombre del hogar y contexto local de la cuenta.",
+                        systemImage: "person.text.rectangle"
+                    )
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    PremiumView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Planes",
+                        summary: "Revisa la base gratis, premium y familia.",
+                        systemImage: "sparkles"
+                    )
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    HelpCenterView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Centro de ayuda",
+                        summary: "Respuestas guiadas para las dudas más comunes.",
+                        systemImage: "questionmark.circle.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    SupportCenterView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Centro de soporte",
+                        summary: "Prepara un paquete local más limpio cuando necesites soporte.",
+                        systemImage: "lifepreserver.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    LegalCenterView()
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Centro legal",
+                        summary: "Privacidad, términos y enlaces públicos de confianza.",
+                        systemImage: "doc.text.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var moreCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Más")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                NavigationLink {
+                    AdvancedSettingsView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Exportación y soporte avanzado",
+                        summary: "Exporta datos, revisa diagnósticos y prepara soporte cuando haga falta.",
+                        systemImage: "switch.2"
+                    )
+                }
+                .buttonStyle(.plain)
+
+                if debugOverlayEnabled {
+                    NavigationLink {
+                        BrandGalleryView()
+                    } label: {
+                        SettingsNavigationRow(
+                            title: "Galería de marca",
+                            summary: "Revisa la librería de personajes y temporadas solo en modo interno.",
+                            systemImage: "swatchpalette.fill"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                HStack(spacing: 12) {
+                    Button("Volver a mostrar guías") {
+                        GuideProgressStore.resetAll()
+                        showingGuideReplay = true
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+
+                    Button("Cerrar sesión") {
+                        viewModel.signOut()
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .foregroundStyle(.red)
+                }
+            }
+        }
+    }
+}
+
+private struct SettingsPreferencesView: View {
+    @AppStorage("native.settings.language") private var language = "auto"
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
+    @AppStorage("native.settings.theme") private var theme = "finance"
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    SettingsSummaryHeader(
+                        badge: "Apariencia",
+                        title: "Apariencia y región",
+                        summary: "Mantén la configuración visual y regional en un solo lugar para que sea fácil de cambiar y fácil de revisar.",
+                        character: .tikki,
+                        expression: .happy
+                    )
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Básicos")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        SettingsChoiceRow(title: "Idioma", summary: "Por ahora se guarda solo en este dispositivo.", selection: $language) {
+                            Text("Auto".appLocalized).tag("auto")
+                            Text("English".appLocalized).tag("en")
+                            Text("Español".appLocalized).tag("es")
+                        }
+
+                        Divider()
+
+                        SettingsChoiceRow(title: "Moneda", summary: "Se usa en dashboard, gastos y exportaciones de este dispositivo.", selection: $currency) {
+                            Text("USD").tag("USD")
+                            Text("EUR").tag("EUR")
+                            Text("GBP").tag("GBP")
+                            Text("JPY").tag("JPY")
+                            Text("MXN").tag("MXN")
+                        }
+
+                        Divider()
+
+                        SettingsChoiceRow(title: "Tema", summary: "Elige el look general sin cambiar el flujo del producto.", selection: $theme) {
+                            Text("Finance".appLocalized).tag("finance")
+                            Text("Midnight".appLocalized).tag("midnight")
+                            Text("Sunrise".appLocalized).tag("sunrise")
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
+        }
+        .background(BrandTheme.canvas)
+        .overlay(alignment: .top) {
+            BrandBackdropView()
+        }
+        .navigationTitle("Apariencia y región")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct SettingsNotificationsView: View {
     @AppStorage("native.settings.reminders") private var remindersEnabled = true
     @AppStorage("native.settings.sound") private var soundStyle = "playful"
     @AppStorage("native.settings.quietHoursEnabled") private var quietHoursEnabled = true
@@ -16,223 +300,137 @@ struct SettingsView: View {
     @AppStorage("native.settings.weekendQuietMode") private var weekendQuietMode = true
     @AppStorage("native.settings.maxNotificationsPerDay") private var maxNotificationsPerDay = 2
     @AppStorage("native.settings.maxNotificationsPerWeek") private var maxNotificationsPerWeek = 5
-    @State private var showingGuideReplay = false
-
-    private var deviceLabel: String {
-        UIDevice.current.localizedModel
-    }
-
-    private var systemVersionLabel: String {
-        "iOS \(UIDevice.current.systemVersion)"
-    }
-
-    private func soundDisplayName(_ value: String) -> String {
-        switch value {
-        case "miau":
-            return "Meow".appLocalized
-        case "off":
-            return "Off".appLocalized
-        default:
-            return "Playful".appLocalized
-        }
-    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                FinanceToolsHeaderCard(
-                    eyebrow: "Account settings",
-                    title: "Settings",
-                    summary: "Tune your account experience, keep support nearby, and make the app feel calmer without digging through dense menus.",
-                    systemImage: "gearshape.fill",
-                    character: .tikki,
-                    expression: .proud,
-                    sceneKey: "guide_25_splash_team"
-                )
+                SurfaceCard {
+                    SettingsSummaryHeader(
+                        badge: "Recordatorios tranquilos",
+                        title: "Notificaciones y calma",
+                        summary: "Mantén los recordatorios útiles y ligeros. Si una opción no afecta tu día a día, déjala como está.",
+                        character: .manchas,
+                        expression: .happy
+                    )
+                }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Account snapshot")
+                        Text("Recordatorios")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
-                            BrandMetricTile(title: "Mode", value: sessionModeLabel, systemImage: "person.crop.circle")
-                            BrandMetricTile(title: "Language", value: AppLocalization.menuLabel(for: language), systemImage: "globe")
-                            BrandMetricTile(title: "Currency", value: currency, systemImage: "dollarsign.circle.fill")
-                            BrandMetricTile(title: "Theme", value: themeDisplayName(theme), systemImage: "paintpalette.fill")
-                            BrandMetricTile(title: "Sound", value: soundDisplayName(soundStyle), systemImage: "speaker.wave.2.fill")
-                            BrandMetricTile(title: "Device", value: deviceLabel, systemImage: "iphone.gen3")
-                        }
-
-                        VStack(spacing: 12) {
-                            Button("Open budget wizard") {
-                                viewModel.presentBudgetWizard()
-                            }
-                            .buttonStyle(PrimaryCTAStyle())
-
-                            NavigationLink {
-                                AdvancedSettingsView(viewModel: viewModel)
-                            } label: {
-                                settingsRouteLabel(
-                                    title: "Advanced settings",
-                                    summary: "Exports, diagnostics, and device-level control tools live here.",
-                                    systemImage: "switch.2"
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-
-                subscriptionSurface
-
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 18) {
-                        Text("Your crew")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        Text("Tikki, Ludo, and Manchas give each part of the app a role so the product feels guided instead of mechanical.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        BrandArtworkSurface {
-                            ViewThatFits(in: .horizontal) {
-                                HStack(alignment: .center, spacing: 16) {
-                                    crewRoleList
-
-                                    BrandAssetImage(
-                                        source: BrandAssetCatalog.shared.guide("guide_16_family_mission_board_team"),
-                                        fallbackSystemImage: "person.3.fill"
-                                    )
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 128, height: 128)
-                                }
-
-                                VStack(alignment: .leading, spacing: 16) {
-                                    BrandAssetImage(
-                                        source: BrandAssetCatalog.shared.guide("guide_16_family_mission_board_team"),
-                                        fallbackSystemImage: "person.3.fill"
-                                    )
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 156)
-
-                                    crewRoleList
-                                }
-                            }
-                        }
-
-                        MascotSpeechCard(
-                            character: .tikki,
-                            expression: .proud,
-                            title: "Crew update",
-                            message: "Keep settings lean. Change only what affects your day-to-day flow, and let the rest stay out of the way."
+                        SettingsToggleRow(
+                            title: "Recordatorios diarios",
+                            summary: "Activa o apaga recordatorios de rutina para este dispositivo.",
+                            isOn: $remindersEnabled
                         )
 
-                        Button("Replay guides") {
-                            GuideProgressStore.resetAll()
-                            showingGuideReplay = true
+                        Divider()
+
+                        SettingsChoiceRow(
+                            title: "Máximo de notificaciones por día",
+                            summary: "Define un límite diario ligero para que la app siga siendo útil.",
+                            selection: $maxNotificationsPerDay
+                        ) {
+                            Text("1").tag(1)
+                            Text("2").tag(2)
+                            Text("3").tag(3)
                         }
-                        .buttonStyle(SecondaryCTAStyle())
-                    }
-                }
 
-                appBasicsCard
-                remindersCard
-                quietHoursCard
-                soundCard
+                        Divider()
 
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Device and export")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        BrandMetricTile(title: "Device", value: deviceLabel, systemImage: "iphone")
-                        BrandMetricTile(title: "Version", value: systemVersionLabel, systemImage: "info.circle.fill")
-
-                        NavigationLink {
-                            AdvancedSettingsView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Open export and diagnostics",
-                                summary: "Read the local ledger snapshot, copy an export, or share a support packet.",
-                                systemImage: "square.and.arrow.up"
-                            )
+                        SettingsChoiceRow(
+                            title: "Máximo de notificaciones por semana",
+                            summary: "Limita cuántas veces la app te recuerda algo a lo largo de la semana.",
+                            selection: $maxNotificationsPerWeek
+                        ) {
+                            Text("3").tag(3)
+                            Text("4").tag(4)
+                            Text("5").tag(5)
+                            Text("6").tag(6)
+                            Text("7").tag(7)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Account and support")
+                        Text("Horas de silencio")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        NavigationLink {
-                            ProfileView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Profile",
-                                summary: "Identity, household details, and local account snapshot.",
-                                systemImage: "person.text.rectangle"
-                            )
-                        }
-                        .buttonStyle(.plain)
+                        SettingsToggleRow(
+                            title: "Horas de silencio",
+                            summary: "Pausa el ruido de recordatorios durante la franja que elijas.",
+                            isOn: $quietHoursEnabled
+                        )
 
-                        NavigationLink {
-                            HelpCenterView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Help Center",
-                                summary: "Guided answers and quick paths when you get stuck.",
-                                systemImage: "questionmark.circle.fill"
-                            )
-                        }
-                        .buttonStyle(.plain)
+                        Divider()
 
-                        NavigationLink {
-                            SupportCenterView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Support Center",
-                                summary: "Build a local packet and share a cleaner troubleshooting summary.",
-                                systemImage: "lifepreserver.fill"
-                            )
+                        SettingsChoiceRow(
+                            title: "Inicio del silencio",
+                            summary: "Elige cuándo comienza la ventana tranquila.",
+                            selection: $quietHoursStart
+                        ) {
+                            Text("21:00").tag("21:00")
+                            Text("22:00").tag("22:00")
+                            Text("23:00").tag("23:00")
+                            Text("00:00").tag("00:00")
                         }
-                        .buttonStyle(.plain)
 
-                        NavigationLink {
-                            LegalCenterView()
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Legal Center",
-                                summary: "Privacy, terms, and public support links for this build.",
-                                systemImage: "doc.text.fill"
-                            )
+                        Divider()
+
+                        SettingsChoiceRow(
+                            title: "Fin del silencio",
+                            summary: "Elige cuándo pueden volver los recordatorios.",
+                            selection: $quietHoursEnd
+                        ) {
+                            Text("06:00").tag("06:00")
+                            Text("07:00").tag("07:00")
+                            Text("08:00").tag("08:00")
+                            Text("09:00").tag("09:00")
                         }
-                        .buttonStyle(.plain)
 
-                        NavigationLink {
-                            BrandGalleryView()
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Brand Gallery",
-                                summary: "Reference the visual language without leaving Settings.",
-                                systemImage: "swatchpalette.fill"
-                            )
+                        Divider()
+
+                        SettingsToggleRow(
+                            title: "Silencio en fin de semana",
+                            summary: "Mantén los fines de semana más tranquilos salvo que abras la app tú mismo.",
+                            isOn: $weekendQuietMode
+                        )
+                    }
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Sonido")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        SettingsChoiceRow(
+                            title: "Sonido de notificación",
+                            summary: "Elige un estilo de respuesta y pruébalo aquí.",
+                            selection: $soundStyle
+                        ) {
+                            Text("Silencio").tag("off")
+                            Text("Miau").tag("miau")
+                            Text("Juguetón").tag("playful")
                         }
-                        .buttonStyle(.plain)
 
-                        Button("Sign out") {
-                            viewModel.signOut()
+                        Button("Probar sonido de notificación") {
+                            guard soundStyle != "off" else { return }
+                            let generator = UINotificationFeedbackGenerator()
+                            generator.notificationOccurred(.success)
+                            AudioServicesPlaySystemSound(1104)
                         }
                         .buttonStyle(SecondaryCTAStyle())
-                        .foregroundStyle(.red)
+
+                        BrandFeatureRow(
+                            systemImage: "speaker.wave.2.fill",
+                            title: "Sonido actual",
+                            detail: settingsSoundDisplayName(soundStyle)
+                        )
                     }
                 }
             }
@@ -240,422 +438,164 @@ struct SettingsView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
         }
-        .scrollDismissesKeyboard(.interactively)
         .background(BrandTheme.canvas)
         .overlay(alignment: .top) {
             BrandBackdropView()
         }
-        .sheet(isPresented: $showingGuideReplay) {
-            GuideSheet(guide: GuideLibrary.guide(.dashboard))
-        }
-        .navigationTitle("Settings".appLocalized)
+        .navigationTitle("Notificaciones y calma")
         .navigationBarTitleDisplayMode(.inline)
     }
+}
 
-    private var sessionModeLabel: String {
-        switch viewModel.session {
-        case .signedOut:
-            return "Signed out".appLocalized
-        case .guest:
-            return "Preview guest".appLocalized
-        case let .signedIn(email, _):
-            return email.components(separatedBy: "@").first ?? "Signed in"
-        }
-    }
+private struct SettingsSummaryHeader: View {
+    let badge: String
+    let title: String
+    let summary: String
+    let character: BrandCharacterID
+    let expression: BrandExpression
 
-    private var subscriptionSurface: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Subscription and services")
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            MascotAvatarView(character: character, expression: expression, size: 68)
 
-                Text("Your account keeps plan status, restore, and billing actions in one connected place.")
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 8) {
+                BrandBadge(text: badge.appLocalized, systemImage: "sparkles")
 
-                BrandFeatureRow(
-                    systemImage: viewModel.session.isAuthenticated ? "lock.fill" : "person.crop.circle.badge.exclamationmark",
-                    title: viewModel.session.isAuthenticated ? "Account ready" : "Sign in for billing",
-                    detail: viewModel.session.isAuthenticated
-                        ? "Restore, manage, and future billing actions stay tied to this account."
-                        : "Plans are visible now, but restore and billing stay connected only after sign-in."
-                )
-
-                NavigationLink {
-                    PremiumView(viewModel: viewModel)
-                } label: {
-                    settingsRouteLabel(
-                        title: "Open premium surface",
-                        summary: "See restore, manage subscription, and upgrade actions in one place.",
-                        systemImage: "sparkles"
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private var crewRoleList: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            crewRoleRow(
-                character: .tikki,
-                expression: .proud,
-                name: "Tikki",
-                role: "Planning, goals, and control"
-            )
-            crewRoleRow(
-                character: .mei,
-                expression: .thinking,
-                name: "Ludo",
-                role: "Insights, reports, and next actions"
-            )
-            crewRoleRow(
-                character: .manchas,
-                expression: .happy,
-                name: "Manchas",
-                role: "Daily check-ins and expense capture"
-            )
-        }
-    }
-
-    private var appBasicsCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                settingsSectionHeader(
-                    title: "App basics",
-                    summary: "Language, currency, and theme stay together so the everyday feel is easy to tune.",
-                    character: .tikki,
-                    expression: .happy
-                )
-
-                settingsPickerRow(title: "Language", selection: $language) {
-                    Text("Auto").tag("auto")
-                    Text("English").tag("en")
-                    Text("Español").tag("es")
-                }
-
-                Divider()
-
-                settingsPickerRow(title: "Currency", selection: $currency) {
-                    Text("USD").tag("USD")
-                    Text("EUR").tag("EUR")
-                    Text("GBP").tag("GBP")
-                    Text("JPY").tag("JPY")
-                    Text("MXN").tag("MXN")
-                }
-
-                Divider()
-
-                settingsPickerRow(title: "Theme", selection: $theme) {
-                    Text("Finance").tag("finance")
-                    Text("Midnight").tag("midnight")
-                    Text("Sunrise").tag("sunrise")
-                }
-            }
-        }
-    }
-
-    private var remindersCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                settingsSectionHeader(
-                    title: "Reminders",
-                    summary: "Keep nudges lightweight so the app stays helpful instead of noisy.",
-                    character: .manchas,
-                    expression: .happy
-                )
-
-                Toggle(isOn: $remindersEnabled) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Daily reminders")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text("Keep lightweight nudges enabled while you stay on-device.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-                }
-                .tint(BrandTheme.primary)
-
-                Divider()
-
-                settingsPickerRow(title: "Max notifications per day", selection: $maxNotificationsPerDay) {
-                    Text("1").tag(1)
-                    Text("2").tag(2)
-                    Text("3").tag(3)
-                }
-
-                Divider()
-
-                settingsPickerRow(title: "Max notifications per week", selection: $maxNotificationsPerWeek) {
-                    Text("3").tag(3)
-                    Text("4").tag(4)
-                    Text("5").tag(5)
-                    Text("6").tag(6)
-                    Text("7").tag(7)
-                }
-            }
-        }
-    }
-
-    private var quietHoursCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                settingsSectionHeader(
-                    title: "Quiet hours",
-                    summary: "Use one calm window instead of micromanaging every reminder.",
-                    character: .mei,
-                    expression: .thinking
-                )
-
-                Toggle(isOn: $quietHoursEnabled) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Quiet hours")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text("Pause routine reminder noise during your selected quiet window.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-                }
-                .tint(BrandTheme.primary)
-
-                Divider()
-
-                settingsPickerRow(title: "Quiet hours start", selection: $quietHoursStart) {
-                    Text("21:00").tag("21:00")
-                    Text("22:00").tag("22:00")
-                    Text("23:00").tag("23:00")
-                    Text("00:00").tag("00:00")
-                }
-
-                Divider()
-
-                settingsPickerRow(title: "Quiet hours end", selection: $quietHoursEnd) {
-                    Text("06:00").tag("06:00")
-                    Text("07:00").tag("07:00")
-                    Text("08:00").tag("08:00")
-                    Text("09:00").tag("09:00")
-                }
-
-                Divider()
-
-                Toggle(isOn: $weekendQuietMode) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Weekend quiet mode")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text("Keep weekends calmer unless you manually open the app.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-                }
-                .tint(BrandTheme.primary)
-            }
-        }
-    }
-
-    private var soundCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                settingsSectionHeader(
-                    title: "Sound",
-                    summary: "Choose one feedback style and test it quickly.",
-                    character: .manchas,
-                    expression: .excited
-                )
-
-                settingsPickerRow(title: "Notification sound", selection: $soundStyle) {
-                    Text("Off").tag("off")
-                    Text("Meow").tag("miau")
-                    Text("Playful").tag("playful")
-                }
-
-                Button("Test notification sound") {
-                    guard soundStyle != "off" else { return }
-                    let generator = UINotificationFeedbackGenerator()
-                    generator.notificationOccurred(.success)
-                    AudioServicesPlaySystemSound(1104)
-                }
-                .buttonStyle(SecondaryCTAStyle())
-            }
-        }
-    }
-
-    private func crewRoleRow(
-        character: BrandCharacterID,
-        expression: BrandExpression,
-        name: String,
-        role: String
-    ) -> some View {
-        HStack(alignment: .center, spacing: 12) {
-            MascotAvatarView(character: character, expression: expression, size: 52)
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(name.appLocalized)
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text(role.appLocalized)
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .layoutPriority(1)
-        }
-    }
-
-    private func settingsSectionHeader(
-        title: String,
-        summary: String,
-        character: BrandCharacterID,
-        expression: BrandExpression
-    ) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            MascotAvatarView(character: character, expression: expression, size: 54)
-
-            VStack(alignment: .leading, spacing: 4) {
                 Text(title.appLocalized)
-                    .font(.headline)
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
+
                 Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .layoutPriority(1)
-
-            Spacer(minLength: 0)
         }
     }
+}
 
-    private func themeDisplayName(_ value: String) -> String {
-        switch value {
-        case "midnight":
-            return "Midnight".appLocalized
-        case "sunrise":
-            return "Sunrise".appLocalized
-        default:
-            return "Finance".appLocalized
-        }
-    }
+private struct SettingsNavigationRow: View {
+    let title: String
+    let summary: String
+    let systemImage: String
 
-    @ViewBuilder
-    private func settingsPickerRow<SelectionValue: Hashable, Content: View>(
-        title: String,
-        selection: Binding<SelectionValue>,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .center, spacing: 12) {
-                pickerCopy(title: title)
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: systemImage)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(BrandTheme.primary)
+                .frame(width: 42, height: 42)
+                .background(BrandTheme.accent.opacity(0.18))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
-                Spacer(minLength: 12)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title.appLocalized)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
 
-                pickerControl(title: title, selection: selection) {
-                    content()
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 12) {
-                pickerCopy(title: title)
-
-                pickerControl(title: title, selection: selection) {
-                    content()
-                }
-            }
-        }
-    }
-
-    private func settingsRouteLabel(title: String, summary: String, systemImage: String) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .top, spacing: 14) {
-                routeIcon(systemImage: systemImage)
-                routeCopy(title: title, summary: summary)
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.bold))
+                Text(summary.appLocalized)
+                    .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
-                    .padding(.top, 6)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .top, spacing: 14) {
-                    routeIcon(systemImage: systemImage)
-                    routeCopy(title: title, summary: summary)
-                }
-
-                HStack {
-                    Spacer()
-
-                    Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.bold))
-                        .foregroundStyle(BrandTheme.muted)
-                }
-            }
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.bold))
+                .foregroundStyle(BrandTheme.muted)
+                .padding(.top, 6)
         }
         .padding(.vertical, 2)
     }
+}
 
-    private func pickerCopy(title: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title.appLocalized)
-                .font(.headline)
-                .foregroundStyle(BrandTheme.ink)
-            Text("Saved only on this device right now.")
-                .font(.subheadline)
-                .foregroundStyle(BrandTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .layoutPriority(1)
-    }
+private struct SettingsChoiceRow<SelectionValue: Hashable, Content: View>: View {
+    let title: String
+    let summary: String
+    @Binding var selection: SelectionValue
+    let content: Content
 
-    private func pickerControl<SelectionValue: Hashable, Content: View>(
+    init(
         title: String,
+        summary: String,
         selection: Binding<SelectionValue>,
         @ViewBuilder content: () -> Content
-    ) -> some View {
-        Picker(title, selection: selection) {
-            content()
-        }
-        .labelsHidden()
-        .pickerStyle(.menu)
-        .tint(BrandTheme.primary)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(BrandTheme.surfaceTint, in: Capsule())
-        .overlay(
-            Capsule(style: .continuous)
-                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
-        )
+    ) {
+        self.title = title
+        self.summary = summary
+        _selection = selection
+        self.content = content()
     }
 
-    private func routeIcon(systemImage: String) -> some View {
-        Image(systemName: systemImage)
-            .font(.headline.weight(.semibold))
-            .foregroundStyle(BrandTheme.primary)
-            .frame(width: 42, height: 42)
-            .background(BrandTheme.accent.opacity(0.18))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
-
-    private func routeCopy(title: String, summary: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
             Text(title.appLocalized)
                 .font(.headline)
                 .foregroundStyle(BrandTheme.ink)
+
             Text(summary.appLocalized)
                 .font(.subheadline)
                 .foregroundStyle(BrandTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
+
+            Picker(title, selection: $selection) {
+                content
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .tint(BrandTheme.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(BrandTheme.surfaceTint, in: Capsule())
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .layoutPriority(1)
+    }
+}
+
+private struct SettingsToggleRow: View {
+    let title: String
+    let summary: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title.appLocalized)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                Text(summary.appLocalized)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .tint(BrandTheme.primary)
+    }
+}
+
+private func settingsThemeDisplayName(_ value: String) -> String {
+    switch value {
+    case "midnight":
+        return "Medianoche"
+    case "sunrise":
+        return "Amanecer"
+    default:
+        return "Finanzas"
+    }
+}
+
+private func settingsSoundDisplayName(_ value: String) -> String {
+    switch value {
+    case "miau":
+        return "Miau"
+    case "off":
+        return "Silencio"
+    default:
+        return "Juguetón"
     }
 }

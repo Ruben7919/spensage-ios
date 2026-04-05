@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 private enum ExportMode: String, CaseIterable, Identifiable {
-    case readable = "Readable"
+    case readable = "Legible"
     case json = "JSON"
 
     var id: String { rawValue }
@@ -39,7 +39,7 @@ struct AdvancedSettingsView: View {
         .overlay(alignment: .top) {
             BrandBackdropView()
         }
-        .navigationTitle("Advanced settings")
+        .navigationTitle("Avanzado")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {
             GuideSheet(guide: GuideLibrary.guide(.sharing))
@@ -49,45 +49,19 @@ struct AdvancedSettingsView: View {
     private var heroCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                BrandBadge(text: "Control center", systemImage: "switch.2")
+                BrandBadge(text: "Centro de control", systemImage: "switch.2")
 
-                Text("Advanced settings")
+                Text("Avanzado")
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Inspect the ledger, generate a safe export, and keep support details close without leaving the main flow.")
+                Text("Revisa el libro local, genera una exportación segura y ten el soporte a mano sin recargar el flujo principal.")
                     .foregroundStyle(BrandTheme.muted)
 
-                LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                    spacing: 12
-                ) {
-                    BrandMetricTile(
-                        title: "Overlay",
-                        value: debugOverlayEnabled ? "On".appLocalized : "Off".appLocalized,
-                        systemImage: "circle.grid.3x3.fill"
-                    )
-                    BrandMetricTile(
-                        title: "Diagnostics",
-                        value: includeDiagnostics ? "On".appLocalized : "Off".appLocalized,
-                        systemImage: "doc.text.magnifyingglass"
-                    )
-                    BrandMetricTile(
-                        title: "Format",
-                        value: exportMode.localizedTitle,
-                        systemImage: "square.and.arrow.up"
-                    )
-                    BrandMetricTile(
-                        title: "Scope",
-                        value: "On device".appLocalized,
-                        systemImage: "lock.fill"
-                    )
-                }
-
-                BrandScenePanel(
-                    sceneKey: "guide_24_advanced_tools_manchas",
-                    fallbackSystemImage: "slider.horizontal.3",
-                    height: 200
+                BrandFeatureRow(
+                    systemImage: "lock.fill",
+                    title: "Todo sigue en este dispositivo",
+                    detail: "Exportación, soporte y diagnóstico se mantienen como acciones conscientes, no como ruido dentro del flujo principal."
                 )
             }
         }
@@ -100,17 +74,17 @@ struct AdvancedSettingsView: View {
                     MascotAvatarView(character: .manchas, expression: .happy, size: 62)
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Sharing and support guide")
+                        Text("Guía de exportación y soporte")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Open the interactive guide that explains exports, support packets, and the collaboration tone across the app.")
+                        Text("Abre la guía interactiva para entender exportaciones, paquetes de soporte y qué información sale realmente del dispositivo.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                     }
                 }
 
-                Button("Open guide") {
+                Button("Abrir guía") {
                     isPresentingGuide = true
                 }
                 .buttonStyle(PrimaryCTAStyle())
@@ -121,17 +95,17 @@ struct AdvancedSettingsView: View {
     private var deviceControlsCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Device controls")
+                Text("Controles del dispositivo")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Toggle("Enable local debug overlay", isOn: $debugOverlayEnabled)
-                Toggle("Include diagnostics in exports", isOn: $includeDiagnostics)
+                Toggle("Activar overlay local", isOn: $debugOverlayEnabled)
+                Toggle("Incluir diagnóstico en exportaciones", isOn: $includeDiagnostics)
 
                 BrandFeatureRow(
                     systemImage: "lock.doc",
-                    title: "Private by default",
-                    detail: "Exports are built from the ledger already loaded on this device, so you decide when anything leaves the app."
+                    title: "Privado por defecto",
+                    detail: "Las exportaciones se arman con el libro ya cargado en este dispositivo, así que tú decides cuándo algo sale de la app."
                 )
             }
         }
@@ -141,18 +115,18 @@ struct AdvancedSettingsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Text("Export center")
+                    Text("Centro de exportación")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                     Spacer()
                     if copiedState {
-                        Text("Copied")
+                        Text("Copiado")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.primary)
                     }
                 }
 
-                Picker("Format", selection: $exportMode) {
+                Picker("Formato", selection: $exportMode) {
                     ForEach(ExportMode.allCases) { mode in
                         Text(mode.localizedTitle).tag(mode)
                     }
@@ -172,14 +146,14 @@ struct AdvancedSettingsView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
                 HStack(spacing: 12) {
-                    Button("Copy export") {
+                    Button("Copiar exportación") {
                         UIPasteboard.general.string = exportBody
                         copiedState = true
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    ShareLink(item: exportBody, preview: SharePreview("SpendSage Local Export")) {
-                        Text("Share export")
+                    ShareLink(item: exportBody, preview: SharePreview("Exportación local de SpendSage")) {
+                        Text("Compartir exportación")
                     }
                     .buttonStyle(PrimaryCTAStyle())
                 }
@@ -190,7 +164,7 @@ struct AdvancedSettingsView: View {
     private var ledgerSummaryCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Ledger summary")
+                Text("Resumen del libro")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
@@ -200,23 +174,23 @@ struct AdvancedSettingsView: View {
                     spacing: 12
                 ) {
                     BrandMetricTile(
-                        title: "Local spend",
+                        title: "Gasto local",
                         value: LocalLedgerExportComposer.currency(state?.budgetSnapshot.monthlySpent ?? 0),
                         systemImage: "chart.bar.fill"
                     )
                     BrandMetricTile(
-                        title: "Remaining",
+                        title: "Restante",
                         value: LocalLedgerExportComposer.currency(state?.budgetSnapshot.remaining ?? 0),
                         systemImage: "shield.lefthalf.filled"
                     )
                     BrandMetricTile(
-                        title: "Last update",
-                        value: viewModel.ledger?.updatedAt.formatted(date: .abbreviated, time: .shortened) ?? "Pending",
+                        title: "Última actualización",
+                        value: viewModel.ledger?.updatedAt.formatted(date: .abbreviated, time: .shortened) ?? "Pendiente",
                         systemImage: "clock.arrow.circlepath"
                     )
                     BrandMetricTile(
-                        title: "Top category",
-                        value: state?.topCategory?.category.localizedTitle ?? "None".appLocalized,
+                        title: "Categoría líder",
+                        value: state?.topCategory?.category.localizedTitle ?? "Sin datos",
                         systemImage: "sparkles.rectangle.stack"
                     )
                 }
@@ -229,7 +203,7 @@ struct AdvancedSettingsView: View {
         case .readable:
             let summary = LocalLedgerExportComposer.readableSummary(viewModel: viewModel)
             if includeDiagnostics {
-                return summary + "\n\nDiagnostics\n- Debug overlay: \(debugOverlayEnabled ? "Enabled" : "Disabled")"
+                return summary + "\n\nDiagnóstico\n- Overlay local: \(debugOverlayEnabled ? "Activo" : "Inactivo")"
             }
             return summary
         case .json:
@@ -240,29 +214,29 @@ struct AdvancedSettingsView: View {
     private var supportHandoffCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Support packet")
+                Text("Soporte")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
                 BrandFeatureRow(
                     systemImage: "square.and.arrow.up",
-                    title: "Share exports only when you choose",
-                    detail: "Support packets stay readable before they are copied or sent, so you can review exactly what leaves the device."
+                    title: "Comparte solo cuando quieras",
+                    detail: "Los paquetes de soporte siguen siendo legibles antes de copiarse o enviarse, para que revises exactamente qué sale del dispositivo."
                 )
 
                 BrandFeatureRow(
                     systemImage: "hand.raised.fill",
-                    title: "Keep trust links nearby",
-                    detail: "Open privacy and support directly from here when you need a public reference while testing."
+                    title: "Ten los enlaces de confianza cerca",
+                    detail: "Abre privacidad y soporte desde aquí cuando necesites una referencia pública mientras pruebas la app."
                 )
 
                 HStack(spacing: 12) {
-                    Button("Open support") {
+                    Button("Abrir soporte") {
                         openURL(PublicLegalLinks.support)
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    Button("Open privacy") {
+                    Button("Abrir privacidad") {
                         openURL(PublicLegalLinks.privacy)
                     }
                     .buttonStyle(PrimaryCTAStyle())
