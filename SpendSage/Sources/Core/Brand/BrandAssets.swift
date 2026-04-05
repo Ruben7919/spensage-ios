@@ -2,6 +2,156 @@ import Foundation
 import SwiftUI
 import UIKit
 
+enum BrandSeasonID: String, CaseIterable, Codable, Hashable {
+    case halloween
+    case winterHolidays
+    case newYear
+}
+
+struct BrandSeasonWindow: Hashable {
+    let startMonth: Int
+    let startDay: Int
+    let endMonth: Int
+    let endDay: Int
+
+    func contains(_ date: Date, calendar: Calendar = .autoupdatingCurrent) -> Bool {
+        let components = calendar.dateComponents([.month, .day], from: date)
+        guard let month = components.month, let day = components.day else { return false }
+        let current = month * 100 + day
+        let start = startMonth * 100 + startDay
+        let end = endMonth * 100 + endDay
+
+        if start <= end {
+            return current >= start && current <= end
+        }
+
+        return current >= start || current <= end
+    }
+
+    func nextStart(after date: Date, calendar: Calendar = .autoupdatingCurrent) -> Date? {
+        let year = calendar.component(.year, from: date)
+        let candidateYears = [year, year + 1]
+
+        return candidateYears
+            .compactMap { candidateYear in
+                var components = DateComponents()
+                components.year = candidateYear
+                components.month = startMonth
+                components.day = startDay
+                return calendar.date(from: components)
+            }
+            .first(where: { $0 >= calendar.startOfDay(for: date) })
+    }
+}
+
+struct BrandSeasonDefinition: Hashable, Identifiable {
+    let id: BrandSeasonID
+    let title: String
+    let summary: String
+    let badgeText: String
+    let badgeAsset: String
+    let spotlightGuideKey: String
+    let guideOverrides: [String: String]
+    let windows: [BrandSeasonWindow]
+    let priority: Int
+
+    func isActive(on date: Date, calendar: Calendar = .autoupdatingCurrent) -> Bool {
+        windows.contains { $0.contains(date, calendar: calendar) }
+    }
+
+    func nextStart(after date: Date, calendar: Calendar = .autoupdatingCurrent) -> Date? {
+        windows
+            .compactMap { $0.nextStart(after: date, calendar: calendar) }
+            .sorted()
+            .first
+    }
+}
+
+enum BrandSeasonCatalog {
+    static let seasons: [BrandSeasonDefinition] = [
+        BrandSeasonDefinition(
+            id: .halloween,
+            title: "Halloween Hunt",
+            summary: "Spooky mission art, event badges, and a short questline show up around the dashboard loop.",
+            badgeText: "Halloween live",
+            badgeAsset: "badge_event_halloween_v2.png",
+            spotlightGuideKey: "guide_01_dashboard_game_manchas",
+            guideOverrides: [
+                "guide_01_dashboard_game_manchas": "guide_01_dashboard_game_manchas_halloween",
+                "guide_25_splash_team": "guide_25_splash_team_halloween",
+                "guide_26_loading_yarn_team": "guide_26_loading_yarn_team_halloween"
+            ],
+            windows: [
+                BrandSeasonWindow(startMonth: 10, startDay: 20, endMonth: 11, endDay: 2)
+            ],
+            priority: 0
+        ),
+        BrandSeasonDefinition(
+            id: .winterHolidays,
+            title: "Holiday Gift Guard",
+            summary: "Festive splash art, cozy loading scenes, and spending guardrails keep December feeling intentional.",
+            badgeText: "Holiday live",
+            badgeAsset: "badge_event_holiday_v2.png",
+            spotlightGuideKey: "guide_25_splash_team",
+            guideOverrides: [
+                "guide_01_dashboard_game_manchas": "guide_01_dashboard_game_manchas_holiday",
+                "guide_25_splash_team": "guide_25_splash_team_holiday",
+                "guide_26_loading_yarn_team": "guide_26_loading_yarn_team_holiday"
+            ],
+            windows: [
+                BrandSeasonWindow(startMonth: 12, startDay: 1, endMonth: 12, endDay: 28)
+            ],
+            priority: 1
+        ),
+        BrandSeasonDefinition(
+            id: .newYear,
+            title: "New Year Reset",
+            summary: "The festive art stays warm while the mission board shifts into reset, fresh-start, and cleanup goals.",
+            badgeText: "Reset live",
+            badgeAsset: "badge_event_new_year_v2.png",
+            spotlightGuideKey: "guide_26_loading_yarn_team",
+            guideOverrides: [
+                "guide_01_dashboard_game_manchas": "guide_01_dashboard_game_manchas_holiday",
+                "guide_25_splash_team": "guide_25_splash_team_holiday",
+                "guide_26_loading_yarn_team": "guide_26_loading_yarn_team_holiday"
+            ],
+            windows: [
+                BrandSeasonWindow(startMonth: 12, startDay: 29, endMonth: 1, endDay: 14)
+            ],
+            priority: 2
+        )
+    ]
+
+    static func activeSeason(on date: Date = .now, calendar: Calendar = .autoupdatingCurrent) -> BrandSeasonDefinition? {
+        seasons
+            .filter { $0.isActive(on: date, calendar: calendar) }
+            .sorted { lhs, rhs in lhs.priority < rhs.priority }
+            .first
+    }
+
+    static func nextSeason(after date: Date = .now, calendar: Calendar = .autoupdatingCurrent) -> (season: BrandSeasonDefinition, startDate: Date)? {
+        let upcoming: [(season: BrandSeasonDefinition, startDate: Date)] = seasons.compactMap { season in
+                guard let startDate = season.nextStart(after: date, calendar: calendar) else { return nil }
+                return (season, startDate)
+            }
+        return upcoming
+            .sorted { lhs, rhs in lhs.startDate < rhs.startDate }
+            .first
+    }
+
+    static func season(for id: BrandSeasonID) -> BrandSeasonDefinition? {
+        seasons.first { $0.id == id }
+    }
+
+    static func contains(_ date: Date, in season: BrandSeasonDefinition, calendar: Calendar = .autoupdatingCurrent) -> Bool {
+        season.isActive(on: date, calendar: calendar)
+    }
+
+    static func resolvedGuideKey(_ key: String, on date: Date = .now, calendar: Calendar = .autoupdatingCurrent) -> String {
+        activeSeason(on: date, calendar: calendar)?.guideOverrides[key] ?? key
+    }
+}
+
 enum BrandVersion: String, CaseIterable, Codable {
     case v1
     case v2
@@ -113,12 +263,14 @@ final class BrandAssetCatalog {
 
     func guide(_ key: String) -> BrandAssetSource? {
         let fallback = manifest.guides.values.sorted().first
-        guard let fileName = manifest.guides[key] ?? fallback else { return nil }
+        let resolvedKey = BrandSeasonCatalog.resolvedGuideKey(key)
+        guard let fileName = manifest.guides[resolvedKey] ?? manifest.guides[key] ?? fallback else { return nil }
         return BrandAssetSource(category: .guides, fileName: fileName, version: version)
     }
 
     func guideIfAvailable(_ key: String) -> BrandAssetSource? {
-        guard let fileName = manifest.guides[key] else { return nil }
+        let resolvedKey = BrandSeasonCatalog.resolvedGuideKey(key)
+        guard let fileName = manifest.guides[resolvedKey] ?? manifest.guides[key] else { return nil }
         return BrandAssetSource(category: .guides, fileName: fileName, version: version)
     }
 

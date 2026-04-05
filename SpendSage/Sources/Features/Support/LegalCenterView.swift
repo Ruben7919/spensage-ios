@@ -130,6 +130,8 @@ struct LegalCenterView: View {
                             Text(selectedResource.url.absoluteString)
                                 .font(.footnote.monospaced())
                                 .foregroundStyle(BrandTheme.muted)
+                                .lineLimit(2)
+                                .truncationMode(.middle)
                                 .textSelection(.enabled)
 
                             HStack(spacing: 12) {
@@ -177,6 +179,8 @@ struct LegalCenterView: View {
                             Text(resource.url.absoluteString)
                                 .font(.footnote.monospaced())
                                 .foregroundStyle(BrandTheme.muted)
+                                .lineLimit(2)
+                                .truncationMode(.middle)
                                 .textSelection(.enabled)
 
                             HStack(spacing: 12) {
@@ -210,6 +214,7 @@ struct LegalCenterView: View {
                     .foregroundStyle(BrandTheme.ink)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
         .background(BrandTheme.canvas)

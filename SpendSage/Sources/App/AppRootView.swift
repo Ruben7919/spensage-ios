@@ -77,6 +77,8 @@ struct AppRootView: View {
             FinanceCsvImportToolView(viewModel: viewModel)
         case .scan:
             FinanceReceiptScanToolView(viewModel: viewModel)
+        case .premium:
+            PremiumView(viewModel: viewModel)
         case .profile:
             ProfileView(viewModel: viewModel)
         case .advanced:

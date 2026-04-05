@@ -340,7 +340,7 @@ struct CharacterCrewRail: View {
 
     var body: some View {
         LazyVGrid(
-            columns: [GridItem(.adaptive(minimum: 152, maximum: 220), spacing: 12)],
+            columns: [GridItem(.adaptive(minimum: 190, maximum: 240), spacing: 12)],
             spacing: 12
         ) {
             ForEach(members) { member in
@@ -362,7 +362,7 @@ private struct CharacterCrewCard: View {
                 MascotAvatarView(character: member.character, expression: member.expression, size: 64)
                     .padding(10)
             }
-            .frame(width: 154, height: 154)
+            .frame(maxWidth: .infinity, minHeight: 144, maxHeight: 144)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(member.title.appLocalized)
@@ -376,9 +376,10 @@ private struct CharacterCrewCard: View {
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(width: 154, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(BrandTheme.surface)

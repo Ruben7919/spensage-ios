@@ -197,38 +197,6 @@ struct TrophyHistoryView: View {
     }
 }
 
-private struct GrowthTrophyPlate: View {
-    let trophy: GrowthTrophy
-    var size: CGFloat = 56
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(trophy.unlocked ? BrandTheme.heroGlowGradient : LinearGradient(
-                    colors: [BrandTheme.surfaceTint, BrandTheme.surface],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ))
-
-            if let image = BrandAssetCatalog.shared.image(for: BrandAssetCatalog.shared.badge(named: trophy.hybridBadgeAsset)) {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .padding(10)
-            } else {
-                Image(systemName: trophy.systemImage)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
-            }
-        }
-        .frame(width: size, height: size)
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
-        )
-    }
-}
-
 private struct DashboardTimelineRow: View {
     let event: GrowthEvent
 
@@ -267,6 +235,75 @@ private struct DashboardTimelineRow: View {
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+        )
+    }
+}
+
+struct GrowthTrophyPlate: View {
+    let trophy: GrowthTrophy
+    var size: CGFloat = 56
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(
+                    trophy.unlocked
+                        ? BrandTheme.heroGlowGradient
+                        : LinearGradient(
+                            colors: [BrandTheme.surfaceTint, BrandTheme.surface],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                )
+
+            if let image = BrandAssetCatalog.shared.image(for: BrandAssetCatalog.shared.badge(named: trophy.hybridBadgeAsset)) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(10)
+            } else {
+                Image(systemName: trophy.systemImage)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
+            }
+        }
+        .frame(width: size, height: size)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+        )
+    }
+}
+
+struct GrowthMissionBadgeView: View {
+    let mission: GrowthMission
+    var size: CGFloat = 52
+
+    var body: some View {
+        ZStack {
+            if mission.status == .completed {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(BrandTheme.heroGlowGradient)
+            } else {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(BrandTheme.surfaceTint)
+            }
+
+            if let image = BrandAssetCatalog.shared.image(for: BrandAssetCatalog.shared.badge(named: mission.hybridBadgeAsset)) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(8)
+            } else {
+                Image(systemName: mission.systemImage)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(BrandTheme.primary)
+            }
+        }
+        .frame(width: size, height: size)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
         )
     }
 }

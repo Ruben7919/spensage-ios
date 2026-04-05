@@ -236,7 +236,9 @@ struct SettingsView: View {
                     }
                 }
             }
-            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
         }
         .scrollDismissesKeyboard(.interactively)
         .background(BrandTheme.canvas)
@@ -247,7 +249,7 @@ struct SettingsView: View {
             GuideSheet(guide: GuideLibrary.guide(.dashboard))
         }
         .navigationTitle("Settings".appLocalized)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var sessionModeLabel: String {
@@ -271,29 +273,15 @@ struct SettingsView: View {
                 Text("Your account keeps plan status, restore, and billing actions in one connected place.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
-                    BrandMetricTile(
-                        title: "Mode",
-                        value: viewModel.session.isAuthenticated ? "Account ready" : "Sign in",
-                        systemImage: "lock.fill"
-                    )
-                    BrandMetricTile(
-                        title: "Restore",
-                        value: viewModel.session.isAuthenticated ? "Available" : "Requires account",
-                        systemImage: "arrow.clockwise"
-                    )
-                    BrandMetricTile(
-                        title: "Manage",
-                        value: "Premium",
-                        systemImage: "slider.horizontal.3"
-                    )
-                    BrandMetricTile(
-                        title: "Support",
-                        value: "Connected",
-                        systemImage: "lifepreserver.fill"
-                    )
-                }
+                BrandFeatureRow(
+                    systemImage: viewModel.session.isAuthenticated ? "lock.fill" : "person.crop.circle.badge.exclamationmark",
+                    title: viewModel.session.isAuthenticated ? "Account ready" : "Sign in for billing",
+                    detail: viewModel.session.isAuthenticated
+                        ? "Restore, manage, and future billing actions stay tied to this account."
+                        : "Plans are visible now, but restore and billing stay connected only after sign-in."
+                )
 
                 NavigationLink {
                     PremiumView(viewModel: viewModel)
@@ -514,6 +502,8 @@ struct SettingsView: View {
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .layoutPriority(1)
         }
     }
 
@@ -535,6 +525,8 @@ struct SettingsView: View {
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .layoutPriority(1)
 
             Spacer(minLength: 0)
         }
@@ -557,60 +549,113 @@ struct SettingsView: View {
         selection: Binding<SelectionValue>,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title.appLocalized)
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text("Saved only on this device right now.")
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .center, spacing: 12) {
+                pickerCopy(title: title)
+
+                Spacer(minLength: 12)
+
+                pickerControl(title: title, selection: selection) {
+                    content()
+                }
             }
 
-            Spacer(minLength: 12)
+            VStack(alignment: .leading, spacing: 12) {
+                pickerCopy(title: title)
 
-            Picker(title, selection: selection) {
-                content()
+                pickerControl(title: title, selection: selection) {
+                    content()
+                }
             }
-            .labelsHidden()
-            .pickerStyle(.menu)
-            .tint(BrandTheme.primary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(BrandTheme.surfaceTint, in: Capsule())
-            .overlay(
-                Capsule(style: .continuous)
-                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
-            )
         }
     }
 
     private func settingsRouteLabel(title: String, summary: String, systemImage: String) -> some View {
-        HStack(alignment: .top, spacing: 14) {
-            Image(systemName: systemImage)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(BrandTheme.primary)
-                .frame(width: 42, height: 42)
-                .background(BrandTheme.accent.opacity(0.18))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .top, spacing: 14) {
+                routeIcon(systemImage: systemImage)
+                routeCopy(title: title, summary: summary)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title.appLocalized)
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text(summary.appLocalized)
-                    .font(.subheadline)
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.bold))
                     .foregroundStyle(BrandTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 6)
             }
 
-            Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .top, spacing: 14) {
+                    routeIcon(systemImage: systemImage)
+                    routeCopy(title: title, summary: summary)
+                }
 
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.bold))
-                .foregroundStyle(BrandTheme.muted)
-                .padding(.top, 6)
+                HStack {
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.bold))
+                        .foregroundStyle(BrandTheme.muted)
+                }
+            }
         }
         .padding(.vertical, 2)
+    }
+
+    private func pickerCopy(title: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title.appLocalized)
+                .font(.headline)
+                .foregroundStyle(BrandTheme.ink)
+            Text("Saved only on this device right now.")
+                .font(.subheadline)
+                .foregroundStyle(BrandTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .layoutPriority(1)
+    }
+
+    private func pickerControl<SelectionValue: Hashable, Content: View>(
+        title: String,
+        selection: Binding<SelectionValue>,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        Picker(title, selection: selection) {
+            content()
+        }
+        .labelsHidden()
+        .pickerStyle(.menu)
+        .tint(BrandTheme.primary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(BrandTheme.surfaceTint, in: Capsule())
+        .overlay(
+            Capsule(style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+        )
+    }
+
+    private func routeIcon(systemImage: String) -> some View {
+        Image(systemName: systemImage)
+            .font(.headline.weight(.semibold))
+            .foregroundStyle(BrandTheme.primary)
+            .frame(width: 42, height: 42)
+            .background(BrandTheme.accent.opacity(0.18))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func routeCopy(title: String, summary: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title.appLocalized)
+                .font(.headline)
+                .foregroundStyle(BrandTheme.ink)
+            Text(summary.appLocalized)
+                .font(.subheadline)
+                .foregroundStyle(BrandTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .layoutPriority(1)
     }
 }

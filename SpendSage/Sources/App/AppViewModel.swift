@@ -11,8 +11,8 @@ final class AppViewModel: ObservableObject {
     enum AppTab: String, CaseIterable, Identifiable {
         case dashboard
         case expenses
+        case scan
         case insights
-        case premium
         case settings
 
         var id: String { rawValue }
@@ -21,8 +21,8 @@ final class AppViewModel: ObservableObject {
             switch self {
             case .dashboard: return "Dashboard".appLocalized
             case .expenses: return "Expenses".appLocalized
+            case .scan: return "Scan".appLocalized
             case .insights: return "Insights".appLocalized
-            case .premium: return "Premium".appLocalized
             case .settings: return "Settings".appLocalized
             }
         }
@@ -31,8 +31,8 @@ final class AppViewModel: ObservableObject {
             switch self {
             case .dashboard: return "house.fill"
             case .expenses: return "list.bullet.rectangle.portrait.fill"
+            case .scan: return "camera.viewfinder"
             case .insights: return "chart.xyaxis.line"
-            case .premium: return "sparkles"
             case .settings: return "gearshape.fill"
             }
         }
@@ -44,6 +44,7 @@ final class AppViewModel: ObservableObject {
         case rules
         case csv = "csv"
         case scan
+        case premium
         case profile
         case advanced = "advanced"
         case support
@@ -56,6 +57,7 @@ final class AppViewModel: ObservableObject {
     @Published var session: SessionState
     @Published var hasCompletedOnboarding: Bool
     @Published var selectedTab: AppTab
+    @Published var scanFlowID = UUID()
     @Published var dashboardState: FinanceDashboardState?
     @Published var ledger: LocalFinanceLedger?
     @Published var isPresentingAddExpense = false
@@ -148,8 +150,14 @@ final class AppViewModel: ObservableObject {
         ledger = nil
         isPresentingAddExpense = false
         isPresentingBudgetWizard = false
+        scanFlowID = UUID()
         selectedTab = .dashboard
         debugRoute = nil
+    }
+
+    func startScanFlow() {
+        scanFlowID = UUID()
+        selectedTab = .scan
     }
 
     func refreshDashboard() async {

@@ -14,13 +14,10 @@ struct DashboardView: View {
                 heroCard
 
                 if let state = viewModel.dashboardState {
+                    missionSummaryCard(growth: growthSnapshot)
                     todayCard(for: state)
                     strategyCard(growth: growthSnapshot)
                     recentSpendCard(for: state)
-                    missionSummaryCard(growth: growthSnapshot)
-                    if !growthSnapshot.highlightedTrophies.isEmpty {
-                        trophiesSection(growth: growthSnapshot)
-                    }
 
                     ExperienceDisclosureCard(
                         title: "Power view",
@@ -46,7 +43,7 @@ struct DashboardView: View {
         }
         .background(FinanceScreenBackground())
         .navigationTitle("Dashboard")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel.dashboardState == nil {
                 await viewModel.refreshDashboard()
@@ -219,12 +216,29 @@ struct DashboardView: View {
 
     private func missionSummaryCard(growth: DashboardGrowthSnapshot) -> some View {
         GuidedSectionCard(
-            title: "Mission board",
-            summary: "Keep the app feeling game-like, but only surface the few actions that matter right now.",
+            title: "Quest board",
+            summary: "Keep one active mission, the live event, and the newest trophies visible without turning the dashboard into a wall of game UI.",
             character: .manchas,
             expression: .excited,
             systemImage: "checklist"
         ) {
+            LazyVGrid(
+                columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                spacing: 12
+            ) {
+                BrandMetricTile(title: "Level", value: "\(growth.level)", systemImage: "bolt.fill")
+                BrandMetricTile(title: "XP", value: "\(growth.totalXP)", systemImage: "sparkles")
+                BrandMetricTile(title: "Next unlock", value: "\(growth.xpToNextLevel) XP", systemImage: "arrow.up.forward")
+                BrandMetricTile(title: "Trophies", value: "\(growth.trophies.filter { $0.unlocked }.count)", systemImage: "trophy.fill")
+            }
+
+            ProgressView(value: growth.levelProgress)
+                .tint(BrandTheme.primary)
+
+            if let liveEvent = growth.liveEvent {
+                liveEventCard(liveEvent)
+            }
+
             if growth.missions.isEmpty {
                 FinanceEmptyStateCard(
                     title: "No missions yet",
@@ -232,27 +246,58 @@ struct DashboardView: View {
                     systemImage: "sparkles"
                 )
             } else {
-                ForEach(growth.missions.prefix(3)) { mission in
+                ForEach(Array(growth.missions.prefix(1))) { mission in
                     VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text(mission.title)
-                                .font(.headline)
-                                .foregroundStyle(BrandTheme.ink)
-                            Spacer()
-                            BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
-                        }
+                        HStack(alignment: .top, spacing: 14) {
+                            GrowthMissionBadgeView(mission: mission, size: 54)
 
-                        Text(mission.detail)
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack(alignment: .top, spacing: 8) {
+                                    Text(mission.title)
+                                        .font(.headline)
+                                        .foregroundStyle(BrandTheme.ink)
+                                        .fixedSize(horizontal: false, vertical: true)
+
+                                    if mission.isSeasonal {
+                                        BrandBadge(text: "Event".appLocalized, systemImage: "wand.and.stars")
+                                    }
+                                }
+
+                                Text(mission.detail)
+                                    .font(.subheadline)
+                                    .foregroundStyle(BrandTheme.muted)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+
+                            Spacer(minLength: 0)
+
+                            VStack(alignment: .trailing, spacing: 8) {
+                                BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
+                                Text(mission.cadenceLabel)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(BrandTheme.primary)
+                            }
+                        }
 
                         ProgressView(value: mission.progressRatio)
                             .tint(BrandTheme.primary)
 
-                        Text("\(mission.progressText) · \(mission.rewardXP) XP")
+                        HStack {
+                            Text("\(mission.progressText) · \(mission.rewardXP) XP")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(BrandTheme.muted)
+
+                            Spacer()
+
+                            if mission.isSeasonal, let seasonID = mission.seasonID, let season = BrandSeasonCatalog.season(for: seasonID) {
+                                Text(season.badgeText.appLocalized)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(BrandTheme.primary)
+                            }
+                        }
+                        Text(mission.coachNote)
                             .font(.footnote.weight(.semibold))
-                            .foregroundStyle(BrandTheme.muted)
+                            .foregroundStyle(BrandTheme.primary)
                     }
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -260,13 +305,240 @@ struct DashboardView: View {
                         RoundedRectangle(cornerRadius: 20, style: .continuous)
                             .fill(BrandTheme.surfaceTint)
                     )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20, style: .continuous)
-                            .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+                        )
+                }
+
+                if growth.missions.count > 1 {
+                    BrandFeatureRow(
+                        systemImage: "checklist.checked",
+                        title: AppLocalization.localized("%d more missions available", arguments: growth.missions.count - 1),
+                        detail: "Open trophy history to see every mission, unlock path, and event reward in one place."
+                    )
+                }
+            }
+
+            trophyRail(growth: growth)
+
+            NavigationLink {
+                TrophyHistoryView(viewModel: viewModel)
+            } label: {
+                QuickActionTile(
+                    title: "Open trophy history",
+                    detail: "See every unlocked badge, progress target, and the longer timeline on a separate screen.",
+                    systemImage: "trophy.fill"
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var billsSection: some View {
+        ExperienceSectionCard(
+            title: "Bills radar",
+            summary: "Upcoming due dates stay tucked away until you need them.",
+            badgeText: "\(viewModel.bills.count)",
+            badgeSystemImage: "calendar.badge.clock"
+        ) {
+            ForEach(viewModel.bills.prefix(3)) { bill in
+                BrandFeatureRow(
+                    systemImage: bill.paymentState(referenceDate: .now, ledger: viewModel.ledger).symbolName,
+                    title: bill.title,
+                    detail: "\(bill.amount.formatted(.currency(code: currencyCode))) · \(FinanceToolFormatting.dueDateText(for: bill, ledger: viewModel.ledger))"
+                )
+            }
+        }
+    }
+
+    private func categorySection(for state: FinanceDashboardState) -> some View {
+        ExperienceSectionCard(
+            title: "Category pressure",
+            summary: "The top categories are the fastest way to see where the month is leaning.",
+            badgeText: state.topCategory?.category.localizedTitle ?? "Mix",
+            badgeSystemImage: state.topCategory?.category.symbolName ?? "chart.pie.fill"
+        ) {
+            ForEach(state.categoryBreakdown.prefix(4)) { item in
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Label(item.category.localizedTitle, systemImage: item.category.symbolName)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(BrandTheme.ink)
+                        Spacer()
+                        Text(item.total.formatted(.currency(code: currencyCode)))
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(BrandTheme.ink)
+                    }
+
+                    ProgressView(value: categoryProgress(item.total, total: state.budgetSnapshot.monthlySpent))
+                        .tint(BrandTheme.primary)
+
+                    Text(categoryCountLabel(for: item.count))
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(BrandTheme.muted)
+                }
+            }
+        }
+    }
+
+    private var loadingCard: some View {
+        MascotLoadingCard(
+            badgeText: "Loading dashboard",
+            title: "Loading dashboard",
+            summary: "Pulling together the local ledger, coach guidance, and category signals.",
+            character: .manchas,
+            expression: .excited
+        )
+    }
+
+    private var dashboardExpression: BrandExpression {
+        switch growthSnapshot.riskState {
+        case .calm:
+            return .happy
+        case .watch:
+            return .thinking
+        case .urgent:
+            return .warning
+        }
+    }
+
+    private var weeklySafeToSpendValue: String {
+        guard let state = viewModel.dashboardState else { return Decimal.zero.formatted(.currency(code: currencyCode)) }
+        return safeToSpendWeek(for: state).formatted(.currency(code: currencyCode))
+    }
+
+    private func safeToSpendWeek(for state: FinanceDashboardState) -> Decimal {
+        let remaining = state.budgetSnapshot.remaining
+        let daysLeft = max(state.remainingDaysInMonth, 1)
+        let perDay = decimalDivide(remaining, by: daysLeft)
+        return max(0, perDay * Decimal(7))
+    }
+
+    private func decimalDivide(_ value: Decimal, by divisor: Int) -> Decimal {
+        guard divisor > 0 else { return 0 }
+        return value / Decimal(divisor)
+    }
+
+    private func categoryProgress(_ value: Decimal, total: Decimal) -> Double {
+        guard total > 0 else { return 0 }
+        let lhs = NSDecimalNumber(decimal: value).doubleValue
+        let rhs = NSDecimalNumber(decimal: total).doubleValue
+        guard rhs > 0 else { return 0 }
+        return min(1, max(0, lhs / rhs))
+    }
+
+    private func categoryCountLabel(for count: Int) -> String {
+        if count == 1 {
+            return AppLocalization.localized("%d transaction", arguments: count)
+        }
+        return AppLocalization.localized("%d transactions", arguments: count)
+    }
+
+    private func localizedCategoryName(_ rawValue: String) -> String {
+        ExpenseCategory.allCases.first(where: { $0.rawValue == rawValue })?.localizedTitle ?? rawValue.appLocalized
+    }
+
+    private func liveEventCard(_ liveEvent: GrowthLiveEvent) -> some View {
+        HStack(alignment: .center, spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(BrandTheme.surface)
+
+                if let image = BrandAssetCatalog.shared.image(for: BrandAssetCatalog.shared.badge(named: liveEvent.badgeAsset)) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .padding(10)
+                } else {
+                    Image(systemName: "wand.and.stars")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(BrandTheme.primary)
+                }
+            }
+            .frame(width: 62, height: 62)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+            )
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    BrandBadge(text: liveEvent.badgeText, systemImage: liveEvent.isActive ? "sparkles" : "calendar")
+                    Text(liveEvent.dateLabel)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(BrandTheme.primary)
+                }
+
+                Text(liveEvent.title)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(liveEvent.detail)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+
+            BrandAssetImage(
+                source: BrandAssetCatalog.shared.guide(liveEvent.sceneKey),
+                fallbackSystemImage: "sparkles"
+            )
+            .aspectRatio(contentMode: .fill)
+            .frame(width: 92, height: 74)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(BrandTheme.surfaceTint)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+        )
+    }
+
+    private func trophyRail(growth: DashboardGrowthSnapshot) -> some View {
+        let trophyPreview = growth.highlightedTrophies.isEmpty ? Array(growth.trophies.prefix(4)) : Array(growth.highlightedTrophies.prefix(4))
+
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Trophy shelf")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Spacer()
+                Text("\(growth.trophies.filter { $0.unlocked }.count) unlocked")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(BrandTheme.primary)
+            }
+
+            LazyVGrid(
+                columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                spacing: 12
+            ) {
+                ForEach(trophyPreview) { trophy in
+                    VStack(alignment: .leading, spacing: 8) {
+                        GrowthTrophyPlate(trophy: trophy, size: 56)
+                        Text(trophy.title)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(BrandTheme.ink)
+                            .lineLimit(2)
+                        Text(trophy.unlocked ? "Unlocked".appLocalized : trophy.progressText)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(BrandTheme.surfaceTint)
                     )
                 }
             }
         }
+        .padding(.top, 4)
     }
 
     private func recentSpendCard(for state: FinanceDashboardState) -> some View {
@@ -335,126 +607,5 @@ struct DashboardView: View {
                 }
             }
         }
-    }
-
-    private var billsSection: some View {
-        ExperienceSectionCard(
-            title: "Bills radar",
-            summary: "Upcoming due dates stay tucked away until you need them.",
-            badgeText: "\(viewModel.bills.count)",
-            badgeSystemImage: "calendar.badge.clock"
-        ) {
-            ForEach(viewModel.bills.prefix(3)) { bill in
-                BrandFeatureRow(
-                    systemImage: bill.paymentState(referenceDate: .now, ledger: viewModel.ledger).symbolName,
-                    title: bill.title,
-                    detail: "\(bill.amount.formatted(.currency(code: currencyCode))) · \(FinanceToolFormatting.dueDateText(for: bill, ledger: viewModel.ledger))"
-                )
-            }
-        }
-    }
-
-    private func categorySection(for state: FinanceDashboardState) -> some View {
-        ExperienceSectionCard(
-            title: "Category pressure",
-            summary: "The top categories are the fastest way to see where the month is leaning.",
-            badgeText: state.topCategory?.category.localizedTitle ?? "Mix",
-            badgeSystemImage: state.topCategory?.category.symbolName ?? "chart.pie.fill"
-        ) {
-            ForEach(state.categoryBreakdown.prefix(4)) { item in
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Label(item.category.localizedTitle, systemImage: item.category.symbolName)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(BrandTheme.ink)
-                        Spacer()
-                        Text(item.total.formatted(.currency(code: currencyCode)))
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(BrandTheme.ink)
-                    }
-
-                    ProgressView(value: categoryProgress(item.total, total: state.budgetSnapshot.monthlySpent))
-                        .tint(BrandTheme.primary)
-
-                    Text(categoryCountLabel(for: item.count))
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(BrandTheme.muted)
-                }
-            }
-        }
-    }
-
-    private func trophiesSection(growth: DashboardGrowthSnapshot) -> some View {
-        ExperienceSectionCard(
-            title: "Recent trophies",
-            summary: "Unlocked wins stay out of the way, but they are still part of the game loop.",
-            badgeText: "\(growth.highlightedTrophies.count)",
-            badgeSystemImage: "trophy.fill"
-        ) {
-            ForEach(growth.highlightedTrophies.prefix(3)) { trophy in
-                BrandFeatureRow(
-                    systemImage: trophy.systemImage,
-                    title: trophy.title,
-                    detail: trophy.celebration
-                )
-            }
-        }
-    }
-
-    private var loadingCard: some View {
-        MascotLoadingCard(
-            badgeText: "Loading dashboard",
-            title: "Loading dashboard",
-            summary: "Pulling together the local ledger, coach guidance, and category signals.",
-            character: .manchas,
-            expression: .excited
-        )
-    }
-
-    private var dashboardExpression: BrandExpression {
-        switch growthSnapshot.riskState {
-        case .calm:
-            return .happy
-        case .watch:
-            return .thinking
-        case .urgent:
-            return .warning
-        }
-    }
-
-    private var weeklySafeToSpendValue: String {
-        guard let state = viewModel.dashboardState else { return Decimal.zero.formatted(.currency(code: currencyCode)) }
-        return safeToSpendWeek(for: state).formatted(.currency(code: currencyCode))
-    }
-
-    private func safeToSpendWeek(for state: FinanceDashboardState) -> Decimal {
-        let remaining = state.budgetSnapshot.remaining
-        let daysLeft = max(state.remainingDaysInMonth, 1)
-        let perDay = decimalDivide(remaining, by: daysLeft)
-        return max(0, perDay * Decimal(7))
-    }
-
-    private func decimalDivide(_ value: Decimal, by divisor: Int) -> Decimal {
-        guard divisor > 0 else { return 0 }
-        return value / Decimal(divisor)
-    }
-
-    private func categoryProgress(_ value: Decimal, total: Decimal) -> Double {
-        guard total > 0 else { return 0 }
-        let lhs = NSDecimalNumber(decimal: value).doubleValue
-        let rhs = NSDecimalNumber(decimal: total).doubleValue
-        guard rhs > 0 else { return 0 }
-        return min(1, max(0, lhs / rhs))
-    }
-
-    private func categoryCountLabel(for count: Int) -> String {
-        if count == 1 {
-            return AppLocalization.localized("%d transaction", arguments: count)
-        }
-        return AppLocalization.localized("%d transactions", arguments: count)
-    }
-
-    private func localizedCategoryName(_ rawValue: String) -> String {
-        ExpenseCategory.allCases.first(where: { $0.rawValue == rawValue })?.localizedTitle ?? rawValue.appLocalized
     }
 }

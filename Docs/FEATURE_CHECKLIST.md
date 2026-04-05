@@ -1,6 +1,6 @@
 # SpendSage iOS Feature Checklist
 
-Last updated: 2026-04-03
+Last updated: 2026-04-04
 
 ## Goal
 
@@ -18,11 +18,12 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 ### Product Foundations
 
 - [x] Native app shell with reusable components
-- [x] Tab navigation for `Inicio`, `Gastos`, `Análisis`, `Premium`, `Ajustes`
+- [x] Tab navigation for `Inicio`, `Gastos`, `Scan`, `Análisis`, `Ajustes`
 - [x] Mascot system integrated across the main surfaces
 - [x] Spanish-first copy consistency across the core screens and touched finance/support routes
 - [x] Currency setting honored across all user-facing financial surfaces
 - [-] Final pre-TestFlight visual QA across all main and secondary routes
+- [x] Root tabs now use simpler inline navigation chrome instead of large-title duplication
 - [x] Internal TestFlight archive and upload
 
 ### Onboarding and Auth
@@ -41,6 +42,7 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - [x] Accounts, bills, and rules management
 - [x] Smart autofill from repeated merchants
 - [x] Assisted receipt draft flow without blocking on OCR
+- [x] Dedicated center scan CTA and 3-step receipt wizard
 - [-] Receipt scan copy aligned with the current non-OCR reality
 - [x] Account tools audit for primary/archive/net-worth consistency
 
@@ -49,12 +51,14 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - [x] Local dashboard with safe-to-spend and mission loop
 - [x] Local savings playbook / strategy engine in dashboard
 - [-] Insights simplified for B2C reading instead of report-heavy copy
+- [x] Chart tap state now exposes exact selected values instead of a decorative-only chart
 - [ ] Savings strategy suggestions surfaced consistently beyond dashboard
 - [ ] Goal coaching and saving recommendations polished end-to-end
 
 ### Monetization Readiness
 
 - [x] Premium screen aligned with current reality instead of fake live billing claims
+- [x] Premium removed from the main tab bar and reduced to a cleaner plan-first surface
 - [ ] Entitlement model documented for `Free`, `Premium`, and `Family`
 - [>] StoreKit integration
 - [>] RevenueCat integration
@@ -89,9 +93,9 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 
 ## Current Priority Order
 
-1. Finish honesty/copy cleanup in `Receipt Scan` and any mock-heavy tools before backend work resumes.
+1. Finish the remaining Spanish-first copy sweep in `Receipt Scan`, `Premium`, and secondary flows below the top fold.
 2. Run one deeper scroll QA pass for long secondary screens after the internal TestFlight build is processed.
-3. Validate the new auth surface and the removal of horizontal drag patterns on small iPhones.
+3. Validate on device that no accidental horizontal drag remains on long settings/support routes.
 4. Prepare the backend/store integration branch after internal tester feedback lands.
 
 ## Progress Notes
@@ -109,3 +113,8 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - 2026-04-03: Internal TestFlight build `1.0 (7)` was archived and uploaded successfully to App Store Connect for internal processing.
 - 2026-04-04: Internal TestFlight build `1.0 (8)` was archived and uploaded after the Xcode 26 icon migration, splash/loading refresh, and final local art polish.
 - 2026-04-04: Generated and integrated final local guide artwork for `Profile`, `Help`, `Rules`, and `Advanced` using the official mascot sprite library and registered them in the brand manifest.
+- 2026-04-04: Dashboard game loop now surfaces mission cards, trophy rail, and live seasonal events; the growth system also ships with maintainable seasonal mission catalogs plus date-driven dashboard/splash/loading art overrides.
+- 2026-04-04: Reworked the main shell so `Scan` is the center CTA, removed `Premium` from the main tab bar, and simplified the root screens with inline navigation chrome.
+- 2026-04-04: `Receipt Scan` now behaves as a true 3-step wizard and protects user-edited category/date values from being overwritten by late OCR/autofill passes.
+- 2026-04-04: `Expenses` was shortened into summary + recent activity + folded tools, `Add expense` now leads with the form, and the dashboard trophy shelf no longer requires horizontal swiping.
+- 2026-04-04: QA screenshots were refreshed for splash, auth, dashboard, scan, insights, settings, and premium; the visible top folds are materially cleaner, though a full below-the-fold i18n pass still remains.

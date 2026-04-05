@@ -55,6 +55,8 @@
   },
   "guides": {
     "guide_01_dashboard_game_manchas": "guide_01_dashboard_game_manchas_v2.png",
+    "guide_01_dashboard_game_manchas_halloween": "guide_01_dashboard_game_manchas_halloween_v2.png",
+    "guide_01_dashboard_game_manchas_holiday": "guide_01_dashboard_game_manchas_holiday_v2.png",
     "guide_02_log_expense_manchas": "guide_02_log_expense_manchas_v2.png",
     "guide_03_budgets_tikki": "guide_03_budgets_tikki_v2.png",
     "guide_04_ai_insights_mei": "guide_04_ai_insights_mei_v2.png",
@@ -79,7 +81,11 @@
     "guide_23_rules_automation_ludo": "guide_23_rules_automation_ludo_v2.png",
     "guide_24_advanced_tools_manchas": "guide_24_advanced_tools_manchas_v2.png",
     "guide_25_splash_team": "guide_25_splash_team_v2.png",
-    "guide_26_loading_yarn_team": "guide_26_loading_yarn_team_v2.png"
+    "guide_25_splash_team_halloween": "guide_25_splash_team_halloween_v2.png",
+    "guide_25_splash_team_holiday": "guide_25_splash_team_holiday_v2.png",
+    "guide_26_loading_yarn_team": "guide_26_loading_yarn_team_v2.png",
+    "guide_26_loading_yarn_team_halloween": "guide_26_loading_yarn_team_halloween_v2.png",
+    "guide_26_loading_yarn_team_holiday": "guide_26_loading_yarn_team_holiday_v2.png"
   },
   "badges": [
     "badge_savings_v2.png",
@@ -101,7 +107,12 @@
     "badge_skip_shield_v2.png",
     "badge_trial_starter_v2.png",
     "badge_streak_guardian_v2.png",
-    "badge_emergency_fund_v2.png"
+    "badge_emergency_fund_v2.png",
+    "badge_bill_radar_v2.png",
+    "badge_safe_to_spend_v2.png",
+    "badge_event_halloween_v2.png",
+    "badge_event_holiday_v2.png",
+    "badge_event_new_year_v2.png"
   ],
   "accessories": [
     "acc_calculator_notebook_coin_v2.png",

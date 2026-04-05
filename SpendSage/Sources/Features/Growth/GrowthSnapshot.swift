@@ -1,6 +1,283 @@
 import Foundation
 import SwiftUI
 
+struct GrowthMissionEvaluationContext {
+    let transactionCount: Int
+    let streakDays: Int
+    let uniqueExpenseDays: Int
+    let accounts: Int
+    let bills: Int
+    let rules: Int
+    let budgetHealthy: Bool
+    let seasonalTransactionCount: Int
+    let seasonalUniqueDayCount: Int
+}
+
+enum GrowthMissionObjective: Hashable {
+    case transactionCount(Int)
+    case streakDays(Int)
+    case uniqueExpenseDays(Int)
+    case accounts(Int)
+    case bills(Int)
+    case rules(Int)
+    case budgetHealthy
+    case seasonalTransactionCount(Int)
+    case seasonalUniqueDayCount(Int)
+
+    func progress(in context: GrowthMissionEvaluationContext) -> (value: Int, target: Int) {
+        switch self {
+        case let .transactionCount(target):
+            return (context.transactionCount, target)
+        case let .streakDays(target):
+            return (context.streakDays, target)
+        case let .uniqueExpenseDays(target):
+            return (context.uniqueExpenseDays, target)
+        case let .accounts(target):
+            return (context.accounts, target)
+        case let .bills(target):
+            return (context.bills, target)
+        case let .rules(target):
+            return (context.rules, target)
+        case .budgetHealthy:
+            return (context.budgetHealthy ? 1 : 0, 1)
+        case let .seasonalTransactionCount(target):
+            return (context.seasonalTransactionCount, target)
+        case let .seasonalUniqueDayCount(target):
+            return (context.seasonalUniqueDayCount, target)
+        }
+    }
+}
+
+struct GrowthMissionBlueprint: Identifiable, Hashable {
+    let id: String
+    let title: String
+    let detail: String
+    let coachNote: String
+    let cadenceLabel: String
+    let rewardXP: Int
+    let systemImage: String
+    let badgeAsset: String
+    let seasonID: BrandSeasonID?
+    let objective: GrowthMissionObjective
+    let readyThreshold: Int?
+    let displayPriority: Int
+
+    func evaluate(in context: GrowthMissionEvaluationContext) -> GrowthMission {
+        let progress = objective.progress(in: context)
+        let status: GrowthMission.Status
+
+        if progress.value >= progress.target {
+            status = .completed
+        } else if let readyThreshold, progress.value >= readyThreshold {
+            status = .ready
+        } else {
+            status = .pending
+        }
+
+        return GrowthMission(
+            id: id,
+            title: title,
+            detail: detail,
+            coachNote: coachNote,
+            cadenceLabel: cadenceLabel,
+            rewardXP: rewardXP,
+            systemImage: systemImage,
+            hybridBadgeAsset: badgeAsset,
+            progressValue: progress.value,
+            progressTarget: progress.target,
+            status: status,
+            seasonID: seasonID
+        )
+    }
+}
+
+enum GrowthMissionCatalog {
+    static let coreBlueprints: [GrowthMissionBlueprint] = [
+        GrowthMissionBlueprint(
+            id: "ledger-momentum",
+            title: "Log five expenses".appLocalized,
+            detail: "Build enough activity for better coach calls and trophy momentum.".appLocalized,
+            coachNote: "Short bursts of clean entries are better than one long catch-up session.".appLocalized,
+            cadenceLabel: "Daily".appLocalized,
+            rewardXP: 80,
+            systemImage: "square.and.pencil.circle.fill",
+            badgeAsset: "badge_quest_daily_v2.png",
+            seasonID: nil,
+            objective: .transactionCount(5),
+            readyThreshold: 3,
+            displayPriority: 0
+        ),
+        GrowthMissionBlueprint(
+            id: "streak-keeper",
+            title: "Protect a three-day streak".appLocalized,
+            detail: "Consecutive active days turn the dashboard from static to predictive.".appLocalized,
+            coachNote: "A streak is just repeatability made visible.".appLocalized,
+            cadenceLabel: "Weekly".appLocalized,
+            rewardXP: 110,
+            systemImage: "flame.fill",
+            badgeAsset: "badge_streak_v2.png",
+            seasonID: nil,
+            objective: .streakDays(3),
+            readyThreshold: 2,
+            displayPriority: 1
+        ),
+        GrowthMissionBlueprint(
+            id: "account-map",
+            title: "Add two account buckets".appLocalized,
+            detail: "Cash, savings, and cards make the dashboard feel like a real cockpit.".appLocalized,
+            coachNote: "One extra account usually unlocks the clearest net-worth story.".appLocalized,
+            cadenceLabel: "Weekly".appLocalized,
+            rewardXP: 90,
+            systemImage: "building.columns.fill",
+            badgeAsset: "badge_safe_to_spend_v2.png",
+            seasonID: nil,
+            objective: .accounts(2),
+            readyThreshold: 1,
+            displayPriority: 2
+        ),
+        GrowthMissionBlueprint(
+            id: "bill-radar",
+            title: "Turn on bills radar".appLocalized,
+            detail: "Track at least one recurring bill so the dashboard can flag future pressure.".appLocalized,
+            coachNote: "The calmest months are the ones where obligations stop arriving as surprises.".appLocalized,
+            cadenceLabel: "Boss".appLocalized,
+            rewardXP: 120,
+            systemImage: "calendar.badge.clock",
+            badgeAsset: "badge_bill_radar_v2.png",
+            seasonID: nil,
+            objective: .bills(1),
+            readyThreshold: nil,
+            displayPriority: 3
+        ),
+        GrowthMissionBlueprint(
+            id: "rule-architect",
+            title: "Create one smart rule".appLocalized,
+            detail: "Let recurring merchants auto-land in the right category.".appLocalized,
+            coachNote: "Rules remove friction from every future expense.".appLocalized,
+            cadenceLabel: "Boss".appLocalized,
+            rewardXP: 120,
+            systemImage: "point.3.filled.connected.trianglepath.dotted",
+            badgeAsset: "badge_smart_spend_v2.png",
+            seasonID: nil,
+            objective: .rules(1),
+            readyThreshold: nil,
+            displayPriority: 4
+        ),
+        GrowthMissionBlueprint(
+            id: "budget-guardian",
+            title: "Keep the month inside budget".appLocalized,
+            detail: "Stay under the current monthly plan through the next review.".appLocalized,
+            coachNote: "If the dashboard stays green, your next decisions get easier.".appLocalized,
+            cadenceLabel: "Monthly".appLocalized,
+            rewardXP: 140,
+            systemImage: "shield.lefthalf.filled",
+            badgeAsset: "badge_budgeting_v2.png",
+            seasonID: nil,
+            objective: .budgetHealthy,
+            readyThreshold: nil,
+            displayPriority: 5
+        )
+    ]
+
+    static let seasonalBlueprints: [BrandSeasonID: [GrowthMissionBlueprint]] = [
+        .halloween: [
+            GrowthMissionBlueprint(
+                id: "halloween-night-watch",
+                title: "Night watch streak".appLocalized,
+                detail: "Stay active on four separate Halloween event days to keep impulse spending from sneaking in.".appLocalized,
+                coachNote: "Short check-ins beat one giant cleanup after the candy and costume rush.".appLocalized,
+                cadenceLabel: "Event".appLocalized,
+                rewardXP: 160,
+                systemImage: "moon.stars.fill",
+                badgeAsset: "badge_event_halloween_v2.png",
+                seasonID: .halloween,
+                objective: .seasonalUniqueDayCount(4),
+                readyThreshold: 3,
+                displayPriority: 0
+            ),
+            GrowthMissionBlueprint(
+                id: "halloween-loot-log",
+                title: "Log six spooky purchases".appLocalized,
+                detail: "Capture the seasonal extras before they blur into the monthly total.".appLocalized,
+                coachNote: "Event spending only feels scary when it stays invisible.".appLocalized,
+                cadenceLabel: "Event".appLocalized,
+                rewardXP: 140,
+                systemImage: "sparkles",
+                badgeAsset: "badge_event_halloween_v2.png",
+                seasonID: .halloween,
+                objective: .seasonalTransactionCount(6),
+                readyThreshold: 4,
+                displayPriority: 1
+            )
+        ],
+        .winterHolidays: [
+            GrowthMissionBlueprint(
+                id: "holiday-gift-guard",
+                title: "Guard the gift budget".appLocalized,
+                detail: "Keep the month inside plan while the festive art pack is live.".appLocalized,
+                coachNote: "A visible guardrail makes generous spending feel calm instead of fuzzy.".appLocalized,
+                cadenceLabel: "Event".appLocalized,
+                rewardXP: 180,
+                systemImage: "gift.fill",
+                badgeAsset: "badge_event_holiday_v2.png",
+                seasonID: .winterHolidays,
+                objective: .budgetHealthy,
+                readyThreshold: nil,
+                displayPriority: 0
+            ),
+            GrowthMissionBlueprint(
+                id: "holiday-wrap-up",
+                title: "Log five festive moments".appLocalized,
+                detail: "Track the travel, gifts, and hosting costs while the holiday pack is active.".appLocalized,
+                coachNote: "Small captures keep December from turning into a mystery total.".appLocalized,
+                cadenceLabel: "Event".appLocalized,
+                rewardXP: 145,
+                systemImage: "sparkles.rectangle.stack.fill",
+                badgeAsset: "badge_event_holiday_v2.png",
+                seasonID: .winterHolidays,
+                objective: .seasonalTransactionCount(5),
+                readyThreshold: 3,
+                displayPriority: 1
+            )
+        ],
+        .newYear: [
+            GrowthMissionBlueprint(
+                id: "new-year-fresh-ledger",
+                title: "Fresh ledger reset".appLocalized,
+                detail: "Log three January entries so the year starts with real visibility instead of guesswork.".appLocalized,
+                coachNote: "The cleanest reset is a short first week, not a perfect spreadsheet.".appLocalized,
+                cadenceLabel: "Event".appLocalized,
+                rewardXP: 150,
+                systemImage: "sparkles",
+                badgeAsset: "badge_event_new_year_v2.png",
+                seasonID: .newYear,
+                objective: .seasonalTransactionCount(3),
+                readyThreshold: 2,
+                displayPriority: 0
+            ),
+            GrowthMissionBlueprint(
+                id: "new-year-cleanup",
+                title: "Reset with two active days".appLocalized,
+                detail: "Two separate days of cleanup are enough to wake the coach back up for the year.".appLocalized,
+                coachNote: "Momentum usually returns faster than motivation once the first two days are visible.".appLocalized,
+                cadenceLabel: "Event".appLocalized,
+                rewardXP: 120,
+                systemImage: "sun.max.fill",
+                badgeAsset: "badge_event_new_year_v2.png",
+                seasonID: .newYear,
+                objective: .seasonalUniqueDayCount(2),
+                readyThreshold: nil,
+                displayPriority: 1
+            )
+        ]
+    ]
+
+    static func activeBlueprints(for activeSeason: BrandSeasonDefinition?) -> [GrowthMissionBlueprint] {
+        guard let activeSeason else { return [] }
+        return seasonalBlueprints[activeSeason.id] ?? []
+    }
+}
+
 struct GrowthMission: Identifiable, Equatable {
     enum Status: String {
         case pending = "Pending"
@@ -19,9 +296,11 @@ struct GrowthMission: Identifiable, Equatable {
     let cadenceLabel: String
     let rewardXP: Int
     let systemImage: String
+    let hybridBadgeAsset: String
     let progressValue: Int
     let progressTarget: Int
     let status: Status
+    let seasonID: BrandSeasonID?
 
     var progressRatio: Double {
         guard progressTarget > 0 else { return 0 }
@@ -30,6 +309,10 @@ struct GrowthMission: Identifiable, Equatable {
 
     var progressText: String {
         "\(min(progressValue, progressTarget))/\(progressTarget)"
+    }
+
+    var isSeasonal: Bool {
+        seasonID != nil
     }
 }
 
@@ -64,6 +347,16 @@ struct GrowthEvent: Identifiable, Equatable {
     let detail: String
     let occurredAt: Date
     let systemImage: String
+}
+
+struct GrowthLiveEvent: Equatable {
+    let title: String
+    let detail: String
+    let badgeText: String
+    let badgeAsset: String
+    let sceneKey: String
+    let isActive: Bool
+    let dateLabel: String
 }
 
 struct DashboardSavingsStrategy: Identifiable, Equatable {
@@ -118,9 +411,11 @@ struct DashboardGrowthSnapshot: Equatable {
     let riskState: RiskState
     let strategies: [DashboardSavingsStrategy]
     let missions: [GrowthMission]
+    let seasonalMissions: [GrowthMission]
     let trophies: [GrowthTrophy]
     let highlightedTrophies: [GrowthTrophy]
     let events: [GrowthEvent]
+    let liveEvent: GrowthLiveEvent?
 }
 
 enum GrowthSnapshotBuilder {
@@ -137,6 +432,12 @@ enum GrowthSnapshotBuilder {
         let uniqueDays = uniqueExpenseDays(in: expenses)
         let streakDays = activeStreak(from: uniqueDays)
         let transactionCount = state?.transactionCount ?? expenses.count
+        let activeSeason = BrandSeasonCatalog.activeSeason()
+        let seasonalExpenses = expenses.filter { expense in
+            guard let activeSeason else { return false }
+            return BrandSeasonCatalog.contains(expense.date, in: activeSeason)
+        }
+        let seasonalUniqueDays = uniqueExpenseDays(in: seasonalExpenses)
         let utilization = state?.utilizationRatio ?? 0
         let isBudgetHealthy = transactionCount > 0 && utilization <= 1
         let profileCustomized = profile != .default
@@ -232,12 +533,18 @@ enum GrowthSnapshotBuilder {
         }
 
         let missions = buildMissions(
-            transactionCount: transactionCount,
-            streakDays: streakDays,
-            accounts: accounts.count,
-            bills: bills.count,
-            rules: rules.count,
-            budgetHealthy: isBudgetHealthy
+            context: GrowthMissionEvaluationContext(
+                transactionCount: transactionCount,
+                streakDays: streakDays,
+                uniqueExpenseDays: uniqueDays.count,
+                accounts: accounts.count,
+                bills: bills.count,
+                rules: rules.count,
+                budgetHealthy: isBudgetHealthy,
+                seasonalTransactionCount: seasonalExpenses.count,
+                seasonalUniqueDayCount: seasonalUniqueDays.count
+            ),
+            activeSeason: activeSeason
         )
         let strategies = buildStrategies(
             state: state,
@@ -262,8 +569,10 @@ enum GrowthSnapshotBuilder {
             ledger: ledger,
             trophies: trophies,
             coachAction: coachAction,
-            riskState: riskState
+            riskState: riskState,
+            activeSeason: activeSeason
         )
+        let liveEvent = buildLiveEvent(activeSeason: activeSeason)
 
         return DashboardGrowthSnapshot(
             greetingTitle: greetingTitle,
@@ -283,103 +592,41 @@ enum GrowthSnapshotBuilder {
             riskState: riskState,
             strategies: strategies,
             missions: missions,
+            seasonalMissions: missions.filter(\.isSeasonal),
             trophies: trophies,
             highlightedTrophies: Array(trophies.filter(\.unlocked).prefix(3)),
-            events: Array(events.prefix(6))
+            events: Array(events.prefix(6)),
+            liveEvent: liveEvent
         )
     }
 
     private static func buildMissions(
-        transactionCount: Int,
-        streakDays: Int,
-        accounts: Int,
-        bills: Int,
-        rules: Int,
-        budgetHealthy: Bool
+        context: GrowthMissionEvaluationContext,
+        activeSeason: BrandSeasonDefinition?
     ) -> [GrowthMission] {
-        let candidates = [
-            GrowthMission(
-                id: "ledger-momentum",
-                title: "Log five expenses".appLocalized,
-                detail: "Build enough activity for better coach calls and trophy momentum.".appLocalized,
-                coachNote: "Short bursts of clean entries are better than one long catch-up session.".appLocalized,
-                cadenceLabel: "Daily".appLocalized,
-                rewardXP: 80,
-                systemImage: "square.and.pencil.circle.fill",
-                progressValue: transactionCount,
-                progressTarget: 5,
-                status: transactionCount >= 5 ? .completed : transactionCount >= 3 ? .ready : .pending
-            ),
-            GrowthMission(
-                id: "streak-keeper",
-                title: "Protect a three-day streak".appLocalized,
-                detail: "Consecutive active days turn the dashboard from static to predictive.".appLocalized,
-                coachNote: "A streak is just repeatability made visible.".appLocalized,
-                cadenceLabel: "Weekly".appLocalized,
-                rewardXP: 110,
-                systemImage: "flame.fill",
-                progressValue: streakDays,
-                progressTarget: 3,
-                status: streakDays >= 3 ? .completed : streakDays >= 2 ? .ready : .pending
-            ),
-            GrowthMission(
-                id: "account-map",
-                title: "Add two account buckets".appLocalized,
-                detail: "Cash, savings, and cards make the dashboard feel like a real cockpit.".appLocalized,
-                coachNote: "One extra account usually unlocks the clearest net-worth story.".appLocalized,
-                cadenceLabel: "Weekly".appLocalized,
-                rewardXP: 90,
-                systemImage: "building.columns.fill",
-                progressValue: accounts,
-                progressTarget: 2,
-                status: accounts >= 2 ? .completed : accounts == 1 ? .ready : .pending
-            ),
-            GrowthMission(
-                id: "bill-radar",
-                title: "Turn on bills radar".appLocalized,
-                detail: "Track at least one recurring bill so the dashboard can flag future pressure.".appLocalized,
-                coachNote: "The calmest months are the ones where obligations stop arriving as surprises.".appLocalized,
-                cadenceLabel: "Boss".appLocalized,
-                rewardXP: 120,
-                systemImage: "calendar.badge.clock",
-                progressValue: bills,
-                progressTarget: 1,
-                status: bills >= 1 ? .completed : .pending
-            ),
-            GrowthMission(
-                id: "rule-architect",
-                title: "Create one smart rule".appLocalized,
-                detail: "Let recurring merchants auto-land in the right category.".appLocalized,
-                coachNote: "Rules remove friction from every future expense.".appLocalized,
-                cadenceLabel: "Boss".appLocalized,
-                rewardXP: 120,
-                systemImage: "point.3.filled.connected.trianglepath.dotted",
-                progressValue: rules,
-                progressTarget: 1,
-                status: rules >= 1 ? .completed : .pending
-            ),
-            GrowthMission(
-                id: "budget-guardian",
-                title: "Keep the month inside budget".appLocalized,
-                detail: "Stay under the current monthly plan through the next review.".appLocalized,
-                coachNote: "If the dashboard stays green, your next decisions get easier.".appLocalized,
-                cadenceLabel: "Monthly".appLocalized,
-                rewardXP: 140,
-                systemImage: "shield.lefthalf.filled",
-                progressValue: budgetHealthy ? 1 : 0,
-                progressTarget: 1,
-                status: budgetHealthy ? .completed : .pending
-            )
-        ]
+        let coreMissions = GrowthMissionCatalog.coreBlueprints.map { $0.evaluate(in: context) }
+        let seasonalMissions = GrowthMissionCatalog
+            .activeBlueprints(for: activeSeason)
+            .map { $0.evaluate(in: context) }
+
+        let candidates = seasonalMissions + coreMissions
 
         return candidates
             .sorted { lhs, rhs in
+                if lhs.isSeasonal != rhs.isSeasonal {
+                    return lhs.isSeasonal && !rhs.isSeasonal
+                }
                 if lhs.status != rhs.status {
                     return lhs.status.sortRank < rhs.status.sortRank
                 }
+                let lhsPriority = missionDisplayPriority(for: lhs.id, seasonID: lhs.seasonID)
+                let rhsPriority = missionDisplayPriority(for: rhs.id, seasonID: rhs.seasonID)
+                if lhsPriority != rhsPriority {
+                    return lhsPriority < rhsPriority
+                }
                 return lhs.progressRatio > rhs.progressRatio
             }
-            .prefix(4)
+            .prefix(activeSeason == nil ? 4 : 5)
             .map { $0 }
     }
 
@@ -676,7 +923,8 @@ enum GrowthSnapshotBuilder {
         ledger: LocalFinanceLedger?,
         trophies: [GrowthTrophy],
         coachAction: String,
-        riskState: DashboardGrowthSnapshot.RiskState
+        riskState: DashboardGrowthSnapshot.RiskState,
+        activeSeason: BrandSeasonDefinition?
     ) -> [GrowthEvent] {
         let lastUpdated = ledger?.updatedAt ?? state?.lastUpdated ?? .now
         var items: [GrowthEvent] = trophies.compactMap { trophy in
@@ -728,7 +976,54 @@ enum GrowthSnapshotBuilder {
             )
         )
 
+        if let activeSeason {
+            items.append(
+                GrowthEvent(
+                    id: "season-\(activeSeason.id.rawValue)",
+                    title: activeSeason.title.appLocalized,
+                    detail: activeSeason.summary.appLocalized,
+                    occurredAt: lastUpdated,
+                    systemImage: "wand.and.stars"
+                )
+            )
+        }
+
         return items.sorted { $0.occurredAt > $1.occurredAt }
+    }
+
+    private static func buildLiveEvent(
+        activeSeason: BrandSeasonDefinition?,
+        referenceDate: Date = .now,
+        calendar: Calendar = .autoupdatingCurrent
+    ) -> GrowthLiveEvent? {
+        if let activeSeason {
+            return GrowthLiveEvent(
+                title: activeSeason.title,
+                detail: activeSeason.summary,
+                badgeText: activeSeason.badgeText,
+                badgeAsset: activeSeason.badgeAsset,
+                sceneKey: activeSeason.spotlightGuideKey,
+                isActive: true,
+                dateLabel: "Live now".appLocalized
+            )
+        }
+
+        guard let nextSeason = BrandSeasonCatalog.nextSeason(after: referenceDate, calendar: calendar) else {
+            return nil
+        }
+
+        return GrowthLiveEvent(
+            title: nextSeason.season.title,
+            detail: nextSeason.season.summary,
+            badgeText: "Next live event".appLocalized,
+            badgeAsset: nextSeason.season.badgeAsset,
+            sceneKey: nextSeason.season.spotlightGuideKey,
+            isActive: false,
+            dateLabel: AppLocalization.localized(
+                "Starts %@",
+                arguments: nextSeason.startDate.formatted(date: .abbreviated, time: .omitted)
+            )
+        )
     }
 
     private static func uniqueExpenseDays(in expenses: [ExpenseRecord]) -> [Date] {
@@ -809,6 +1104,20 @@ enum GrowthSnapshotBuilder {
         let incomeCap = income * Decimal(string: "0.08")!
         let remainingCap = remaining * Decimal(string: "0.25")!
         return min(incomeCap, remainingCap)
+    }
+
+    private static func missionDisplayPriority(for id: String, seasonID: BrandSeasonID?) -> Int {
+        if let seasonID {
+            return GrowthMissionCatalog
+                .seasonalBlueprints[seasonID]?
+                .first(where: { $0.id == id })?
+                .displayPriority ?? .max
+        }
+
+        return GrowthMissionCatalog
+            .coreBlueprints
+            .first(where: { $0.id == id })?
+            .displayPriority ?? .max
     }
 }
 

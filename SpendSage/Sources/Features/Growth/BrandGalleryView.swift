@@ -20,6 +20,8 @@ struct BrandGalleryView: View {
 
     private let catalog = BrandAssetCatalog.shared
     private var manifest: BrandAssetManifest { catalog.activeManifest }
+    private var activeSeason: BrandSeasonDefinition? { BrandSeasonCatalog.activeSeason() }
+    private var nextSeason: (season: BrandSeasonDefinition, startDate: Date)? { BrandSeasonCatalog.nextSeason() }
 
     var body: some View {
         ScrollView {
@@ -54,6 +56,72 @@ struct BrandGalleryView: View {
                             title: "Guide-ready system",
                             detail: "Mascot expressions, badge art, and guide scenes all come from the same manifest, so the product language stays consistent."
                         )
+                    }
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Seasonal packs")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text("Date-based art swaps for dashboard, splash, and loading now come from a small catalog instead of one-off conditions.")
+                            .foregroundStyle(BrandTheme.muted)
+
+                        ForEach(BrandSeasonCatalog.seasons, id: \.id) { season in
+                            HStack(alignment: .top, spacing: 14) {
+                                BrandAssetImage(
+                                    source: seasonalPreviewSource(for: season),
+                                    fallbackSystemImage: "sparkles"
+                                )
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 92, height: 72)
+                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack(spacing: 8) {
+                                        Text(season.title.appLocalized)
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+
+                                        if activeSeason?.id == season.id {
+                                            BrandBadge(text: "Live".appLocalized, systemImage: "sparkles")
+                                        } else if nextSeason?.season.id == season.id {
+                                            BrandBadge(text: "Next".appLocalized, systemImage: "calendar")
+                                        }
+                                    }
+
+                                    Text(season.summary.appLocalized)
+                                        .font(.subheadline)
+                                        .foregroundStyle(BrandTheme.muted)
+                                        .fixedSize(horizontal: false, vertical: true)
+
+                                    HStack(spacing: 8) {
+                                        BrandAssetImage(
+                                            source: catalog.badge(named: season.badgeAsset),
+                                            fallbackSystemImage: "seal.fill"
+                                        )
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 28, height: 28)
+
+                                        Text(seasonDateLabel(for: season))
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(BrandTheme.primary)
+                                    }
+                                }
+
+                                Spacer()
+                            }
+                            .padding(14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                    .fill(BrandTheme.surfaceTint)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                    .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+                            )
+                        }
                     }
                 }
 
@@ -256,5 +324,25 @@ struct BrandGalleryView: View {
         .sheet(item: $selectedGuide) { guide in
             GuideSheet(guide: guide)
         }
+    }
+
+    private func seasonalPreviewSource(for season: BrandSeasonDefinition) -> BrandAssetSource? {
+        let key = season.guideOverrides[season.spotlightGuideKey] ?? season.spotlightGuideKey
+        return catalog.guideIfAvailable(key) ?? catalog.guideIfAvailable(season.spotlightGuideKey)
+    }
+
+    private func seasonDateLabel(for season: BrandSeasonDefinition) -> String {
+        if activeSeason?.id == season.id {
+            return "Active on today's date".appLocalized
+        }
+
+        if let nextSeason, nextSeason.season.id == season.id {
+            return AppLocalization.localized(
+                "Starts %@",
+                arguments: nextSeason.startDate.formatted(date: .abbreviated, time: .omitted)
+            )
+        }
+
+        return "Catalog ready".appLocalized
     }
 }

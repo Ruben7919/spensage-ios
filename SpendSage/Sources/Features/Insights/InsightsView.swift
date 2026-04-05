@@ -13,6 +13,7 @@ struct InsightsView: View {
     @State private var isPresentingGuide = false
     @State private var budgetDraft: [ExpenseCategory: String] = [:]
     @State private var plannerNotice: String?
+    @State private var selectedChartIndex: Int?
 
     private var currentState: FinanceDashboardState? {
         viewModel.dashboardState
@@ -162,6 +163,11 @@ struct InsightsView: View {
         buildSeries(for: selectedPeriod, metric: selectedMetric, expenses: recentExpenses)
     }
 
+    private var selectedChartPoint: InsightsSeriesPoint? {
+        guard let selectedChartIndex else { return nil }
+        return selectedSeries.first(where: { $0.index == selectedChartIndex })
+    }
+
     private var plannerCategories: [ExpenseCategory] {
         Array(ExpenseCategory.allCases.prefix(6))
     }
@@ -202,9 +208,15 @@ struct InsightsView: View {
             .ignoresSafeArea()
         )
         .navigationTitle("Insights".appLocalized)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {
             GuideSheet(guide: GuideLibrary.guide(.insights))
+        }
+        .onChange(of: selectedPeriod) { _ in
+            selectedChartIndex = nil
+        }
+        .onChange(of: selectedMetric) { _ in
+            selectedChartIndex = nil
         }
         .task {
             seedBudgetDraftIfNeeded()
@@ -285,14 +297,14 @@ struct InsightsView: View {
                         systemImage: "banknote.fill"
                     )
                     BrandMetricTile(
-                        title: "Net worth",
-                        value: netWorthTotal.formatted(.currency(code: currencyCode)),
-                        systemImage: "scale.3d"
-                    )
-                    BrandMetricTile(
                         title: "Savings rate",
                         value: savingsRate.map { String(format: "%.0f%%", $0 * 100) } ?? "n/a".appLocalized,
                         systemImage: "percent"
+                    )
+                    BrandMetricTile(
+                        title: "Net worth",
+                        value: netWorthTotal.formatted(.currency(code: currencyCode)),
+                        systemImage: "scale.3d"
                     )
                 }
 
@@ -344,7 +356,7 @@ struct InsightsView: View {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
                     title: "Main chart",
-                    detail: "One visual is enough when it makes the pattern obvious."
+                    detail: "Use the chart for the quick pattern. Open trend detail when you want the full read."
                 )
 
                 if selectedSeries.isEmpty {
@@ -354,33 +366,84 @@ struct InsightsView: View {
                         detail: "Add a few expenses and the chart will start showing a clearer pattern."
                     )
                 } else {
+                    if let selectedChartPoint {
+                        BrandFeatureRow(
+                            systemImage: selectedMetric.systemImage,
+                            title: AppLocalization.localized("%@ selected", arguments: selectedChartPoint.label),
+                            detail: formattedChartValue(selectedChartPoint.value)
+                        )
+                    } else {
+                        BrandFeatureRow(
+                            systemImage: "hand.tap.fill",
+                            title: "Touch a bar",
+                            detail: "The exact value appears here when you press a bucket."
+                        )
+                    }
+
                     Chart(selectedSeries) { row in
                         BarMark(
-                            x: .value("Bucket", row.label),
+                            x: .value("Bucket", row.index),
                             y: .value("Value", row.value)
                         )
-                        .foregroundStyle(BrandTheme.primary)
+                        .foregroundStyle(selectedChartIndex == row.index ? BrandTheme.accent : BrandTheme.primary)
+                        .opacity(selectedChartIndex == nil || selectedChartIndex == row.index ? 1 : 0.45)
                         .cornerRadius(6)
+                        .annotation(position: .top, spacing: 8) {
+                            if selectedChartIndex == row.index {
+                                Text(formattedChartValue(row.value))
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(BrandTheme.ink)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 6)
+                                    .background(BrandTheme.surface, in: Capsule())
+                            }
+                        }
                     }
                     .frame(height: 220)
+                    .chartXAxis {
+                        AxisMarks(values: selectedSeries.map(\.index)) { value in
+                            AxisGridLine()
+                            AxisTick()
+                            if let index = value.as(Int.self),
+                               let point = selectedSeries.first(where: { $0.index == index }) {
+                                AxisValueLabel(point.label)
+                            }
+                        }
+                    }
                     .chartYAxis {
                         AxisMarks(position: .leading)
                     }
-
-                    if !monthlyTrendRows.isEmpty {
-                        HStack(spacing: 12) {
-                            BrandMetricTile(
-                                title: "Avg spend",
-                                value: averageMonthlySpend.formatted(.currency(code: currencyCode)),
-                                systemImage: "chart.line.uptrend.xyaxis"
-                            )
-                            BrandMetricTile(
-                                title: "Best month",
-                                value: strongestMonthLabel,
-                                systemImage: "trophy.fill"
-                            )
+                    .chartOverlay { proxy in
+                        GeometryReader { geometry in
+                            Rectangle()
+                                .fill(Color.clear)
+                                .contentShape(Rectangle())
+                                .gesture(
+                                    DragGesture(minimumDistance: 0)
+                                        .onChanged { value in
+                                            updateChartSelection(at: value.location, proxy: proxy, geometry: geometry)
+                                        }
+                                )
                         }
                     }
+
+                    NavigationLink {
+                        InsightsTrendDetailView(
+                            monthlyTrendRows: monthlyTrendRows,
+                            averageMonthlySpend: averageMonthlySpend,
+                            strongestMonthLabel: strongestMonthLabel,
+                            series: selectedSeries,
+                            metric: selectedMetric,
+                            currencyCode: currencyCode
+                        )
+                    } label: {
+                        QuickActionTile(
+                            title: "Open trend detail",
+                            detail: "See average spend, strongest month, and every recent bucket on a separate screen.",
+                            systemImage: "chart.bar.xaxis"
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -391,7 +454,7 @@ struct InsightsView: View {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
                     title: "Category pressure",
-                    detail: "Focus on the categories that deserve attention, not every detail at once."
+                    detail: "Start with the top categories here. Open the detail view when you want the full breakdown."
                 )
 
                 if categoryBreakdown.isEmpty {
@@ -401,7 +464,7 @@ struct InsightsView: View {
                         detail: "The first expenses will reveal where the budget is tilting."
                     )
                 } else {
-                    ForEach(categoryBreakdown) { category in
+                    ForEach(Array(categoryBreakdown.prefix(3))) { category in
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
                                 Text(category.category.localizedTitle)
@@ -430,13 +493,29 @@ struct InsightsView: View {
                     }
                 }
 
-                ForEach(insightRows(for: state)) { row in
+                if let row = insightRows(for: state).first {
                     BrandFeatureRow(
                         systemImage: row.systemImage,
                         title: row.title,
                         detail: row.detail
                     )
                 }
+
+                NavigationLink {
+                    InsightsCategoryDetailView(
+                        categories: categoryBreakdown,
+                        monthSpending: monthSpending,
+                        currencyCode: currencyCode,
+                        rows: insightRows(for: state)
+                    )
+                } label: {
+                    QuickActionTile(
+                        title: "Open category detail",
+                        detail: "See the full category list and all next-step prompts on a separate screen.",
+                        systemImage: "list.bullet.rectangle.portrait"
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -636,6 +715,31 @@ struct InsightsView: View {
             return AppLocalization.localized("%d transaction", arguments: count)
         }
         return AppLocalization.localized("%d transactions", arguments: count)
+    }
+
+    private func formattedChartValue(_ value: Double) -> String {
+        NSDecimalNumber(value: value).decimalValue.formatted(.currency(code: currencyCode))
+    }
+
+    private func updateChartSelection(at location: CGPoint, proxy: ChartProxy, geometry: GeometryProxy) {
+        guard !selectedSeries.isEmpty else {
+            selectedChartIndex = nil
+            return
+        }
+
+        let plotArea = geometry[proxy.plotAreaFrame]
+        guard plotArea.contains(location) else {
+            selectedChartIndex = nil
+            return
+        }
+
+        let relativeX = location.x - plotArea.minX
+        let stepWidth = plotArea.width / CGFloat(selectedSeries.count)
+        guard stepWidth > 0 else { return }
+
+        let rawIndex = Int(relativeX / stepWidth)
+        let boundedIndex = min(max(rawIndex, 0), selectedSeries.count - 1)
+        selectedChartIndex = selectedSeries[boundedIndex].index
     }
 
     private func copyExport(_ text: String, label: String) {
@@ -847,10 +951,226 @@ private struct TrendRow: Identifiable {
 }
 
 private struct InsightsSeriesPoint: Identifiable {
+    let index: Int
     let label: String
     let value: Double
 
-    var id: String { label }
+    var id: Int { index }
+}
+
+private struct InsightsTrendDetailView: View {
+    let monthlyTrendRows: [TrendRow]
+    let averageMonthlySpend: Decimal
+    let strongestMonthLabel: String
+    let series: [InsightsSeriesPoint]
+    let metric: InsightsMetric
+    let currencyCode: String
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        CompactSectionHeader(
+                            title: "Trend detail",
+                            detail: "This screen carries the extra context so the main Insights view can stay lighter."
+                        )
+
+                        HStack(spacing: 12) {
+                            BrandMetricTile(
+                                title: "Avg spend",
+                                value: averageMonthlySpend.formatted(.currency(code: currencyCode)),
+                                systemImage: "chart.line.uptrend.xyaxis"
+                            )
+                            BrandMetricTile(
+                                title: "Best month",
+                                value: strongestMonthLabel,
+                                systemImage: "trophy.fill"
+                            )
+                        }
+                    }
+                }
+
+                if !series.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            CompactSectionHeader(
+                                title: "Current range buckets",
+                                detail: "Each bucket shows the exact \(metric.title.lowercased()) total in the selected range."
+                            )
+
+                            ForEach(series) { point in
+                                detailRow(title: point.label, value: formattedCurrency(point.value))
+                            }
+                        }
+                    }
+                }
+
+                if !monthlyTrendRows.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            CompactSectionHeader(
+                                title: "Six-month view",
+                                detail: "Recent monthly spend and net flow stay here instead of crowding the main chart."
+                            )
+
+                            ForEach(monthlyTrendRows) { row in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text(row.label)
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+
+                                        Spacer()
+
+                                        Text(formattedCurrency(row.expense))
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+                                    }
+
+                                    detailRow(title: "Net", value: formattedCurrency(row.net))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 40)
+        }
+        .background(
+            ZStack {
+                BrandTheme.canvas
+                BrandBackdropView()
+            }
+            .ignoresSafeArea()
+        )
+        .navigationTitle("Trend detail".appLocalized)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func formattedCurrency(_ value: Double) -> String {
+        NSDecimalNumber(value: value).decimalValue.formatted(.currency(code: currencyCode))
+    }
+
+    @ViewBuilder
+    private func detailRow(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(BrandTheme.muted)
+
+            Spacer()
+
+            Text(value)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(BrandTheme.ink)
+                .multilineTextAlignment(.trailing)
+        }
+    }
+}
+
+private struct InsightsCategoryDetailView: View {
+    let categories: [CategoryBreakdown]
+    let monthSpending: Decimal
+    let currencyCode: String
+    let rows: [InsightRow]
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 14) {
+                        CompactSectionHeader(
+                            title: "Category detail",
+                            detail: "Full category pressure and the supporting prompts live here instead of the main screen."
+                        )
+
+                        if categories.isEmpty {
+                            BrandFeatureRow(
+                                systemImage: "square.grid.2x2.fill",
+                                title: "No categories yet",
+                                detail: "Add a few expenses and the category breakdown will appear here."
+                            )
+                        } else {
+                            ForEach(categories) { category in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text(category.category.localizedTitle)
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+
+                                        Spacer()
+
+                                        Text(category.total.formatted(.currency(code: currencyCode)))
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+                                    }
+
+                                    ProgressView(value: share(for: category))
+                                        .tint(BrandTheme.primary)
+
+                                    Text(categoryCountLabel(for: category.count))
+                                        .font(.footnote.weight(.semibold))
+                                        .foregroundStyle(BrandTheme.muted)
+                                }
+                                .padding(16)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                        .fill(BrandTheme.surfaceTint)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if !rows.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            CompactSectionHeader(
+                                title: "Next prompts",
+                                detail: "These are the follow-up actions that were removed from the main Insights screen."
+                            )
+
+                            ForEach(rows) { row in
+                                BrandFeatureRow(
+                                    systemImage: row.systemImage,
+                                    title: row.title,
+                                    detail: row.detail
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 40)
+        }
+        .background(
+            ZStack {
+                BrandTheme.canvas
+                BrandBackdropView()
+            }
+            .ignoresSafeArea()
+        )
+        .navigationTitle("Category detail".appLocalized)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func share(for category: CategoryBreakdown) -> Double {
+        let total = NSDecimalNumber(decimal: monthSpending).doubleValue
+        guard total > 0 else { return 0 }
+        return NSDecimalNumber(decimal: category.total).doubleValue / total
+    }
+
+    private func categoryCountLabel(for count: Int) -> String {
+        if count == 1 {
+            return AppLocalization.localized("%d transaction", arguments: count)
+        }
+        return AppLocalization.localized("%d transactions", arguments: count)
+    }
 }
 
 private enum InsightsPeriod: String, CaseIterable, Identifiable {
@@ -912,6 +1232,7 @@ private func buildSeries(for period: InsightsPeriod, metric: InsightsMetric, exp
             let start = calendar.date(bySettingHour: offset * 4, minute: 0, second: 0, of: now) ?? now
             let end = calendar.date(byAdding: .hour, value: 4, to: start) ?? start
             return InsightsSeriesPoint(
+                index: offset,
                 label: start.formatted(.dateTime.hour(.defaultDigits(amPM: .omitted))),
                 value: metricValue(
                     for: expenses.filter { $0.date >= start && $0.date < end },
@@ -924,6 +1245,7 @@ private func buildSeries(for period: InsightsPeriod, metric: InsightsMetric, exp
             let start = calendar.date(byAdding: .day, value: -(6 - offset), to: calendar.startOfDay(for: now)) ?? now
             let end = calendar.date(byAdding: .day, value: 1, to: start) ?? start
             return InsightsSeriesPoint(
+                index: offset,
                 label: start.formatted(.dateTime.weekday(.abbreviated)),
                 value: metricValue(
                     for: expenses.filter { $0.date >= start && $0.date < end },
@@ -936,6 +1258,7 @@ private func buildSeries(for period: InsightsPeriod, metric: InsightsMetric, exp
             let weekStart = calendar.date(byAdding: .day, value: -(21 - (offset * 7)), to: calendar.startOfDay(for: now)) ?? now
             let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart) ?? weekStart
             return InsightsSeriesPoint(
+                index: offset,
                 label: "W\(offset + 1)",
                 value: metricValue(
                     for: expenses.filter { $0.date >= weekStart && $0.date < weekEnd },

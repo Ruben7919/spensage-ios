@@ -32,6 +32,7 @@ struct AdvancedSettingsView: View {
                 ledgerSummaryCard
                 supportHandoffCard
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
         .background(BrandTheme.canvas)

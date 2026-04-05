@@ -30,6 +30,7 @@ struct ProfileView: View {
                 preferencesCard
                 updatesCard
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
         .scrollDismissesKeyboard(.interactively)

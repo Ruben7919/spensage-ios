@@ -35,15 +35,12 @@ struct AddExpenseView: View {
                     FinanceToolsHeaderCard(
                         eyebrow: "Quick capture",
                         title: "Add expense",
-                        summary: "Enter one expense, review the draft, and keep it local before you save.",
+                        summary: "Enter the merchant and amount first. Smart fill appears only when it can save you time.",
                         systemImage: "plus.circle.fill",
                         character: .manchas,
                         expression: .happy,
                         sceneKey: "guide_02_log_expense_manchas"
                     )
-
-                    previewCard
-                    smartAssistCard
 
                     SurfaceCard {
                         VStack(alignment: .leading, spacing: 14) {
@@ -90,6 +87,14 @@ struct AddExpenseView: View {
                         }
                     }
 
+                    if shouldShowSmartAssist {
+                        smartAssistCard
+                    }
+
+                    if shouldShowPreview {
+                        previewCard
+                    }
+
                     if let errorMessage {
                         Text(errorMessage)
                             .font(.footnote)
@@ -126,7 +131,17 @@ struct AddExpenseView: View {
     }
 
     private var canSave: Bool {
-        !merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && Decimal(string: amount) != nil
+        !merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && (FinanceToolFormatting.decimal(from: amount) ?? 0) > 0
+    }
+
+    private var shouldShowPreview: Bool {
+        !merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || (FinanceToolFormatting.decimal(from: amount) ?? 0) > 0
+    }
+
+    private var shouldShowSmartAssist: Bool {
+        merchantAutofillSuggestion != nil || !merchantSuggestions.isEmpty
     }
 
     private var previewCard: some View {

@@ -245,12 +245,28 @@ struct FinanceToolRowLabel: View {
 
 enum FinanceToolFormatting {
     static func decimal(from text: String) -> Decimal? {
-        let normalized = text
+        let trimmed = text
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "$", with: "")
-            .replacingOccurrences(of: ",", with: "")
-        guard !normalized.isEmpty else { return nil }
-        return Decimal(string: normalized)
+            .replacingOccurrences(of: " ", with: "")
+        guard !trimmed.isEmpty else { return nil }
+
+        if trimmed.contains(","), !trimmed.contains(".") {
+            return Decimal(string: trimmed.replacingOccurrences(of: ",", with: "."))
+        }
+
+        if trimmed.contains(","),
+           trimmed.contains("."),
+           let lastComma = trimmed.lastIndex(of: ","),
+           let lastDot = trimmed.lastIndex(of: "."),
+           lastComma > lastDot {
+            let normalized = trimmed
+                .replacingOccurrences(of: ".", with: "")
+                .replacingOccurrences(of: ",", with: ".")
+            return Decimal(string: normalized)
+        }
+
+        return Decimal(string: trimmed.replacingOccurrences(of: ",", with: ""))
     }
 
     static func dueDateText(for bill: BillRecord, ledger: LocalFinanceLedger?) -> String {

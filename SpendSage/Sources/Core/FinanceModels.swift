@@ -566,12 +566,11 @@ struct LocalFinanceLedger: Codable, Equatable {
 
     mutating func appendExpense(_ draft: ExpenseDraft, id: UUID = UUID(), date: Date = .now) {
         let normalized = draft.normalized()
-        let matchedCategory = inferredCategory(for: normalized.merchant) ?? normalized.category
         expenses.insert(
             ExpenseRecord(
                 id: id,
                 merchant: normalized.merchant,
-                category: matchedCategory,
+                category: normalized.category,
                 amount: normalized.amount,
                 date: normalized.date == .distantPast ? date : normalized.date,
                 note: normalized.note.isEmpty ? nil : normalized.note

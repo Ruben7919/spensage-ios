@@ -402,6 +402,7 @@ struct SupportCenterView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
         .background(BrandTheme.canvas)

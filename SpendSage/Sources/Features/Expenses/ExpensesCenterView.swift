@@ -61,7 +61,7 @@ struct ExpensesCenterView: View {
                 if let state = currentState {
                     snapshotCard(for: state)
                     recentLedgerCard
-                    toolsHubCard
+                    toolsDisclosureCard
                     if !categoryBreakdown.isEmpty {
                         ExperienceDisclosureCard(
                             title: "More details",
@@ -72,7 +72,10 @@ struct ExpensesCenterView: View {
                             categoryCard(for: state)
                         }
                     }
-                    sponsorCard
+
+                    if case .guest = viewModel.session {
+                        sponsorCard
+                    }
                 } else {
                     loadingCard
                 }
@@ -89,7 +92,7 @@ struct ExpensesCenterView: View {
             .ignoresSafeArea()
         )
         .navigationTitle("Expenses")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {
             GuideSheet(guide: GuideLibrary.guide(.expenses))
         }
@@ -170,8 +173,8 @@ struct ExpensesCenterView: View {
                     }
                     .buttonStyle(PrimaryCTAStyle())
 
-                    NavigationLink("Scan receipt") {
-                        FinanceReceiptScanToolView(viewModel: viewModel)
+                    Button("Scan receipt") {
+                        viewModel.startScanFlow()
                     }
                     .buttonStyle(SecondaryCTAStyle())
                 }
@@ -293,40 +296,36 @@ struct ExpensesCenterView: View {
     }
 
     private var sponsorCard: some View {
-        Group {
-            if case .guest = viewModel.session {
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Sponsor-supported free mode")
-                                    .font(.headline)
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("This sponsor surface stays visible in free mode, between the capture tools and the recent ledger, so the experience remains supported and upgrade-ready.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-
-                            Spacer(minLength: 0)
-
-                            BrandBadge(text: "Free mode", systemImage: "sparkles")
-                        }
-
-                        HStack(spacing: 12) {
-                            NavigationLink {
-                                PremiumView(viewModel: viewModel)
-                            } label: {
-                                Label("Unlock premium", systemImage: "sparkles")
-                            }
-                            .buttonStyle(PrimaryCTAStyle())
-
-                            Button("Why this appears") {
-                                isPresentingGuide = true
-                            }
-                            .buttonStyle(SecondaryCTAStyle())
-                        }
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Sponsor-supported free mode")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("This sponsor surface stays visible in free mode, between the capture tools and the recent ledger, so the experience remains supported and upgrade-ready.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
+
+                    Spacer(minLength: 0)
+
+                    BrandBadge(text: "Free mode", systemImage: "sparkles")
+                }
+
+                HStack(spacing: 12) {
+                    NavigationLink {
+                        PremiumView(viewModel: viewModel)
+                    } label: {
+                        Label("Unlock premium", systemImage: "sparkles")
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+
+                    Button("Why this appears") {
+                        isPresentingGuide = true
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
                 }
             }
         }
@@ -356,69 +355,74 @@ struct ExpensesCenterView: View {
         }
     }
 
-    private var toolsHubCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "More actions",
-                    detail: "Open the tool you need instead of keeping every feature on the same screen."
+    private var toolsDisclosureCard: some View {
+        ExperienceDisclosureCard(
+            title: "More tools",
+            summary: "Scan stays one tap away. Accounts, rules, bills, imports, and wizard tools stay folded until you need them.",
+            character: .manchas,
+            expression: .thinking
+        ) {
+            toolsHubContent
+        }
+    }
+
+    private var toolsHubContent: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Button {
+                viewModel.startScanFlow()
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Scan receipts",
+                    summary: "Turn a receipt photo into a draft expense you can review before saving.",
+                    systemImage: "camera.viewfinder"
                 )
-
-                NavigationLink {
-                    FinanceReceiptScanToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "Scan receipts",
-                        summary: "Turn a receipt photo into a draft expense you can review before saving.",
-                        systemImage: "camera.viewfinder"
-                    )
-                }
-
-                NavigationLink {
-                    FinanceCsvImportToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "CSV import",
-                        summary: "Bring in multiple expenses when you already have a spreadsheet export.",
-                        systemImage: "square.and.arrow.down.on.square.fill"
-                    )
-                }
-
-                NavigationLink {
-                    FinanceAccountsToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "Accounts",
-                        summary: "Review cash, cards, and manual balances in one place.",
-                        systemImage: "wallet.pass.fill"
-                    )
-                }
-
-                NavigationLink {
-                    FinanceBillsToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "Bills",
-                        summary: "Track recurring payments and due dates without crowding the main screen.",
-                        systemImage: "calendar.badge.clock"
-                    )
-                }
-
-                NavigationLink {
-                    FinanceRulesToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "Rules",
-                        summary: "Save merchant rules so repeated expenses stay organized automatically.",
-                        systemImage: "slider.horizontal.3"
-                    )
-                }
-
-                Button("Open budget wizard") {
-                    viewModel.presentBudgetWizard()
-                }
-                .buttonStyle(SecondaryCTAStyle())
             }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                FinanceCsvImportToolView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(
+                    title: "CSV import",
+                    summary: "Bring in multiple expenses when you already have a spreadsheet export.",
+                    systemImage: "square.and.arrow.down.on.square.fill"
+                )
+            }
+
+            NavigationLink {
+                FinanceAccountsToolView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Accounts",
+                    summary: "Review cash, cards, and manual balances in one place.",
+                    systemImage: "wallet.pass.fill"
+                )
+            }
+
+            NavigationLink {
+                FinanceBillsToolView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Bills",
+                    summary: "Track recurring payments and due dates without crowding the main screen.",
+                    systemImage: "calendar.badge.clock"
+                )
+            }
+
+            NavigationLink {
+                FinanceRulesToolView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Rules",
+                    summary: "Save merchant rules so repeated expenses stay organized automatically.",
+                    systemImage: "slider.horizontal.3"
+                )
+            }
+
+            Button("Open budget wizard") {
+                viewModel.presentBudgetWizard()
+            }
+            .buttonStyle(SecondaryCTAStyle())
         }
     }
 
