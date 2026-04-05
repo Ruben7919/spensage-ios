@@ -31,6 +31,7 @@ struct FinanceReceiptScanToolView: View {
     @State private var isApplyingAutofill = false
     @State private var isCategoryLockedByUser = false
     @State private var isDateLockedByUser = false
+    @State private var hasAppliedDebugState = false
 
     private var parsedAmount: Decimal? {
         FinanceToolFormatting.decimal(from: amount)
@@ -198,6 +199,7 @@ struct FinanceReceiptScanToolView: View {
             if !GuideProgressStore.isSeen(.scan) {
                 isPresentingGuide = true
             }
+            applyDebugLaunchStateIfNeeded()
         }
         .onChange(of: merchant) { _, _ in
             clearTransientState()
@@ -990,6 +992,22 @@ struct FinanceReceiptScanToolView: View {
         resetDraftLocks()
         clearTransientState()
         transitionToStep(.autofill)
+    }
+
+    private func applyDebugLaunchStateIfNeeded() {
+        guard !hasAppliedDebugState else { return }
+        hasAppliedDebugState = true
+
+        let state = ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_SCAN_STATE"]?.lowercased()
+        switch state {
+        case "autofill", "edit":
+            loadSampleDraft()
+        case "review":
+            loadSampleDraft()
+            currentStep = .review
+        default:
+            break
+        }
     }
 
     private func applyTemplate(from item: ExpenseItem) {

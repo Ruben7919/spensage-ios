@@ -1,13 +1,20 @@
-# SpendSage Pending Art Prompts
+# SpendSage Art Status and Prompt Library
 
-Last updated: 2026-04-03
+Last updated: 2026-04-05
 
 ## Purpose
 
-These prompts cover the remaining surfaces that still rely on prompt placeholders instead of final artwork.
+This document records the shipped core art status plus the prompt direction used to regenerate or extend the art library when needed.
 
 Status:
 - 2026-04-04: Matching guide scenes were generated locally from the official mascot sprite library and integrated into the app.
+- 2026-04-04: Seasonal sprite packs for Halloween, Holiday, and New Year were generated and wired into runtime asset resolution.
+- 2026-04-05: The release icon was rebuilt as a three-mascot peeking composition and the app now ships with core guide, splash, loading, badge, icon, and seasonal art coverage.
+
+Current release-critical art status:
+- Core release art is present in the repository and registered in `asset_manifest.json`.
+- The current remaining art work is backlog expansion, not missing launch-blocking art.
+- Future prompt work should focus on new events, new badge families, or extra mascot poses beyond the shipped pack.
 
 In the current codebase:
 - `Ludo` maps to the `mei_*` asset family
@@ -30,6 +37,10 @@ In the current codebase:
 - Preserve transparent backgrounds; no solid white or baked scene background inside character sprite exports
 - Use emotion cues like blush, sparkles, yarn, coins, or floating hearts before changing the limb count or silhouette
 - Keep each mascot readable as the same character family already used in `Brand/v2/characters`
+
+## Historical Guide Prompt Set
+
+These were the hero prompts used to fill the surfaces that previously relied on placeholders.
 
 ## Scene 1: Profile Hero
 
@@ -88,3 +99,9 @@ Create an advanced settings hero scene for SpendSage, a mobile-first savings gam
 1. Add each exported PNG into `SpendSage/Resources/Brand/v2/`.
 2. Register the asset keys in `SpendSage/Resources/Brand/v2/asset_manifest.json`.
 3. Update `SpendSage/Sources/Core/Brand/BrandStory.swift` to swap each `scenePrompt` placeholder for the new `sceneSource`.
+
+## Remaining Art Backlog
+
+- New event packs beyond Halloween, Holiday, and New Year
+- More functional poses such as pointing, holding receipt, family hug, and protect-wallet
+- Optional social-share celebration backgrounds for special badge campaigns

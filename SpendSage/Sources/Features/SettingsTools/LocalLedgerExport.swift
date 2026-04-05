@@ -1,9 +1,9 @@
 import Foundation
 
 enum PublicLegalLinks {
-    static let privacy = URL(string: "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/privacy-policy")!
-    static let support = URL(string: "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/support-and-contact")!
-    static let terms = URL(string: "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/terms-of-service")!
+    static let privacy = URL(string: "https://legal.spendsage.ai/privacy")!
+    static let support = URL(string: "https://legal.spendsage.ai/support")!
+    static let terms = URL(string: "https://legal.spendsage.ai/terms")!
 }
 
 private struct LocalExportPayload: Encodable {

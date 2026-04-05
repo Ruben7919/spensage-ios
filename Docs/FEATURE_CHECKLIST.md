@@ -29,6 +29,15 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - [x] Shareable celebration overlay for level-ups and badges
 - [x] One-time in-app review prompt policy tied to positive progress moments
 
+### Route Coverage
+
+- [x] `Inicio` simplified for B2C daily use
+- [x] `Gastos` simplified with scan-first capture flow
+- [x] `Scan` 3-step wizard with editable autofill review
+- [x] `Análisis` simplified with tappable chart values
+- [x] `Ajustes` split into lighter navigation instead of one long wall
+- [x] Secondary routes for `Help`, `Support`, `Legal`, `Profile`, `Advanced`, and `Budget Wizard`
+
 ### Onboarding and Auth
 
 - [x] Short onboarding focused on first value
@@ -74,6 +83,34 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - [x] Help / Support / Legal surfaces
 - [x] Local export and support packet generation
 - [x] Public/legal/billing/support copy aligned with current product truth
+
+### Brand, Art, and Content
+
+- [x] Main mascot expression pack for `tikki`, `mei`, and `manchas`
+- [x] Seasonal mascot sprite pack for Halloween, Holiday, and New Year
+- [x] Main guide scenes for dashboard, budgets, insights, scan, family, profile, help, rules, and advanced tools
+- [x] Badge art pack for missions, streaks, savings, premium, and seasonal events
+- [x] Splash artwork with default and seasonal swaps
+- [x] Loading artwork and yarn-ball loading animation
+- [x] Xcode 26 app icon variants `Any`, `Dark`, and `Tinted`
+- [x] Prompt documentation for icon, splash, loading, and seasonal sprite generation
+- [ ] Additional event art backlog beyond the three shipped seasons
+
+### Legal, Release, and Compliance
+
+- [x] Privacy Policy drafted in Spanish
+- [x] Terms of Use drafted in Spanish
+- [x] Beta Notice and Disclosures drafted in Spanish
+- [x] Support and Contact policy drafted in Spanish
+- [x] Legal documents bundled and rendered inside the app
+- [x] Legal docs updated with declared operator identity for `Ruben Lazaro`
+- [x] Declared operator tax ID captured as `RUC 0924829179001`
+- [x] Declared operator address captured as `Samanes 4 Mz 408 Villa 130112`
+- [x] External App Store metadata package prepared
+- [x] External App Privacy response matrix prepared
+- [x] External iPhone 6.9 screenshot pack prepared with blurred data and mascot side composition
+- [x] Public-site content staged for `spendsage.ai` and `legal.spendsage.ai`
+- [-] Final lawyer review before public production release
 
 ## Nice-to-Have
 
@@ -134,3 +171,5 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - 2026-04-05: Rebuilt the app icon as a three-mascot peeking composition for the Xcode 26 `Any`, `Dark`, and `Tinted` icon variants, then refreshed a full route QA pass covering onboarding, auth, the 5 root tabs, celebration state, and the main deep-link settings/support tools.
 - 2026-04-05: Final polish reduced heavy legal/profile/advanced heroes, surfaced receipt scan actions in the first fold, removed more internal-looking `preview` copy from user-facing screens, and tightened the celebration overlay before the next internal TestFlight upload.
 - 2026-04-05: Internal TestFlight build `1.0 (10)` uploaded successfully after removing alpha from the Xcode 26 icon assets and re-running the full route QA repair pass.
+- 2026-04-05: Legal documentation was updated with the declared current operator identity: `Ruben Lazaro`, `RUC 0924829179001`, `Samanes 4 Mz 408 Villa 130112`.
+- 2026-04-05: Prepared the external release package with App Store metadata, App Privacy mapping, iPhone 6.9 screenshots with blurred data and mascot-side compositions, plus staged public-site legal/support content for `spendsage.ai` and `legal.spendsage.ai`.

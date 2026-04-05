@@ -31,7 +31,10 @@ enum GuideProgressStore {
     private static let prefix = "spendsage_guide_seen_"
 
     static func isSeen(_ id: GuideID, defaults: UserDefaults = .standard) -> Bool {
-        defaults.bool(forKey: key(for: id))
+        if shouldForceHideGuides {
+            return true
+        }
+        return defaults.bool(forKey: key(for: id))
     }
 
     static func markSeen(_ id: GuideID, defaults: UserDefaults = .standard) {
@@ -44,6 +47,11 @@ enum GuideProgressStore {
 
     private static func key(for id: GuideID) -> String {
         prefix + id.rawValue
+    }
+
+    private static var shouldForceHideGuides: Bool {
+        let value = ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_HIDE_GUIDES"]?.lowercased()
+        return value == "1" || value == "true" || value == "yes" || value == "hide"
     }
 }
 

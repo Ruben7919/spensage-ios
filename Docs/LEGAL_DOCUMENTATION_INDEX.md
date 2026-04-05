@@ -9,6 +9,12 @@ Los documentos legales fuente de verdad para la build nativa de iOS viven dentro
 - `/Users/rubenlazaro/Projects/spensage-ios/SpendSage/Resources/Legal/BETA_NOTICE_AND_DISCLOSURES.md`
 - `/Users/rubenlazaro/Projects/spensage-ios/SpendSage/Resources/Legal/SUPPORT_AND_CONTACT.md`
 
+Operador actual declarado en esta línea documental:
+
+- `Ruben Lazaro`
+- RUC: `0924829179001`
+- Domicilio declarado: `Samanes 4 Mz 408 Villa 130112`
+
 Destino de publicación:
 
 - `Privacy Policy`: endpoint público de privacidad y Centro legal dentro de la app.
@@ -20,4 +26,5 @@ Estándar de redacción:
 
 - redactados para reflejar la implementación local-first actual en iOS;
 - evitan afirmar sincronización cloud activa, push activo, geofencing activo o cobro activo de App Store cuando esas capacidades todavía no están plenamente en vivo;
-- pensados como borrador operativo de alta calidad, pero igualmente sujetos a revisión por asesoría legal calificada antes de un lanzamiento público de producción.
+- pensados como borrador operativo de alta calidad, pero igualmente sujetos a revisión por asesoría legal calificada antes de un lanzamiento público de producción;
+- actualizados para identificar al titular/operador declarado por el dueño actual del producto.
