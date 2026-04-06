@@ -6,7 +6,7 @@ Last updated: 2026-04-05
 
 - App: `SpendSage`
 - Version: `1.0`
-- Build: `15`
+- Build: `16`
 - Bundle ID: `com.spendsage.ai`
 - Team ID: `YU855NB22W`
 
@@ -16,11 +16,11 @@ Last updated: 2026-04-05
 - Upload completed successfully to App Store Connect
 - TestFlight scope: internal testing only
 - Current state: waiting for App Store Connect processing to finish
-- Notes: build `15` keeps the Cognito Hosted UI DEV alignment and adds a stronger spending-entry pass: the tab shell now lives as a real bottom block instead of floating over content, manual expense capture localizes category labels, subscriptions can store recurrence cadence plus renewal date and optional auto-recording, pasted email or online purchase summaries can prefill a draft, and trophy history cards no longer collapse badge text vertically.
+- Notes: build `16` keeps the auth and capture fixes from build `15`, then tightens the home mission card and the bottom shell visual language. The active mission preview now stacks status/cadence chips below the title instead of squeezing text into a narrow vertical column, and the tab bar now sits as a continuous base attached to the bottom edge rather than feeling like a detached floating tray.
 
 ## Archive Paths
 
-- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-15.xcarchive`
+- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-16.xcarchive`
 - Export options: `/Users/rubenlazaro/Projects/spensage-ios/build/ExportOptions-TestFlight-Internal.plist`
 - Upload executed directly via `xcodebuild -exportArchive ... -destination upload` with no persisted export bundle kept on disk
 

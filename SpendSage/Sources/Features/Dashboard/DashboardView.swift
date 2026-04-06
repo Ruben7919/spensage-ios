@@ -262,35 +262,32 @@ struct DashboardView: View {
                 )
             } else {
                 ForEach(Array(growth.missions.prefix(1))) { mission in
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 12) {
                         HStack(alignment: .top, spacing: 14) {
                             GrowthMissionBadgeView(mission: mission, size: 54)
 
                             VStack(alignment: .leading, spacing: 6) {
-                                HStack(alignment: .top, spacing: 8) {
-                                    Text(mission.title)
-                                        .font(.headline)
-                                        .foregroundStyle(BrandTheme.ink)
-                                        .fixedSize(horizontal: false, vertical: true)
-
-                                    if mission.isSeasonal {
-                                        BrandBadge(text: "Evento", systemImage: "wand.and.stars")
-                                    }
-                                }
+                                Text(mission.title)
+                                    .font(.headline)
+                                    .foregroundStyle(BrandTheme.ink)
+                                    .lineLimit(2)
+                                    .multilineTextAlignment(.leading)
+                                    .fixedSize(horizontal: false, vertical: true)
 
                                 Text(mission.detail)
                                     .font(.subheadline)
                                     .foregroundStyle(BrandTheme.muted)
+                                    .lineLimit(3)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
-
                             Spacer(minLength: 0)
+                        }
 
-                            VStack(alignment: .trailing, spacing: 8) {
-                                BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
-                                Text(mission.cadenceLabel)
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(BrandTheme.primary)
+                        FlowStack(spacing: 8, rowSpacing: 8) {
+                            BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
+                            BrandBadge(text: mission.cadenceLabel, systemImage: "calendar")
+                            if mission.isSeasonal {
+                                BrandBadge(text: "Evento", systemImage: "wand.and.stars")
                             }
                         }
 
@@ -303,16 +300,11 @@ struct DashboardView: View {
                                 .foregroundStyle(BrandTheme.muted)
 
                             Spacer()
-
-                            if mission.isSeasonal, let seasonID = mission.seasonID, let season = BrandSeasonCatalog.season(for: seasonID) {
-                                Text(season.badgeText.appLocalized)
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(BrandTheme.primary)
-                            }
                         }
                         Text(mission.coachNote)
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.primary)
+                            .lineLimit(2)
                     }
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)

@@ -62,14 +62,11 @@ struct NativeAppShellView: View {
     }
 
     private var bottomNavigation: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(BrandTheme.surface.opacity(0.96))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        .stroke(BrandTheme.line.opacity(0.9), lineWidth: 1)
-                )
-                .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 18, x: 0, y: 8)
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(BrandTheme.line.opacity(0.42))
+                .frame(height: 1)
+                .padding(.horizontal, 20)
 
             HStack(alignment: .bottom, spacing: 14) {
                 ForEach(leadingTabs) { tab in
@@ -95,13 +92,19 @@ struct NativeAppShellView: View {
                 }
             }
             .padding(.horizontal, 18)
-            .padding(.vertical, 14)
+            .padding(.top, 10)
+            .padding(.bottom, 10)
         }
-        .frame(height: 104)
-        .padding(.horizontal, 12)
-        .padding(.top, 8)
-        .padding(.bottom, 8)
-        .background(BrandTheme.background)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+            .fill(BrandTheme.surface.opacity(0.98))
+            .overlay(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.76), lineWidth: 1)
+            )
+            .shadow(color: BrandTheme.shadow.opacity(0.08), radius: 12, x: 0, y: -2)
+            .ignoresSafeArea(edges: .bottom)
+        )
     }
 
     private func select(_ tab: AppViewModel.AppTab) {
