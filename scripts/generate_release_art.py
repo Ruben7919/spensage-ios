@@ -218,17 +218,11 @@ def draw_ledge(
     top_highlight: tuple[int, int, int, int],
     shadow_alpha: int,
 ) -> None:
-    add_shadow(canvas, (box[0] + 40, box[1] - 10, box[2] - 40, box[1] + 104), alpha=shadow_alpha)
+    add_shadow(canvas, (box[0] + 52, box[1] + 10, box[2] - 52, box[3] + 30), alpha=max(18, shadow_alpha - 12))
     draw = ImageDraw.Draw(canvas)
     radius = min((box[2] - box[0]) // 5, (box[3] - box[1]) // 2)
     draw.rounded_rectangle(box, radius=radius, fill=fill, outline=outline, width=3)
-    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
-    detail = ImageDraw.Draw(overlay)
-    detail.ellipse((box[0] + 30, box[1] + 14, box[0] + 276, box[1] + 88), fill=top_highlight)
-    detail.ellipse((box[2] - 276, box[1] + 14, box[2] - 30, box[1] + 88), fill=(255, 255, 255, max(18, top_highlight[3] // 2)))
-    overlay = overlay.filter(ImageFilter.GaussianBlur(radius=10))
-    canvas.alpha_composite(overlay)
-    draw.line((box[0] + 52, box[1] + 10, box[2] - 52, box[1] + 10), fill=(255, 255, 255, 92), width=2)
+    draw.line((box[0] + 44, box[1] + 8, box[2] - 44, box[1] + 8), fill=(255, 255, 255, max(54, top_highlight[3] + 24)), width=2)
 
 
 def create_manchas_icon(
@@ -274,7 +268,7 @@ def create_manchas_icon(
     paste_peeking_sprite(
         canvas,
         "manchas_neutral_v2.png",
-        (146, 90, 878, 692),
+        (162, 64, 862, 638),
         crop=(0.13, 0.0, 0.87, 0.60),
         monochrome=monochrome,
         fade_bottom_start=0.48,
@@ -282,7 +276,7 @@ def create_manchas_icon(
 
     draw_ledge(
         canvas,
-        (108, 648, 916, 732),
+        (132, 660, 892, 716),
         fill=ledge_fill,
         outline=ledge_outline,
         top_highlight=ledge_highlight,
@@ -292,7 +286,7 @@ def create_manchas_icon(
     paste_peeking_sprite(
         canvas,
         "manchas_neutral_v2.png",
-        (198, 598, 368, 724),
+        (214, 606, 360, 720),
         crop=(0.20, 0.88, 0.31, 0.985),
         monochrome=monochrome,
         align_bottom=True,
@@ -300,7 +294,7 @@ def create_manchas_icon(
     paste_peeking_sprite(
         canvas,
         "manchas_neutral_v2.png",
-        (656, 598, 826, 724),
+        (664, 606, 810, 720),
         crop=(0.69, 0.88, 0.80, 0.985),
         monochrome=monochrome,
         align_bottom=True,
@@ -472,17 +466,17 @@ def create_splash_guide() -> Image.Image:
         inner_outline=(232, 240, 238, 255),
     )
 
-    draw_yarn_ball(canvas, (274, 734), 74, (99, 179, 191))
-    draw_yarn_ball(canvas, (512, 772), 88, (255, 198, 96))
-    draw_yarn_ball(canvas, (748, 734), 74, (121, 209, 191))
+    draw_yarn_ball(canvas, (278, 688), 78, (99, 179, 191))
+    draw_yarn_ball(canvas, (512, 724), 94, (255, 198, 96))
+    draw_yarn_ball(canvas, (746, 688), 78, (121, 209, 191))
 
-    add_shadow(canvas, (124, 610, 394, 756))
-    add_shadow(canvas, (338, 648, 690, 826))
-    add_shadow(canvas, (614, 612, 892, 758))
+    add_shadow(canvas, (116, 556, 404, 718))
+    add_shadow(canvas, (322, 586, 706, 782))
+    add_shadow(canvas, (620, 556, 908, 718))
 
-    paste_sprite(canvas, "tikki_proud_v2.png", (84, 188, 388, 748))
-    paste_sprite(canvas, "mei_neutral_v2.png", (322, 118, 706, 812))
-    paste_sprite(canvas, "manchas_proud_v2.png", (634, 180, 938, 748))
+    paste_sprite(canvas, "tikki_proud_v2.png", (70, 124, 394, 724))
+    paste_sprite(canvas, "mei_neutral_v2.png", (294, 46, 730, 812))
+    paste_sprite(canvas, "manchas_proud_v2.png", (630, 116, 954, 724))
 
     for point, size in (((184, 174), 10), ((280, 228), 10), ((828, 188), 10), ((744, 256), 10), ((512, 138), 12), ((870, 608), 10), ((418, 188), 8)):
         draw_twinkle(draw, point, size, fill=(255, 205, 107, 190))
@@ -508,19 +502,19 @@ def create_loading_guide() -> Image.Image:
     )
 
     for center, radius, color, tail in (
-        ((248, 736), 76, (104, 182, 193), False),
-        ((514, 774), 98, (255, 196, 96), True),
-        ((776, 734), 76, (121, 208, 192), False),
+        ((250, 690), 82, (104, 182, 193), False),
+        ((514, 722), 104, (255, 196, 96), True),
+        ((778, 688), 82, (121, 208, 192), False),
     ):
         draw_yarn_ball(canvas, center, radius, color, show_tail=tail)
 
-    add_shadow(canvas, (116, 606, 404, 774))
-    add_shadow(canvas, (320, 632, 710, 840))
-    add_shadow(canvas, (624, 604, 922, 770))
+    add_shadow(canvas, (110, 542, 412, 740))
+    add_shadow(canvas, (300, 566, 728, 812))
+    add_shadow(canvas, (616, 540, 928, 738))
 
-    paste_sprite(canvas, "tikki_excited_v2.png", (82, 176, 396, 760))
-    paste_sprite(canvas, "mei_neutral_v2.png", (300, 104, 724, 844))
-    paste_sprite(canvas, "manchas_excited_v2.png", (644, 170, 952, 762))
+    paste_sprite(canvas, "tikki_excited_v2.png", (64, 110, 400, 744))
+    paste_sprite(canvas, "mei_neutral_v2.png", (270, 28, 754, 850))
+    paste_sprite(canvas, "manchas_excited_v2.png", (636, 104, 972, 746))
 
     for point, size in (((184, 176), 11), ((296, 238), 10), ((832, 190), 11), ((738, 258), 10), ((512, 138), 12), ((874, 606), 10), ((438, 852), 10), ((604, 194), 8)):
         draw_twinkle(draw, point, size, fill=(255, 208, 112, 190))
