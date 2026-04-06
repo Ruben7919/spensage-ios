@@ -11,12 +11,12 @@ struct DashboardView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                heroCard
-
                 if let state = viewModel.dashboardState {
-                    missionSummaryCard(growth: growthSnapshot)
-                    todayCard(for: state)
-                    strategyCard(growth: growthSnapshot)
+                    let growth = growthSnapshot(for: state)
+                    heroCard(growth: growth, state: state)
+                    missionSummaryCard(growth: growth)
+                    todayCard(for: state, growth: growth)
+                    strategyCard(growth: growth)
                     recentSpendCard(for: state)
 
                     ExperienceDisclosureCard(
@@ -34,6 +34,7 @@ struct DashboardView: View {
                         }
                     }
                 } else {
+                    loadingHeroCard
                     loadingCard
                 }
             }
@@ -52,7 +53,7 @@ struct DashboardView: View {
         .onAppear {
             guard !hasPresentedInitialGuide else { return }
             hasPresentedInitialGuide = true
-            if onOpenGuide == nil, !GuideProgressStore.isSeen(.dashboard) {
+            if onOpenGuide == nil, !GuideProgressStore.isSeen(.dashboard), viewModel.debugRoute == nil {
                 isPresentingGuide = true
             }
         }
@@ -61,10 +62,10 @@ struct DashboardView: View {
         }
     }
 
-    private var growthSnapshot: DashboardGrowthSnapshot {
+    private func growthSnapshot(for state: FinanceDashboardState) -> DashboardGrowthSnapshot {
         viewModel.growthSnapshot ?? GrowthSnapshotBuilder.build(
             session: viewModel.session,
-            state: viewModel.dashboardState,
+            state: state,
             ledger: viewModel.ledger,
             accounts: viewModel.accounts,
             bills: viewModel.bills,
@@ -73,29 +74,29 @@ struct DashboardView: View {
         )
     }
 
-    private var heroCard: some View {
+    private func heroCard(growth: DashboardGrowthSnapshot, state: FinanceDashboardState) -> some View {
         JourneyHeroCard(
             eyebrow: "Ciclo diario del dinero",
-            title: growthSnapshot.greetingTitle,
+            title: growth.greetingTitle,
             summary: "Empieza con un número claro, un siguiente paso y la parte del mes que necesita atención ahora.",
             character: .manchas,
-            expression: dashboardExpression,
+            expression: dashboardExpression(growth: growth),
             sceneKey: "guide_01_dashboard_game_manchas",
             scenePrompt: nil,
             metrics: [
                 BrandHeroMetric(
                     title: "Esta semana",
-                    value: weeklySafeToSpendValue,
+                    value: safeToSpendWeek(for: state).formatted(.currency(code: currencyCode)),
                     systemImage: "banknote.fill"
                 ),
                 BrandHeroMetric(
                     title: "Racha",
-                    value: "\(growthSnapshot.streakDays)d",
+                    value: "\(growth.streakDays)d",
                     systemImage: "flame.fill"
                 ),
                 BrandHeroMetric(
                     title: "Días restantes",
-                    value: "\(viewModel.dashboardState?.remainingDaysInMonth ?? 0)",
+                    value: "\(state.remainingDaysInMonth)",
                     systemImage: "calendar"
                 )
             ]
@@ -110,6 +111,20 @@ struct DashboardView: View {
             }
             .buttonStyle(SecondaryCTAStyle())
 
+            guideButton
+        }
+    }
+
+    private var loadingHeroCard: some View {
+        JourneyHeroCard(
+            eyebrow: "Ciclo diario del dinero",
+            title: "Cargando inicio",
+            summary: "Estamos reuniendo tu libro local, la guía del coach y las señales que alimentan el dashboard.",
+            character: .manchas,
+            expression: .thinking,
+            sceneKey: "guide_01_dashboard_game_manchas",
+            scenePrompt: nil
+        ) {
             guideButton
         }
     }
@@ -134,11 +149,11 @@ struct DashboardView: View {
         }
     }
 
-    private func todayCard(for state: FinanceDashboardState) -> some View {
+    private func todayCard(for state: FinanceDashboardState, growth: DashboardGrowthSnapshot) -> some View {
         ExperienceSectionCard(
             title: "Hoy",
-            summary: growthSnapshot.coachBody,
-            badgeText: growthSnapshot.riskState.label,
+            summary: growth.coachBody,
+            badgeText: growth.riskState.label,
             badgeSystemImage: "sparkles"
         ) {
             BrandFeatureRow(
@@ -153,7 +168,7 @@ struct DashboardView: View {
             BrandFeatureRow(
                 systemImage: "arrow.triangle.branch",
                 title: "Mejor siguiente paso",
-                detail: growthSnapshot.coachAction
+                detail: growth.coachAction
             )
 
             ProgressView(value: min(max(state.utilizationRatio, 0), 1))
@@ -392,8 +407,8 @@ struct DashboardView: View {
         )
     }
 
-    private var dashboardExpression: BrandExpression {
-        switch growthSnapshot.riskState {
+    private func dashboardExpression(growth: DashboardGrowthSnapshot) -> BrandExpression {
+        switch growth.riskState {
         case .calm:
             return .happy
         case .watch:
@@ -401,11 +416,6 @@ struct DashboardView: View {
         case .urgent:
             return .warning
         }
-    }
-
-    private var weeklySafeToSpendValue: String {
-        guard let state = viewModel.dashboardState else { return Decimal.zero.formatted(.currency(code: currencyCode)) }
-        return safeToSpendWeek(for: state).formatted(.currency(code: currencyCode))
     }
 
     private func safeToSpendWeek(for state: FinanceDashboardState) -> Decimal {
@@ -440,54 +450,67 @@ struct DashboardView: View {
     }
 
     private func liveEventCard(_ liveEvent: GrowthLiveEvent) -> some View {
-        HStack(alignment: .center, spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(BrandTheme.surface)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(BrandTheme.surface)
 
-                if let image = BrandAssetCatalog.shared.image(for: BrandAssetCatalog.shared.badge(named: liveEvent.badgeAsset)) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .padding(10)
-                } else {
-                    Image(systemName: "wand.and.stars")
-                        .font(.title2.weight(.bold))
-                        .foregroundStyle(BrandTheme.primary)
+                    if let image = BrandAssetCatalog.shared.image(for: BrandAssetCatalog.shared.badge(named: liveEvent.badgeAsset)) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .padding(10)
+                    } else {
+                        Image(systemName: "wand.and.stars")
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(BrandTheme.primary)
+                    }
+                }
+                .frame(width: 62, height: 62)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+                )
+
+                VStack(alignment: .leading, spacing: 8) {
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .center, spacing: 8) {
+                            BrandBadge(text: liveEvent.badgeText, systemImage: liveEvent.isActive ? "sparkles" : "calendar")
+                            Spacer(minLength: 8)
+                            Text(liveEvent.dateLabel)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(BrandTheme.primary)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            BrandBadge(text: liveEvent.badgeText, systemImage: liveEvent.isActive ? "sparkles" : "calendar")
+                            Text(liveEvent.dateLabel)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(BrandTheme.primary)
+                        }
+                    }
+
+                    Text(liveEvent.title)
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(liveEvent.detail)
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .frame(width: 62, height: 62)
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
-            )
-
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    BrandBadge(text: liveEvent.badgeText, systemImage: liveEvent.isActive ? "sparkles" : "calendar")
-                    Text(liveEvent.dateLabel)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(BrandTheme.primary)
-                }
-
-                Text(liveEvent.title)
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text(liveEvent.detail)
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Spacer(minLength: 0)
 
             BrandAssetImage(
                 source: BrandAssetCatalog.shared.guide(liveEvent.sceneKey),
                 fallbackSystemImage: "sparkles"
             )
             .aspectRatio(contentMode: .fill)
-            .frame(width: 92, height: 74)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .frame(maxWidth: .infinity)
+            .frame(height: 126)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
         .padding(14)
         .background(

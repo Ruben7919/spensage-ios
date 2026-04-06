@@ -84,21 +84,14 @@ struct SupportCenterView: View {
             VStack(alignment: .leading, spacing: 20) {
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        HStack(alignment: .top, spacing: 14) {
+                        BrandCardHeader(
+                            badgeText: "Soporte",
+                            badgeSystemImage: "lifepreserver.fill",
+                            title: "Centro de soporte",
+                            summary: "Describe el problema, genera un paquete local y compártelo solo si decides enviarlo.",
+                            titleSize: 32
+                        ) {
                             MascotAvatarView(character: .manchas, expression: .thinking, size: 76)
-
-                            VStack(alignment: .leading, spacing: 10) {
-                                BrandBadge(text: "Soporte", systemImage: "lifepreserver.fill")
-
-                                Text("Centro de soporte")
-                                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                                    .foregroundStyle(BrandTheme.ink)
-
-                                Text("Describe el problema, genera un paquete local y compártelo solo si decides enviarlo.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
                         }
                     }
                 }

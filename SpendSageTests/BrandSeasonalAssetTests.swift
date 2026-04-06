@@ -30,4 +30,23 @@ struct BrandSeasonalAssetTests {
 
         #expect(source?.fileName == "manchas_proud_v2.png")
     }
+
+    @Test
+    func liveEventPreviewStaysHiddenWhenSeasonIsStillFarAway() throws {
+        let date = try #require(Calendar.autoupdatingCurrent.date(from: DateComponents(year: 2026, month: 4, day: 5)))
+
+        let liveEvent = GrowthSnapshotBuilder.buildLiveEvent(activeSeason: nil, referenceDate: date, calendar: .autoupdatingCurrent)
+
+        #expect(liveEvent == nil)
+    }
+
+    @Test
+    func liveEventPreviewAppearsInsideLeadWindow() throws {
+        let date = try #require(Calendar.autoupdatingCurrent.date(from: DateComponents(year: 2026, month: 10, day: 5)))
+
+        let liveEvent = GrowthSnapshotBuilder.buildLiveEvent(activeSeason: nil, referenceDate: date, calendar: .autoupdatingCurrent)
+
+        #expect(liveEvent?.isActive == false)
+        #expect(liveEvent?.title == "Halloween Hunt")
+    }
 }

@@ -455,22 +455,13 @@ private struct SettingsSummaryHeader: View {
     let expression: BrandExpression
 
     var body: some View {
-        HStack(alignment: .top, spacing: 14) {
+        BrandCardHeader(
+            badgeText: badge,
+            badgeSystemImage: "sparkles",
+            title: title,
+            summary: summary
+        ) {
             MascotAvatarView(character: character, expression: expression, size: 68)
-
-            VStack(alignment: .leading, spacing: 8) {
-                BrandBadge(text: badge.appLocalized, systemImage: "sparkles")
-
-                Text(title.appLocalized)
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundStyle(BrandTheme.ink)
-
-                Text(summary.appLocalized)
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

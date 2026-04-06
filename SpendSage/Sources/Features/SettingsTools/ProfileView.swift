@@ -48,25 +48,18 @@ struct ProfileView: View {
     private var heroCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .top, spacing: 14) {
+                BrandCardHeader(
+                    badgeText: "Identidad local",
+                    badgeSystemImage: "person.crop.circle.fill",
+                    title: "Perfil",
+                    summary: "Mantén tu identidad clara aquí. Los detalles de cuenta y las preferencias viven en rutas separadas para no convertir perfil en un panel pesado.",
+                    titleSize: 32
+                ) {
                     MascotAvatarView(
                         character: .mei,
                         expression: viewModel.session.isAuthenticated ? .proud : .thinking,
                         size: 76
                     )
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        BrandBadge(text: "Identidad local", systemImage: "person.crop.circle.fill")
-
-                        Text("Perfil")
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-
-                        Text("Mantén tu identidad clara aquí. Los detalles de cuenta y las preferencias viven en rutas separadas para no convertir perfil en un panel pesado.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
                 }
 
                 FlowStack(spacing: 8, rowSpacing: 8) {

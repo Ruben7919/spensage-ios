@@ -144,6 +144,36 @@ struct BrandBadge: View {
     }
 }
 
+struct BrandCardHeader<Accessory: View>: View {
+    let badgeText: String
+    let badgeSystemImage: String
+    let title: String
+    let summary: String
+    var titleSize: CGFloat = 30
+    @ViewBuilder var accessory: Accessory
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 14) {
+                BrandBadge(text: badgeText.appLocalized, systemImage: badgeSystemImage)
+                Spacer(minLength: 12)
+                accessory
+            }
+
+            Text(title.appLocalized)
+                .font(.system(size: titleSize, weight: .bold, design: .rounded))
+                .foregroundStyle(BrandTheme.ink)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(summary.appLocalized)
+                .font(.subheadline)
+                .foregroundStyle(BrandTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
 struct MascotAvatarView: View {
     let character: BrandCharacterID
     var expression: BrandExpression = .neutral
@@ -419,23 +449,13 @@ struct BrandStoryCard: View {
     var body: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        BrandBadge(text: spec.badgeText, systemImage: "sparkles")
-
-                        Text(title.appLocalized)
-                            .font(.system(size: 31, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(message.appLocalized)
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
-
+                BrandCardHeader(
+                    badgeText: spec.badgeText,
+                    badgeSystemImage: "sparkles",
+                    title: title,
+                    summary: message,
+                    titleSize: 31
+                ) {
                     MascotAvatarView(character: spec.character, expression: spec.expression, size: 74)
                 }
 
@@ -490,23 +510,13 @@ struct JourneyHeroCard<ActionContent: View>: View {
     var body: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        BrandBadge(text: eyebrow, systemImage: "sparkles")
-
-                        Text(title.appLocalized)
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(summary.appLocalized)
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
-
+                BrandCardHeader(
+                    badgeText: eyebrow,
+                    badgeSystemImage: "sparkles",
+                    title: title,
+                    summary: summary,
+                    titleSize: 32
+                ) {
                     MascotAvatarView(character: character, expression: expression, size: 92)
                 }
 

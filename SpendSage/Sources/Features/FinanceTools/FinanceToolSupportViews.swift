@@ -51,22 +51,12 @@ struct FinanceToolsHeaderCard: View {
     var body: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .top, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        BrandBadge(text: eyebrow, systemImage: systemImage)
-
-                        Text(title.appLocalized)
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(summary.appLocalized)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
-
+                BrandCardHeader(
+                    badgeText: eyebrow,
+                    badgeSystemImage: systemImage,
+                    title: title,
+                    summary: summary
+                ) {
                     MascotAvatarView(character: resolvedCharacter, expression: resolvedExpression, size: 78)
                 }
 

@@ -66,21 +66,14 @@ struct HelpCenterView: View {
             VStack(alignment: .leading, spacing: 20) {
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        HStack(alignment: .top, spacing: 14) {
+                        BrandCardHeader(
+                            badgeText: "Ayuda rápida",
+                            badgeSystemImage: "questionmark.circle.fill",
+                            title: "Centro de ayuda",
+                            summary: "Encuentra la respuesta rápida, abre soporte si hace falta y revisa lo legal solo cuando realmente lo necesites.",
+                            titleSize: 32
+                        ) {
                             MascotAvatarView(character: .mei, expression: .happy, size: 76)
-
-                            VStack(alignment: .leading, spacing: 10) {
-                                BrandBadge(text: "Ayuda rápida", systemImage: "questionmark.circle.fill")
-
-                                Text("Centro de ayuda")
-                                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                                    .foregroundStyle(BrandTheme.ink)
-
-                                Text("Encuentra la respuesta rápida, abre soporte si hace falta y revisa lo legal solo cuando realmente lo necesites.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
                         }
 
                         BrandScenePanel(

@@ -420,6 +420,8 @@ struct DashboardGrowthSnapshot: Equatable {
 }
 
 enum GrowthSnapshotBuilder {
+    static let liveEventPreviewLeadDays = 21
+
     static func build(
         session: SessionState,
         state: FinanceDashboardState?,
@@ -1052,7 +1054,7 @@ enum GrowthSnapshotBuilder {
         return items.sorted { $0.occurredAt > $1.occurredAt }
     }
 
-    private static func buildLiveEvent(
+    static func buildLiveEvent(
         activeSeason: BrandSeasonDefinition?,
         referenceDate: Date = .now,
         calendar: Calendar = .autoupdatingCurrent
@@ -1070,6 +1072,14 @@ enum GrowthSnapshotBuilder {
         }
 
         guard let nextSeason = BrandSeasonCatalog.nextSeason(after: referenceDate, calendar: calendar) else {
+            return nil
+        }
+
+        let startOfReference = calendar.startOfDay(for: referenceDate)
+        let startOfSeason = calendar.startOfDay(for: nextSeason.startDate)
+        let daysUntilStart = calendar.dateComponents([.day], from: startOfReference, to: startOfSeason).day ?? .max
+
+        guard daysUntilStart <= liveEventPreviewLeadDays else {
             return nil
         }
 

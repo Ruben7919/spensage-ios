@@ -106,23 +106,12 @@ struct ExpensesCenterView: View {
     private var headerCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        BrandBadge(
-                            text: expenseRecords.isEmpty ? "Empieza aquí" : "Este mes",
-                            systemImage: "creditcard.fill"
-                        )
-
-                        Text("Gastos")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-
-                        Text("Registra una compra rápido, revisa el mes y abre más herramientas solo cuando haga falta.")
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-
-                    Spacer(minLength: 0)
-
+                BrandCardHeader(
+                    badgeText: expenseRecords.isEmpty ? "Empieza aquí" : "Este mes",
+                    badgeSystemImage: "creditcard.fill",
+                    title: "Gastos",
+                    summary: "Registra una compra rápido, revisa el mes y abre más herramientas solo cuando haga falta."
+                ) {
                     Text(lastUpdatedLabel)
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(BrandTheme.muted)
@@ -130,31 +119,29 @@ struct ExpensesCenterView: View {
                 }
 
                 BrandArtworkSurface {
-                    HStack(alignment: .center, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Manchas mantiene esta pantalla corta: primero capturas, luego revisas y al final profundizas si hace falta.")
-                                .font(.subheadline)
-                                .foregroundStyle(BrandTheme.muted)
-                                .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("Manchas mantiene esta pantalla corta: primero capturas, luego revisas y al final profundizas si hace falta.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
 
-                            BrandMetricTile(
-                                title: "Este mes",
-                                value: totalSpentThisMonth.formatted(.currency(code: currencyCode)),
-                                systemImage: "creditcard.fill"
-                            )
+                        BrandMetricTile(
+                            title: "Este mes",
+                            value: totalSpentThisMonth.formatted(.currency(code: currencyCode)),
+                            systemImage: "creditcard.fill"
+                        )
 
-                            BrandBadge(
-                                text: AppLocalization.localized("%d registros", arguments: expenseRecords.count),
-                                systemImage: "list.bullet.rectangle"
-                            )
-                        }
+                        BrandBadge(
+                            text: AppLocalization.localized("%d registros", arguments: expenseRecords.count),
+                            systemImage: "list.bullet.rectangle"
+                        )
 
                         BrandAssetImage(
                             source: BrandAssetCatalog.shared.guide("guide_02_log_expense_manchas"),
                             fallbackSystemImage: "receipt.fill"
                         )
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 126, height: 126)
+                        .frame(maxWidth: .infinity, maxHeight: 132, alignment: .center)
                     }
                 }
 

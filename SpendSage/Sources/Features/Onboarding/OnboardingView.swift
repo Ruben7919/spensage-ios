@@ -65,27 +65,23 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 18) {
                 BrandBadge(text: story.badgeText, systemImage: "sparkles")
 
-                HStack(alignment: .center, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Your first money win in 3 steps")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
+                Text("Your first money win in 3 steps")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(BrandTheme.ink)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                        Text("Start with income, fixed bills, and one goal. The crew guides the setup so the first plan feels quick and clear.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                Text("Start with income, fixed bills, and one goal. The crew guides the setup so the first plan feels quick and clear.")
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                    BrandArtworkSurface {
-                        BrandAssetImage(
-                            source: story.sceneSource,
-                            fallbackSystemImage: "person.3.fill"
-                        )
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 108, height: 108)
-                    }
-                    .frame(width: 124, height: 124)
+                BrandArtworkSurface {
+                    BrandAssetImage(
+                        source: story.sceneSource,
+                        fallbackSystemImage: "person.3.fill"
+                    )
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 144)
                 }
 
                 CharacterCrewRail(
