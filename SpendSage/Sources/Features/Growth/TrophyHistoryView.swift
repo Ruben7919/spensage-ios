@@ -3,6 +3,8 @@ import SwiftUI
 struct TrophyHistoryView: View {
     @ObservedObject var viewModel: AppViewModel
 
+    private let collectionColumns = [GridItem(.adaptive(minimum: 250), spacing: 14)]
+
     private var growthSnapshot: DashboardGrowthSnapshot {
         viewModel.growthSnapshot ?? GrowthSnapshotBuilder.build(
             session: viewModel.session,
@@ -84,7 +86,7 @@ struct TrophyHistoryView: View {
                     detail: "Los logros desbloqueados se quedan brillantes; el resto muestra el progreso hacia la siguiente meta visible."
                 )
 
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
+                LazyVGrid(columns: collectionColumns, spacing: 14) {
                     ForEach(growthSnapshot.trophies) { trophy in
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(alignment: .top) {
@@ -95,6 +97,8 @@ struct TrophyHistoryView: View {
                                 Text(trophy.unlocked ? "Desbloqueado" : trophy.progressText.appLocalized)
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(trophy.unlocked ? BrandTheme.primary : BrandTheme.muted)
+                                    .multilineTextAlignment(.trailing)
+                                    .lineLimit(2)
                             }
 
                             Text(trophy.title.appLocalized)
@@ -142,7 +146,7 @@ struct TrophyHistoryView: View {
                     detail: "Aquí ves el tablero completo: lo que ya cerraste, lo que está listo y lo que todavía empuja tu progreso."
                 )
 
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 14) {
+                LazyVGrid(columns: collectionColumns, spacing: 14) {
                     ForEach(growthSnapshot.allMissions) { mission in
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(alignment: .top) {

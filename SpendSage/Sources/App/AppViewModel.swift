@@ -64,6 +64,7 @@ final class AppViewModel: ObservableObject {
         case legal
         case brand = "brand"
         case budget = "budget"
+        case trophies
     }
 
     @Published var session: SessionState
@@ -361,7 +362,15 @@ final class AppViewModel: ObservableObject {
         }
 
         await financeStore.saveExpense(draft, for: session)
-        notice = "Expense saved locally on this device.".appLocalized
+        if draft.category == .subscriptions, draft.recurringPlan != nil {
+            notice = draft.recurringPlan?.autoRecord == true
+                ? "Suscripción guardada y lista para registrarse sola en cada renovación.".appLocalized
+                : "Suscripción guardada con seguimiento recurrente.".appLocalized
+        } else if draft.source == .email {
+            notice = "Compra importada desde correo y guardada localmente.".appLocalized
+        } else {
+            notice = "Expense saved locally on this device.".appLocalized
+        }
         isPresentingAddExpense = false
         await refreshDashboard()
     }

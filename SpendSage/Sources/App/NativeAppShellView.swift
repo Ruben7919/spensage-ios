@@ -7,12 +7,14 @@ struct NativeAppShellView: View {
     private let trailingTabs: [AppViewModel.AppTab] = [.insights, .settings]
 
     var body: some View {
-        currentTabContent
-            .tint(BrandTheme.primary)
-            .safeAreaPadding(.bottom, 18)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                bottomNavigation
-            }
+        VStack(spacing: 0) {
+            currentTabContent
+                .tint(BrandTheme.primary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            bottomNavigation
+        }
+        .background(BrandTheme.background.ignoresSafeArea())
             .sheet(isPresented: Binding(
                 get: { viewModel.isPresentingAddExpense },
                 set: { viewModel.isPresentingAddExpense = $0 }
@@ -60,7 +62,7 @@ struct NativeAppShellView: View {
     }
 
     private var bottomNavigation: some View {
-        ZStack(alignment: .top) {
+        ZStack {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(BrandTheme.surface.opacity(0.96))
                 .overlay(
@@ -68,8 +70,6 @@ struct NativeAppShellView: View {
                         .stroke(BrandTheme.line.opacity(0.9), lineWidth: 1)
                 )
                 .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 18, x: 0, y: 8)
-                .padding(.horizontal, 12)
-                .padding(.top, 18)
 
             HStack(alignment: .bottom, spacing: 14) {
                 ForEach(leadingTabs) { tab in
@@ -95,11 +95,13 @@ struct NativeAppShellView: View {
                 }
             }
             .padding(.horizontal, 18)
-            .padding(.top, 18)
-            .padding(.bottom, 14)
+            .padding(.vertical, 14)
         }
-        .frame(height: 122)
-        .background(BrandTheme.background.opacity(0.01).ignoresSafeArea())
+        .frame(height: 104)
+        .padding(.horizontal, 12)
+        .padding(.top, 8)
+        .padding(.bottom, 8)
+        .background(BrandTheme.background)
     }
 
     private func select(_ tab: AppViewModel.AppTab) {

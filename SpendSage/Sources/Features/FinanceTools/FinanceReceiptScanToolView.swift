@@ -1161,7 +1161,9 @@ struct FinanceReceiptScanToolView: View {
             amount: amountValue,
             category: category,
             date: date,
-            note: note.trimmingCharacters(in: .whitespacesAndNewlines)
+            note: note.trimmingCharacters(in: .whitespacesAndNewlines),
+            source: .receiptScan,
+            sourceText: receiptAnalysis?.recognizedText ?? ""
         )
 
         await viewModel.addExpense(draft)

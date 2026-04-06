@@ -2,14 +2,36 @@ import UIKit
 import SwiftUI
 
 struct AddExpenseView: View {
+    private enum EntryMode: String, CaseIterable, Identifiable {
+        case manual
+        case email
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .manual:
+                return "Manual"
+            case .email:
+                return "Correo / online"
+            }
+        }
+    }
+
     @ObservedObject var viewModel: AppViewModel
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
 
+    @State private var entryMode: EntryMode = .manual
     @State private var merchant = ""
     @State private var amount = ""
     @State private var category = ExpenseCategory.groceries
     @State private var date = Date()
     @State private var note = ""
+    @State private var emailImportText = ""
+    @State private var isRecurringSubscription = false
+    @State private var subscriptionCadence: RecurringCadence = .monthly
+    @State private var renewalDate = Calendar.autoupdatingCurrent.date(byAdding: .month, value: 1, to: .now) ?? .now
+    @State private var autoRecordSubscription = true
     @State private var errorMessage: String?
 
     private var merchantAutofillSuggestion: MerchantAutofillSuggestion? {
@@ -28,6 +50,12 @@ struct AddExpenseView: View {
         return viewModel.ledger?.merchantSuggestions(matching: trimmedMerchant, limit: 4) ?? []
     }
 
+    private var subscriptionHelperText: String {
+        autoRecordSubscription
+            ? "La suscripción quedará lista para registrarse sola en cada renovación."
+            : "La suscripción quedará rastreada para que no tengas que volver a configurar la renovación."
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -35,57 +63,15 @@ struct AddExpenseView: View {
                     FinanceToolsHeaderCard(
                         eyebrow: "Captura rápida",
                         title: "Agregar gasto",
-                        summary: "Empieza por el comercio y el monto. El llenado inteligente aparece solo cuando realmente te ahorra tiempo.",
+                        summary: "Registra a mano, pega un correo de compra o deja lista una suscripción recurrente sin salir de la misma pantalla.",
                         systemImage: "plus.circle.fill",
                         character: .manchas,
                         expression: .happy,
                         sceneKey: "guide_02_log_expense_manchas"
                     )
 
-                    SurfaceCard {
-                        VStack(alignment: .leading, spacing: 14) {
-                            FinanceField(
-                                label: "Comercio o título",
-                                placeholder: "Supermercado",
-                                text: $merchant
-                            )
-                            FinanceField(
-                                label: "Monto",
-                                placeholder: "24.50",
-                                text: $amount,
-                                keyboard: .decimalPad,
-                                capitalization: .never
-                            )
-
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Categoría")
-                                    .font(.footnote.weight(.semibold))
-                                    .foregroundStyle(BrandTheme.muted)
-
-                                Picker("Categoría", selection: $category) {
-                                    ForEach(ExpenseCategory.allCases) { item in
-                                        Label(item.localizedTitle, systemImage: item.symbolName)
-                                            .tag(item)
-                                    }
-                                }
-                                .pickerStyle(.menu)
-                            }
-
-                            DatePicker(selection: $date, displayedComponents: .date) {
-                                Text("Fecha")
-                                    .font(.footnote.weight(.semibold))
-                                    .foregroundStyle(BrandTheme.muted)
-                            }
-                            .tint(BrandTheme.primary)
-
-                            FinanceField(
-                                label: "Nota",
-                                placeholder: "Nota opcional",
-                                text: $note,
-                                capitalization: .sentences
-                            )
-                        }
-                    }
+                    entrySourceCard
+                    expenseFormCard
 
                     if shouldShowSmartAssist {
                         smartAssistCard
@@ -109,6 +95,7 @@ struct AddExpenseView: View {
                     .opacity(canSave ? 1 : 0.6)
                 }
                 .padding(20)
+                .padding(.bottom, 24)
             }
             .background(FinanceScreenBackground())
             .navigationTitle("Agregar gasto")
@@ -128,6 +115,155 @@ struct AddExpenseView: View {
         }
         .onChange(of: merchant) { _, newValue in
             applyMerchantAutofillIfNeeded(for: newValue)
+        }
+        .onChange(of: category) { _, newValue in
+            if newValue != .subscriptions {
+                isRecurringSubscription = false
+            }
+        }
+    }
+
+    private var entrySourceCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                CompactSectionHeader(
+                    title: "Cómo quieres registrarlo",
+                    detail: "Manual para captura rápida o correo/online si vas a pegar un resumen de compra."
+                )
+
+                Picker("Modo de captura", selection: $entryMode) {
+                    ForEach(EntryMode.allCases) { mode in
+                        Text(mode.title.appLocalized).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                if entryMode == .email {
+                    FinanceMultilineField(
+                        label: "Correo o resumen de compra",
+                        placeholder: "Pega aquí el correo de confirmación, la factura online o el resumen del consumo.",
+                        text: $emailImportText
+                    )
+
+                    Button {
+                        applyEmailImport()
+                    } label: {
+                        Label("Autollenar desde correo", systemImage: "wand.and.stars")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    Text("SpendSage intenta detectar comercio, monto, fecha y categoría desde el texto pegado. Tú siempre puedes corregirlo antes de guardar.")
+                        .font(.footnote)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    private var expenseFormCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                FinanceField(
+                    label: "Comercio o título",
+                    placeholder: "Supermercado",
+                    text: $merchant
+                )
+                FinanceField(
+                    label: "Monto",
+                    placeholder: "24.50",
+                    text: $amount,
+                    keyboard: .decimalPad,
+                    capitalization: .never
+                )
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Categoría")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(BrandTheme.muted)
+
+                    Picker("Categoría", selection: $category) {
+                        ForEach(ExpenseCategory.allCases) { item in
+                            Label(item.localizedTitle, systemImage: item.symbolName)
+                                .tag(item)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+
+                DatePicker(selection: $date, displayedComponents: .date) {
+                    Text("Fecha")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(BrandTheme.muted)
+                }
+                .tint(BrandTheme.primary)
+
+                FinanceField(
+                    label: "Nota",
+                    placeholder: "Nota opcional",
+                    text: $note,
+                    capitalization: .sentences
+                )
+
+                if category == .subscriptions {
+                    subscriptionAutomationCard
+                }
+            }
+        }
+    }
+
+    private var subscriptionAutomationCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Divider()
+
+            Toggle(isOn: $isRecurringSubscription) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Es una suscripción recurrente")
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+                    Text("Actívalo para guardar también la renovación y no volver a configurarla.")
+                        .font(.footnote)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .tint(BrandTheme.primary)
+
+            if isRecurringSubscription {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Frecuencia")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(BrandTheme.muted)
+
+                    Picker("Frecuencia", selection: $subscriptionCadence) {
+                        ForEach(RecurringCadence.allCases) { cadence in
+                            Text(cadence.localizedTitle).tag(cadence)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                DatePicker(selection: $renewalDate, displayedComponents: .date) {
+                    Text(subscriptionCadence == .monthly ? "Próxima renovación" : "Próxima renovación anual")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(BrandTheme.muted)
+                }
+                .tint(BrandTheme.primary)
+
+                Toggle(isOn: $autoRecordSubscription) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Registrar automáticamente")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text(subscriptionHelperText)
+                            .font(.footnote)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .tint(BrandTheme.primary)
+            }
         }
     }
 
@@ -153,10 +289,10 @@ struct AddExpenseView: View {
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                     Spacer()
-                    BrandBadge(text: "Borrador local", systemImage: "iphone.gen3")
+                    BrandBadge(text: sourceBadgeText, systemImage: sourceBadgeIcon)
                 }
 
-                Text("Revisa el comercio, la categoría y el monto antes de guardar.")
+                Text("Revisa comercio, categoría y monto antes de guardar.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
 
@@ -184,6 +320,16 @@ struct AddExpenseView: View {
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                 }
+
+                if category == .subscriptions, isRecurringSubscription {
+                    FlowStack(spacing: 8, rowSpacing: 8) {
+                        BrandBadge(text: subscriptionCadence.localizedTitle, systemImage: "repeat")
+                        BrandBadge(text: renewalDate.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
+                        if autoRecordSubscription {
+                            BrandBadge(text: "Auto", systemImage: "sparkles")
+                        }
+                    }
+                }
             }
         }
     }
@@ -199,7 +345,7 @@ struct AddExpenseView: View {
                     BrandBadge(text: "1 toque", systemImage: "sparkles")
                 }
 
-                Text("Reutiliza la categoría, el monto y la nota de un comercio conocido para registrar más rápido.")
+                Text("Reutiliza categoría, monto y nota de un comercio conocido para registrar más rápido.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -275,7 +421,56 @@ struct AddExpenseView: View {
     }
 
     private var previewAmount: Decimal {
-        Decimal(string: amount) ?? 0
+        FinanceToolFormatting.decimal(from: amount) ?? 0
+    }
+
+    private var sourceBadgeText: String {
+        switch entryMode {
+        case .manual:
+            return "Entrada manual"
+        case .email:
+            return "Correo"
+        }
+    }
+
+    private var sourceBadgeIcon: String {
+        switch entryMode {
+        case .manual:
+            return "keyboard"
+        case .email:
+            return "envelope.fill"
+        }
+    }
+
+    private func applyEmailImport() {
+        let trimmed = emailImportText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            errorMessage = "Pega primero el correo o el resumen de compra."
+            return
+        }
+
+        let analysis = ExpenseEmailImportService.analyze(trimmed)
+        guard analysis.hasDetectedValues else {
+            errorMessage = "No pudimos detectar datos claros en ese correo. Puedes completar el gasto manualmente."
+            return
+        }
+
+        if let merchantValue = analysis.merchant, merchant.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            merchant = merchantValue
+        }
+        if let amountValue = analysis.amount, amount.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            amount = formatAmount(amountValue)
+        }
+        if let categoryValue = analysis.category {
+            category = categoryValue
+        }
+        if let detectedDate = analysis.date {
+            date = detectedDate
+        }
+        if note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            note = "Importado desde correo o compra online.".appLocalized
+        }
+        errorMessage = nil
     }
 
     private func applySuggestion(_ suggestion: MerchantAutofillSuggestion, includeMerchant: Bool) {
@@ -309,18 +504,35 @@ struct AddExpenseView: View {
     }
 
     private func saveExpense() async {
-        guard let amountValue = Decimal(string: amount) else {
+        guard let amountValue = FinanceToolFormatting.decimal(from: amount) else {
             errorMessage = "Ingresa un monto válido.".appLocalized
             return
         }
 
+        let trimmedMerchant = merchant.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedMerchant.isEmpty else {
+            errorMessage = "Agrega un comercio antes de guardar.".appLocalized
+            return
+        }
+
         errorMessage = nil
+        let recurringPlan: RecurringExpensePlan? = category == .subscriptions && isRecurringSubscription
+            ? RecurringExpensePlan(
+                cadence: subscriptionCadence,
+                renewalDate: renewalDate,
+                autoRecord: autoRecordSubscription
+            )
+            : nil
+
         let draft = ExpenseDraft(
-            merchant: merchant,
+            merchant: trimmedMerchant,
             amount: amountValue,
             category: category,
             date: date,
-            note: note
+            note: note,
+            source: entryMode == .email ? .email : .manual,
+            sourceText: entryMode == .email ? emailImportText : "",
+            recurringPlan: recurringPlan
         )
         await viewModel.addExpense(draft)
     }

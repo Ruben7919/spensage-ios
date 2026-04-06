@@ -227,7 +227,8 @@ enum ReceiptVisionService {
             (.groceries, ["market", "grocery", "super", "whole foods", "trader joe", "costco", "walmart"]),
             (.transport, ["uber", "lyft", "shell", "chevron", "fuel", "gas", "metro", "transit", "taxi"]),
             (.shopping, ["amazon", "target", "mall", "zara", "nike", "h&m", "store"]),
-            (.bills, ["internet", "utility", "electric", "water", "rent", "phone", "subscription"])
+            (.subscriptions, ["spotify", "netflix", "icloud", "youtube premium", "prime", "adobe", "canva", "disney", "apple one", "membership", "subscription"]),
+            (.bills, ["internet", "utility", "electric", "water", "rent", "phone"])
         ]
 
         for (category, keywords) in mappings {

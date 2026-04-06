@@ -149,6 +149,8 @@ struct AppRootView: View {
             BrandGalleryView()
         case .budget:
             BudgetWizardView(viewModel: viewModel)
+        case .trophies:
+            TrophyHistoryView(viewModel: viewModel)
         }
     }
 }

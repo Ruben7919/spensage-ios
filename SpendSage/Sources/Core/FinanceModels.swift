@@ -36,6 +36,59 @@ enum ExpenseCategory: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+enum ExpenseEntrySource: String, CaseIterable, Codable, Identifiable {
+    case manual = "Manual"
+    case email = "Email import"
+    case receiptScan = "Receipt scan"
+    case subscriptionAutomation = "Subscription automation"
+
+    var id: String { rawValue }
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
+
+    var systemImage: String {
+        switch self {
+        case .manual:
+            return "keyboard"
+        case .email:
+            return "envelope.fill"
+        case .receiptScan:
+            return "camera.viewfinder"
+        case .subscriptionAutomation:
+            return "repeat.circle.fill"
+        }
+    }
+}
+
+enum RecurringCadence: String, CaseIterable, Codable, Identifiable {
+    case monthly = "Monthly"
+    case yearly = "Yearly"
+
+    var id: String { rawValue }
+
+    var localizedTitle: String {
+        rawValue.appLocalized
+    }
+}
+
+struct RecurringExpensePlan: Codable, Equatable {
+    var cadence: RecurringCadence
+    var renewalDate: Date
+    var autoRecord: Bool
+
+    init(
+        cadence: RecurringCadence = .monthly,
+        renewalDate: Date = .now,
+        autoRecord: Bool = true
+    ) {
+        self.cadence = cadence
+        self.renewalDate = renewalDate
+        self.autoRecord = autoRecord
+    }
+}
+
 enum AccountKind: String, CaseIterable, Codable, Identifiable {
     case checking = "Checking"
     case savings = "Savings"
@@ -213,19 +266,25 @@ struct BillDraft: Equatable {
     var dueDay: Int
     var category: ExpenseCategory
     var autopay: Bool
+    var cadence: RecurringCadence
+    var renewalMonth: Int?
 
     init(
         title: String = "",
         amount: Decimal = 0,
         dueDay: Int = 1,
         category: ExpenseCategory = .bills,
-        autopay: Bool = false
+        autopay: Bool = false,
+        cadence: RecurringCadence = .monthly,
+        renewalMonth: Int? = nil
     ) {
         self.title = title
         self.amount = amount
         self.dueDay = dueDay
         self.category = category
         self.autopay = autopay
+        self.cadence = cadence
+        self.renewalMonth = renewalMonth
     }
 
     var isValid: Bool {
@@ -241,6 +300,8 @@ struct BillRecord: Identifiable, Codable, Equatable {
     var category: ExpenseCategory
     var autopay: Bool
     var lastPaidAt: Date?
+    var cadence: RecurringCadence? = nil
+    var renewalMonth: Int? = nil
 
     func paymentState(referenceDate: Date = .now, ledger: LocalFinanceLedger? = nil) -> BillPaymentState {
         guard lastPaidAt == nil else {
@@ -372,19 +433,28 @@ struct ExpenseDraft: Equatable {
     var category: ExpenseCategory
     var date: Date
     var note: String
+    var source: ExpenseEntrySource
+    var sourceText: String
+    var recurringPlan: RecurringExpensePlan?
 
     init(
         merchant: String = "",
         amount: Decimal = 0,
         category: ExpenseCategory = .groceries,
         date: Date = .now,
-        note: String = ""
+        note: String = "",
+        source: ExpenseEntrySource = .manual,
+        sourceText: String = "",
+        recurringPlan: RecurringExpensePlan? = nil
     ) {
         self.merchant = merchant
         self.amount = amount
         self.category = category
         self.date = date
         self.note = note
+        self.source = source
+        self.sourceText = sourceText
+        self.recurringPlan = recurringPlan
     }
 
     var isValid: Bool {
@@ -397,7 +467,10 @@ struct ExpenseDraft: Equatable {
             amount: amount,
             category: category,
             date: date,
-            note: note.trimmingCharacters(in: .whitespacesAndNewlines)
+            note: note.trimmingCharacters(in: .whitespacesAndNewlines),
+            source: source,
+            sourceText: sourceText.trimmingCharacters(in: .whitespacesAndNewlines),
+            recurringPlan: recurringPlan
         )
     }
 }
@@ -409,6 +482,9 @@ struct ExpenseRecord: Identifiable, Codable, Equatable {
     var amount: Decimal
     var date: Date
     var note: String?
+    var source: ExpenseEntrySource? = nil
+    var sourceText: String? = nil
+    var recurringPlan: RecurringExpensePlan? = nil
 }
 
 struct CategoryBreakdown: Identifiable, Codable, Equatable {
@@ -593,10 +669,14 @@ struct LocalFinanceLedger: Codable, Equatable {
                 category: normalized.category,
                 amount: normalized.amount,
                 date: normalized.date == .distantPast ? date : normalized.date,
-                note: normalized.note.isEmpty ? nil : normalized.note
+                note: normalized.note.isEmpty ? nil : normalized.note,
+                source: normalized.source,
+                sourceText: normalized.sourceText.isEmpty ? nil : normalized.sourceText,
+                recurringPlan: normalized.recurringPlan
             ),
             at: 0
         )
+        upsertTrackedSubscription(from: normalized, referenceDate: normalized.date == .distantPast ? date : normalized.date)
         updatedAt = date
     }
 
@@ -625,7 +705,9 @@ struct LocalFinanceLedger: Codable, Equatable {
                 dueDay: draft.dueDay,
                 category: draft.category,
                 autopay: draft.autopay,
-                lastPaidAt: nil
+                lastPaidAt: nil,
+                cadence: draft.cadence,
+                renewalMonth: draft.renewalMonth
             ),
             at: 0
         )
@@ -655,7 +737,13 @@ struct LocalFinanceLedger: Codable, Equatable {
                 amount: bills[index].amount,
                 category: bills[index].category,
                 date: date,
-                note: bills[index].autopay ? "Autopay bill".appLocalized : "Bill payment".appLocalized
+                note: bills[index].autopay ? "Autopay bill".appLocalized : "Bill payment".appLocalized,
+                source: bills[index].autopay ? .subscriptionAutomation : .manual,
+                recurringPlan: RecurringExpensePlan(
+                    cadence: bills[index].cadence ?? .monthly,
+                    renewalDate: dueDate(for: bills[index], referenceDate: date),
+                    autoRecord: bills[index].autopay
+                )
             ),
             date: date
         )
@@ -752,13 +840,24 @@ struct LocalFinanceLedger: Codable, Equatable {
 
     func dueDate(for bill: BillRecord, referenceDate: Date = .now) -> Date {
         let calendar = Calendar.autoupdatingCurrent
-        let components = calendar.dateComponents([.year, .month], from: referenceDate)
         let day = min(max(bill.dueDay, 1), 28)
-        let currentMonthDate = calendar.date(from: DateComponents(year: components.year, month: components.month, day: day)) ?? referenceDate
-        if currentMonthDate >= calendar.startOfDay(for: referenceDate) {
-            return currentMonthDate
+        switch bill.cadence ?? .monthly {
+        case .monthly:
+            let components = calendar.dateComponents([.year, .month], from: referenceDate)
+            let currentMonthDate = calendar.date(from: DateComponents(year: components.year, month: components.month, day: day)) ?? referenceDate
+            if currentMonthDate >= calendar.startOfDay(for: referenceDate) {
+                return currentMonthDate
+            }
+            return calendar.date(byAdding: .month, value: 1, to: currentMonthDate) ?? currentMonthDate
+        case .yearly:
+            let components = calendar.dateComponents([.year], from: referenceDate)
+            let month = min(max(bill.renewalMonth ?? calendar.component(.month, from: referenceDate), 1), 12)
+            let currentYearDate = calendar.date(from: DateComponents(year: components.year, month: month, day: day)) ?? referenceDate
+            if currentYearDate >= calendar.startOfDay(for: referenceDate) {
+                return currentYearDate
+            }
+            return calendar.date(byAdding: .year, value: 1, to: currentYearDate) ?? currentYearDate
         }
-        return calendar.date(byAdding: .month, value: 1, to: currentMonthDate) ?? currentMonthDate
     }
 
     func matchingExpensesCount(for rule: RuleRecord) -> Int {
@@ -874,6 +973,117 @@ struct LocalFinanceLedger: Codable, Equatable {
             .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
+    }
+
+    mutating func materializeScheduledAutopayBills(referenceDate: Date = .now) {
+        let calendar = Calendar.autoupdatingCurrent
+        let startOfToday = calendar.startOfDay(for: referenceDate)
+
+        for index in bills.indices {
+            guard bills[index].autopay else { continue }
+
+            let cycleDate = currentCycleDueDate(for: bills[index], referenceDate: referenceDate)
+            guard cycleDate <= startOfToday || calendar.isDate(cycleDate, inSameDayAs: startOfToday) else { continue }
+
+            if hasRecordedExpense(for: bills[index], inSameCycleAs: cycleDate, calendar: calendar) {
+                if !didRecord(bills[index].lastPaidAt, inSameCycleAs: cycleDate, cadence: bills[index].cadence ?? .monthly, calendar: calendar) {
+                    bills[index].lastPaidAt = cycleDate
+                    updatedAt = referenceDate
+                }
+                continue
+            }
+
+            appendExpense(
+                ExpenseDraft(
+                    merchant: bills[index].title,
+                    amount: bills[index].amount,
+                    category: bills[index].category,
+                    date: cycleDate,
+                    note: "Registro automático de suscripción".appLocalized,
+                    source: .subscriptionAutomation,
+                    recurringPlan: RecurringExpensePlan(
+                        cadence: bills[index].cadence ?? .monthly,
+                        renewalDate: cycleDate,
+                        autoRecord: true
+                    )
+                ),
+                date: referenceDate
+            )
+            bills[index].lastPaidAt = cycleDate
+            updatedAt = referenceDate
+        }
+    }
+
+    private mutating func upsertTrackedSubscription(from draft: ExpenseDraft, referenceDate: Date) {
+        guard draft.category == .subscriptions, let recurringPlan = draft.recurringPlan else { return }
+
+        let calendar = Calendar.autoupdatingCurrent
+        let dueDay = min(max(calendar.component(.day, from: recurringPlan.renewalDate), 1), 28)
+        let renewalMonth = recurringPlan.cadence == .yearly ? calendar.component(.month, from: recurringPlan.renewalDate) : nil
+        let normalizedMerchant = normalizedMerchantKey(for: draft.merchant)
+
+        if let index = bills.firstIndex(where: {
+            $0.category == .subscriptions && normalizedMerchantKey(for: $0.title) == normalizedMerchant
+        }) {
+            bills[index].title = draft.merchant
+            bills[index].amount = draft.amount
+            bills[index].dueDay = dueDay
+            bills[index].category = .subscriptions
+            bills[index].autopay = recurringPlan.autoRecord
+            bills[index].lastPaidAt = referenceDate
+            bills[index].cadence = recurringPlan.cadence
+            bills[index].renewalMonth = renewalMonth
+        } else {
+            bills.insert(
+                BillRecord(
+                    id: UUID(),
+                    title: draft.merchant,
+                    amount: draft.amount,
+                    dueDay: dueDay,
+                    category: .subscriptions,
+                    autopay: recurringPlan.autoRecord,
+                    lastPaidAt: referenceDate,
+                    cadence: recurringPlan.cadence,
+                    renewalMonth: renewalMonth
+                ),
+                at: 0
+            )
+        }
+    }
+
+    private func currentCycleDueDate(for bill: BillRecord, referenceDate: Date) -> Date {
+        let calendar = Calendar.autoupdatingCurrent
+        let day = min(max(bill.dueDay, 1), 28)
+
+        switch bill.cadence ?? .monthly {
+        case .monthly:
+            let components = calendar.dateComponents([.year, .month], from: referenceDate)
+            return calendar.date(from: DateComponents(year: components.year, month: components.month, day: day)) ?? referenceDate
+        case .yearly:
+            let year = calendar.component(.year, from: referenceDate)
+            let month = min(max(bill.renewalMonth ?? calendar.component(.month, from: referenceDate), 1), 12)
+            return calendar.date(from: DateComponents(year: year, month: month, day: day)) ?? referenceDate
+        }
+    }
+
+    private func hasRecordedExpense(for bill: BillRecord, inSameCycleAs cycleDate: Date, calendar: Calendar) -> Bool {
+        expenses.contains { expense in
+            normalizedMerchantKey(for: expense.merchant) == normalizedMerchantKey(for: bill.title)
+                && expense.category == bill.category
+                && didRecord(expense.date, inSameCycleAs: cycleDate, cadence: bill.cadence ?? .monthly, calendar: calendar)
+        }
+    }
+
+    private func didRecord(_ date: Date?, inSameCycleAs cycleDate: Date, cadence: RecurringCadence, calendar: Calendar) -> Bool {
+        guard let date else { return false }
+
+        switch cadence {
+        case .monthly:
+            return calendar.isDate(date, equalTo: cycleDate, toGranularity: .month)
+        case .yearly:
+            return calendar.isDate(date, equalTo: cycleDate, toGranularity: .year)
+                && calendar.component(.month, from: date) == calendar.component(.month, from: cycleDate)
+        }
     }
 }
 

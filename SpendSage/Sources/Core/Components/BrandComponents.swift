@@ -128,10 +128,12 @@ struct BrandBadge: View {
                 .font(.caption.weight(.semibold))
             Text(text.appLocalized)
                 .font(.caption.weight(.semibold))
+                .lineLimit(1)
         }
         .foregroundStyle(BrandTheme.primary)
         .padding(.horizontal, 14)
         .padding(.vertical, 9)
+        .fixedSize(horizontal: true, vertical: false)
         .background(
             Capsule(style: .continuous)
                 .fill(BrandTheme.surface.opacity(0.82))

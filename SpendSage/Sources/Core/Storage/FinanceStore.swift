@@ -139,11 +139,20 @@ final class LocalFinanceStore: FinanceDashboardStoring {
     }
 
     private func loadLedger() -> LocalFinanceLedger {
-        guard let data = defaults.data(forKey: storageKey),
-              let ledger = try? decoder.decode(LocalFinanceLedger.self, from: data) else {
-            return seedLedger
+        let baseLedger: LocalFinanceLedger
+        if let data = defaults.data(forKey: storageKey),
+           let decodedLedger = try? decoder.decode(LocalFinanceLedger.self, from: data) {
+            baseLedger = decodedLedger
+        } else {
+            baseLedger = seedLedger
         }
-        return ledger
+
+        var normalizedLedger = baseLedger
+        normalizedLedger.materializeScheduledAutopayBills()
+        if normalizedLedger != baseLedger {
+            saveLedger(normalizedLedger)
+        }
+        return normalizedLedger
     }
 
     private func saveLedger(_ ledger: LocalFinanceLedger) {
