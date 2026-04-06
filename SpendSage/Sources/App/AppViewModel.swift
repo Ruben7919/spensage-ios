@@ -5,7 +5,14 @@ final class AppViewModel: ObservableObject {
     enum Screen {
         case onboarding
         case auth
+        case profileSetup
         case app
+    }
+
+    struct PendingProfileSetup: Equatable {
+        var email: String
+        var suggestedFullName: String
+        var countryCode: String
     }
 
     enum AppTab: String, CaseIterable, Identifiable {
@@ -39,6 +46,10 @@ final class AppViewModel: ObservableObject {
     }
 
     enum DebugRoute: String {
+        case dashboard
+        case expenses
+        case insights
+        case settings
         case accounts
         case bills
         case rules
@@ -67,6 +78,7 @@ final class AppViewModel: ObservableObject {
     @Published var debugRoute: DebugRoute?
     @Published var activeCelebration: GrowthCelebration?
     @Published var reviewPromptToken: UUID?
+    @Published var pendingProfileSetup: PendingProfileSetup?
 
     private let authService: AuthServicing
     private let financeStore: FinanceDashboardStoring
@@ -110,6 +122,9 @@ final class AppViewModel: ObservableObject {
         if !hasCompletedOnboarding {
             return .onboarding
         }
+        if pendingProfileSetup != nil {
+            return .profileSetup
+        }
         switch session {
         case .signedOut:
             return .auth
@@ -127,12 +142,14 @@ final class AppViewModel: ObservableObject {
 
     func signIn(email: String, password: String) async throws {
         session = try await authService.signIn(email: email, password: password)
+        pendingProfileSetup = nil
         notice = nil
         await refreshDashboard()
     }
 
     func createAccount(email: String, password: String) async throws {
         session = try await authService.createAccount(email: email, password: password)
+        pendingProfileSetup = nil
         notice = nil
         await refreshDashboard()
     }
@@ -141,6 +158,7 @@ final class AppViewModel: ObservableObject {
         session = try await authService.signInWithSocial(provider)
         notice = AppLocalization.localized("Signed in with %@.", arguments: provider.displayName)
         await refreshDashboard()
+        pendingProfileSetup = makePendingProfileSetup(from: authService.consumeProfileSeed(), provider: provider)
     }
 
     func continueAsGuest() async {
@@ -163,11 +181,17 @@ final class AppViewModel: ObservableObject {
         queuedCelebrations.removeAll()
         shouldPromptForReviewAfterCelebrations = false
         reviewPromptToken = nil
+        pendingProfileSetup = nil
     }
 
     func startScanFlow() {
         scanFlowID = UUID()
         selectedTab = .scan
+    }
+
+    func startManualExpenseFlow() {
+        selectedTab = .expenses
+        isPresentingAddExpense = true
     }
 
     func refreshDashboard() async {
@@ -310,8 +334,34 @@ final class AppViewModel: ObservableObject {
 
     func saveProfile(_ profile: ProfileRecord) async {
         await financeStore.saveProfile(profile, for: session)
+        if !profile.needsWelcomeProfile(for: session.emailAddress) {
+            pendingProfileSetup = nil
+        }
         notice = "Profile preferences saved on this device.".appLocalized
         await refreshDashboard()
+    }
+
+    func completeWelcomeProfile(fullName: String, countryCode: String) async {
+        guard let email = session.emailAddress else { return }
+
+        let trimmedName = fullName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
+            notice = "Escribe tu nombre antes de continuar.".appLocalized
+            return
+        }
+
+        let currentProfile = profile
+        let updatedProfile = ProfileRecord(
+            fullName: trimmedName,
+            householdName: currentProfile.householdName,
+            email: email,
+            countryCode: countryCode,
+            marketingOptIn: currentProfile.marketingOptIn
+        )
+
+        await saveProfile(updatedProfile)
+        pendingProfileSetup = nil
+        notice = "Perfil listo. Ahora sí, entremos.".appLocalized
     }
 
     func dismissCelebration() {
@@ -337,6 +387,27 @@ final class AppViewModel: ObservableObject {
             bills: bills,
             rules: rules,
             profile: profile
+        )
+    }
+
+    private func makePendingProfileSetup(from seed: AuthProfileSeed?, provider: SocialProvider) -> PendingProfileSetup? {
+        guard session.socialProvider == provider, let sessionEmail = session.emailAddress else {
+            return nil
+        }
+
+        let currentProfile = profile
+        guard currentProfile.needsWelcomeProfile(for: sessionEmail) else {
+            return nil
+        }
+
+        let suggestedFullName = seed?.preferredFullName
+            ?? currentProfile.normalizedFullName
+            ?? ""
+
+        return PendingProfileSetup(
+            email: seed?.preferredEmail ?? sessionEmail,
+            suggestedFullName: suggestedFullName,
+            countryCode: currentProfile.countryCode
         )
     }
 

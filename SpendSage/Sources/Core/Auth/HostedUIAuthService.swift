@@ -6,6 +6,7 @@ import UIKit
 @MainActor
 final class HostedUIAuthService: NSObject, AuthServicing {
     let configuration: AuthConfiguration
+    private var lastProfileSeed: AuthProfileSeed?
 
     init(configuration: AuthConfiguration) {
         self.configuration = configuration
@@ -42,6 +43,11 @@ final class HostedUIAuthService: NSObject, AuthServicing {
 
     func hostedUIRequest(for provider: SocialProvider) -> AuthHostedUIRequest? {
         configuration.hostedUIRequest(for: provider, action: .social)
+    }
+
+    func consumeProfileSeed() -> AuthProfileSeed? {
+        defer { lastProfileSeed = nil }
+        return lastProfileSeed
     }
 
     private func authorize(
@@ -82,7 +88,12 @@ final class HostedUIAuthService: NSObject, AuthServicing {
             hostedUI: hostedUI
         )
 
-        let email = Self.email(fromIDToken: tokenResponse.idToken) ?? loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
+        let profileSeed = Self.profileSeed(
+            fromIDToken: tokenResponse.idToken,
+            fallbackEmail: loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
+        )
+        lastProfileSeed = profileSeed
+        let email = profileSeed.preferredEmail ?? loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
         let providerLabel = provider?.rawValue ?? "Hosted UI"
         return .signedIn(email: email, provider: providerLabel)
     }
@@ -158,7 +169,7 @@ final class HostedUIAuthService: NSObject, AuthServicing {
             .replacingOccurrences(of: "=", with: "")
     }
 
-    private static func email(fromIDToken token: String) -> String? {
+    private static func tokenPayload(from token: String) -> [String: Any]? {
         let segments = token.split(separator: ".")
         guard segments.count > 1 else { return nil }
         var payload = String(segments[1])
@@ -173,7 +184,23 @@ final class HostedUIAuthService: NSObject, AuthServicing {
         else {
             return nil
         }
-        return json["email"] as? String ?? json["cognito:username"] as? String
+        return json
+    }
+
+    private static func profileSeed(fromIDToken token: String, fallbackEmail: String?) -> AuthProfileSeed {
+        let payload = tokenPayload(from: token)
+        let givenName = payload?["given_name"] as? String
+        let familyName = payload?["family_name"] as? String
+        let fullName = (payload?["name"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let mergedName = [givenName, familyName]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+
+        return AuthProfileSeed(
+            fullName: (fullName?.isEmpty == false ? fullName : nil) ?? (mergedName.isEmpty ? nil : mergedName),
+            email: (payload?["email"] as? String) ?? (payload?["cognito:username"] as? String) ?? fallbackEmail
+        )
     }
 }
 

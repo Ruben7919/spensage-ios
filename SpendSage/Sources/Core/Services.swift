@@ -8,6 +8,7 @@ protocol AuthServicing {
     func signInWithSocial(_ provider: SocialProvider) async throws -> SessionState
     func continueAsGuest() async -> SessionState
     func hostedUIRequest(for provider: SocialProvider) -> AuthHostedUIRequest?
+    func consumeProfileSeed() -> AuthProfileSeed?
 }
 
 @MainActor
@@ -27,8 +28,9 @@ enum DefaultAuthService {
 }
 
 @MainActor
-struct PreviewAuthService: AuthServicing {
+final class PreviewAuthService: AuthServicing {
     let configuration: AuthConfiguration
+    private var lastProfileSeed: AuthProfileSeed?
 
     init(configuration: AuthConfiguration = .preview) {
         self.configuration = configuration
@@ -37,12 +39,14 @@ struct PreviewAuthService: AuthServicing {
     func signIn(email: String, password: String) async throws -> SessionState {
         try AuthValidation.validate(email: email)
         try await Task.sleep(for: .milliseconds(150))
+        lastProfileSeed = AuthProfileSeed(email: email.trimmingCharacters(in: .whitespacesAndNewlines))
         return .signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: nil)
     }
 
     func createAccount(email: String, password: String) async throws -> SessionState {
         try AuthValidation.validate(email: email)
         try await Task.sleep(for: .milliseconds(180))
+        lastProfileSeed = AuthProfileSeed(email: email.trimmingCharacters(in: .whitespacesAndNewlines))
         return .signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: "Email")
     }
 
@@ -51,6 +55,10 @@ struct PreviewAuthService: AuthServicing {
             throw AuthError.providerUnavailable(provider)
         }
         try await Task.sleep(for: .milliseconds(180))
+        lastProfileSeed = AuthProfileSeed(
+            fullName: nil,
+            email: "\(provider.rawValue.lowercased())@spendsage.ai"
+        )
         return .signedIn(email: "\(provider.rawValue.lowercased())@spendsage.ai", provider: provider.rawValue)
     }
 
@@ -60,6 +68,11 @@ struct PreviewAuthService: AuthServicing {
 
     func hostedUIRequest(for provider: SocialProvider) -> AuthHostedUIRequest? {
         configuration.hostedUIRequest(for: provider, action: .social)
+    }
+
+    func consumeProfileSeed() -> AuthProfileSeed? {
+        defer { lastProfileSeed = nil }
+        return lastProfileSeed
     }
 }
 

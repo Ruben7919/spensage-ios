@@ -24,7 +24,6 @@ struct FinanceReceiptScanToolView: View {
     @State private var isSavingDraft = false
     @State private var errorMessage: String?
     @State private var lastSavedSummary: String?
-    @State private var hasPresentedInitialGuide = false
     @State private var receiptAnalysis: ReceiptScanAnalysis?
     @State private var analysisToken = UUID()
     @State private var currentStep: ReceiptWizardStep = .capture
@@ -32,6 +31,9 @@ struct FinanceReceiptScanToolView: View {
     @State private var isCategoryLockedByUser = false
     @State private var isDateLockedByUser = false
     @State private var hasAppliedDebugState = false
+    @State private var hasAttemptedAutomaticCamera = false
+    @State private var didCaptureInCurrentCameraSession = false
+    @State private var showCaptureFallback = false
 
     private var parsedAmount: Decimal? {
         FinanceToolFormatting.decimal(from: amount)
@@ -134,6 +136,10 @@ struct FinanceReceiptScanToolView: View {
         }
     }
 
+    private var shouldShowStatusCard: Bool {
+        currentStep != .capture || errorMessage != nil || isSavingDraft || isAnalyzingReceipt || lastSavedSummary != nil
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
@@ -153,12 +159,13 @@ struct FinanceReceiptScanToolView: View {
                     FinanceNoticeCard(message: notice)
                 }
 
-                if currentStep == .capture {
+                if currentStep == .capture && showCaptureFallback {
                     captureQuickStartCard
                 }
 
-                wizardStatusCard
-                wizardProgressCard
+                if shouldShowStatusCard {
+                    wizardStatusCard
+                }
                 stepContent
             }
             .padding(24)
@@ -182,24 +189,21 @@ struct FinanceReceiptScanToolView: View {
                 await viewModel.refreshDashboard()
             }
         }
+        .task(id: viewModel.scanFlowID) {
+            applyDebugLaunchStateIfNeeded()
+            await triggerAutomaticCameraIfNeeded()
+        }
         .task(id: photoPickerItem) {
             await loadPhotoSelection()
         }
-        .sheet(isPresented: $isPresentingCamera) {
+        .sheet(isPresented: $isPresentingCamera, onDismiss: handleCameraDismiss) {
             ReceiptCameraPicker { image in
+                didCaptureInCurrentCameraSession = true
                 attachImage(image, source: .camera)
             }
         }
         .sheet(isPresented: $isPresentingGuide) {
             GuideSheet(guide: GuideLibrary.guide(.scan))
-        }
-        .onAppear {
-            guard !hasPresentedInitialGuide else { return }
-            hasPresentedInitialGuide = true
-            if !GuideProgressStore.isSeen(.scan) {
-                isPresentingGuide = true
-            }
-            applyDebugLaunchStateIfNeeded()
         }
         .onChange(of: merchant) { _, _ in
             clearTransientState()
@@ -295,28 +299,29 @@ struct FinanceReceiptScanToolView: View {
     }
 
     private var captureStepCard: some View {
-        return VStack(alignment: .leading, spacing: 20) {
-            SurfaceCard {
-                VStack(alignment: .leading, spacing: 16) {
-                    stepHeader(
-                        for: .capture,
-                        title: "Empieza con el recibo",
-                        summary: prefersCompactGuidance
-                            ? "Toma o importa el recibo. Si quieres velocidad, sigue sin foto."
-                            : "Toma una foto clara o importa una desde Fotos. Si solo quieres registrar el gasto rápido, también puedes seguir sin imagen."
-                    )
+        VStack(alignment: .leading, spacing: 20) {
+            if capturedImage != nil || isLoadingPhoto {
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        CompactSectionHeader(
+                            title: "Recibo listo",
+                            detail: "Cuando la captura termina, SpendSage llena el borrador editable para que solo confirmes y guardes."
+                        )
 
-                    ReceiptImagePreviewCard(
-                        image: capturedImage,
-                        source: captureSource,
-                        capturedAt: captureDate,
-                        isBusy: isLoadingPhoto,
-                        onRemove: removeAttachedImage
-                    )
+                        ReceiptImagePreviewCard(
+                            image: capturedImage,
+                            source: captureSource,
+                            capturedAt: captureDate,
+                            isBusy: isLoadingPhoto,
+                            onRemove: removeAttachedImage
+                        )
+                    }
                 }
             }
 
-            photoTipsCard
+            if showCaptureFallback {
+                photoTipsCard
+            }
         }
     }
 
@@ -324,8 +329,8 @@ struct FinanceReceiptScanToolView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 CompactSectionHeader(
-                    title: "Empieza aquí",
-                    detail: "La acción principal ya queda visible: foto, importación o borrador rápido."
+                    title: "Si no usas la cámara ahora",
+                    detail: "Importa una foto o pasa a registro manual. El flujo de escaneo principal ya intenta abrir la cámara apenas entras."
                 )
 
                 captureActionsStack
@@ -357,17 +362,16 @@ struct FinanceReceiptScanToolView: View {
             }
             .buttonStyle(.plain)
 
-            HStack(spacing: 12) {
-                Button("Continuar sin foto") {
-                    transitionToStep(.autofill)
-                }
-                .buttonStyle(SecondaryCTAStyle())
-
-                Button("Usar borrador de ejemplo") {
-                    loadSampleDraft()
-                }
-                .buttonStyle(SecondaryCTAStyle())
+            Button {
+                viewModel.startManualExpenseFlow()
+            } label: {
+                ReceiptActionLabel(
+                    title: "Registrar manualmente",
+                    systemImage: "square.and.pencil",
+                    style: .secondary
+                )
             }
+            .buttonStyle(.plain)
         }
     }
 
@@ -971,13 +975,33 @@ struct FinanceReceiptScanToolView: View {
         transitionToStep(.review)
     }
 
+    private func triggerAutomaticCameraIfNeeded() async {
+        guard !hasAttemptedAutomaticCamera else { return }
+        guard currentStep == .capture, capturedImage == nil else { return }
+        hasAttemptedAutomaticCamera = true
+
+        try? await Task.sleep(for: .milliseconds(180))
+        guard currentStep == .capture, capturedImage == nil else { return }
+        openCamera()
+    }
+
+    private func handleCameraDismiss() {
+        if !didCaptureInCurrentCameraSession && currentStep == .capture && capturedImage == nil {
+            showCaptureFallback = true
+        }
+        didCaptureInCurrentCameraSession = false
+    }
+
     private func openCamera() {
         clearTransientState()
+        didCaptureInCurrentCameraSession = false
         guard VNDocumentCameraViewController.isSupported else {
             errorMessage = "Document scan is not available on this device.".appLocalized
+            showCaptureFallback = true
             return
         }
 
+        showCaptureFallback = false
         isPresentingCamera = true
     }
 
@@ -1070,6 +1094,7 @@ struct FinanceReceiptScanToolView: View {
         analysisToken = UUID()
         resetDraftLocks()
         clearTransientState()
+        showCaptureFallback = true
         transitionToStep(.capture)
     }
 
@@ -1080,6 +1105,7 @@ struct FinanceReceiptScanToolView: View {
         receiptAnalysis = nil
         resetDraftLocks()
         clearTransientState()
+        showCaptureFallback = false
         transitionToStep(.autofill)
         startReceiptAnalysis(for: image)
     }
@@ -1153,6 +1179,7 @@ struct FinanceReceiptScanToolView: View {
         isAnalyzingReceipt = false
         isSavingDraft = false
         resetDraftLocks()
+        showCaptureFallback = true
         transitionToStep(.capture)
     }
 

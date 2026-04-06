@@ -6,7 +6,7 @@ Last updated: 2026-04-05
 
 - App: `SpendSage`
 - Version: `1.0`
-- Build: `10`
+- Build: `13`
 - Bundle ID: `com.spendsage.ai`
 - Team ID: `YU855NB22W`
 
@@ -16,19 +16,19 @@ Last updated: 2026-04-05
 - Upload completed successfully to App Store Connect
 - TestFlight scope: internal testing only
 - Current state: waiting for App Store Connect processing to finish
-- Notes: build `10` includes the new three-mascot peeking `AppIcon` with `Any`, `Dark`, and `Tinted` variants, the final full-route visual QA repair pass, a lighter legal/profile/advanced navigation pass, a stronger celebration modal, and receipt scan actions surfaced directly in the first fold
+- Notes: build `13` keeps the Cognito Hosted UI DEV alignment for real account-first auth through `spendsage://auth-callback`, and adds two UX changes for the next internal pass: social login now routes Apple/Google users through a short profile-completion screen to confirm name/country, and the `Escanear` tab now opens the camera directly on first entry while manual registration lives in a separate add-expense flow.
 
 ## Archive Paths
 
-- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-10.xcarchive`
+- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-13.xcarchive`
 - Export options: `/Users/rubenlazaro/Projects/spensage-ios/build/ExportOptions-TestFlight-Internal.plist`
 - Upload executed directly via `xcodebuild -exportArchive ... -destination upload` with no persisted export bundle kept on disk
 
 ## Internal QA Focus
 
 1. Validate the new three-character icon on device under default, dark, and tinted icon appearances on iOS 26.
-2. Validate the simplified auth flow, especially email-first entry plus Apple/Google login buttons.
-3. Validate the main B2C loop: onboarding, dashboard, quick expense capture, receipt draft, celebration overlay, and premium messaging.
+2. Validate the simplified auth flow, especially email-first entry, Apple/Google consent, and the one-time short profile-completion screen after social login.
+3. Validate the main B2C loop: onboarding, dashboard, direct-to-camera receipt capture, editable receipt draft, manual expense registration, celebration overlay, and premium messaging.
 4. Validate secondary tools on smaller iPhones: accounts, bills, CSV import, budget wizard, help, support, legal, profile, and advanced settings.
 5. Confirm Spanish-first copy is consistent enough for internal review and note any remaining mixed-language strings below the top fold.
 6. Confirm the app never implies live backend, billing, sync, or notifications that are not active yet beyond the current local/OCR scope.

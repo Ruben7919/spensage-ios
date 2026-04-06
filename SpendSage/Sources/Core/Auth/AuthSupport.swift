@@ -8,6 +8,21 @@ struct AuthHostedUIRequest: Equatable {
     let prefersEphemeralSession: Bool
 }
 
+struct AuthProfileSeed: Equatable {
+    var fullName: String?
+    var email: String?
+
+    var preferredFullName: String? {
+        let trimmed = fullName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    var preferredEmail: String? {
+        let trimmed = email?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+}
+
 enum AuthError: LocalizedError, Equatable {
     case invalidEmail
     case weakPassword(minimum: Int)

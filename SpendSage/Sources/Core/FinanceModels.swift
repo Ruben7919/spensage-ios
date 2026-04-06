@@ -344,6 +344,26 @@ struct ProfileRecord: Codable, Equatable {
         countryCode: "US",
         marketingOptIn: false
     )
+
+    var normalizedFullName: String? {
+        let trimmed = fullName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed != Self.default.fullName else { return nil }
+        return trimmed
+    }
+
+    var normalizedEmail: String? {
+        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed != Self.default.email else { return nil }
+        return trimmed
+    }
+
+    func needsWelcomeProfile(for sessionEmail: String?) -> Bool {
+        guard let sessionEmail, !sessionEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return normalizedFullName == nil
+        }
+
+        return normalizedFullName == nil || normalizedEmail != sessionEmail
+    }
 }
 
 struct ExpenseDraft: Equatable {

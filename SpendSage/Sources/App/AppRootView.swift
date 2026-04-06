@@ -38,6 +38,10 @@ struct AppRootView: View {
                     NavigationStack {
                         AuthView(viewModel: viewModel)
                     }
+                case .profileSetup:
+                    NavigationStack {
+                        ProfileCompletionView(viewModel: viewModel)
+                    }
                 case .app:
                     NativeAppShellView(viewModel: viewModel)
                 }
@@ -86,6 +90,14 @@ struct AppRootView: View {
     @ViewBuilder
     private func debugRouteView(_ route: AppViewModel.DebugRoute) -> some View {
         switch route {
+        case .dashboard:
+            DashboardView(viewModel: viewModel)
+        case .expenses:
+            ExpensesCenterView(viewModel: viewModel)
+        case .insights:
+            InsightsView(viewModel: viewModel)
+        case .settings:
+            SettingsView(viewModel: viewModel)
         case .accounts:
             FinanceAccountsToolView(viewModel: viewModel)
         case .bills:

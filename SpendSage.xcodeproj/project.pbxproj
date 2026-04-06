@@ -145,6 +145,7 @@
 		78FD6FF7284FE22A88BCE118 /* FinanceReceiptScanToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975B357AB70EED51E253E86B /* FinanceReceiptScanToolView.swift */; };
 		7944C6B638F7199DB8F4697B /* guide_25_splash_team_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CFB976CA179049E2DCA1420 /* guide_25_splash_team_holiday_v2.png */; };
 		7AF41B4C587CE7787DF9F076 /* tikki_thinking_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D0419C3252DB61244E31A71D /* tikki_thinking_holiday_v2.png */; };
+		7B31916E3239C0784BFEFE71 /* ProfileCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9AE2E4062B2ED34A969EF0D /* ProfileCompletionView.swift */; };
 		7C952BC79399632D62AAE695 /* manchas_confused_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 62B956373BF646B0778402E6 /* manchas_confused_holiday_v2.png */; };
 		7DF4DC2173F9DABE964341CE /* mei_neutral_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C21073C0C9AA6223F9F37057 /* mei_neutral_v2.png */; };
 		7FC6102EE4E7B57C55CDCB47 /* tikki_excited_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = E2347E10F03EF2036C829115 /* tikki_excited_new_year_v2.png */; };
@@ -184,6 +185,7 @@
 		94AEC299A56ED2AB813D0BE4 /* mei_excited_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = BF3A52A4D53EC9146979FE27 /* mei_excited_halloween_v2.png */; };
 		9530C8BBEF430A2B30F885CC /* badge_goals_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 381690D6AA9297592598EC3A /* badge_goals_v2.png */; };
 		970786DA41BB24AC236F80E0 /* badge_recovery_mode_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BF97127EEC9ABE5F58F3976 /* badge_recovery_mode_v2.png */; };
+		98C41737F7E240D39122F33B /* ProfileCompletionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE57325664004CBCF267818B /* ProfileCompletionTests.swift */; };
 		9BF510400E05D1A4B72ECA8A /* BrandGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89985226F3D7B000843752AB /* BrandGalleryView.swift */; };
 		9C0618AEBF3310C881D2F0AA /* badge_weekly_decision_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 98A12E850C7A5E616CC20C87 /* badge_weekly_decision_v2.png */; };
 		9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679F2DB952FBB586D6057598 /* AuthSupport.swift */; };
@@ -560,8 +562,10 @@
 		C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewFinanceData.swift; sourceTree = "<group>"; };
 		C65D3EB1639597D338721CE9 /* app_icon_dark_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_dark_v2.png; sourceTree = "<group>"; };
 		C7EE7F5280A10507BD9E9A82 /* mei_warning_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_warning_new_year_v2.png; sourceTree = "<group>"; };
+		C9AE2E4062B2ED34A969EF0D /* ProfileCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCompletionView.swift; sourceTree = "<group>"; };
 		CA56DF4650B5021F47704B05 /* tikki_angry_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_angry_v2.png; sourceTree = "<group>"; };
 		CC05C996D8DF40D500F2777C /* BrandStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandStory.swift; sourceTree = "<group>"; };
+		CE57325664004CBCF267818B /* ProfileCompletionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCompletionTests.swift; sourceTree = "<group>"; };
 		CE631D88FC12C05CB7B74E33 /* guide_33_tikki_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_33_tikki_new_year_v2.png; sourceTree = "<group>"; };
 		CED414330125E63F549BE0AC /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
 		CF636AE08A9FDCCDF51460A3 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -798,6 +802,7 @@
 			children = (
 				8CC8D8BD53F09EA71C1D0744 /* AuthView.swift */,
 				07CC2A6F29FF5CDF041CF122 /* ConfirmAccountView.swift */,
+				C9AE2E4062B2ED34A969EF0D /* ProfileCompletionView.swift */,
 				CED414330125E63F549BE0AC /* ResetPasswordView.swift */,
 			);
 			path = Auth;
@@ -1168,6 +1173,7 @@
 			children = (
 				6902A39AC1EB9CDDD5E6F785 /* BrandSeasonalAssetTests.swift */,
 				849574DD6B6ABAA23CB11EE0 /* GrowthCelebrationTests.swift */,
+				CE57325664004CBCF267818B /* ProfileCompletionTests.swift */,
 				DC1238852B64244DC049D08D /* ReceiptVisionServiceTests.swift */,
 				8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */,
 			);
@@ -1608,6 +1614,7 @@
 				77843C280365837DC6797467 /* OnboardingView.swift in Sources */,
 				E9DAD4C151A3D2FCBD608678 /* PremiumView.swift in Sources */,
 				DD5EF1AA1AA2C0479F642F48 /* PreviewFinanceData.swift in Sources */,
+				7B31916E3239C0784BFEFE71 /* ProfileCompletionView.swift in Sources */,
 				5F087A9A789816CA3D0374CB /* ProfileView.swift in Sources */,
 				AED083756FE4631D3475EBD2 /* ReceiptVisionService.swift in Sources */,
 				52978F026A957FCC3741603E /* ResetPasswordView.swift in Sources */,
@@ -1626,6 +1633,7 @@
 			files = (
 				E69CE8E8F10B302A01F33D25 /* BrandSeasonalAssetTests.swift in Sources */,
 				199E1A30C5CDA340DEDB8C97 /* GrowthCelebrationTests.swift in Sources */,
+				98C41737F7E240D39122F33B /* ProfileCompletionTests.swift in Sources */,
 				F6D4F13256E68E49F659F817 /* ReceiptVisionServiceTests.swift in Sources */,
 				65B04B25CFA84CFF4DB53DCF /* SpendSageTests.swift in Sources */,
 			);
@@ -1715,7 +1723,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 13;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1820,7 +1828,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 13;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_NS_ASSERTIONS = NO;

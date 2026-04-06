@@ -7,7 +7,7 @@ settings:
   base:
     PRODUCT_NAME: SpendSage
     SWIFT_VERSION: "6.0"
-    CURRENT_PROJECT_VERSION: 9
+    CURRENT_PROJECT_VERSION: 13
     MARKETING_VERSION: 1.0
     DEVELOPMENT_TEAM: YU855NB22W
     CODE_SIGN_STYLE: Automatic
@@ -38,8 +38,8 @@ targets:
           - CFBundleURLName: com.spendsage.ai
             CFBundleURLSchemes:
               - spendsage
-        SpendSageCognitoHostedUIDomain: ""
-        SpendSageCognitoUserPoolClientId: ""
+        SpendSageCognitoHostedUIDomain: "spendsage-dev-177600645043.auth.us-east-1.amazoncognito.com"
+        SpendSageCognitoUserPoolClientId: "7t375oqkn6ihh1rnk3lt0qffv3"
         SpendSageCognitoRedirectSignIn: "spendsage://auth-callback"
         SpendSageCognitoRedirectSignOut: "spendsage://auth-logout"
         UISupportedInterfaceOrientations:
