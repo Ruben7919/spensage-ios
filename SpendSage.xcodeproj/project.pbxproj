@@ -43,6 +43,7 @@
 		1EDFE1B083DE5D7FD31C1AAF /* GrowthCelebration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816A9A7F99699404E0C20D7B /* GrowthCelebration.swift */; };
 		2075B4BAD8CFC8E86497DF21 /* manchas_love_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 88014219EB3F0992C86B6B8F /* manchas_love_v2.png */; };
 		2180ED9BE745BCC430A6B38C /* GuideSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20839DBFC007023E8C5F905 /* GuideSheet.swift */; };
+		22F1A544D638BA03D95C378B /* SessionUnlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3C5E5018EA0970DE99F25F /* SessionUnlockView.swift */; };
 		24530C5507D70C5A3041AE7C /* FinanceToolSupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659DC0EB3BB892E509CF9D7E /* FinanceToolSupportViews.swift */; };
 		2479497860AAE4AFCD24C78B /* tikki_neutral_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 03FED166909E39AC396E5864 /* tikki_neutral_holiday_v2.png */; };
 		25951CEDF2272CAE81E49CBB /* badge_promo_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 541EB56F619104E174DEEFC0 /* badge_promo_v2.png */; };
@@ -133,6 +134,7 @@
 		6A7708B2F5103A9CCFC04D88 /* mei_sleepy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 0670165A10A90A31703E4200 /* mei_sleepy_v2.png */; };
 		6C427F329745EA2133E4E448 /* mei_neutral_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1EAAF4C662ABF8F913C97B8D /* mei_neutral_holiday_v2.png */; };
 		6EC5208CCAE13B63FF25AD1E /* manchas_neutral_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = E513F9225E0963D7D2A2F243 /* manchas_neutral_holiday_v2.png */; };
+		6F3046998A1B45AFADDAB85D /* AuthSessionSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F1C837B987E6604CBC5420 /* AuthSessionSecurity.swift */; };
 		72B1B7135030B93F7BFA4308 /* manchas_love_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3B9732E88A890107243795EB /* manchas_love_new_year_v2.png */; };
 		7437B6BF8EED326E79627B4B /* manchas_love_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = AEEDE0F9C2886A3844805FEA /* manchas_love_halloween_v2.png */; };
 		748A230A2F9398A3A9D02B41 /* ExpensesCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17C24351BCC0914DF6508A0 /* ExpensesCenterView.swift */; };
@@ -256,6 +258,7 @@
 		D4AC84409117247C82C3CD14 /* BETA_NOTICE_AND_DISCLOSURES.md in Resources */ = {isa = PBXBuildFile; fileRef = 7F2934138AE36700A47D2D0E /* BETA_NOTICE_AND_DISCLOSURES.md */; };
 		D4C44A8FC7EA81DF37FBD5E0 /* manchas_sad_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4E72AC8C2C1E9A3F76994A46 /* manchas_sad_halloween_v2.png */; };
 		D5A63F5297E1DC9294373C18 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6921A66E622A020378A8781E /* InfoPlist.strings */; };
+		D5C90E37142F70A5E45F3523 /* CrashGuardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33ED27E7545FFE71B7BB40F /* CrashGuardTests.swift */; };
 		D764D9C93EF0CF5DCD3B181C /* tikki_shocked_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = E81AE9CC1FD4CA763E7BCD0F /* tikki_shocked_holiday_v2.png */; };
 		D84782692819883735AEBC17 /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37595A2FF2CF4E81B4AE65CF /* Services.swift */; };
 		D8F8CC2700F1F9919ED0851F /* badge_impulse_pause_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6739F1D28DEEC3B3961D8680 /* badge_impulse_pause_v2.png */; };
@@ -476,6 +479,7 @@
 		81AC3F0BFEAB1120D31917A5 /* badge_event_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_event_holiday_v2.png; sourceTree = "<group>"; };
 		8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageTests.swift; sourceTree = "<group>"; };
 		82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_v2.png; sourceTree = "<group>"; };
+		82F1C837B987E6604CBC5420 /* AuthSessionSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSessionSecurity.swift; sourceTree = "<group>"; };
 		847604C8966C8CE67D228AEE /* mei_confused_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_confused_holiday_v2.png; sourceTree = "<group>"; };
 		849574DD6B6ABAA23CB11EE0 /* GrowthCelebrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthCelebrationTests.swift; sourceTree = "<group>"; };
 		85F97639538CC7EB23FB4B46 /* manchas_confused_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_confused_new_year_v2.png; sourceTree = "<group>"; };
@@ -565,6 +569,7 @@
 		C9AE2E4062B2ED34A969EF0D /* ProfileCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCompletionView.swift; sourceTree = "<group>"; };
 		CA56DF4650B5021F47704B05 /* tikki_angry_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_angry_v2.png; sourceTree = "<group>"; };
 		CC05C996D8DF40D500F2777C /* BrandStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandStory.swift; sourceTree = "<group>"; };
+		CD3C5E5018EA0970DE99F25F /* SessionUnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionUnlockView.swift; sourceTree = "<group>"; };
 		CE57325664004CBCF267818B /* ProfileCompletionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCompletionTests.swift; sourceTree = "<group>"; };
 		CE631D88FC12C05CB7B74E33 /* guide_33_tikki_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_33_tikki_new_year_v2.png; sourceTree = "<group>"; };
 		CED414330125E63F549BE0AC /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
@@ -611,6 +616,7 @@
 		F16CA60ECBB38428C4E22675 /* tikki_angry_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_angry_holiday_v2.png; sourceTree = "<group>"; };
 		F1D35519F695338481DE4E91 /* mei_thinking_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_thinking_halloween_v2.png; sourceTree = "<group>"; };
 		F275BE7F6CC8CC4E21804DEF /* mei_excited_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_excited_new_year_v2.png; sourceTree = "<group>"; };
+		F33ED27E7545FFE71B7BB40F /* CrashGuardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashGuardTests.swift; sourceTree = "<group>"; };
 		F37AE3D67532FB77808B3980 /* LegalDocuments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalDocuments.swift; sourceTree = "<group>"; };
 		F3B24BF2E6CF26600BC87CD9 /* badge_quest_weekly_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_quest_weekly_v2.png; sourceTree = "<group>"; };
 		F3D4E77E93F8B42DBA06E3F1 /* SUPPORT_AND_CONTACT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SUPPORT_AND_CONTACT.md; sourceTree = "<group>"; };
@@ -804,6 +810,7 @@
 				07CC2A6F29FF5CDF041CF122 /* ConfirmAccountView.swift */,
 				C9AE2E4062B2ED34A969EF0D /* ProfileCompletionView.swift */,
 				CED414330125E63F549BE0AC /* ResetPasswordView.swift */,
+				CD3C5E5018EA0970DE99F25F /* SessionUnlockView.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -1172,6 +1179,7 @@
 			isa = PBXGroup;
 			children = (
 				6902A39AC1EB9CDDD5E6F785 /* BrandSeasonalAssetTests.swift */,
+				F33ED27E7545FFE71B7BB40F /* CrashGuardTests.swift */,
 				849574DD6B6ABAA23CB11EE0 /* GrowthCelebrationTests.swift */,
 				CE57325664004CBCF267818B /* ProfileCompletionTests.swift */,
 				DC1238852B64244DC049D08D /* ReceiptVisionServiceTests.swift */,
@@ -1198,6 +1206,7 @@
 		DDA9C73E819C396AB3DFFCCC /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				82F1C837B987E6604CBC5420 /* AuthSessionSecurity.swift */,
 				679F2DB952FBB586D6057598 /* AuthSupport.swift */,
 				D20799AB6E9D49FDE20443E9 /* HostedUIAuthService.swift */,
 			);
@@ -1574,6 +1583,7 @@
 				A14E5B6B21BADE70EC7F687F /* AppRootView.swift in Sources */,
 				0F23374C3FFF9B892C7C0270 /* AppViewModel.swift in Sources */,
 				814A93CC9BAC8C86152BE59E /* AuthConfiguration.swift in Sources */,
+				6F3046998A1B45AFADDAB85D /* AuthSessionSecurity.swift in Sources */,
 				9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */,
 				4D4645CD2FE607017F0639D5 /* AuthView.swift in Sources */,
 				9D4E37757DC5A04361C411D5 /* BrandAssetImage.swift in Sources */,
@@ -1619,6 +1629,7 @@
 				AED083756FE4631D3475EBD2 /* ReceiptVisionService.swift in Sources */,
 				52978F026A957FCC3741603E /* ResetPasswordView.swift in Sources */,
 				D84782692819883735AEBC17 /* Services.swift in Sources */,
+				22F1A544D638BA03D95C378B /* SessionUnlockView.swift in Sources */,
 				8190DE8A0F0ADDF37A21E9A0 /* SettingsView.swift in Sources */,
 				30CC4427086325546CBEFE6A /* SpendSageApp.swift in Sources */,
 				BA3E435560B1762B69507B9B /* SupportCenterView.swift in Sources */,
@@ -1632,6 +1643,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E69CE8E8F10B302A01F33D25 /* BrandSeasonalAssetTests.swift in Sources */,
+				D5C90E37142F70A5E45F3523 /* CrashGuardTests.swift in Sources */,
 				199E1A30C5CDA340DEDB8C97 /* GrowthCelebrationTests.swift in Sources */,
 				98C41737F7E240D39122F33B /* ProfileCompletionTests.swift in Sources */,
 				F6D4F13256E68E49F659F817 /* ReceiptVisionServiceTests.swift in Sources */,
@@ -1723,7 +1735,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1828,7 +1840,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_NS_ASSERTIONS = NO;

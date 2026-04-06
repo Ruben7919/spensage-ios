@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 @MainActor
 final class AppViewModel: ObservableObject {
@@ -79,12 +80,18 @@ final class AppViewModel: ObservableObject {
     @Published var activeCelebration: GrowthCelebration?
     @Published var reviewPromptToken: UUID?
     @Published var pendingProfileSetup: PendingProfileSetup?
+    @Published var isRestoringRememberedSession = false
+    @Published var requiresSessionUnlock = false
+    @Published var biometricKind = BiometricUnlockService.availableBiometric()
+    @Published var sessionUnlockError: String?
 
     private let authService: AuthServicing
     private let financeStore: FinanceDashboardStoring
     private let onboardingKey = "native_onboarding_completed"
     private var queuedCelebrations: [GrowthCelebration] = []
     private var shouldPromptForReviewAfterCelebrations = false
+    private var didBootstrapRememberedSession = false
+    private var backgroundedAt: Date?
 
     init(
         authService: AuthServicing = DefaultAuthService.make(),
@@ -144,6 +151,8 @@ final class AppViewModel: ObservableObject {
         session = try await authService.signIn(email: email, password: password)
         pendingProfileSetup = nil
         notice = nil
+        requiresSessionUnlock = false
+        sessionUnlockError = nil
         await refreshDashboard()
     }
 
@@ -151,12 +160,16 @@ final class AppViewModel: ObservableObject {
         session = try await authService.createAccount(email: email, password: password)
         pendingProfileSetup = nil
         notice = nil
+        requiresSessionUnlock = false
+        sessionUnlockError = nil
         await refreshDashboard()
     }
 
     func signInWithSocial(_ provider: SocialProvider) async throws {
         session = try await authService.signInWithSocial(provider)
         notice = AppLocalization.localized("Signed in with %@.", arguments: provider.displayName)
+        requiresSessionUnlock = false
+        sessionUnlockError = nil
         await refreshDashboard()
         pendingProfileSetup = makePendingProfileSetup(from: authService.consumeProfileSeed(), provider: provider)
     }
@@ -168,6 +181,121 @@ final class AppViewModel: ObservableObject {
     }
 
     func signOut() {
+        authService.forgetRememberedSession()
+        resetLocalSessionState()
+    }
+
+    func forgetRememberedDevice() {
+        authService.forgetRememberedSession()
+        requiresSessionUnlock = false
+        sessionUnlockError = nil
+    }
+
+    func bootstrapRememberedSessionIfNeeded() async {
+        guard !didBootstrapRememberedSession else { return }
+        didBootstrapRememberedSession = true
+        biometricKind = BiometricUnlockService.availableBiometric()
+
+        guard hasCompletedOnboarding, !session.isAuthenticated, authService.hasRememberedSession() else {
+            return
+        }
+
+        if shouldRequireBiometricUnlock {
+            requiresSessionUnlock = true
+            await unlockRememberedSession()
+        } else {
+            await restoreRememberedSession()
+        }
+    }
+
+    func unlockRememberedSession() async {
+        guard authService.hasRememberedSession() else {
+            requiresSessionUnlock = false
+            return
+        }
+
+        sessionUnlockError = nil
+        requiresSessionUnlock = shouldRequireBiometricUnlock
+
+        if shouldRequireBiometricUnlock {
+            isRestoringRememberedSession = true
+            let unlocked = await BiometricUnlockService.authenticate(
+                reason: "Desbloquea SpendSage para abrir tu cuenta guardada."
+            )
+            if !unlocked {
+                isRestoringRememberedSession = false
+                requiresSessionUnlock = true
+                sessionUnlockError = AppLocalization.localized(
+                    "Usa %@ o el código del dispositivo para abrir tu cuenta guardada.",
+                    arguments: biometricKind.displayName
+                )
+                return
+            }
+        }
+
+        await restoreRememberedSession()
+    }
+
+    func handleScenePhaseChange(_ phase: ScenePhase) {
+        biometricKind = BiometricUnlockService.availableBiometric()
+
+        switch phase {
+        case .active:
+            if !didBootstrapRememberedSession {
+                Task { await bootstrapRememberedSessionIfNeeded() }
+                return
+            }
+
+            guard
+                session.isAuthenticated,
+                authService.hasRememberedSession(),
+                shouldRequireBiometricUnlock,
+                let backgroundedAt
+            else {
+                self.backgroundedAt = nil
+                return
+            }
+
+            self.backgroundedAt = nil
+            guard Date().timeIntervalSince(backgroundedAt) >= 20 else { return }
+
+            requiresSessionUnlock = true
+            Task { await unlockRememberedSession() }
+
+        case .background:
+            if session.isAuthenticated {
+                backgroundedAt = .now
+            }
+
+        case .inactive:
+            break
+        @unknown default:
+            break
+        }
+    }
+
+    func updateRememberDevicePreference(enabled: Bool) {
+        if !enabled {
+            authService.forgetRememberedSession()
+            requiresSessionUnlock = false
+            sessionUnlockError = nil
+        }
+    }
+
+    func updateBiometricUnlockPreference(enabled: Bool) {
+        if !enabled {
+            requiresSessionUnlock = false
+            sessionUnlockError = nil
+        }
+    }
+
+    private var shouldRequireBiometricUnlock: Bool {
+        AuthSessionPreferences.rememberDeviceEnabled()
+            && AuthSessionPreferences.biometricUnlockEnabled()
+            && biometricKind != .none
+    }
+
+    private func resetLocalSessionState() {
         session = .signedOut
         dashboardState = nil
         ledger = nil
@@ -182,6 +310,10 @@ final class AppViewModel: ObservableObject {
         shouldPromptForReviewAfterCelebrations = false
         reviewPromptToken = nil
         pendingProfileSetup = nil
+        requiresSessionUnlock = false
+        isRestoringRememberedSession = false
+        sessionUnlockError = nil
+        backgroundedAt = nil
     }
 
     func startScanFlow() {
@@ -457,6 +589,30 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    private func restoreRememberedSession() async {
+        isRestoringRememberedSession = true
+        defer { isRestoringRememberedSession = false }
+
+        guard let restoredSession = await authService.restoreRememberedSession() else {
+            requiresSessionUnlock = false
+            sessionUnlockError = nil
+            resetLocalSessionState()
+            return
+        }
+
+        session = restoredSession
+        notice = nil
+        requiresSessionUnlock = false
+        sessionUnlockError = nil
+        await refreshDashboard()
+
+        if let provider = restoredSession.socialProvider {
+            pendingProfileSetup = makePendingProfileSetup(from: authService.consumeProfileSeed(), provider: provider)
+        } else {
+            pendingProfileSetup = nil
+        }
+    }
+
     private func applyDebugLaunchOverrides() {
         let environment = ProcessInfo.processInfo.environment
 
@@ -527,6 +683,31 @@ final class AppViewModel: ObservableObject {
 
         if let celebrationOverride = environment["SPENDSAGE_DEBUG_CELEBRATION"]?.lowercased() {
             activeCelebration = debugCelebration(for: celebrationOverride)
+        }
+
+        if let modalOverride = environment["SPENDSAGE_DEBUG_MODAL"]?.lowercased() {
+            switch modalOverride {
+            case "add_expense", "expense":
+                hasCompletedOnboarding = true
+                if !session.isAuthenticated {
+                    session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
+                }
+                selectedTab = .expenses
+                isPresentingAddExpense = true
+            case "budget":
+                hasCompletedOnboarding = true
+                if !session.isAuthenticated {
+                    session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
+                }
+                selectedTab = .settings
+                isPresentingBudgetWizard = true
+            default:
+                break
+            }
+        }
+
+        if session.isAuthenticated {
+            didBootstrapRememberedSession = true
         }
     }
 

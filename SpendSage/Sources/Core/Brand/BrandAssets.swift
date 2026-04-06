@@ -246,6 +246,22 @@ struct BrandAssetManifest: Decodable {
     let badges: [String]
     let accessories: [String]
     let logo: LogoAsset
+
+    static func fallback(for version: BrandVersion) -> BrandAssetManifest {
+        let suffix = version.rawValue
+        return BrandAssetManifest(
+            version: version,
+            characters: [:],
+            guides: [:],
+            badges: [],
+            accessories: [],
+            logo: LogoAsset(
+                mark: "brand_mark_\(suffix).png",
+                appIcon: "app_icon_\(suffix).png",
+                wordmark: "brand_wordmark_\(suffix).png"
+            )
+        )
+    }
 }
 
 @MainActor
@@ -365,16 +381,38 @@ final class BrandAssetCatalog {
             subdirectory: "Brand/\(version.rawValue)"
         )
         let rootURL = bundle.url(forResource: "asset_manifest", withExtension: "json")
+        let fallbackManifest = BrandAssetManifest.fallback(for: version)
 
-        guard let url = nestedURL ?? rootURL else {
-            preconditionFailure("Missing Brand asset manifest for \(version.rawValue)")
+        if let nestedURL {
+            do {
+                let data = try Data(contentsOf: nestedURL)
+                return try JSONDecoder().decode(BrandAssetManifest.self, from: data)
+            } catch {
+                NSLog("Failed to decode Brand asset manifest for %@: %@", version.rawValue, String(describing: error))
+                return fallbackManifest
+            }
         }
 
-        do {
-            let data = try Data(contentsOf: url)
-            return try JSONDecoder().decode(BrandAssetManifest.self, from: data)
-        } catch {
-            preconditionFailure("Failed to decode Brand asset manifest: \(error)")
+        if let rootURL {
+            do {
+                let data = try Data(contentsOf: rootURL)
+                let manifest = try JSONDecoder().decode(BrandAssetManifest.self, from: data)
+                guard manifest.version == version else {
+                    NSLog("Brand asset manifest version mismatch: expected %@, got %@", version.rawValue, manifest.version.rawValue)
+                    return fallbackManifest
+                }
+                return manifest
+            } catch {
+                NSLog("Failed to decode Brand asset manifest for %@: %@", version.rawValue, String(describing: error))
+                return fallbackManifest
+            }
         }
+
+        if nestedURL == nil && rootURL == nil {
+            NSLog("Missing Brand asset manifest for %@", version.rawValue)
+            return fallbackManifest
+        }
+
+        return fallbackManifest
     }
 }

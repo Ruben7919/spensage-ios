@@ -181,8 +181,25 @@ enum GuideLibrary {
 
     static func guide(_ id: GuideID) -> GuideDefinition {
         guard let guide = all[id] else {
-            preconditionFailure("Missing guide definition for \(id.rawValue)")
+            assertionFailure("Missing guide definition for \(id.rawValue)")
+            return fallbackGuide(for: id)
         }
         return guide
+    }
+
+    static func fallbackGuide(for id: GuideID) -> GuideDefinition {
+        GuideDefinition(
+            id: id,
+            title: "Guía temporal",
+            slides: [
+                GuideSlide(
+                    imageKey: "guide_25_splash_team",
+                    character: .manchas,
+                    expression: .thinking,
+                    title: "Contenido temporal",
+                    body: "Estamos mostrando una guía segura mientras se corrige este contenido."
+                )
+            ]
+        )
     }
 }

@@ -50,6 +50,41 @@ final class HostedUIAuthService: NSObject, AuthServicing {
         return lastProfileSeed
     }
 
+    func hasRememberedSession() -> Bool {
+        AuthSessionPreferences.rememberDeviceEnabled() && AuthSessionVault.hasSession()
+    }
+
+    func restoreRememberedSession() async -> SessionState? {
+        guard
+            AuthSessionPreferences.rememberDeviceEnabled(),
+            let hostedUI = configuration.hostedUI,
+            let persisted = AuthSessionVault.load()
+        else {
+            return nil
+        }
+
+        do {
+            let tokenResponse = try await refreshSession(refreshToken: persisted.refreshToken, hostedUI: hostedUI)
+            let profileSeed = Self.profileSeed(fromIDToken: tokenResponse.idToken, fallbackEmail: persisted.email)
+            lastProfileSeed = profileSeed
+
+            let email = profileSeed.preferredEmail ?? persisted.email
+            let refreshToken = tokenResponse.refreshToken ?? persisted.refreshToken
+            persistRememberedSession(email: email, provider: persisted.provider, refreshToken: refreshToken)
+
+            return .signedIn(email: email, provider: persisted.provider)
+        } catch {
+            AuthSessionVault.delete()
+            lastProfileSeed = nil
+            return nil
+        }
+    }
+
+    func forgetRememberedSession() {
+        AuthSessionVault.delete()
+        lastProfileSeed = nil
+    }
+
     private func authorize(
         action: AuthConfiguration.AuthAction,
         provider: SocialProvider?,
@@ -94,7 +129,8 @@ final class HostedUIAuthService: NSObject, AuthServicing {
         )
         lastProfileSeed = profileSeed
         let email = profileSeed.preferredEmail ?? loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
-        let providerLabel = provider?.rawValue ?? "Hosted UI"
+        let providerLabel = provider?.rawValue ?? "Email"
+        persistRememberedSession(email: email, provider: providerLabel, refreshToken: tokenResponse.refreshToken)
         return .signedIn(email: email, provider: providerLabel)
     }
 
@@ -114,7 +150,7 @@ final class HostedUIAuthService: NSObject, AuthServicing {
                 }
                 continuation.resume(returning: callbackURL)
             }
-            session.prefersEphemeralWebBrowserSession = true
+            session.prefersEphemeralWebBrowserSession = !AuthSessionPreferences.rememberDeviceEnabled()
             session.presentationContextProvider = PresentationAnchorProvider.shared
             if !session.start() {
                 continuation.resume(throwing: NSError(domain: "HostedUIAuthService", code: 5, userInfo: [NSLocalizedDescriptionKey: "Unable to start secure browser session."]))
@@ -150,6 +186,52 @@ final class HostedUIAuthService: NSObject, AuthServicing {
         }
 
         return try JSONDecoder().decode(HostedUITokenResponse.self, from: data)
+    }
+
+    private func refreshSession(
+        refreshToken: String,
+        hostedUI: AuthConfiguration.HostedUI
+    ) async throws -> HostedUITokenResponse {
+        var request = URLRequest(url: hostedUI.tokenURL)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+
+        let formItems = [
+            URLQueryItem(name: "grant_type", value: "refresh_token"),
+            URLQueryItem(name: "client_id", value: hostedUI.clientId),
+            URLQueryItem(name: "refresh_token", value: refreshToken),
+        ]
+
+        var components = URLComponents()
+        components.queryItems = formItems
+        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) else {
+            let body = String(data: data, encoding: .utf8) ?? "Unknown refresh token error."
+            throw NSError(domain: "HostedUIAuthService", code: 7, userInfo: [NSLocalizedDescriptionKey: body])
+        }
+
+        return try JSONDecoder().decode(HostedUITokenResponse.self, from: data)
+    }
+
+    private func persistRememberedSession(email: String, provider: String?, refreshToken: String?) {
+        guard AuthSessionPreferences.rememberDeviceEnabled() else {
+            AuthSessionVault.delete()
+            return
+        }
+
+        guard let refreshToken, !refreshToken.isEmpty else {
+            return
+        }
+
+        let session = PersistedAuthSession(
+            email: email,
+            provider: provider,
+            refreshToken: refreshToken,
+            storedAt: .now
+        )
+        try? AuthSessionVault.save(session)
     }
 
     private static func randomVerifier() -> String {

@@ -39,6 +39,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Scan receipts and capture supporting images.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Unlock your saved SpendSage account quickly and securely.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Save exported images and documents.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

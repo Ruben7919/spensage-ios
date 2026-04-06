@@ -259,12 +259,22 @@ struct AuthView: View {
             Task { await submitSocial(provider) }
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: systemImage)
-                    .font(.headline.weight(.semibold))
-                    .frame(width: 22)
+                ZStack {
+                    Circle()
+                        .fill(BrandTheme.surface)
+                    Image(systemName: systemImage)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(BrandTheme.ink)
+                }
+                .frame(width: 28, height: 28)
+
                 Text(title.appLocalized)
+                    .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
+
+                Spacer(minLength: 0)
             }
+            .padding(.horizontal, 4)
         }
         .buttonStyle(SecondaryCTAStyle())
         .disabled(isLoading || !supportsProvider(provider))

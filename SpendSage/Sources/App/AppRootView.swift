@@ -4,6 +4,7 @@ import StoreKit
 struct AppRootView: View {
     @ObservedObject var viewModel: AppViewModel
     @Environment(\.requestReview) private var requestReview
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showLaunchExperience = true
 
     private var shouldShowSplash: Bool {
@@ -64,6 +65,24 @@ struct AppRootView: View {
                 }
                 .zIndex(30)
             }
+
+            if viewModel.isRestoringRememberedSession && viewModel.session == .signedOut {
+                SessionRestoreLoadingView()
+                    .zIndex(35)
+            }
+
+            if viewModel.requiresSessionUnlock {
+                SessionUnlockView(
+                    biometricKind: viewModel.biometricKind,
+                    errorMessage: viewModel.sessionUnlockError,
+                    isLoading: viewModel.isRestoringRememberedSession
+                ) {
+                    Task { await viewModel.unlockRememberedSession() }
+                } onUseAnotherAccount: {
+                    viewModel.signOut()
+                }
+                .zIndex(40)
+            }
         }
         .task {
             guard shouldShowSplash else {
@@ -79,6 +98,12 @@ struct AppRootView: View {
             withAnimation(.easeInOut(duration: 0.32)) {
                 showLaunchExperience = false
             }
+        }
+        .task {
+            await viewModel.bootstrapRememberedSessionIfNeeded()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            viewModel.handleScenePhaseChange(phase)
         }
         .onChange(of: viewModel.reviewPromptToken) { _, token in
             guard token != nil else { return }

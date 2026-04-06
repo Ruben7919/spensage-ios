@@ -9,6 +9,7 @@ struct NativeAppShellView: View {
     var body: some View {
         currentTabContent
             .tint(BrandTheme.primary)
+            .safeAreaPadding(.bottom, 18)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 bottomNavigation
             }
@@ -59,49 +60,46 @@ struct NativeAppShellView: View {
     }
 
     private var bottomNavigation: some View {
-        HStack(alignment: .bottom, spacing: 14) {
-            ForEach(leadingTabs) { tab in
-                ShellNavigationButton(
-                    tab: tab,
-                    isSelected: viewModel.selectedTab == tab
-                ) {
-                    select(tab)
+        ZStack(alignment: .top) {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(BrandTheme.surface.opacity(0.96))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(BrandTheme.line.opacity(0.9), lineWidth: 1)
+                )
+                .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 18, x: 0, y: 8)
+                .padding(.horizontal, 12)
+                .padding(.top, 18)
+
+            HStack(alignment: .bottom, spacing: 14) {
+                ForEach(leadingTabs) { tab in
+                    ShellNavigationButton(
+                        tab: tab,
+                        isSelected: viewModel.selectedTab == tab
+                    ) {
+                        select(tab)
+                    }
+                }
+
+                ReceiptScanDockButton(isSelected: viewModel.selectedTab == .scan) {
+                    viewModel.startScanFlow()
+                }
+
+                ForEach(trailingTabs) { tab in
+                    ShellNavigationButton(
+                        tab: tab,
+                        isSelected: viewModel.selectedTab == tab
+                    ) {
+                        select(tab)
+                    }
                 }
             }
-
-            ReceiptScanDockButton(isSelected: viewModel.selectedTab == .scan) {
-                viewModel.startScanFlow()
-            }
-
-            ForEach(trailingTabs) { tab in
-                ShellNavigationButton(
-                    tab: tab,
-                    isSelected: viewModel.selectedTab == tab
-                ) {
-                    select(tab)
-                }
-            }
+            .padding(.horizontal, 18)
+            .padding(.top, 18)
+            .padding(.bottom, 14)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 12)
-        .padding(.bottom, 12)
-        .background(
-            ZStack(alignment: .top) {
-                Rectangle()
-                    .fill(BrandTheme.background.opacity(0.01))
-
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(BrandTheme.surface.opacity(0.96))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 28, style: .continuous)
-                            .stroke(BrandTheme.line.opacity(0.9), lineWidth: 1)
-                    )
-                    .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 18, x: 0, y: 8)
-                    .padding(.horizontal, 12)
-                    .padding(.top, 6)
-            }
-            .ignoresSafeArea()
-        )
+        .frame(height: 122)
+        .background(BrandTheme.background.opacity(0.01).ignoresSafeArea())
     }
 
     private func select(_ tab: AppViewModel.AppTab) {
@@ -173,7 +171,6 @@ private struct ReceiptScanDockButton: View {
                     .font(.caption.weight(.bold))
                     .foregroundStyle(BrandTheme.primary)
             }
-            .offset(y: -10)
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)

@@ -9,7 +9,13 @@ struct SettingsView: View {
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
     @AppStorage("native.settings.localDebugOverlay") private var debugOverlayEnabled = false
+    @AppStorage(AuthSessionPreferences.rememberDeviceKey) private var rememberDeviceEnabled = true
+    @AppStorage(AuthSessionPreferences.biometricUnlockKey) private var biometricUnlockEnabled = true
     @State private var showingGuideReplay = false
+
+    private var biometricLabel: String {
+        viewModel.biometricKind.displayName
+    }
 
     private var sessionModeLabel: String {
         switch viewModel.session {
@@ -43,6 +49,15 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingGuideReplay) {
             GuideSheet(guide: GuideLibrary.guide(.dashboard))
+        }
+        .onChange(of: rememberDeviceEnabled) { _, newValue in
+            viewModel.updateRememberDevicePreference(enabled: newValue)
+            if !newValue {
+                biometricUnlockEnabled = false
+            }
+        }
+        .onChange(of: biometricUnlockEnabled) { _, newValue in
+            viewModel.updateBiometricUnlockPreference(enabled: newValue)
         }
         .navigationTitle("Ajustes")
         .navigationBarTitleDisplayMode(.inline)
@@ -120,6 +135,26 @@ struct SettingsView: View {
                 Text("Cuenta y ayuda")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
+
+                SettingsToggleRow(
+                    title: "Recordar este dispositivo",
+                    summary: "Mantiene tu cuenta lista para volver a entrar sin repetir Apple, Google o email cada vez.",
+                    isOn: $rememberDeviceEnabled
+                )
+
+                if viewModel.biometricKind != .none {
+                    Divider()
+
+                    SettingsToggleRow(
+                        title: "Abrir con \(biometricLabel)",
+                        summary: "Usa la biometría del iPhone para abrir la cuenta guardada al volver a la app.",
+                        isOn: $biometricUnlockEnabled
+                    )
+                    .disabled(!rememberDeviceEnabled)
+                    .opacity(rememberDeviceEnabled ? 1 : 0.45)
+                }
+
+                Divider()
 
                 NavigationLink {
                     ProfileView(viewModel: viewModel)

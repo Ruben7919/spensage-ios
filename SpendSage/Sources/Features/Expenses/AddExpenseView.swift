@@ -121,7 +121,8 @@ struct AddExpenseView: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
         .onAppear {
             errorMessage = nil
         }

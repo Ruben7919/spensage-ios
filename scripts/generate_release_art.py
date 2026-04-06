@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import math
+import os
+import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
@@ -101,6 +103,7 @@ def prepared_sprite(
     filename: str,
     *,
     crop: tuple[float, float, float, float] | None = None,
+    ellipse_mask: tuple[float, float, float, float] | None = None,
     mirror: bool = False,
     tint: tuple[int, int, int] | None = None,
     monochrome: tuple[tuple[int, int, int], tuple[int, int, int]] | None = None,
@@ -127,6 +130,22 @@ def prepared_sprite(
             fade_draw.line((0, y, sprite.width, y), fill=opacity)
         alpha = ImageChops.multiply(alpha, fade)
 
+    if ellipse_mask is not None:
+        mask = Image.new("L", sprite.size, 0)
+        mask_draw = ImageDraw.Draw(mask)
+        left, top, right, bottom = ellipse_mask
+        mask_draw.ellipse(
+            (
+                int(sprite.width * left),
+                int(sprite.height * top),
+                int(sprite.width * right),
+                int(sprite.height * bottom),
+            ),
+            fill=255,
+        )
+        mask = mask.filter(ImageFilter.GaussianBlur(radius=max(2, sprite.width // 64)))
+        alpha = ImageChops.multiply(alpha, mask)
+
     if monochrome is not None:
         light, dark = monochrome
         luminance = ImageOps.autocontrast(Image.merge("RGB", (red, green, blue)).convert("L"))
@@ -148,6 +167,7 @@ def paste_peeking_sprite(
     box: tuple[int, int, int, int],
     *,
     crop: tuple[float, float, float, float],
+    ellipse_mask: tuple[float, float, float, float] | None = None,
     mirror: bool = False,
     tint: tuple[int, int, int] | None = None,
     monochrome: tuple[tuple[int, int, int], tuple[int, int, int]] | None = None,
@@ -158,6 +178,7 @@ def paste_peeking_sprite(
     sprite = prepared_sprite(
         filename,
         crop=crop,
+        ellipse_mask=ellipse_mask,
         mirror=mirror,
         tint=tint,
         monochrome=monochrome,
@@ -268,15 +289,15 @@ def create_manchas_icon(
     paste_peeking_sprite(
         canvas,
         "manchas_neutral_v2.png",
-        (162, 64, 862, 638),
-        crop=(0.13, 0.0, 0.87, 0.60),
+        (206, 98, 818, 590),
+        crop=(0.13, 0.0, 0.87, 0.56),
+        ellipse_mask=(-0.08, -0.04, 1.08, 1.10),
         monochrome=monochrome,
-        fade_bottom_start=0.48,
     )
 
     draw_ledge(
         canvas,
-        (132, 660, 892, 716),
+        (176, 686, 848, 722),
         fill=ledge_fill,
         outline=ledge_outline,
         top_highlight=ledge_highlight,
@@ -286,7 +307,7 @@ def create_manchas_icon(
     paste_peeking_sprite(
         canvas,
         "manchas_neutral_v2.png",
-        (214, 606, 360, 720),
+        (244, 620, 366, 720),
         crop=(0.20, 0.88, 0.31, 0.985),
         monochrome=monochrome,
         align_bottom=True,
@@ -294,7 +315,7 @@ def create_manchas_icon(
     paste_peeking_sprite(
         canvas,
         "manchas_neutral_v2.png",
-        (664, 606, 810, 720),
+        (658, 620, 780, 720),
         crop=(0.69, 0.88, 0.80, 0.985),
         monochrome=monochrome,
         align_bottom=True,
@@ -312,7 +333,7 @@ def draw_yarn_ball(
     show_tail: bool = True,
 ) -> None:
     x, y = center
-    add_shadow(canvas, (x - radius, y + radius // 2, x + radius, y + radius + radius // 2), alpha=86)
+    add_shadow(canvas, (x - radius, y + radius // 2, x + radius, y + radius + radius // 2), alpha=52)
 
     draw = ImageDraw.Draw(canvas)
     draw.ellipse(
@@ -329,6 +350,14 @@ def draw_yarn_ball(
     draw.ellipse(
         (x - radius + radius // 3, y - radius + radius // 3, x - radius + int(radius * 0.8), y - radius + int(radius * 0.8)),
         fill=(255, 255, 255, 54),
+    )
+    draw.ellipse(
+        (x - int(radius * 0.94), y - int(radius * 0.08), x + int(radius * 0.98), y + int(radius * 1.04)),
+        fill=(80, 62, 40, 12),
+    )
+    draw.ellipse(
+        (x - int(radius * 0.30), y + int(radius * 0.08), x + int(radius * 0.86), y + int(radius * 0.98)),
+        fill=(124, 92, 42, 10),
     )
 
     thread_overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
@@ -387,11 +416,47 @@ def draw_yarn_ball(
 
     thread_overlay = thread_overlay.filter(ImageFilter.GaussianBlur(radius=max(1, radius // 30)))
     canvas.alpha_composite(thread_overlay)
-    add_glow(canvas, center, int(radius * 1.15), fill, 42)
+    add_glow(canvas, center, int(radius * 1.05), fill, 18)
 
 
 def save_without_alpha(image: Image.Image, path: Path) -> None:
-    image.convert("RGB").save(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            dir=path.parent,
+            prefix=f".{path.stem}-",
+            suffix=path.suffix,
+            delete=False,
+        ) as handle:
+            temp_path = Path(handle.name)
+
+        image.convert("RGB").save(temp_path)
+        os.replace(temp_path, path)
+    finally:
+        if temp_path is not None and temp_path.exists():
+            temp_path.unlink(missing_ok=True)
+
+
+def write_text_atomically(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            dir=path.parent,
+            prefix=f".{path.stem}-",
+            suffix=path.suffix,
+            delete=False,
+            mode="w",
+            encoding="utf-8",
+        ) as handle:
+            handle.write(content)
+            temp_path = Path(handle.name)
+
+        os.replace(temp_path, path)
+    finally:
+        if temp_path is not None and temp_path.exists():
+            temp_path.unlink(missing_ok=True)
 
 
 def create_app_icon() -> Image.Image:
@@ -466,17 +531,17 @@ def create_splash_guide() -> Image.Image:
         inner_outline=(232, 240, 238, 255),
     )
 
-    draw_yarn_ball(canvas, (278, 688), 78, (99, 179, 191))
-    draw_yarn_ball(canvas, (512, 724), 94, (255, 198, 96))
-    draw_yarn_ball(canvas, (746, 688), 78, (121, 209, 191))
+    draw_yarn_ball(canvas, (278, 646), 80, (99, 179, 191))
+    draw_yarn_ball(canvas, (512, 678), 98, (255, 198, 96))
+    draw_yarn_ball(canvas, (746, 646), 80, (121, 209, 191))
 
-    add_shadow(canvas, (116, 556, 404, 718))
-    add_shadow(canvas, (322, 586, 706, 782))
-    add_shadow(canvas, (620, 556, 908, 718))
+    add_shadow(canvas, (116, 500, 404, 684), alpha=30)
+    add_shadow(canvas, (314, 526, 714, 746), alpha=32)
+    add_shadow(canvas, (620, 500, 908, 684), alpha=30)
 
-    paste_sprite(canvas, "tikki_proud_v2.png", (70, 124, 394, 724))
-    paste_sprite(canvas, "mei_neutral_v2.png", (294, 46, 730, 812))
-    paste_sprite(canvas, "manchas_proud_v2.png", (630, 116, 954, 724))
+    paste_sprite(canvas, "tikki_proud_v2.png", (66, 70, 398, 694))
+    paste_sprite(canvas, "mei_neutral_v2.png", (282, -8, 742, 796))
+    paste_sprite(canvas, "manchas_proud_v2.png", (626, 64, 958, 694))
 
     for point, size in (((184, 174), 10), ((280, 228), 10), ((828, 188), 10), ((744, 256), 10), ((512, 138), 12), ((870, 608), 10), ((418, 188), 8)):
         draw_twinkle(draw, point, size, fill=(255, 205, 107, 190))
@@ -502,19 +567,19 @@ def create_loading_guide() -> Image.Image:
     )
 
     for center, radius, color, tail in (
-        ((250, 690), 82, (104, 182, 193), False),
-        ((514, 722), 104, (255, 196, 96), True),
-        ((778, 688), 82, (121, 208, 192), False),
+        ((250, 640), 84, (104, 182, 193), False),
+        ((514, 672), 108, (255, 196, 96), True),
+        ((778, 638), 84, (121, 208, 192), False),
     ):
         draw_yarn_ball(canvas, center, radius, color, show_tail=tail)
 
-    add_shadow(canvas, (110, 542, 412, 740))
-    add_shadow(canvas, (300, 566, 728, 812))
-    add_shadow(canvas, (616, 540, 928, 738))
+    add_shadow(canvas, (110, 474, 412, 708), alpha=30)
+    add_shadow(canvas, (286, 494, 742, 786), alpha=32)
+    add_shadow(canvas, (616, 472, 928, 706), alpha=30)
 
-    paste_sprite(canvas, "tikki_excited_v2.png", (64, 110, 400, 744))
-    paste_sprite(canvas, "mei_neutral_v2.png", (270, 28, 754, 850))
-    paste_sprite(canvas, "manchas_excited_v2.png", (636, 104, 972, 746))
+    paste_sprite(canvas, "tikki_excited_v2.png", (56, 48, 408, 720))
+    paste_sprite(canvas, "mei_neutral_v2.png", (250, -26, 774, 830))
+    paste_sprite(canvas, "manchas_excited_v2.png", (628, 44, 980, 722))
 
     for point, size in (((184, 176), 11), ((296, 238), 10), ((832, 190), 11), ((738, 258), 10), ((512, 138), 12), ((874, 606), 10), ((438, 852), 10), ((604, 194), 8)):
         draw_twinkle(draw, point, size, fill=(255, 208, 112, 190))
@@ -525,18 +590,21 @@ def create_loading_guide() -> Image.Image:
 def write_universal_appicon_set(any_icon: Image.Image, dark_icon: Image.Image, tinted_icon: Image.Image) -> None:
     APPICON_ROOT.mkdir(parents=True, exist_ok=True)
 
-    for stale in APPICON_ROOT.glob("*.png"):
-        stale.unlink()
-
     outputs = {
         "icon-any-1024.png": any_icon,
         "icon-dark-1024.png": dark_icon,
         "icon-tinted-1024.png": tinted_icon,
     }
+    expected_files = set(outputs.keys())
+
     for filename, image in outputs.items():
         path = APPICON_ROOT / filename
         save_without_alpha(image, path)
         print(f"updated {path}")
+
+    for stale in APPICON_ROOT.glob("*.png"):
+        if stale.name not in expected_files:
+            stale.unlink()
 
     contents = {
         "images": [
@@ -576,7 +644,7 @@ def write_universal_appicon_set(any_icon: Image.Image, dark_icon: Image.Image, t
             "version": 1,
         },
     }
-    (APPICON_ROOT / "Contents.json").write_text(f"{json.dumps(contents, indent=2)}\n")
+    write_text_atomically(APPICON_ROOT / "Contents.json", f"{json.dumps(contents, indent=2)}\n")
 
 
 def main() -> None:

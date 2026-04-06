@@ -9,6 +9,9 @@ protocol AuthServicing {
     func continueAsGuest() async -> SessionState
     func hostedUIRequest(for provider: SocialProvider) -> AuthHostedUIRequest?
     func consumeProfileSeed() -> AuthProfileSeed?
+    func hasRememberedSession() -> Bool
+    func restoreRememberedSession() async -> SessionState?
+    func forgetRememberedSession()
 }
 
 @MainActor
@@ -31,6 +34,7 @@ enum DefaultAuthService {
 final class PreviewAuthService: AuthServicing {
     let configuration: AuthConfiguration
     private var lastProfileSeed: AuthProfileSeed?
+    private var rememberedSession: SessionState?
 
     init(configuration: AuthConfiguration = .preview) {
         self.configuration = configuration
@@ -40,14 +44,22 @@ final class PreviewAuthService: AuthServicing {
         try AuthValidation.validate(email: email)
         try await Task.sleep(for: .milliseconds(150))
         lastProfileSeed = AuthProfileSeed(email: email.trimmingCharacters(in: .whitespacesAndNewlines))
-        return .signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: nil)
+        let session = SessionState.signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: "Email")
+        if AuthSessionPreferences.rememberDeviceEnabled() {
+            rememberedSession = session
+        }
+        return session
     }
 
     func createAccount(email: String, password: String) async throws -> SessionState {
         try AuthValidation.validate(email: email)
         try await Task.sleep(for: .milliseconds(180))
         lastProfileSeed = AuthProfileSeed(email: email.trimmingCharacters(in: .whitespacesAndNewlines))
-        return .signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: "Email")
+        let session = SessionState.signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: "Email")
+        if AuthSessionPreferences.rememberDeviceEnabled() {
+            rememberedSession = session
+        }
+        return session
     }
 
     func signInWithSocial(_ provider: SocialProvider) async throws -> SessionState {
@@ -59,7 +71,11 @@ final class PreviewAuthService: AuthServicing {
             fullName: nil,
             email: "\(provider.rawValue.lowercased())@spendsage.ai"
         )
-        return .signedIn(email: "\(provider.rawValue.lowercased())@spendsage.ai", provider: provider.rawValue)
+        let session = SessionState.signedIn(email: "\(provider.rawValue.lowercased())@spendsage.ai", provider: provider.rawValue)
+        if AuthSessionPreferences.rememberDeviceEnabled() {
+            rememberedSession = session
+        }
+        return session
     }
 
     func continueAsGuest() async -> SessionState {
@@ -73,6 +89,20 @@ final class PreviewAuthService: AuthServicing {
     func consumeProfileSeed() -> AuthProfileSeed? {
         defer { lastProfileSeed = nil }
         return lastProfileSeed
+    }
+
+    func hasRememberedSession() -> Bool {
+        rememberedSession != nil
+    }
+
+    func restoreRememberedSession() async -> SessionState? {
+        try? await Task.sleep(for: .milliseconds(120))
+        return rememberedSession
+    }
+
+    func forgetRememberedSession() {
+        rememberedSession = nil
+        lastProfileSeed = nil
     }
 }
 
