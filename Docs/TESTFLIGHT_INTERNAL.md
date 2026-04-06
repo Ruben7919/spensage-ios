@@ -6,7 +6,7 @@ Last updated: 2026-04-05
 
 - App: `SpendSage`
 - Version: `1.0`
-- Build: `16`
+- Build: `17`
 - Bundle ID: `com.spendsage.ai`
 - Team ID: `YU855NB22W`
 
@@ -16,11 +16,11 @@ Last updated: 2026-04-05
 - Upload completed successfully to App Store Connect
 - TestFlight scope: internal testing only
 - Current state: waiting for App Store Connect processing to finish
-- Notes: build `16` keeps the auth and capture fixes from build `15`, then tightens the home mission card and the bottom shell visual language. The active mission preview now stacks status/cadence chips below the title instead of squeezing text into a narrow vertical column, and the tab bar now sits as a continuous base attached to the bottom edge rather than feeling like a detached floating tray.
+- Notes: build `17` softens the bottom shell again so it feels embedded into the app instead of a separate tray. The tab bar now uses a light translucent material with a gentler edge treatment, while mission and savings titles across the dashboard were shortened to friendlier labels so cards stay readable on iPhone without vertical text collapse.
 
 ## Archive Paths
 
-- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-16.xcarchive`
+- Archive: `/Users/rubenlazaro/Projects/spensage-ios/build/SpendSage-1.0-17.xcarchive`
 - Export options: `/Users/rubenlazaro/Projects/spensage-ios/build/ExportOptions-TestFlight-Internal.plist`
 - Upload executed directly via `xcodebuild -exportArchive ... -destination upload` with no persisted export bundle kept on disk
 

@@ -95,7 +95,7 @@ enum GrowthMissionCatalog {
     static let coreBlueprints: [GrowthMissionBlueprint] = [
         GrowthMissionBlueprint(
             id: "ledger-momentum",
-            title: "Registra cinco gastos".appLocalized,
+            title: "Cinco gastos y ya".appLocalized,
             detail: "Crea suficiente actividad para que el coach tome mejores decisiones y arranque el progreso de logros.".appLocalized,
             coachNote: "Pequeñas tandas de registros limpios valen más que una sola sesión larga para ponerte al día.".appLocalized,
             cadenceLabel: "Diaria".appLocalized,
@@ -109,7 +109,7 @@ enum GrowthMissionCatalog {
         ),
         GrowthMissionBlueprint(
             id: "streak-keeper",
-            title: "Protege una racha de tres días".appLocalized,
+            title: "Racha de 3 días".appLocalized,
             detail: "Los días activos consecutivos convierten el dashboard de estático a predictivo.".appLocalized,
             coachNote: "Una racha no es más que repetición hecha visible.".appLocalized,
             cadenceLabel: "Semanal".appLocalized,
@@ -123,7 +123,7 @@ enum GrowthMissionCatalog {
         ),
         GrowthMissionBlueprint(
             id: "account-map",
-            title: "Agrega dos bolsillos o cuentas".appLocalized,
+            title: "Dos cuentas listas".appLocalized,
             detail: "Efectivo, ahorro y tarjetas hacen que el dashboard se sienta como una cabina real.".appLocalized,
             coachNote: "Una cuenta extra suele desbloquear la lectura más clara del patrimonio.".appLocalized,
             cadenceLabel: "Semanal".appLocalized,
@@ -137,7 +137,7 @@ enum GrowthMissionCatalog {
         ),
         GrowthMissionBlueprint(
             id: "bill-radar",
-            title: "Activa el radar de facturas".appLocalized,
+            title: "Radar de facturas".appLocalized,
             detail: "Registra al menos una factura recurrente para que el dashboard pueda avisar presión futura.".appLocalized,
             coachNote: "Los meses más tranquilos son los que dejan de recibir obligaciones como sorpresas.".appLocalized,
             cadenceLabel: "Jefe".appLocalized,
@@ -151,7 +151,7 @@ enum GrowthMissionCatalog {
         ),
         GrowthMissionBlueprint(
             id: "rule-architect",
-            title: "Crea una regla inteligente".appLocalized,
+            title: "Regla smart".appLocalized,
             detail: "Haz que los comercios recurrentes caigan solos en la categoría correcta.".appLocalized,
             coachNote: "Las reglas quitan fricción a cada gasto futuro.".appLocalized,
             cadenceLabel: "Jefe".appLocalized,
@@ -165,7 +165,7 @@ enum GrowthMissionCatalog {
         ),
         GrowthMissionBlueprint(
             id: "budget-guardian",
-            title: "Mantén el mes dentro del presupuesto".appLocalized,
+            title: "Mes en verde".appLocalized,
             detail: "Mantente debajo del plan mensual actual hasta la siguiente revisión.".appLocalized,
             coachNote: "Si el dashboard sigue en verde, tus próximas decisiones se vuelven más fáciles.".appLocalized,
             cadenceLabel: "Mensual".appLocalized,
@@ -183,7 +183,7 @@ enum GrowthMissionCatalog {
         .halloween: [
             GrowthMissionBlueprint(
                 id: "halloween-night-watch",
-                title: "Racha de guardia nocturna".appLocalized,
+                title: "Racha spooky".appLocalized,
                 detail: "Mantente activo en cuatro días distintos del evento de Halloween para que el gasto impulsivo no se cuele.".appLocalized,
                 coachNote: "Pequeños chequeos ganan frente a una limpieza gigante después del apuro de dulces y disfraces.".appLocalized,
                 cadenceLabel: "Evento".appLocalized,
@@ -197,7 +197,7 @@ enum GrowthMissionCatalog {
             ),
             GrowthMissionBlueprint(
                 id: "halloween-loot-log",
-                title: "Registra seis compras espeluznantes".appLocalized,
+                title: "Gastos spooky".appLocalized,
                 detail: "Captura los extras de temporada antes de que se mezclen con el total mensual.".appLocalized,
                 coachNote: "El gasto de evento solo da miedo cuando se queda invisible.".appLocalized,
                 cadenceLabel: "Evento".appLocalized,
@@ -213,7 +213,7 @@ enum GrowthMissionCatalog {
         .winterHolidays: [
             GrowthMissionBlueprint(
                 id: "holiday-gift-guard",
-                title: "Protege el presupuesto de regalos".appLocalized,
+                title: "Regalos bajo control".appLocalized,
                 detail: "Mantén el mes dentro del plan mientras el pack festivo esté activo.".appLocalized,
                 coachNote: "Un límite visible hace que el gasto generoso se sienta claro y tranquilo.".appLocalized,
                 cadenceLabel: "Evento".appLocalized,
@@ -227,7 +227,7 @@ enum GrowthMissionCatalog {
             ),
             GrowthMissionBlueprint(
                 id: "holiday-wrap-up",
-                title: "Registra cinco momentos festivos".appLocalized,
+                title: "Mood navideño".appLocalized,
                 detail: "Sigue viajes, regalos y gastos de reuniones mientras el pack navideño esté activo.".appLocalized,
                 coachNote: "Las capturas pequeñas evitan que diciembre se vuelva un total misterioso.".appLocalized,
                 cadenceLabel: "Evento".appLocalized,
@@ -243,7 +243,7 @@ enum GrowthMissionCatalog {
         .newYear: [
             GrowthMissionBlueprint(
                 id: "new-year-fresh-ledger",
-                title: "Reinicio limpio del libro".appLocalized,
+                title: "Arranque limpio".appLocalized,
                 detail: "Registra tres movimientos de enero para que el año arranque con visibilidad real en vez de adivinanza.".appLocalized,
                 coachNote: "El reinicio más limpio es una primera semana corta, no una hoja perfecta.".appLocalized,
                 cadenceLabel: "Evento".appLocalized,
@@ -257,7 +257,7 @@ enum GrowthMissionCatalog {
             ),
             GrowthMissionBlueprint(
                 id: "new-year-cleanup",
-                title: "Reinicia con dos días activos".appLocalized,
+                title: "Vuelve al ritmo".appLocalized,
                 detail: "Dos días separados de limpieza bastan para despertar de nuevo al coach este año.".appLocalized,
                 coachNote: "El impulso suele volver más rápido que la motivación cuando los dos primeros días ya son visibles.".appLocalized,
                 cadenceLabel: "Evento".appLocalized,
@@ -713,7 +713,7 @@ enum GrowthSnapshotBuilder {
                     0,
                     DashboardSavingsStrategy(
                         id: "seed-ledger",
-                        title: "Dale señal al coach con tres gastos reales".appLocalized,
+                        title: "Arranca con 3".appLocalized,
                         detail: "Registra supermercado, transporte y una compra flexible para que la app empiece a detectar patrones en vez de adivinar.".appLocalized,
                         footnote: "Las primeras sugerencias de ahorro se vuelven más confiables apenas el libro local tiene algunas categorías para comparar.".appLocalized,
                         badgeText: "3 registros".appLocalized,
@@ -735,8 +735,8 @@ enum GrowthSnapshotBuilder {
                 )
                 let shareLabel = percentLabel(for: categoryShare)
                 let title = state.utilizationRatio >= 1
-                    ? AppLocalization.localized("Recorta %@ primero", arguments: topCategory.category.localizedTitle)
-                    : AppLocalization.localized("Ponle tope a %@ esta semana", arguments: topCategory.category.localizedTitle)
+                    ? AppLocalization.localized("Bájale a %@", arguments: topCategory.category.localizedTitle)
+                    : AppLocalization.localized("Suave con %@", arguments: topCategory.category.localizedTitle)
 
                 candidates.append(
                     (
@@ -770,7 +770,7 @@ enum GrowthSnapshotBuilder {
                     state.utilizationRatio >= 1 ? 1 : 0,
                     DashboardSavingsStrategy(
                         id: "merchant-hotspot-\(hotspot.id)",
-                        title: AppLocalization.localized("Pausa %@ una vez", arguments: hotspot.merchant),
+                        title: AppLocalization.localized("Salta %@ una vez", arguments: hotspot.merchant),
                         detail: AppLocalization.localized(
                             "%@ apareció %@ por %@ este mes. Saltarte una visita compra aire de inmediato.",
                             arguments: hotspot.merchant,
@@ -804,7 +804,7 @@ enum GrowthSnapshotBuilder {
                         state.utilizationRatio >= 1 ? 3 : 1,
                         DashboardSavingsStrategy(
                             id: "reserve-buffer",
-                            title: "Aparta un colchón de ahorro ahora".appLocalized,
+                            title: "Haz colchón".appLocalized,
                             detail: AppLocalization.localized(
                                 "Aparta %@ antes de que el resto del mes lo absorba dentro del gasto diario.",
                                 arguments: reserveAmount.formatted(.currency(code: currencyCode))
@@ -828,7 +828,7 @@ enum GrowthSnapshotBuilder {
                     2,
                     DashboardSavingsStrategy(
                         id: "merchant-rule-\(topMerchant.id)",
-                        title: AppLocalization.localized("Automatiza %@", arguments: topMerchant.merchant),
+                        title: AppLocalization.localized("Pon %@ en auto", arguments: topMerchant.merchant),
                         detail: AppLocalization.localized(
                             "%@ ya aparece %@. Una regla por comercio mantiene limpia la categoría sin repetir la misma edición.",
                             arguments: topMerchant.merchant,
@@ -849,7 +849,7 @@ enum GrowthSnapshotBuilder {
                     0,
                     DashboardSavingsStrategy(
                         id: "protect-weekly-pace",
-                        title: "Protege el ritmo semanal".appLocalized,
+                        title: "Semana tranqui".appLocalized,
                         detail: AppLocalization.localized(
                             "Mantente cerca de %@ durante los próximos 7 días para que el mes siga sintiéndose fácil de dirigir.",
                             arguments: weeklySafeToSpend.formatted(.currency(code: currencyCode))

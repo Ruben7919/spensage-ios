@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct NativeAppShellView: View {
     @ObservedObject var viewModel: AppViewModel
@@ -63,10 +64,12 @@ struct NativeAppShellView: View {
 
     private var bottomNavigation: some View {
         VStack(spacing: 0) {
-            Rectangle()
-                .fill(BrandTheme.line.opacity(0.42))
-                .frame(height: 1)
-                .padding(.horizontal, 20)
+            LinearGradient(
+                colors: [BrandTheme.shadow.opacity(0.08), .clear],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 12)
 
             HStack(alignment: .bottom, spacing: 14) {
                 ForEach(leadingTabs) { tab in
@@ -92,18 +95,33 @@ struct NativeAppShellView: View {
                 }
             }
             .padding(.horizontal, 18)
-            .padding(.top, 10)
+            .padding(.top, 8)
             .padding(.bottom, 10)
         }
         .background(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-            .fill(BrandTheme.surface.opacity(0.98))
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(BrandTheme.line.opacity(0.76), lineWidth: 1)
-            )
-            .shadow(color: BrandTheme.shadow.opacity(0.08), radius: 12, x: 0, y: -2)
-            .ignoresSafeArea(edges: .bottom)
+            TopRoundedTabBarShape(radius: 30)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    TopRoundedTabBarShape(radius: 30)
+                        .fill(BrandTheme.surface.opacity(0.26))
+                )
+                .overlay(alignment: .top) {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.white.opacity(0.22), Color.white.opacity(0.04)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(height: 1)
+                }
+                .overlay(
+                    TopRoundedTabBarShape(radius: 30)
+                        .stroke(BrandTheme.line.opacity(0.22), lineWidth: 0.8)
+                )
+                .shadow(color: BrandTheme.shadow.opacity(0.04), radius: 10, x: 0, y: -1)
+                .ignoresSafeArea(edges: .bottom)
         )
     }
 
@@ -119,6 +137,19 @@ struct NativeAppShellView: View {
                 .toolbarBackground(.visible, for: .navigationBar)
                 .toolbarBackground(BrandTheme.background.opacity(0.92), for: .navigationBar)
         }
+    }
+}
+
+private struct TopRoundedTabBarShape: Shape {
+    var radius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let bezier = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: [.topLeft, .topRight],
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(bezier.cgPath)
     }
 }
 

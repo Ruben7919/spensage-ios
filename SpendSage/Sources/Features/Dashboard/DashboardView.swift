@@ -193,25 +193,27 @@ struct DashboardView: View {
             } else {
                 ForEach(growth.strategies) { strategy in
                     VStack(alignment: .leading, spacing: 10) {
-                        HStack(alignment: .top, spacing: 12) {
-                            Label(strategy.title, systemImage: strategy.systemImage)
-                                .font(.headline)
-                                .foregroundStyle(BrandTheme.ink)
-                                .labelStyle(.titleAndIcon)
+                        Label(strategy.title, systemImage: strategy.systemImage)
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                            .labelStyle(.titleAndIcon)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
 
-                            Spacer(minLength: 0)
-
+                        FlowStack(spacing: 8, rowSpacing: 8) {
                             BrandBadge(text: strategy.badgeText, systemImage: strategy.badgeSystemImage)
                         }
 
                         Text(strategy.detail)
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
+                            .lineLimit(4)
                             .fixedSize(horizontal: false, vertical: true)
 
                         Text(strategy.footnote)
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.primary)
+                            .lineLimit(3)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(16)
