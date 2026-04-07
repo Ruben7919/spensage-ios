@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PremiumView: View {
     @ObservedObject var viewModel: AppViewModel
+    @Environment(\.openURL) private var openURL
     @State private var notice: String?
     @AppStorage("native.premium.status") private var storedStatus = PremiumStatus.free.rawValue
     @AppStorage("native.premium.plan") private var storedPlanID = PremiumPlan.ID.freeLocal.rawValue
@@ -35,6 +36,9 @@ struct PremiumView: View {
         )
         .navigationTitle("Planes")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await viewModel.refreshStoreBilling(force: true)
+        }
     }
 
     private var heroCard: some View {
@@ -65,6 +69,34 @@ struct PremiumView: View {
                     title: AppLocalization.localized("Actual: %@", arguments: currentPlan.name.appLocalized),
                     detail: currentStatus.detail(plan: currentPlan)
                 )
+
+                BrandFeatureRow(
+                    systemImage: "storefront.fill",
+                    title: AppLocalization.localized("App Store: %@", arguments: viewModel.storeEntitlements.displayPlanName),
+                    detail: appStoreSummaryLine
+                )
+
+                if let entitlements = viewModel.cloudEntitlements {
+                    BrandFeatureRow(
+                        systemImage: "icloud.fill",
+                        title: AppLocalization.localized("Cloud: %@", arguments: entitlements.planDisplayName),
+                        detail: AppLocalization.localized(
+                            "%@ · %@",
+                            arguments: viewModel.backendConfiguration?.environmentName ?? viewModel.backendStatus?.capabilities.mode ?? "cloud",
+                            entitlements.featuresDisplayLine
+                        )
+                    )
+                } else if let backendConfiguration = viewModel.backendConfiguration {
+                    BrandFeatureRow(
+                        systemImage: "icloud.slash",
+                        title: "Cloud listo para enlazar",
+                        detail: AppLocalization.localized(
+                            "Backend %@ activo en %@. Falta leer entitlements vivos para esta sesión.",
+                            arguments: backendConfiguration.environmentName,
+                            backendConfiguration.hostLabel
+                        )
+                    )
+                }
             }
         }
     }
@@ -81,10 +113,15 @@ struct PremiumView: View {
                     ForEach(PremiumPlan.allCases) { plan in
                         PremiumPlanCard(
                             plan: plan,
+                            priceLabel: priceLabel(for: plan),
                             isCurrent: plan.id == currentPlan.id,
-                            canPreview: viewModel.session.isAuthenticated || plan.id == .freeLocal
-                        ) {
-                            select(plan: plan)
+                            canPurchase: viewModel.session.isAuthenticated || plan.id == .freeLocal,
+                            storeOptions: storeOptions(for: plan),
+                            isBusy: viewModel.storeBillingState.isLoading,
+                            activeProductIDs: Set(viewModel.storeEntitlements.activeProductIDs),
+                            activePurchaseProductID: viewModel.storeBillingState.activePurchaseProductID
+                        ) { action in
+                            handle(action)
                         }
                     }
                 }
@@ -94,25 +131,57 @@ struct PremiumView: View {
 
     private var billingDetails: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if let backendConfiguration = viewModel.backendConfiguration {
+                actionRow(
+                    title: "Estado cloud",
+                    summary: AppLocalization.localized(
+                        "%@ · %@",
+                        arguments: backendConfiguration.environmentName,
+                        viewModel.backendStatusError ?? viewModel.cloudEntitlements?.featuresDisplayLine ?? "Capacidades enlazadas"
+                    ),
+                    systemImage: viewModel.backendStatusError == nil ? "checkmark.shield.fill" : "exclamationmark.triangle.fill"
+                )
+
+                Button {
+                    Task {
+                        await viewModel.refreshBackendStatus(force: true)
+                        notice = viewModel.backendStatusError ?? "Estado cloud actualizado."
+                    }
+                } label: {
+                    actionRow(
+                        title: "Actualizar estado cloud",
+                        summary: "Vuelve a leer capacidades, plan y flags del backend actual.",
+                        systemImage: "arrow.clockwise.circle.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+
             Button {
-                notice = viewModel.session.isAuthenticated
-                    ? "Restaurar usará esta cuenta cuando activemos los pagos de App Store."
-                    : "Inicia sesión primero para que futuras compras queden ligadas a tu cuenta cuando restaurar esté disponible."
+                Task {
+                    await viewModel.restoreStorePurchases()
+                    notice = viewModel.storeBillingState.lastError ?? viewModel.notice ?? "Restauracion completada."
+                }
             } label: {
                 actionRow(
                     title: "Restaurar compras",
-                    summary: "Revisa la ruta de restauración para esta cuenta.",
+                    summary: "Relee compras y suscripciones del Apple ID actual.",
                     systemImage: "arrow.clockwise.circle.fill"
                 )
             }
             .buttonStyle(.plain)
 
             Button {
-                notice = "Gestionar suscripción abrirá la sección de pagos del sistema cuando activemos ese flujo."
+                guard let url = viewModel.subscriptionManagementURL else {
+                    notice = "No se pudo abrir la gestion de suscripciones."
+                    return
+                }
+                openURL(url)
+                notice = "Gestion de suscripciones abierta en App Store."
             } label: {
                 actionRow(
                     title: "Gestionar suscripción",
-                    summary: "Abre después los controles de renovación y cancelación.",
+                    summary: "Abre los controles de renovacion, cambio o cancelacion del sistema.",
                     systemImage: "slider.horizontal.3"
                 )
             }
@@ -203,34 +272,83 @@ struct PremiumView: View {
         )
     }
 
-    private func select(plan: PremiumPlan) {
-        guard viewModel.session.isAuthenticated || plan.id == .freeLocal else {
-            notice = "Inicia sesión primero para mantener la vista previa premium ligada a tu cuenta."
-            return
+    private func handle(_ action: PremiumPlanAction) {
+        switch action {
+        case .keepFree:
+            guard viewModel.storeEntitlements.activeProductIDs.isEmpty else {
+                notice = "Ya tienes una compra activa en App Store. Usa Gestionar suscripcion si quieres cambiarla."
+                return
+            }
+            viewModel.chooseFreeLocalPlan()
+            notice = viewModel.notice ?? "Local gratis sigue activo en este iPhone."
+        case let .purchase(product):
+            guard viewModel.session.isAuthenticated else {
+                notice = "Inicia sesion primero para comprar o restaurar desde App Store."
+                return
+            }
+
+            Task {
+                await viewModel.purchaseStoreProduct(product.id)
+                notice = viewModel.storeBillingState.lastError ?? viewModel.notice
+            }
+        }
+    }
+
+    private func storeOptions(for plan: PremiumPlan) -> [StoreCatalogProduct] {
+        viewModel.storeProducts(for: plan.id.rawValue)
+    }
+
+    private func priceLabel(for plan: PremiumPlan) -> String {
+        let storeOptions = storeOptions(for: plan)
+        guard !storeOptions.isEmpty else { return plan.priceLabel }
+
+        return storeOptions
+            .map { "\($0.kind.summaryLabel) \($0.displayPrice)" }
+            .joined(separator: " · ")
+    }
+
+    private var appStoreSummaryLine: String {
+        if let lastError = viewModel.storeBillingState.lastError, !lastError.isEmpty {
+            return lastError
         }
 
-        switch plan.id {
-        case .freeLocal:
-            storedPlanID = PremiumPlan.ID.freeLocal.rawValue
-            storedStatus = PremiumStatus.free.rawValue
-            notice = "Local gratis sigue activo en este dispositivo."
-        case .removeAds:
-            storedPlanID = PremiumPlan.ID.removeAds.rawValue
-            storedStatus = PremiumStatus.active.rawValue
-            notice = AppLocalization.localized("%@ quedó seleccionado como mejora única para esta cuenta.", arguments: plan.name.appLocalized)
-        case .pro, .family:
-            storedPlanID = plan.id.rawValue
-            storedStatus = currentStatus == .expired ? PremiumStatus.active.rawValue : PremiumStatus.trialing.rawValue
-            notice = AppLocalization.localized("%@ quedó seleccionado como el plan principal de esta cuenta.", arguments: plan.name.appLocalized)
+        let activeProducts = viewModel.storeEntitlements.activeProductIDs.count
+        if activeProducts > 0 {
+            return AppLocalization.localized("%d compra(s) activas detectadas en este Apple ID.", arguments: activeProducts)
         }
+
+        if viewModel.storeBillingState.isLoading {
+            return "Cargando productos y compras activas desde App Store."
+        }
+
+        return "Sin compras activas detectadas todavia."
     }
 
     private var currentStatus: PremiumStatus {
         guard viewModel.session.isAuthenticated else { return .free }
+        if !viewModel.storeEntitlements.activeProductIDs.isEmpty {
+            return .active
+        }
+        if viewModel.storeBillingState.lastError == StoreBillingError.purchasePending.errorDescription {
+            return .trialing
+        }
         return PremiumStatus(rawValue: storedStatus) ?? .free
     }
 
     private var currentPlan: PremiumPlan {
+        if let activePlanKey = viewModel.storeEntitlements.activePlanKey {
+            switch activePlanKey {
+            case .freeLocal:
+                return PremiumPlan.allCases.first(where: { $0.id == .freeLocal }) ?? PremiumPlan.allCases[0]
+            case .removeAds:
+                return PremiumPlan.allCases.first(where: { $0.id == .removeAds }) ?? PremiumPlan.allCases[0]
+            case .pro:
+                return PremiumPlan.allCases.first(where: { $0.id == .pro }) ?? PremiumPlan.allCases[0]
+            case .family:
+                return PremiumPlan.allCases.first(where: { $0.id == .family }) ?? PremiumPlan.allCases[0]
+            }
+        }
+
         let planID: PremiumPlan.ID
         if currentStatus == .free {
             planID = .freeLocal
@@ -284,13 +402,13 @@ private enum PremiumStatus: String {
     func detail(plan: PremiumPlan) -> String {
         switch self {
         case .free:
-            return AppLocalization.localized("%@ se mantiene local por ahora. Los pagos, compras y restauración desde App Store todavía no están activos.", arguments: plan.name.appLocalized)
+            return AppLocalization.localized("%@ se mantiene local-first en este iPhone hasta que compres o restaures desde App Store.", arguments: plan.name.appLocalized)
         case .trialing:
-            return AppLocalization.localized("%@ está seleccionado en esta vista. Los pagos todavía no están activos en esta versión.", arguments: plan.name.appLocalized)
+            return AppLocalization.localized("%@ quedo pendiente en App Store. Revisa aprobacion familiar, cobro o restauracion.", arguments: plan.name.appLocalized)
         case .active:
-            return AppLocalization.localized("%@ aparece como el plan listo en esta pantalla. Los pagos reales y la restauración se activarán cuando conectemos App Store.", arguments: plan.name.appLocalized)
+            return AppLocalization.localized("%@ aparece activo desde App Store en este dispositivo.", arguments: plan.name.appLocalized)
         case .expired:
-            return AppLocalization.localized("%@ está mostrando la ruta de recuperación. Renovar y restaurar serán acciones reales cuando activemos los pagos.", arguments: plan.name.appLocalized)
+            return AppLocalization.localized("%@ necesita revision. Usa restaurar o gestionar suscripcion para corregirlo.", arguments: plan.name.appLocalized)
         }
     }
 }
@@ -362,9 +480,14 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
 
 private struct PremiumPlanCard: View {
     let plan: PremiumPlan
+    let priceLabel: String
     let isCurrent: Bool
-    let canPreview: Bool
-    let action: () -> Void
+    let canPurchase: Bool
+    let storeOptions: [StoreCatalogProduct]
+    let isBusy: Bool
+    let activeProductIDs: Set<String>
+    let activePurchaseProductID: String?
+    let action: (PremiumPlanAction) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -384,12 +507,25 @@ private struct PremiumPlanCard: View {
                         }
                     }
 
-                    Text(plan.priceLabel)
+                    Text(priceLabel)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(BrandTheme.primary)
                 }
 
                 Spacer(minLength: 0)
+
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(
+                            plan.isHighlighted
+                                ? AnyShapeStyle(BrandTheme.heroGlowGradient)
+                                : AnyShapeStyle(BrandTheme.accent.opacity(0.16))
+                        )
+                    Image(systemName: plan.isHighlighted ? "sparkles" : "leaf.fill")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(plan.isHighlighted ? BrandTheme.primary : BrandTheme.muted)
+                }
+                .frame(width: 42, height: 42)
             }
 
             Text(plan.summary.appLocalized)
@@ -406,22 +542,48 @@ private struct PremiumPlanCard: View {
                 }
             }
 
-            if isCurrent {
-                Button(action: action) {
-                    Text("Actual".appLocalized)
+            if plan.id == .freeLocal {
+                if isCurrent {
+                    Button(action: {}) {
+                        Text("Actual".appLocalized)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .disabled(true)
+                } else {
+                    Button {
+                        action(.keepFree)
+                    } label: {
+                        Text("Mantener local gratis".appLocalized)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+                }
+            } else if !storeOptions.isEmpty {
+                VStack(spacing: 8) {
+                    ForEach(storeOptions) { product in
+                        purchaseButton(for: product)
+                    }
+                }
+            } else if isBusy {
+                HStack(spacing: 10) {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                    Text("Cargando App Store".appLocalized)
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Button(action: {}) {
+                    Text(
+                        canPurchase
+                            ? "Producto pendiente en App Store Connect".appLocalized
+                            : "Inicia sesion para comprar".appLocalized
+                    )
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(SecondaryCTAStyle())
                 .disabled(true)
-            } else {
-                Button(action: action) {
-                    Text(
-                        canPreview
-                            ? AppLocalization.localized("Elegir %@", arguments: plan.name.appLocalized)
-                            : "Inicia sesión para verlo".appLocalized
-                    )
-                    .frame(maxWidth: .infinity)
-                }
                 .buttonStyle(PrimaryCTAStyle())
             }
         }
@@ -429,12 +591,62 @@ private struct PremiumPlanCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(BrandTheme.surfaceTint)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            BrandTheme.surfaceTint,
+                            plan.isHighlighted ? BrandTheme.glow.opacity(0.18) : BrandTheme.surface.opacity(0.92)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
         )
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                .stroke(plan.isHighlighted ? BrandTheme.primary.opacity(0.28) : BrandTheme.line.opacity(0.8), lineWidth: 1)
         )
-        .shadow(color: BrandTheme.shadow.opacity(0.06), radius: 14, x: 0, y: 8)
+        .shadow(color: plan.isHighlighted ? BrandTheme.primary.opacity(0.12) : BrandTheme.shadow.opacity(0.06), radius: 16, x: 0, y: 8)
     }
+
+    private func label(for product: StoreCatalogProduct) -> String {
+        productIsActive(product) ? "Actual · \(product.displayPrice)" : product.ctaLabel
+    }
+
+    private func productIsActive(_ product: StoreCatalogProduct) -> Bool {
+        activeProductIDs.contains(product.id)
+    }
+
+    @ViewBuilder
+    private func purchaseButton(for product: StoreCatalogProduct) -> some View {
+        let isActive = productIsActive(product)
+        let isPurchasing = activePurchaseProductID == product.id
+        let title = label(for: product)
+        let button = Button {
+            action(.purchase(product))
+        } label: {
+            HStack(spacing: 12) {
+                Text(title)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                if isPurchasing {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .disabled(!canPurchase || activePurchaseProductID != nil || isActive)
+
+        if isActive {
+            button.buttonStyle(SecondaryCTAStyle())
+        } else {
+            button.buttonStyle(PrimaryCTAStyle())
+        }
+    }
+}
+
+private enum PremiumPlanAction {
+    case keepFree
+    case purchase(StoreCatalogProduct)
 }

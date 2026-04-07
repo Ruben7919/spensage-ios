@@ -28,6 +28,7 @@ struct AdvancedSettingsView: View {
                 heroCard
                 guideCard
                 deviceControlsCard
+                backendCloudCard
                 exportCenterCard
                 ledgerSummaryCard
                 supportHandoffCard
@@ -36,7 +37,7 @@ struct AdvancedSettingsView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Avanzado")
@@ -161,6 +162,80 @@ struct AdvancedSettingsView: View {
         }
     }
 
+    private var backendCloudCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Backend cloud")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        if let backendConfiguration = viewModel.backendConfiguration {
+                            Text(
+                                AppLocalization.localized(
+                                    "%@ · %@",
+                                    arguments: backendConfiguration.environmentName,
+                                    backendConfiguration.hostLabel
+                                )
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                        } else {
+                            Text("Sin configuración remota en el bundle.")
+                                .font(.subheadline)
+                                .foregroundStyle(BrandTheme.muted)
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Button("Actualizar") {
+                        Task {
+                            await viewModel.refreshBackendStatus(force: true)
+                        }
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .disabled(viewModel.backendConfiguration == nil)
+                }
+
+                if let backendStatus = viewModel.backendStatus {
+                    BrandFeatureRow(
+                        systemImage: backendStatus.securityIcon,
+                        title: AppLocalization.localized("Seguridad: %@", arguments: backendStatus.securitySummary),
+                        detail: backendStatus.featureSummary
+                    )
+
+                    if let entitlements = backendStatus.entitlements {
+                        BrandFeatureRow(
+                            systemImage: "person.2.crop.square.stack.fill",
+                            title: AppLocalization.localized("Plan cloud: %@", arguments: entitlements.planDisplayName),
+                            detail: AppLocalization.localized("Features: %@", arguments: entitlements.featuresDisplayLine)
+                        )
+                    } else {
+                        BrandFeatureRow(
+                            systemImage: "person.crop.circle.badge.questionmark",
+                            title: "Entitlements pendientes",
+                            detail: "La sesión actual todavía no devolvió plan ni features cloud."
+                        )
+                    }
+                } else if let backendStatusError = viewModel.backendStatusError {
+                    BrandFeatureRow(
+                        systemImage: "exclamationmark.triangle.fill",
+                        title: "Cloud no verificado",
+                        detail: backendStatusError
+                    )
+                } else {
+                    BrandFeatureRow(
+                        systemImage: "icloud.slash",
+                        title: "Cloud sin leer",
+                        detail: "Usa Actualizar para consultar capacidades, billing y flags del backend."
+                    )
+                }
+            }
+        }
+    }
+
     private var ledgerSummaryCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
@@ -243,5 +318,41 @@ struct AdvancedSettingsView: View {
                 }
             }
         }
+    }
+}
+
+private extension BackendRuntimeStatus {
+    var securitySummary: String {
+        let checks = [
+            capabilities.security.waf,
+            capabilities.security.kmsAtRest,
+            capabilities.security.cognitoAuth,
+            capabilities.security.webhookSignatureValidation,
+            capabilities.security.rateLimits,
+        ]
+        let readyChecks = checks.filter { $0 }.count
+        return AppLocalization.localized("%d/5 listas", arguments: readyChecks)
+    }
+
+    var featureSummary: String {
+        var flags = [
+            capabilities.features.billing ? "billing" : nil,
+            capabilities.features.pushRegistration ? "push" : nil,
+            capabilities.features.spaces ? "family" : nil,
+            capabilities.features.csvImport ? "csv" : nil,
+            capabilities.features.invoiceScan ? "scan" : nil,
+        ].compactMap(\.self)
+
+        if capabilities.features.aiInsights {
+            flags.append("ai")
+        }
+
+        return flags.isEmpty ? "Sin features cloud activas" : flags.joined(separator: ", ")
+    }
+
+    var securityIcon: String {
+        capabilities.security.waf && capabilities.security.rateLimits && capabilities.security.cognitoAuth
+            ? "checkmark.shield.fill"
+            : "exclamationmark.shield.fill"
     }
 }

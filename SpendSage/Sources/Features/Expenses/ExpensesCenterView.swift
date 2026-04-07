@@ -3,6 +3,7 @@ import SwiftUI
 struct ExpensesCenterView: View {
     @ObservedObject var viewModel: AppViewModel
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
+    @Environment(\.shellBottomInset) private var shellBottomInset
     @State private var isPresentingGuide = false
 
     private var ledger: LocalFinanceLedger? {
@@ -82,7 +83,7 @@ struct ExpensesCenterView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 40)
+            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .background(
             ZStack {

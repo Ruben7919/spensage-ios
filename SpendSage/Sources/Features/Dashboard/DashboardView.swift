@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardView: View {
     @ObservedObject var viewModel: AppViewModel
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
+    @Environment(\.shellBottomInset) private var shellBottomInset
     var onOpenGuide: (() -> Void)? = nil
 
     @State private var isPresentingGuide = false
@@ -40,7 +41,7 @@ struct DashboardView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 40)
+            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .background(FinanceScreenBackground())
         .navigationTitle("Inicio")

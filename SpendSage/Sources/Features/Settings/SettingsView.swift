@@ -1,6 +1,5 @@
 import SwiftUI
 import UIKit
-import AudioToolbox
 
 struct SettingsView: View {
     @ObservedObject var viewModel: AppViewModel
@@ -8,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("native.settings.language") private var language = "auto"
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
+    @Environment(\.shellBottomInset) private var shellBottomInset
     @AppStorage("native.settings.localDebugOverlay") private var debugOverlayEnabled = false
     @AppStorage(AuthSessionPreferences.rememberDeviceKey) private var rememberDeviceEnabled = true
     @AppStorage(AuthSessionPreferences.biometricUnlockKey) private var biometricUnlockEnabled = true
@@ -41,12 +41,10 @@ struct SettingsView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20)
-            .padding(.vertical, 20)
+            .padding(.top, 20)
+            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
-        .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
-            BrandBackdropView()
-        }
+        .background(FinanceScreenBackground())
         .sheet(isPresented: $showingGuideReplay) {
             GuideSheet(guide: GuideLibrary.guide(.dashboard))
         }
@@ -73,6 +71,25 @@ struct SettingsView: View {
                     character: .tikki,
                     expression: .proud
                 )
+
+                FlowStack(spacing: 8, rowSpacing: 8) {
+                    BrandBadge(
+                        text: rememberDeviceEnabled ? "Inicio rápido" : "Ingreso manual",
+                        systemImage: "iphone.gen3"
+                    )
+                    BrandBadge(
+                        text: viewModel.biometricKind == .none
+                            ? "Seguridad local"
+                            : (biometricUnlockEnabled ? biometricLabel : "Biometría lista"),
+                        systemImage: viewModel.biometricKind == .none
+                            ? "lock.shield"
+                            : viewModel.biometricKind.systemImage
+                    )
+                    BrandBadge(
+                        text: settingsThemeDisplayName(theme),
+                        systemImage: "paintpalette.fill"
+                    )
+                }
 
                 LazyVGrid(
                     columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
@@ -111,7 +128,7 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
 
                 NavigationLink {
-                    SettingsNotificationsView()
+                    SettingsNotificationsView(viewModel: viewModel)
                 } label: {
                     SettingsNavigationRow(
                         title: "Notificaciones y calma",
@@ -253,7 +270,7 @@ struct SettingsView: View {
                     .buttonStyle(SecondaryCTAStyle())
 
                     Button("Cerrar sesión") {
-                        viewModel.signOut()
+                        Task { await viewModel.signOut() }
                     }
                     .buttonStyle(SecondaryCTAStyle())
                     .foregroundStyle(.red)
@@ -318,7 +335,7 @@ private struct SettingsPreferencesView: View {
             .padding(.vertical, 20)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Apariencia y región")
@@ -327,6 +344,8 @@ private struct SettingsPreferencesView: View {
 }
 
 private struct SettingsNotificationsView: View {
+    @ObservedObject var viewModel: AppViewModel
+    @Environment(\.openURL) private var openURL
     @AppStorage("native.settings.reminders") private var remindersEnabled = true
     @AppStorage("native.settings.sound") private var soundStyle = "playful"
     @AppStorage("native.settings.quietHoursEnabled") private var quietHoursEnabled = true
@@ -347,6 +366,75 @@ private struct SettingsNotificationsView: View {
                         character: .manchas,
                         expression: .happy
                     )
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Push de este iPhone")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        BrandFeatureRow(
+                            systemImage: viewModel.pushRegistrationStatus.backendEnabled ? "checkmark.icloud.fill" : "icloud.slash.fill",
+                            title: "Backend",
+                            detail: viewModel.pushRegistrationStatus.backendEnabled
+                                ? "El backend permite registro push para esta app."
+                                : "Dev aún no tiene APNs/SNS activos para esta app."
+                        )
+
+                        BrandFeatureRow(
+                            systemImage: viewModel.pushRegistrationStatus.authorization.systemImage,
+                            title: "Permiso del iPhone",
+                            detail: viewModel.pushRegistrationStatus.authorization.summary
+                        )
+
+                        BrandFeatureRow(
+                            systemImage: viewModel.pushRegistrationStatus.cachedTokenSuffix == nil ? "iphone.slash" : "iphone.radiowaves.left.and.right",
+                            title: "Token APNs",
+                            detail: viewModel.pushRegistrationStatus.cachedTokenSuffix.map { "Registrado localmente \($0)" }
+                                ?? "Todavía no hay token APNs guardado en este iPhone."
+                        )
+
+                        if let lastUploadedAt = viewModel.pushRegistrationStatus.lastUploadedAt {
+                            BrandFeatureRow(
+                                systemImage: "checkmark.seal.fill",
+                                title: "Última vinculación cloud",
+                                detail: "Subido el \(lastUploadedAt.formatted(date: .abbreviated, time: .shortened))"
+                            )
+                        }
+
+                        if let lastError = viewModel.pushRegistrationStatus.lastError, !lastError.isEmpty {
+                            BrandFeatureRow(
+                                systemImage: "exclamationmark.triangle.fill",
+                                title: "Último error",
+                                detail: lastError
+                            )
+                        }
+
+                        Button(viewModel.pushRegistrationStatus.cachedTokenSuffix == nil ? "Activar push en este iPhone" : "Revalidar push en este iPhone") {
+                            Task { await viewModel.registerPushNotifications() }
+                        }
+                        .buttonStyle(PrimaryCTAStyle())
+                        .disabled(
+                            !viewModel.session.isAuthenticated
+                                || !viewModel.pushRegistrationStatus.backendEnabled
+                                || viewModel.pushRegistrationStatus.isRegistering
+                        )
+
+                        if viewModel.pushRegistrationStatus.authorization == .denied {
+                            Button("Abrir ajustes del sistema") {
+                                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                                openURL(url)
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                        }
+
+                        if !viewModel.session.isAuthenticated {
+                            Text("La cuenta es obligatoria para registrar este iPhone contra `/devices/register`.")
+                                .font(.footnote)
+                                .foregroundStyle(BrandTheme.muted)
+                        }
+                    }
                 }
 
                 SurfaceCard {
@@ -454,17 +542,17 @@ private struct SettingsNotificationsView: View {
                         }
 
                         Button("Probar sonido de notificación") {
-                            guard soundStyle != "off" else { return }
-                            let generator = UINotificationFeedbackGenerator()
-                            generator.notificationOccurred(.success)
-                            AudioServicesPlaySystemSound(1104)
+                            NotificationSoundPreviewService.shared.play(
+                                style: AppNotificationSoundStyle(rawPreference: soundStyle)
+                            )
                         }
                         .buttonStyle(SecondaryCTAStyle())
+                        .disabled(AppNotificationSoundStyle(rawPreference: soundStyle) == .off)
 
                         BrandFeatureRow(
                             systemImage: "speaker.wave.2.fill",
                             title: "Sonido actual",
-                            detail: settingsSoundDisplayName(soundStyle)
+                            detail: AppNotificationSoundStyle(rawPreference: soundStyle).displayName
                         )
                     }
                 }
@@ -474,11 +562,42 @@ private struct SettingsNotificationsView: View {
             .padding(.vertical, 20)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
+        }
+        .task {
+            await viewModel.refreshPushRegistrationState()
         }
         .navigationTitle("Notificaciones y calma")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private extension PushAuthorizationState {
+    var summary: String {
+        switch self {
+        case .authorized:
+            return "Las notificaciones están permitidas para este iPhone."
+        case .provisional:
+            return "Las notificaciones están permitidas provisionalmente."
+        case .ephemeral:
+            return "La autorización push es temporal."
+        case .denied:
+            return "Las notificaciones están bloqueadas en Ajustes del sistema."
+        case .notDetermined:
+            return "Todavía no se ha pedido permiso push en este iPhone."
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .authorized, .provisional, .ephemeral:
+            return "bell.badge.fill"
+        case .denied:
+            return "bell.slash.fill"
+        case .notDetermined:
+            return "bell"
+        }
     }
 }
 
@@ -616,12 +735,23 @@ private func settingsThemeDisplayName(_ value: String) -> String {
 }
 
 private func settingsSoundDisplayName(_ value: String) -> String {
-    switch value {
-    case "miau":
-        return "Miau"
-    case "off":
-        return "Silencio"
-    default:
-        return "Juguetón"
+    AppNotificationSoundStyle(rawPreference: value).displayName
+}
+
+struct SettingsPreferencesDebugView: View {
+    var body: some View {
+        NavigationStack {
+            SettingsPreferencesView()
+        }
+    }
+}
+
+struct SettingsNotificationsDebugView: View {
+    @ObservedObject var viewModel: AppViewModel
+
+    var body: some View {
+        NavigationStack {
+            SettingsNotificationsView(viewModel: viewModel)
+        }
     }
 }

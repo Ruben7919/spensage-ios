@@ -178,7 +178,7 @@ struct HelpCenterView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Centro de ayuda")

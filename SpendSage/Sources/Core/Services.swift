@@ -11,6 +11,7 @@ protocol AuthServicing {
     func consumeProfileSeed() -> AuthProfileSeed?
     func hasRememberedSession() -> Bool
     func restoreRememberedSession() async -> SessionState?
+    func currentIDToken() async -> String?
     func forgetRememberedSession()
 }
 
@@ -98,6 +99,10 @@ final class PreviewAuthService: AuthServicing {
     func restoreRememberedSession() async -> SessionState? {
         try? await Task.sleep(for: .milliseconds(120))
         return rememberedSession
+    }
+
+    func currentIDToken() async -> String? {
+        nil
     }
 
     func forgetRememberedSession() {

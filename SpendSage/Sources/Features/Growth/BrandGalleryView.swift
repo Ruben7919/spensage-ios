@@ -341,7 +341,7 @@ struct BrandGalleryView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Brand Gallery")

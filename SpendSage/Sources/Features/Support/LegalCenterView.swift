@@ -28,7 +28,7 @@ struct LegalCenterView: View {
             }
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
     }
@@ -91,6 +91,7 @@ private struct LegalDocumentLibraryView: View {
 
 private struct LegalDocumentDetailView: View {
     @Environment(\.openURL) private var openURL
+    @Environment(\.shellBottomInset) private var shellBottomInset
     @State private var copiedLink = false
 
     let document: LegalDocumentResource
@@ -197,7 +198,7 @@ private struct LegalDocumentDetailView: View {
                     .background(BrandTheme.surface)
                     .clipShape(Capsule(style: .continuous))
                     .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 12, x: 0, y: 6)
-                    .padding(.bottom, 18)
+                    .padding(.bottom, shellBottomInset + 18)
             }
         }
     }

@@ -80,6 +80,8 @@ struct AuthView: View {
             VStack(alignment: .leading, spacing: 18) {
                 header
 
+                authTrustStrip
+
                 authField(
                     title: "Email",
                     placeholder: "name@domain.com",
@@ -180,9 +182,21 @@ struct AuthView: View {
 
     private var header: some View {
         VStack(spacing: 14) {
-            MascotAvatarView(character: authStory.character, expression: authStory.expression, size: 92)
+            ZStack {
+                Circle()
+                    .fill(BrandTheme.heroGlowGradient)
+                    .frame(width: 116, height: 116)
+                    .blur(radius: 10)
+
+                MascotAvatarView(character: authStory.character, expression: authStory.expression, size: 92)
+            }
 
             VStack(alignment: .center, spacing: 10) {
+                BrandBadge(
+                    text: mode == .signIn ? "Cuenta segura" : "Inicio simple",
+                    systemImage: "sparkles"
+                )
+
                 Text("SpendSage")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(BrandTheme.primary)
@@ -201,6 +215,15 @@ struct AuthView: View {
             }
         }
         .frame(maxWidth: .infinity)
+    }
+
+    private var authTrustStrip: some View {
+        FlowStack(spacing: 10, rowSpacing: 10) {
+            StoryTag(text: "Cloud login", systemImage: "lock.shield")
+            StoryTag(text: "Apple y Google", systemImage: "person.crop.circle.badge.checkmark")
+            StoryTag(text: "Vuelve a tu plan", systemImage: "arrow.clockwise")
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 
     private var invitePendingCard: some View {

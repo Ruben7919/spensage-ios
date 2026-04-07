@@ -46,7 +46,7 @@ class ShotSpec:
 SPECS: tuple[ShotSpec, ...] = (
     ShotSpec(
         slug="01_inicio_control.png",
-        source=".qa-screens/final-routes/tab-dashboard.png",
+        source=".qa-screens/codex-20260406/appstore/dashboard.png",
         badge="Inicio simple",
         title="Controla tu dinero\nsin enredos",
         subtitle="Mira lo importante del día, detecta presión en tu presupuesto y decide tu siguiente paso en segundos.",
@@ -64,7 +64,7 @@ SPECS: tuple[ShotSpec, ...] = (
     ),
     ShotSpec(
         slug="02_gastos_rapidos.png",
-        source=".qa-screens/full-routes-real/tab-expenses.png",
+        source=".qa-screens/codex-20260406/appstore/expenses.png",
         badge="Gastos al vuelo",
         title="Registra y organiza\ngastos rápido",
         subtitle="Captura el mes sin saturarte. Primero anotas, luego profundizas solo cuando hace falta.",
@@ -93,7 +93,7 @@ SPECS: tuple[ShotSpec, ...] = (
     ),
     ShotSpec(
         slug="04_analisis_claro.png",
-        source=".qa-screens/insights-final-20260405-v5.png",
+        source=".qa-screens/codex-20260406/appstore/insights.png",
         badge="Análisis claro",
         title="Entiende qué cambió\nsin leer un reporte",
         subtitle="Toca una barra para ver el valor exacto, detectar focos de gasto y actuar con más calma.",

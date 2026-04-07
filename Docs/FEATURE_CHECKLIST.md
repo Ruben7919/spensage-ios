@@ -1,6 +1,6 @@
 # SpendSage iOS Feature Checklist
 
-Last updated: 2026-04-05
+Last updated: 2026-04-07
 
 ## Goal
 
@@ -74,9 +74,11 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - [x] Premium screen aligned with current reality instead of fake live billing claims
 - [x] Premium removed from the main tab bar and reduced to a cleaner plan-first surface
 - [ ] Entitlement model documented for `Free`, `Premium`, and `Family`
-- [>] StoreKit integration
+- [x] StoreKit integration
 - [>] RevenueCat integration
-- [>] Real restore/manage subscription flows
+- [x] Real restore/manage subscription flows
+- [x] App Store Connect metadata and upload automation scripts added under `scripts/app_store/`
+- [x] App Store Connect app metadata, review notes, pricing metadata, and localized screenshot sets synced through the authenticated ASC session
 
 ### Support, Trust, and Export
 
@@ -173,3 +175,4 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - 2026-04-05: Internal TestFlight build `1.0 (10)` uploaded successfully after removing alpha from the Xcode 26 icon assets and re-running the full route QA repair pass.
 - 2026-04-05: Legal documentation was updated with the declared current operator identity: `Ruben Lazaro`, `RUC 0924829179001`, `Samanes 4 Mz 408 Villa 130112`.
 - 2026-04-05: Prepared the external release package with App Store metadata, App Privacy mapping, iPhone 6.9 screenshots with blurred data and mascot-side compositions, plus staged public-site legal/support content for `spendsage.ai` and `legal.spendsage.ai`.
+- 2026-04-07: Reworked the App Store Connect automation to use the logged-in Chrome session directly, synced `en-US` + `es-ES` metadata, updated App Review contact details, and uploaded the current 6-shot iPhone screenshot pack to both locales.

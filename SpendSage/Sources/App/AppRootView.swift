@@ -79,7 +79,7 @@ struct AppRootView: View {
                 ) {
                     Task { await viewModel.unlockRememberedSession() }
                 } onUseAnotherAccount: {
-                    viewModel.signOut()
+                    Task { await viewModel.signOut() }
                 }
                 .zIndex(40)
             }
@@ -101,6 +101,12 @@ struct AppRootView: View {
         }
         .task {
             await viewModel.bootstrapRememberedSessionIfNeeded()
+        }
+        .task {
+            await viewModel.refreshPushRegistrationState()
+        }
+        .task {
+            await viewModel.refreshStoreBilling()
         }
         .onChange(of: scenePhase) { _, phase in
             viewModel.handleScenePhaseChange(phase)
@@ -137,6 +143,10 @@ struct AppRootView: View {
             PremiumView(viewModel: viewModel)
         case .profile:
             ProfileView(viewModel: viewModel)
+        case .preferences:
+            SettingsPreferencesDebugView()
+        case .notifications:
+            SettingsNotificationsDebugView(viewModel: viewModel)
         case .advanced:
             AdvancedSettingsView(viewModel: viewModel)
         case .support:

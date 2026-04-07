@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TrophyHistoryView: View {
     @ObservedObject var viewModel: AppViewModel
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     private let collectionColumns = [GridItem(.adaptive(minimum: 250), spacing: 14)]
 
@@ -28,7 +29,7 @@ struct TrophyHistoryView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 40)
+            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .background(
             ZStack {
@@ -37,7 +38,7 @@ struct TrophyHistoryView: View {
             }
             .ignoresSafeArea()
         )
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Historial de logros")

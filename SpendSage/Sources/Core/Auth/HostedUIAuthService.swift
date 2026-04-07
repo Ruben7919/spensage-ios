@@ -7,6 +7,7 @@ import UIKit
 final class HostedUIAuthService: NSObject, AuthServicing {
     let configuration: AuthConfiguration
     private var lastProfileSeed: AuthProfileSeed?
+    private var activeIDToken: String?
 
     init(configuration: AuthConfiguration) {
         self.configuration = configuration
@@ -70,12 +71,44 @@ final class HostedUIAuthService: NSObject, AuthServicing {
 
             let email = profileSeed.preferredEmail ?? persisted.email
             let refreshToken = tokenResponse.refreshToken ?? persisted.refreshToken
+            activeIDToken = tokenResponse.idToken
             persistRememberedSession(email: email, provider: persisted.provider, refreshToken: refreshToken)
 
             return .signedIn(email: email, provider: persisted.provider)
         } catch {
             AuthSessionVault.delete()
             lastProfileSeed = nil
+            activeIDToken = nil
+            return nil
+        }
+    }
+
+    func currentIDToken() async -> String? {
+        if let activeIDToken, !activeIDToken.isEmpty {
+            return activeIDToken
+        }
+
+        guard
+            AuthSessionPreferences.rememberDeviceEnabled(),
+            let hostedUI = configuration.hostedUI,
+            let persisted = AuthSessionVault.load()
+        else {
+            return nil
+        }
+
+        do {
+            let tokenResponse = try await refreshSession(refreshToken: persisted.refreshToken, hostedUI: hostedUI)
+            let email = Self.profileSeed(fromIDToken: tokenResponse.idToken, fallbackEmail: persisted.email).preferredEmail ?? persisted.email
+            activeIDToken = tokenResponse.idToken
+            persistRememberedSession(
+                email: email,
+                provider: persisted.provider,
+                refreshToken: tokenResponse.refreshToken ?? persisted.refreshToken
+            )
+            return tokenResponse.idToken
+        } catch {
+            activeIDToken = nil
+            AuthSessionVault.delete()
             return nil
         }
     }
@@ -83,6 +116,7 @@ final class HostedUIAuthService: NSObject, AuthServicing {
     func forgetRememberedSession() {
         AuthSessionVault.delete()
         lastProfileSeed = nil
+        activeIDToken = nil
     }
 
     private func authorize(
@@ -130,6 +164,7 @@ final class HostedUIAuthService: NSObject, AuthServicing {
         lastProfileSeed = profileSeed
         let email = profileSeed.preferredEmail ?? loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
         let providerLabel = provider?.rawValue ?? "Email"
+        activeIDToken = tokenResponse.idToken
         persistRememberedSession(email: email, provider: providerLabel, refreshToken: tokenResponse.refreshToken)
         return .signedIn(email: email, provider: providerLabel)
     }

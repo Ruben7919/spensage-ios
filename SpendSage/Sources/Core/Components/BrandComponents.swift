@@ -75,25 +75,60 @@ struct BrandScenePanel: View {
 struct BrandBackdropView: View {
     var body: some View {
         ZStack {
-            Circle()
-                .fill(BrandTheme.accent.opacity(0.34))
-                .frame(width: 270, height: 270)
-                .blur(radius: 28)
-                .offset(x: 132, y: -122)
+            LinearGradient(
+                colors: [
+                    BrandTheme.glow.opacity(0.18),
+                    BrandTheme.accent.opacity(0.08),
+                    Color.clear
+                ],
+                startPoint: .topTrailing,
+                endPoint: .center
+            )
 
             Circle()
-                .fill(BrandTheme.primary.opacity(0.18))
-                .frame(width: 220, height: 220)
-                .blur(radius: 32)
-                .offset(x: -148, y: 68)
-
-            RoundedRectangle(cornerRadius: 78, style: .continuous)
-                .fill(BrandTheme.surface.opacity(0.5))
+                .fill(BrandTheme.accent.opacity(0.22))
                 .frame(width: 240, height: 240)
-                .rotationEffect(.degrees(14))
-                .blur(radius: 16)
-                .offset(x: 110, y: 226)
+                .blur(radius: 52)
+                .offset(x: 132, y: -112)
+
+            Circle()
+                .fill(BrandTheme.primary.opacity(0.16))
+                .frame(width: 220, height: 220)
+                .blur(radius: 58)
+                .offset(x: -148, y: 24)
+
+            Ellipse()
+                .fill(BrandTheme.glow.opacity(0.16))
+                .frame(width: 280, height: 128)
+                .blur(radius: 38)
+                .offset(x: 96, y: 10)
+
+            RoundedRectangle(cornerRadius: 64, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            BrandTheme.surface.opacity(0.3),
+                            BrandTheme.glow.opacity(0.16),
+                            Color.clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 290, height: 180)
+                .rotationEffect(.degrees(-16))
+                .blur(radius: 28)
+                .offset(x: -82, y: -10)
+
+            Capsule(style: .continuous)
+                .fill(Color.white.opacity(0.12))
+                .frame(width: 180, height: 20)
+                .blur(radius: 18)
+                .offset(x: 54, y: 6)
         }
+        .frame(maxWidth: .infinity)
+        .frame(height: 280, alignment: .top)
+        .clipped()
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }

@@ -58,6 +58,8 @@ final class AppViewModel: ObservableObject {
         case scan
         case premium
         case profile
+        case preferences
+        case notifications
         case advanced = "advanced"
         case support
         case help
@@ -85,21 +87,38 @@ final class AppViewModel: ObservableObject {
     @Published var requiresSessionUnlock = false
     @Published var biometricKind = BiometricUnlockService.availableBiometric()
     @Published var sessionUnlockError: String?
+    @Published var backendStatus: BackendRuntimeStatus?
+    @Published var backendStatusError: String?
+    @Published var pushRegistrationStatus = PushRegistrationStatus()
+    @Published var storeBillingState = StoreBillingState()
 
     private let authService: AuthServicing
     private let financeStore: FinanceDashboardStoring
+    private let backendService: BackendServicing
+    private let pushRegistrationService: PushRegistrationServicing
+    private let storeBillingService: StoreBillingServicing
     private let onboardingKey = "native_onboarding_completed"
+    private let premiumStatusDefaultsKey = "native.premium.status"
+    private let premiumPlanDefaultsKey = "native.premium.plan"
     private var queuedCelebrations: [GrowthCelebration] = []
     private var shouldPromptForReviewAfterCelebrations = false
     private var didBootstrapRememberedSession = false
     private var backgroundedAt: Date?
+    private var backendStatusUpdatedAt: Date?
+    private var storeBillingUpdatedAt: Date?
 
     init(
         authService: AuthServicing = DefaultAuthService.make(),
-        financeStore: FinanceDashboardStoring = LocalFinanceStore()
+        financeStore: FinanceDashboardStoring = LocalFinanceStore(),
+        backendService: BackendServicing = DefaultBackendService.make(),
+        pushRegistrationService: PushRegistrationServicing = DefaultPushRegistrationService.make(),
+        storeBillingService: StoreBillingServicing = DefaultStoreBillingService.make()
     ) {
         self.authService = authService
         self.financeStore = financeStore
+        self.backendService = backendService
+        self.pushRegistrationService = pushRegistrationService
+        self.storeBillingService = storeBillingService
         self.session = .signedOut
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: onboardingKey)
         self.selectedTab = .dashboard
@@ -108,6 +127,22 @@ final class AppViewModel: ObservableObject {
 
     var authConfiguration: AuthConfiguration {
         authService.configuration
+    }
+
+    var backendConfiguration: BackendConfiguration? {
+        backendService.configuration
+    }
+
+    var cloudEntitlements: BackendEntitlements? {
+        backendStatus?.entitlements
+    }
+
+    var storeEntitlements: StoreEntitlementSnapshot {
+        storeBillingState.entitlements
+    }
+
+    var subscriptionManagementURL: URL? {
+        storeBillingService.managementURL()
     }
 
     var accounts: [AccountRecord] {
@@ -155,6 +190,8 @@ final class AppViewModel: ObservableObject {
         requiresSessionUnlock = false
         sessionUnlockError = nil
         await refreshDashboard()
+        await refreshBackendStatus(force: true)
+        await refreshStoreBilling(force: true)
     }
 
     func createAccount(email: String, password: String) async throws {
@@ -164,6 +201,8 @@ final class AppViewModel: ObservableObject {
         requiresSessionUnlock = false
         sessionUnlockError = nil
         await refreshDashboard()
+        await refreshBackendStatus(force: true)
+        await refreshStoreBilling(force: true)
     }
 
     func signInWithSocial(_ provider: SocialProvider) async throws {
@@ -172,6 +211,8 @@ final class AppViewModel: ObservableObject {
         requiresSessionUnlock = false
         sessionUnlockError = nil
         await refreshDashboard()
+        await refreshBackendStatus(force: true)
+        await refreshStoreBilling(force: true)
         pendingProfileSetup = makePendingProfileSetup(from: authService.consumeProfileSeed(), provider: provider)
     }
 
@@ -179,9 +220,12 @@ final class AppViewModel: ObservableObject {
         session = await authService.continueAsGuest()
         notice = "Guest mode stays local on this device.".appLocalized
         await refreshDashboard()
+        await refreshBackendStatus(force: true)
+        await refreshStoreBilling(force: true)
     }
 
-    func signOut() {
+    func signOut() async {
+        await unregisterPushNotificationsIfNeeded()
         authService.forgetRememberedSession()
         resetLocalSessionState()
     }
@@ -242,6 +286,9 @@ final class AppViewModel: ObservableObject {
 
         switch phase {
         case .active:
+            Task { await refreshPushRegistrationState() }
+            Task { await refreshStoreBilling() }
+
             if !didBootstrapRememberedSession {
                 Task { await bootstrapRememberedSessionIfNeeded() }
                 return
@@ -301,6 +348,9 @@ final class AppViewModel: ObservableObject {
         dashboardState = nil
         ledger = nil
         growthSnapshot = nil
+        backendStatus = nil
+        backendStatusError = nil
+        pushRegistrationStatus = PushRegistrationStatus()
         isPresentingAddExpense = false
         isPresentingBudgetWizard = false
         scanFlowID = UUID()
@@ -315,6 +365,10 @@ final class AppViewModel: ObservableObject {
         isRestoringRememberedSession = false
         sessionUnlockError = nil
         backgroundedAt = nil
+        backendStatusUpdatedAt = nil
+        storeBillingUpdatedAt = nil
+        storeBillingState = StoreBillingState()
+        PushRegistrationPersistence.clearUploadMarker()
     }
 
     func startScanFlow() {
@@ -337,6 +391,317 @@ final class AppViewModel: ObservableObject {
         let newGrowthSnapshot = makeGrowthSnapshot(state: state, ledger: ledger)
         growthSnapshot = newGrowthSnapshot
         handleGrowthUpdates(previous: previousGrowthSnapshot, current: newGrowthSnapshot)
+        if backendStatus == nil {
+            await refreshBackendStatus()
+        }
+        if storeBillingState.products.isEmpty {
+            await refreshStoreBilling()
+        }
+    }
+
+    func storeProducts(for planID: String) -> [StoreCatalogProduct] {
+        guard let planKey = StorePlanKey(rawValue: planID) else { return [] }
+        return storeBillingState.products
+            .filter { $0.planKey == planKey }
+            .sorted { lhs, rhs in
+                lhs.sortOrder < rhs.sortOrder
+            }
+    }
+
+    func storeHasActiveProduct(_ productID: String) -> Bool {
+        storeBillingState.entitlements.activeProductIDs.contains(productID)
+    }
+
+    func refreshBackendStatus(force: Bool = false) async {
+        guard backendService.configuration != nil else {
+            backendStatus = nil
+            backendStatusError = nil
+            backendStatusUpdatedAt = nil
+            await refreshPushRegistrationState()
+            return
+        }
+
+        if !force, let backendStatusUpdatedAt, Date().timeIntervalSince(backendStatusUpdatedAt) < 60 {
+            return
+        }
+
+        do {
+            let idToken = session.isAuthenticated ? await authService.currentIDToken() : nil
+            backendStatus = try await backendService.fetchStatus(idToken: idToken)
+            backendStatusError = nil
+            backendStatusUpdatedAt = .now
+        } catch {
+            backendStatusError = error.localizedDescription
+        }
+
+        await refreshPushRegistrationState()
+        await syncCachedPushRegistrationIfNeeded()
+    }
+
+    func refreshStoreBilling(force: Bool = false) async {
+        if !force, let storeBillingUpdatedAt, Date().timeIntervalSince(storeBillingUpdatedAt) < 60 {
+            return
+        }
+
+        storeBillingState.isLoading = true
+        storeBillingState.lastError = nil
+
+        var loadedProducts = storeBillingState.products
+        var loadedEntitlements = storeBillingState.entitlements
+        var errors: [String] = []
+
+        do {
+            loadedProducts = try await storeBillingService.loadCatalog()
+        } catch {
+            errors.append(error.localizedDescription)
+        }
+
+        do {
+            loadedEntitlements = try await storeBillingService.refreshEntitlements()
+        } catch {
+            errors.append(error.localizedDescription)
+        }
+
+        storeBillingState.products = loadedProducts
+        storeBillingState.entitlements = loadedEntitlements
+        storeBillingState.lastUpdatedAt = .now
+        storeBillingState.isLoading = false
+        storeBillingUpdatedAt = .now
+        syncPersistedPremiumState(with: loadedEntitlements)
+
+        if !errors.isEmpty {
+            storeBillingState.lastError = errors.joined(separator: "\n")
+        }
+    }
+
+    func purchaseStoreProduct(_ productID: String) async {
+        guard session.isAuthenticated else {
+            let message = "Inicia sesión antes de comprar o restaurar en App Store."
+            notice = message
+            storeBillingState.lastError = message
+            return
+        }
+
+        storeBillingState.activePurchaseProductID = productID
+        storeBillingState.lastError = nil
+
+        do {
+            let entitlements = try await storeBillingService.purchase(productID: productID)
+            applyStoreEntitlements(entitlements)
+            notice = purchaseSuccessMessage(for: productID, entitlements: entitlements)
+            await refreshBackendStatus(force: true)
+        } catch let error as StoreBillingError {
+            handleStoreBillingError(error, productID: productID)
+        } catch {
+            storeBillingState.lastError = error.localizedDescription
+            notice = error.localizedDescription
+        }
+
+        storeBillingState.activePurchaseProductID = nil
+    }
+
+    func restoreStorePurchases() async {
+        guard session.isAuthenticated else {
+            let message = "Inicia sesión antes de restaurar compras en este iPhone."
+            notice = message
+            storeBillingState.lastError = message
+            return
+        }
+
+        storeBillingState.isRestoring = true
+        storeBillingState.lastError = nil
+
+        do {
+            let entitlements = try await storeBillingService.restorePurchases()
+            applyStoreEntitlements(entitlements)
+            notice = entitlements.activePlanKey == nil && !entitlements.hasRemoveAds
+                ? "No se encontraron compras activas para restaurar en este Apple ID."
+                : "Compras restauradas desde App Store."
+            await refreshBackendStatus(force: true)
+        } catch let error as StoreBillingError {
+            storeBillingState.lastError = error.localizedDescription
+            notice = error.localizedDescription
+        } catch {
+            storeBillingState.lastError = error.localizedDescription
+            notice = error.localizedDescription
+        }
+
+        storeBillingState.isRestoring = false
+    }
+
+    func refreshPushRegistrationState(lastError: String? = nil, isRegistering: Bool? = nil) async {
+        let authorization = await pushRegistrationService.authorizationStatus()
+        let cachedToken = pushRegistrationService.cachedToken()
+        let marker = PushRegistrationPersistence.uploadMarker()
+
+        pushRegistrationStatus = PushRegistrationStatus(
+            backendEnabled: backendStatus?.capabilities.features.pushRegistration ?? false,
+            authorization: authorization,
+            cachedTokenSuffix: cachedToken.flatMap(Self.pushTokenSuffix(for:)),
+            lastUploadedAt: marker?.uploadedAt,
+            lastUploadedEnvironment: marker?.environmentName,
+            lastUploadedEmail: marker?.email,
+            lastError: lastError,
+            isRegistering: isRegistering ?? false
+        )
+    }
+
+    func chooseFreeLocalPlan() {
+        syncPersistedPremiumState(with: .empty)
+        notice = "Local gratis sigue activo en este dispositivo."
+    }
+
+    private func applyStoreEntitlements(_ entitlements: StoreEntitlementSnapshot) {
+        storeBillingState.entitlements = entitlements
+        storeBillingState.lastUpdatedAt = .now
+        storeBillingUpdatedAt = .now
+        storeBillingState.lastError = nil
+        syncPersistedPremiumState(with: entitlements)
+    }
+
+    private func syncPersistedPremiumState(with entitlements: StoreEntitlementSnapshot) {
+        let defaults = UserDefaults.standard
+        let nextPlan = entitlements.activePlanKey?.rawValue ?? StorePlanKey.freeLocal.rawValue
+        let nextStatus = entitlements.activePlanKey == nil ? "free" : "active"
+        defaults.set(nextPlan, forKey: premiumPlanDefaultsKey)
+        defaults.set(nextStatus, forKey: premiumStatusDefaultsKey)
+    }
+
+    private func markPendingPremiumState(for productID: String) {
+        let defaults = UserDefaults.standard
+        let nextPlan = StoreProductID(rawValue: productID)?.planKey.rawValue ?? StorePlanKey.pro.rawValue
+        defaults.set(nextPlan, forKey: premiumPlanDefaultsKey)
+        defaults.set("trialing", forKey: premiumStatusDefaultsKey)
+    }
+
+    private func handleStoreBillingError(_ error: StoreBillingError, productID: String) {
+        if error == .purchasePending {
+            markPendingPremiumState(for: productID)
+        }
+        storeBillingState.lastError = error.localizedDescription
+        notice = error.localizedDescription
+    }
+
+    private func purchaseSuccessMessage(
+        for productID: String,
+        entitlements: StoreEntitlementSnapshot
+    ) -> String {
+        if StoreProductID(rawValue: productID)?.planKey == .removeAds {
+            return "Compra completada. SpendSage queda sin anuncios en este Apple ID."
+        }
+
+        return AppLocalization.localized(
+            "Compra completada. Plan activo en App Store: %@.",
+            arguments: entitlements.displayPlanName
+        )
+    }
+
+    func registerPushNotifications() async {
+        guard session.isAuthenticated else {
+            let message = "Inicia sesión antes de registrar este iPhone para notificaciones push."
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+            return
+        }
+
+        guard backendStatus?.capabilities.features.pushRegistration == true else {
+            let message = "El backend todavía no tiene APNs/SNS configurado para esta app."
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+            return
+        }
+
+        guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else {
+            let message = "No se pudo obtener un token válido de tu sesión."
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+            return
+        }
+
+        await refreshPushRegistrationState(isRegistering: true)
+
+        do {
+            let token = try await pushRegistrationService.requestRemoteNotificationToken()
+            let request = BackendDeviceRegistrationRequest(
+                platform: "ios",
+                provider: "apns",
+                token: token
+            )
+            _ = try await backendService.registerDevice(idToken: idToken, request: request)
+
+            if
+                let email = session.emailAddress,
+                let environmentName = backendConfiguration?.environmentName
+            {
+                PushRegistrationPersistence.recordUpload(
+                    token: token,
+                    email: email,
+                    environmentName: environmentName
+                )
+            }
+
+            notice = "Push activado y vinculado a tu cuenta en este iPhone."
+            await refreshPushRegistrationState()
+        } catch {
+            let message = error.localizedDescription
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+        }
+    }
+
+    private func syncCachedPushRegistrationIfNeeded() async {
+        guard
+            session.isAuthenticated,
+            backendStatus?.capabilities.features.pushRegistration == true,
+            let email = session.emailAddress,
+            let environmentName = backendConfiguration?.environmentName,
+            let idToken = await authService.currentIDToken(),
+            !idToken.isEmpty,
+            let token = pushRegistrationService.cachedToken(),
+            !token.isEmpty,
+            PushRegistrationPersistence.shouldUpload(token: token, email: email, environmentName: environmentName)
+        else {
+            return
+        }
+
+        do {
+            let request = BackendDeviceRegistrationRequest(
+                platform: "ios",
+                provider: "apns",
+                token: token
+            )
+            _ = try await backendService.registerDevice(idToken: idToken, request: request)
+            PushRegistrationPersistence.recordUpload(
+                token: token,
+                email: email,
+                environmentName: environmentName
+            )
+            await refreshPushRegistrationState()
+        } catch {
+            await refreshPushRegistrationState(lastError: error.localizedDescription)
+        }
+    }
+
+    private func unregisterPushNotificationsIfNeeded() async {
+        defer { PushRegistrationPersistence.clearUploadMarker() }
+
+        guard
+            session.isAuthenticated,
+            backendStatus?.capabilities.features.pushRegistration == true,
+            let token = pushRegistrationService.cachedToken(),
+            !token.isEmpty,
+            let idToken = await authService.currentIDToken(),
+            !idToken.isEmpty
+        else {
+            return
+        }
+
+        let request = BackendDeviceRegistrationRequest(
+            platform: "ios",
+            provider: "apns",
+            token: token
+        )
+        _ = try? await backendService.unregisterDevice(idToken: idToken, request: request)
     }
 
     func presentAddExpense() {
@@ -614,6 +979,7 @@ final class AppViewModel: ObservableObject {
         requiresSessionUnlock = false
         sessionUnlockError = nil
         await refreshDashboard()
+        await refreshBackendStatus(force: true)
 
         if let provider = restoredSession.socialProvider {
             pendingProfileSetup = makePendingProfileSetup(from: authService.consumeProfileSeed(), provider: provider)
@@ -764,5 +1130,10 @@ final class AppViewModel: ObservableObject {
         default:
             return nil
         }
+    }
+
+    private static func pushTokenSuffix(for token: String) -> String {
+        let suffix = token.suffix(8)
+        return "…\(suffix)"
     }
 }

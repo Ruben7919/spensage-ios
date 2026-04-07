@@ -42,6 +42,26 @@ xcodegen generate
 xcodebuild -project SpendSage.xcodeproj -scheme SpendSage -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```
 
+## Archive and upload to App Store Connect
+
+```bash
+bash scripts/app_store/archive_and_upload.sh internal
+```
+
+```bash
+bash scripts/app_store/archive_and_upload.sh external
+```
+
+## Sync App Store Connect metadata
+
+```bash
+python3 scripts/app_store/app_store_connect_iris_sync.py --transport cookies --app-info --version --pricing --status
+```
+
+```bash
+python3 scripts/app_store/app_store_connect_screenshots_sync.py --locales es-ES,en-US
+```
+
 ## Run tests
 
 ```bash

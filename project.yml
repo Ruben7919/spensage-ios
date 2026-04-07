@@ -43,6 +43,10 @@ targets:
         SpendSageCognitoUserPoolClientId: "7t375oqkn6ihh1rnk3lt0qffv3"
         SpendSageCognitoRedirectSignIn: "spendsage://auth-callback"
         SpendSageCognitoRedirectSignOut: "spendsage://auth-logout"
+        SpendSageAPIBaseURL: "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/"
+        SpendSageEnvironmentName: "dev"
+        UIBackgroundModes:
+          - remote-notification
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
     settings:
@@ -53,6 +57,12 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleIconName: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_ENTITLEMENTS: SpendSage/SpendSage.entitlements
+      configs:
+        Debug:
+          APS_ENVIRONMENT: development
+        Release:
+          APS_ENVIRONMENT: production
   SpendSageTests:
     type: bundle.unit-test
     platform: iOS

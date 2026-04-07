@@ -53,8 +53,16 @@
 	<string>spendsage://auth-logout</string>
 	<key>SpendSageCognitoUserPoolClientId</key>
 	<string>7t375oqkn6ihh1rnk3lt0qffv3</string>
+	<key>SpendSageAPIBaseURL</key>
+	<string>https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/</string>
+	<key>SpendSageEnvironmentName</key>
+	<string>dev</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UIRequiresFullScreen</key>

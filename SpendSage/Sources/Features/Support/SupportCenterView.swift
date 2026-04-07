@@ -58,6 +58,7 @@ struct SupportCenterView: View {
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
 
     @Environment(\.openURL) private var openURL
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     @State private var issueType: SupportIssueType = .bug
     @State private var priority: SupportPriority = .medium
@@ -325,7 +326,7 @@ struct SupportCenterView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .overlay(alignment: .bottom) {
@@ -338,7 +339,7 @@ struct SupportCenterView: View {
                     .background(BrandTheme.surface)
                     .clipShape(Capsule(style: .continuous))
                     .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 12, x: 0, y: 6)
-                    .padding(.bottom, 18)
+                    .padding(.bottom, shellBottomInset + 18)
             }
         }
         .navigationTitle("Centro de soporte")

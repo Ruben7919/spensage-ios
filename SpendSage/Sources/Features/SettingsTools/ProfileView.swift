@@ -1,6 +1,5 @@
 import SwiftUI
 import UIKit
-import AudioToolbox
 
 struct ProfileView: View {
     @ObservedObject var viewModel: AppViewModel
@@ -33,7 +32,7 @@ struct ProfileView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Perfil")
@@ -340,13 +339,12 @@ private struct ProfilePreferencesDetailView: View {
                         }
 
                         Button("Probar sonido") {
-                            guard soundStyle != "off" else { return }
-                            let generator = UINotificationFeedbackGenerator()
-                            generator.notificationOccurred(.success)
-                            AudioServicesPlaySystemSound(1104)
+                            NotificationSoundPreviewService.shared.play(
+                                style: AppNotificationSoundStyle(rawPreference: soundStyle)
+                            )
                         }
                         .buttonStyle(SecondaryCTAStyle())
-                        .disabled(soundStyle == "off")
+                        .disabled(AppNotificationSoundStyle(rawPreference: soundStyle) == .off)
                     }
                 }
             }
@@ -354,7 +352,7 @@ private struct ProfilePreferencesDetailView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Preferencias")
@@ -423,7 +421,7 @@ private struct ProfileAccountDetailsView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Detalle de cuenta")

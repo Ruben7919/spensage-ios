@@ -88,7 +88,7 @@ struct ProfileCompletionView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Cerrar sesión") {
-                    viewModel.signOut()
+                    Task { await viewModel.signOut() }
                 }
                 .font(.subheadline.weight(.semibold))
             }

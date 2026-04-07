@@ -1,21 +1,32 @@
 # SpendSage External App Store Metadata
 
-Last updated: 2026-04-05
+Last updated: 2026-04-07
+
+## Automation Source Of Truth
+
+- App Store Connect metadata source: `/Users/rubenlazaro/Projects/spensage-ios/AppStoreAssets/app_store_connect_config.json`
+- Browser automation helper: `/Users/rubenlazaro/Projects/spensage-ios/scripts/app_store/chrome_apple_events.py`
+- Metadata apply script: `/Users/rubenlazaro/Projects/spensage-ios/scripts/app_store/app_store_connect_apply.py`
+- Session-backed metadata/pricing sync: `/Users/rubenlazaro/Projects/spensage-ios/scripts/app_store/app_store_connect_iris_sync.py`
+- Session-backed screenshot sync: `/Users/rubenlazaro/Projects/spensage-ios/scripts/app_store/app_store_connect_screenshots_sync.py`
+- Archive and upload script: `/Users/rubenlazaro/Projects/spensage-ios/scripts/app_store/archive_and_upload.sh`
+
+The current automation assumes an already authenticated App Store Connect session in Google Chrome on this Mac.
 
 ## Publication URLs
 
-- Marketing URL: `https://spendsage.ai`
-- Support URL: `https://spendsage.ai/support`
-- Privacy Policy URL: `https://legal.spendsage.ai/privacy`
-- Terms of Use URL: `https://legal.spendsage.ai/terms`
-- Legal hub URL: `https://legal.spendsage.ai`
+- Marketing URL: `https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/disclaimer`
+- Support URL: `https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/support-and-contact`
+- Privacy Policy URL: `https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/privacy-policy`
+- Terms of Use URL: `https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/terms-of-service`
+- Legal hub URL: `https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal`
 
-If the exact support route differs in production, update the Support URL in App Store Connect before submission.
+These URLs respond today from the live backend. Replace them with branded production domains before public App Store launch.
 
 ## Product Identity
 
 - App name: `SpendSage AI`
-- Subtitle: `Gastos, recibos y ahorro fácil`
+- Subtitle: `Gastos, recibos y presupuesto fácil`
 - Primary category: `Finance`
 - Secondary category: `Productivity`
 - Content rights owner: `Ruben Lazaro`
@@ -23,7 +34,7 @@ If the exact support route differs in production, update the Support URL in App 
 ## Promotional Text
 
 ```text
-Controla gastos, escanea recibos y convierte el ahorro en un loop simple, cute y poderoso desde tu iPhone.
+Controla gastos, escanea recibos y entiende tu mes con una app clara, cute y poderosa desde tu iPhone.
 ```
 
 ## Keywords
@@ -35,9 +46,9 @@ gastos,ahorro,presupuesto,recibos,finanzas,scanner,control,metas,budget,expense
 ## Full Description
 
 ```text
-SpendSage te ayuda a llevar tus gastos y a ahorrar sin sentir que estás administrando una hoja de cálculo.
+SpendSage te ayuda a registrar gastos, escanear recibos y cuidar tu presupuesto sin sentir que estás administrando una hoja de cálculo.
 
-Registra compras rápido, revisa tu presupuesto con claridad y usa el escaneo de recibos para armar un borrador editable antes de guardar. La experiencia está pensada para ser simple para cualquiera, pero lo bastante poderosa para darte contexto real sobre cómo vas este mes.
+Registra compras rápido, revisa el mes con claridad y usa el escaneo de recibos para crear un borrador editable antes de guardar. La experiencia está pensada para sentirse simple desde el primer minuto, pero lo bastante útil para darte contexto real sobre cómo vas este mes.
 
 Con SpendSage puedes:
 
@@ -48,7 +59,7 @@ Con SpendSage puedes:
 - configurar un presupuesto guiado paso a paso;
 - seguir tu progreso con niveles, rachas, badges y celebraciones compartibles.
 
-SpendSage está diseñado con una experiencia mobile-first, una UI clara y personajes que acompañan el progreso sin volver la app pesada o confusa.
+SpendSage está diseñado para iPhone con una experiencia mobile-first, una UI clara y personajes que acompañan el progreso sin volver la app pesada o confusa.
 
 Privacidad primero:
 
@@ -64,7 +75,7 @@ SpendSage es una app de apoyo para finanzas personales. No es un banco ni reempl
 ## What’s New for Version 1.0
 
 ```text
-Lanzamiento inicial de SpendSage en iPhone con dashboard simple, captura de gastos, escaneo guiado de recibos, análisis claros, presupuesto paso a paso, badges y celebraciones compartibles.
+Pulimos la primera experiencia de iPhone con un dashboard más claro, dock inferior anclado, captura de gastos más limpia, escaneo guiado de recibos, análisis simples y presupuesto paso a paso.
 ```
 
 ## App Review Notes
@@ -85,8 +96,8 @@ Puntos importantes para revisión:
 These fields are required in App Store Connect but still need live values before final submission if they aren't already configured in the account:
 
 - Contact name: `Ruben Lazaro`
-- Contact email: `REQUIRED`
-- Contact phone: `REQUIRED`
+- Contact email: `support@spendsage.ai`
+- Contact phone: `+593969686491`
 
 ## Age Rating Guidance
 
@@ -107,7 +118,26 @@ Recommended resulting rating for the current implementation: `4+`
 
 - Availability: countries where support and legal pages are published and maintained
 - Price: `Free`
-- Monetization state for current external submission: avoid enabling any paid plan until StoreKit / entitlements / review copy are fully aligned
+- Monetization state for current external submission:
+  - StoreKit 2 native purchase / restore wiring now exists in the iOS app.
+  - App Store Connect products now exist for `spendsage.pro.monthly`, `spendsage.pro.annual`, `spendsage.family.monthly`, `spendsage.family.annual`, and `spendsage.remove_ads`.
+  - Store review copy and public metadata must still avoid claiming cloud entitlements are active until backend reconciliation is live.
+  - Keep paid plans disabled for an external submission until pricing, localizations, and backend entitlement sync are reviewable end-to-end.
+
+Configured store pricing source of truth:
+
+- `spendsage.remove_ads`: `USD 7.99`
+- `spendsage.pro.monthly`: `USD 4.99`
+- `spendsage.pro.annual`: `USD 29.99`
+- `spendsage.family.monthly`: `USD 7.99`
+- `spendsage.family.annual`: `USD 49.99`
+
+Current App Store Connect sync status:
+
+- App info localizations are synced for `en-US` and `es-ES`.
+- App version localizations are synced for `en-US` and `es-ES`.
+- App Review contact and notes are synced.
+- iPhone screenshot sets are uploaded for `en-US` and `es-ES` using the current 6-shot pack.
 
 ## Submission Positioning
 
@@ -126,4 +156,4 @@ Avoid leading with:
 - cloud sync as if already live;
 - advanced AI coaching as if already live;
 - geofence nudges as if already live;
-- live billing or restore flows unless they are enabled and reviewable.
+- live cloud premium unlocks unless they are enabled and reviewable end-to-end.

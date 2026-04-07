@@ -5,6 +5,7 @@ import UIKit
 struct InsightsView: View {
     @ObservedObject var viewModel: AppViewModel
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     @State private var exportNotice: String?
     @State private var selectedPeriod: InsightsPeriod = .week
@@ -204,7 +205,7 @@ struct InsightsView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 40)
+            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .background(
             ZStack {
@@ -237,7 +238,7 @@ struct InsightsView: View {
                     .background(BrandTheme.surface)
                     .clipShape(Capsule(style: .continuous))
                     .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 12, x: 0, y: 6)
-                    .padding(.bottom, 18)
+                    .padding(.bottom, shellBottomInset + 18)
             }
         }
     }
@@ -987,6 +988,7 @@ private struct InsightsTrendDetailView: View {
     let series: [InsightsSeriesPoint]
     let metric: InsightsMetric
     let currencyCode: String
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -1059,7 +1061,7 @@ private struct InsightsTrendDetailView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 40)
+            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .background(
             ZStack {
@@ -1098,6 +1100,7 @@ private struct InsightsCategoryDetailView: View {
     let monthSpending: Decimal
     let currencyCode: String
     let rows: [InsightRow]
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -1168,7 +1171,7 @@ private struct InsightsCategoryDetailView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 40)
+            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .background(
             ZStack {
