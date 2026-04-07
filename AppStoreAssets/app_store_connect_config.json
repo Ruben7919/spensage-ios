@@ -51,6 +51,26 @@
       "notes": "SpendSage is a local-first personal-finance app for iPhone.\n\nReview notes:\n1. Sign in is required. Reviewers can create a fresh account with email or use Sign in with Apple / Google from the first screen.\n2. Free accounts remain local-first after authentication; the core flow is onboarding, dashboard, expense capture, receipt scan, insights, and settings.\n3. Receipt scan uses on-device Vision or VisionKit assistance; the user always reviews and edits the draft before saving.\n4. This build does not use cross-app tracking or active geolocation.\n5. StoreKit purchase surfaces are visible in Premium, but review can focus on the free authenticated flow if needed."
     }
   },
+  "beta": {
+    "localizations": {
+      "en-US": {
+        "feedbackEmail": "support@spendsage.ai",
+        "marketingUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/support-and-contact",
+        "privacyPolicyUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/privacy-policy",
+        "description": "SpendSage is a local-first personal finance beta for iPhone. Sign in is required before using the app. Testers can create an account with email or continue with Sign in with Apple or Google, then track expenses, scan receipts, review insights, configure budgets, and explore premium purchase surfaces."
+      },
+      "es-MX": {
+        "feedbackEmail": "support@spendsage.ai",
+        "marketingUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/support-and-contact",
+        "privacyPolicyUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/privacy-policy",
+        "description": "SpendSage es una beta local-first de finanzas personales para iPhone. El inicio de sesión es obligatorio antes de usar la app. Los testers pueden crear una cuenta con email o continuar con Sign in with Apple o Google, luego registrar gastos, escanear recibos, revisar insights, configurar presupuestos y explorar las pantallas de compra premium."
+      }
+    }
+  },
+  "testflight": {
+    "internalGroupId": "2c78be6d-4e47-416d-9ce0-ebe17d85ff1a",
+    "externalGroupId": "af7d1ea2-45ea-4762-9d57-850def545006"
+  },
   "pricing": {
     "app": {
       "basePriceUsd": "0.00",

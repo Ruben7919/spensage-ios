@@ -329,6 +329,42 @@ def patch_review_detail(config: dict[str, Any], client: ChromeIrisClient) -> Non
     )
 
 
+def upsert_beta_app_localizations(config: dict[str, Any], client: ChromeIrisClient) -> None:
+    current = client.get(f"/iris/v1/apps/{config['appId']}/betaAppLocalizations?limit=50")
+    existing = {item["attributes"]["locale"]: item for item in current.get("data", [])}
+    for locale, payload in config["beta"]["localizations"].items():
+        attributes = {
+            "description": payload["description"],
+            "feedbackEmail": payload["feedbackEmail"],
+            "marketingUrl": payload["marketingUrl"],
+            "privacyPolicyUrl": payload["privacyPolicyUrl"],
+        }
+        if locale in existing:
+            client.patch(
+                f"/iris/v1/betaAppLocalizations/{existing[locale]['id']}",
+                {
+                    "data": {
+                        "type": "betaAppLocalizations",
+                        "id": existing[locale]["id"],
+                        "attributes": attributes,
+                    }
+                },
+            )
+            continue
+        client.post(
+            "/iris/v1/betaAppLocalizations",
+            {
+                "data": {
+                    "type": "betaAppLocalizations",
+                    "attributes": {"locale": locale, **attributes},
+                    "relationships": {
+                        "app": {"data": {"type": "apps", "id": config["appId"]}}
+                    },
+                }
+            },
+        )
+
+
 def upsert_subscription_group_localizations(config: dict[str, Any], client: ChromeIrisClient) -> None:
     group_id = config["pricing"]["subscriptions"]["groupId"]
     current = client.get(f"/iris/v1/subscriptionGroups/{group_id}/subscriptionGroupLocalizations")
@@ -594,6 +630,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--app-info", action="store_true")
     parser.add_argument("--version", action="store_true")
+    parser.add_argument("--beta-app", action="store_true")
     parser.add_argument("--pricing", action="store_true")
     parser.add_argument("--status", action="store_true")
     parser.add_argument(
@@ -604,8 +641,8 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    if not any((args.app_info, args.version, args.pricing, args.status)):
-        parser.error("Pick at least one of --app-info, --version, --pricing, or --status")
+    if not any((args.app_info, args.version, args.beta_app, args.pricing, args.status)):
+        parser.error("Pick at least one of --app-info, --version, --beta-app, --pricing, or --status")
 
     config = load_config()
     if args.transport == "chrome":
@@ -618,6 +655,8 @@ def main() -> int:
     if args.version:
         upsert_version_localizations(config, client)
         patch_review_detail(config, client)
+    if args.beta_app:
+        upsert_beta_app_localizations(config, client)
     if args.pricing:
         sync_pricing(config, client)
     if args.status:

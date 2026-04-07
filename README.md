@@ -59,7 +59,15 @@ python3 scripts/app_store/app_store_connect_iris_sync.py --transport cookies --a
 ```
 
 ```bash
+python3 scripts/app_store/app_store_connect_iris_sync.py --transport cookies --beta-app
+```
+
+```bash
 python3 scripts/app_store/app_store_connect_screenshots_sync.py --locales es-ES,en-US
+```
+
+```bash
+python3 scripts/app_store/testflight_promote.py --version 20
 ```
 
 ## Run tests

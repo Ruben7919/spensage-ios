@@ -44,11 +44,13 @@ xcodebuild \
   -scheme "$SCHEME" \
   -configuration Release \
   -destination "generic/platform=iOS" \
+  -allowProvisioningUpdates \
   archive \
   -archivePath "$archive_path"
 
 xcodebuild \
   -exportArchive \
+  -allowProvisioningUpdates \
   -archivePath "$archive_path" \
   -exportPath "$export_path" \
   -exportOptionsPlist "$export_options"
