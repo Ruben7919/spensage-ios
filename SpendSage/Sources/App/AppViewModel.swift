@@ -69,6 +69,13 @@ final class AppViewModel: ObservableObject {
         case trophies
     }
 
+    enum PresentedSheet: String, Identifiable {
+        case addExpense
+        case budgetWizard
+
+        var id: String { rawValue }
+    }
+
     @Published var session: SessionState
     @Published var hasCompletedOnboarding: Bool
     @Published var selectedTab: AppTab
@@ -76,8 +83,7 @@ final class AppViewModel: ObservableObject {
     @Published var dashboardState: FinanceDashboardState?
     @Published var ledger: LocalFinanceLedger?
     @Published var growthSnapshot: DashboardGrowthSnapshot?
-    @Published var isPresentingAddExpense = false
-    @Published var isPresentingBudgetWizard = false
+    @Published var activeSheet: PresentedSheet?
     @Published var notice: String?
     @Published var debugRoute: DebugRoute?
     @Published var activeCelebration: GrowthCelebration?
@@ -432,8 +438,7 @@ final class AppViewModel: ObservableObject {
         lastCreatedInvite = nil
         sharingStatusError = nil
         isRefreshingSharing = false
-        isPresentingAddExpense = false
-        isPresentingBudgetWizard = false
+        activeSheet = nil
         scanFlowID = UUID()
         selectedTab = .dashboard
         debugRoute = nil
@@ -461,7 +466,7 @@ final class AppViewModel: ObservableObject {
 
     func startManualExpenseFlow() {
         selectedTab = .expenses
-        isPresentingAddExpense = true
+        activeSheet = .addExpense
     }
 
     func refreshDashboard() async {
@@ -1167,19 +1172,23 @@ final class AppViewModel: ObservableObject {
     }
 
     func presentAddExpense() {
-        isPresentingAddExpense = true
+        activeSheet = .addExpense
     }
 
     func dismissAddExpense() {
-        isPresentingAddExpense = false
+        if activeSheet == .addExpense {
+            activeSheet = nil
+        }
     }
 
     func presentBudgetWizard() {
-        isPresentingBudgetWizard = true
+        activeSheet = .budgetWizard
     }
 
     func dismissBudgetWizard() {
-        isPresentingBudgetWizard = false
+        if activeSheet == .budgetWizard {
+            activeSheet = nil
+        }
     }
 
     func addExpense(_ draft: ExpenseDraft) async {
@@ -1198,7 +1207,9 @@ final class AppViewModel: ObservableObject {
         } else {
             notice = "Expense saved locally on this device.".appLocalized
         }
-        isPresentingAddExpense = false
+        if activeSheet == .addExpense {
+            activeSheet = nil
+        }
         await refreshDashboard()
     }
 
@@ -1210,7 +1221,9 @@ final class AppViewModel: ObservableObject {
 
         await financeStore.saveBudget(monthlyIncome: monthlyIncome, monthlyBudget: monthlyBudget, for: session, spaceID: currentSpaceID)
         notice = "Budget updated locally on this device.".appLocalized
-        isPresentingBudgetWizard = false
+        if activeSheet == .budgetWizard {
+            activeSheet = nil
+        }
         await refreshDashboard()
     }
 
@@ -1647,14 +1660,14 @@ final class AppViewModel: ObservableObject {
                     session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
                 }
                 selectedTab = .expenses
-                isPresentingAddExpense = true
+                activeSheet = .addExpense
             case "budget":
                 hasCompletedOnboarding = true
                 if !session.isAuthenticated {
                     session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
                 }
                 selectedTab = .settings
-                isPresentingBudgetWizard = true
+                activeSheet = .budgetWizard
             default:
                 break
             }

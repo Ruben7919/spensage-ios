@@ -84,6 +84,7 @@ private struct LegalDocumentLibraryView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
         }
+        .accessibilityIdentifier("legal.screen")
         .navigationTitle("Centro legal")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -187,6 +188,7 @@ private struct LegalDocumentDetailView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
         }
+        .accessibilityIdentifier("legal.document.screen")
         .navigationTitle(document.title)
         .navigationBarTitleDisplayMode(.inline)
         .overlay(alignment: .bottom) {

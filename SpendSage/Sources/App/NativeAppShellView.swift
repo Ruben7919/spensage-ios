@@ -2,13 +2,6 @@ import SwiftUI
 import UIKit
 
 struct NativeAppShellView: View {
-    private enum ActiveSheet: String, Identifiable {
-        case addExpense
-        case budgetWizard
-
-        var id: String { rawValue }
-    }
-
     @ObservedObject var viewModel: AppViewModel
 
     private let leadingTabs: [AppViewModel.AppTab] = [.dashboard, .expenses]
@@ -28,7 +21,7 @@ struct NativeAppShellView: View {
         }
         .ignoresSafeArea(edges: .bottom)
         .background(BrandTheme.background.ignoresSafeArea())
-        .sheet(item: activeSheet) { sheet in
+        .sheet(item: $viewModel.activeSheet) { sheet in
             switch sheet {
             case .addExpense:
                 SheetPresentationProbe(identifier: "addExpense.presented") {
@@ -138,26 +131,6 @@ struct NativeAppShellView: View {
 
     private var bottomNavigationInset: CGFloat {
         ShellBarMetrics.backgroundHeight + bottomNavigationContentPadding + 12
-    }
-
-    private var activeSheet: Binding<ActiveSheet?> {
-        Binding(
-            get: {
-                if viewModel.isPresentingAddExpense {
-                    return .addExpense
-                }
-
-                if viewModel.isPresentingBudgetWizard {
-                    return .budgetWizard
-                }
-
-                return nil
-            },
-            set: { newValue in
-                viewModel.isPresentingAddExpense = newValue == .addExpense
-                viewModel.isPresentingBudgetWizard = newValue == .budgetWizard
-            }
-        )
     }
 }
 

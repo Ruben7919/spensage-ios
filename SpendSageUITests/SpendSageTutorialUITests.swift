@@ -155,8 +155,9 @@ final class SpendSageTutorialUITests: XCTestCase {
         pause(0.9)
         back(app)
 
+        reveal(app.buttons["settings.link.legal"].firstMatch, in: app, maxSwipes: 1)
         tap(app.buttons["settings.link.legal"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Centro legal"].firstMatch.waitForExistence(timeout: 8))
+        XCTAssertTrue(element("legal.screen", in: app).waitForExistence(timeout: 8))
         pause(0.9)
         back(app)
 
