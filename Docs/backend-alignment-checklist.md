@@ -1,11 +1,11 @@
 # SpendSage Native Backend Alignment Checklist
 
-Updated: 2026-04-07
+Updated: 2026-04-08
 
 ## Verified now
 
-- [x] `spendsage` monorepo tests passed locally: backend `25/25`, `73/73`; mobile `16/16`; web `1/1`.
-- [x] Authenticated smoke checks passed against current dev API: `15/15` on `https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/`.
+- [x] `spendsage` backend tests passed locally on 2026-04-07: `26/26`, `76/76`.
+- [x] Authenticated smoke checks passed against current dev API: `18/18` on `https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/` with push register/test/unregister included.
 - [x] Native iOS app bundle now includes explicit backend config for the current dev API.
 - [x] Native iOS app now reads backend capabilities and billing entitlements when Cognito Hosted UI tokens are available.
 - [x] Native iOS settings/premium flows now expose cloud status for faster QA alignment.
@@ -13,6 +13,10 @@ Updated: 2026-04-07
 - [x] Current `dev` stack is deployed and now exposes CloudWatch ops dashboard `spendsage-dev-operations`.
 - [x] APNs `dev` key is stored in AWS Secrets Manager and `spendsage-dev-stack` now exposes `IosPushPlatformApplicationArn`.
 - [x] Authenticated `/devices/register` validation passed against `dev` with Cognito + SNS endpoint creation.
+- [x] Authenticated `/devices/test-push` route now exists for device-level delivery validation without waiting on budget alerts.
+- [x] Device re-registration against SNS now re-enables previously disabled APNs endpoints in `dev`.
+- [x] Authenticated finance bootstrap smoke passed against `dev` on 2026-04-07, including `/me/finance-bootstrap`, `/me/native-profile`, expense creation with `locationLabel`, and tester-plan overrides.
+- [x] App Store Connect monetization metadata now clears reviewability for all five SKUs, and version `1.0` includes them in `Compras dentro de la app y suscripciones`.
 
 ## Backend state by feature
 
@@ -27,20 +31,28 @@ Updated: 2026-04-07
 - [x] Async workers exist for invoice OCR, CSV import, outbound webhooks and account deletion.
 - [x] Updated pricing fallback/catalog changes are deployed to the current dev environment.
 - [x] APNs-backed iOS push registration is enabled in the current dev backend.
-- [ ] Pricing data is seeded in the current dev environment.
-- [ ] Push delivery is enabled in the mobile clients.
-- [ ] Native iOS app consumes shared cloud data beyond auth/capabilities.
-- [ ] Crash telemetry is wired end-to-end.
+- [x] Authenticated manual test-push dispatch exists in the backend and native iOS app.
+- [x] Pricing and launch promo data are seeded in the current dev environment.
+- [x] Push delivery is now validated on physical iPhone for the current TestFlight/dev-backed path.
+- [x] Native iOS app now consumes authenticated cloud finance bootstrap and native-profile state beyond auth/capabilities.
+- [x] Low-cost first-party crash/performance telemetry is wired end-to-end through MetricKit + `/me/telemetry`.
 - [x] Backend rollback-friendly API deployment retention and CloudWatch operational alarms exist in `dev`.
-- [ ] Real analytics pipeline exists beyond local event buffering.
+- [x] Low-cost first-party analytics sink exists beyond local event buffering through `/me/telemetry`.
+- [x] Native telemetry now feeds CloudWatch release-health graphs and a MetricKit diagnostic alarm in backend infra.
 
 ## Native iOS gaps still open
 
-- [ ] Remote expense/budget/account/bill/rule sync.
-- [ ] Shared family space browsing and invite acceptance UI.
-- [ ] Push permission flow, token registration and notification routing.
-- [ ] RevenueCat/App Store billing bridge.
-- [ ] Offline-first merge strategy between local ledger and shared cloud state.
+- [x] Remote bootstrap plus first-write sync exist for expenses, accounts, bills, rules, and native profile in authenticated sessions.
+- [x] Core bidirectional sync coverage now exists for expenses, accounts, bills, rules, and native profile.
+- [-] Explicit conflict UX and durable replay journal are still open.
+- [x] Shared family space browsing and invite acceptance UI now exist.
+- [x] Push permission flow and token registration now exist for iOS.
+- [x] Release builds now hide internal tester billing overrides.
+- [x] Native StoreKit 2 purchase and restore flows exist.
+- [x] Offline-first bootstrap merge now aligns local ledger and cloud state per authenticated session.
+- [x] Remote notification delivery is validated end-to-end on physical iPhone.
+- [ ] RevenueCat server sync remains optional and is not wired yet.
+- [ ] Full mutation journal / replay strategy is still open for resilient offline conflict recovery.
 - [ ] Cloud legal/support screens fed directly from backend/public endpoints.
 
 ## Infra and deploy blockers
@@ -48,7 +60,7 @@ Updated: 2026-04-07
 - [x] Current dev API is reachable publicly.
 - [x] AWS credentials are available on this machine.
 - [x] Safe deploy path exists from this machine with `npx aws-cdk` plus exported live Cognito env.
-- [ ] Pricing table has active plans in DynamoDB for `dev` (`0` live rows today; API currently uses fallback bootstrap).
+- [x] Pricing table has active plans in DynamoDB for `dev`.
 - [x] APNs credentials are loaded for iOS push in `dev`.
 - [ ] FCM credentials are loaded for Android push.
 - [ ] RevenueCat secrets are loaded for server sync.
@@ -56,14 +68,16 @@ Updated: 2026-04-07
 
 ## Recommended next implementations
 
-- [ ] Add a native `SpendSageAPI` layer for expenses, budgets, spaces, invites and billing.
-- [ ] Move the local ledger into a sync engine with conflict policy per entity.
+- [x] Add a native authenticated API layer for finance bootstrap, native profile, and first-write sync.
+- [x] Extend the native API layer to shared spaces, invites, and core finance mutation coverage.
+- [ ] Move the local ledger into a fuller sync engine with conflict policy per entity and replay journal.
 - [x] Wire APNs permission + token upload to `/devices/register`.
 - [ ] Add RevenueCat native SDK flow and map Cognito `sub` to `appUserId`.
-- [ ] Add Sentry or Crashlytics plus release health dashboards.
-- [ ] Add CloudWatch alarms, synthetic smoke gate and canary rollback strategy.
+- [x] Add richer release-health dashboards on top of the current first-party telemetry pipeline.
+- [-] Add CloudWatch alarms, synthetic smoke gate and rollback runbook. Full automated canary rollback remains open.
 - [ ] Consume `/public/billing-catalog` from native iOS so plan copy and entitlement IDs stop drifting.
 - [ ] Add feature flags so `dev`, `staging` and `prod` can diverge safely without recompiling.
+- [x] Add optional calendar reminder sync for recurring bills and optional expense location tagging with updated privacy copy.
 
 ## Nice to have
 

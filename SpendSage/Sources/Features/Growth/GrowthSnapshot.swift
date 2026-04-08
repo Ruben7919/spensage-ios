@@ -445,7 +445,7 @@ enum GrowthSnapshotBuilder {
         let isBudgetHealthy = transactionCount > 0 && utilization <= 1
         let profileCustomized = profile != .default
         let riskState: DashboardGrowthSnapshot.RiskState
-        let persistedProgress = GrowthProgressStore.load()
+        let persistedProgress = GrowthProgressStore.load(for: session)
 
         if transactionCount == 0 || utilization < 0.82 {
             riskState = .calm
@@ -578,7 +578,7 @@ enum GrowthSnapshotBuilder {
             budgetHealthy: isBudgetHealthy,
             profileCustomized: profileCustomized
         )
-        let syncedProgress = GrowthProgressStore.sync(trophies: trophies, missions: allMissions)
+        let syncedProgress = GrowthProgressStore.sync(for: session, trophies: trophies, missions: allMissions)
         let finalizedAllMissions = applyPersistedProgress(syncedProgress, to: allMissions)
         let finalizedTrophies = applyPersistedProgress(syncedProgress, to: trophies)
         let missions = visibleMissions(from: finalizedAllMissions, activeSeason: activeSeason)

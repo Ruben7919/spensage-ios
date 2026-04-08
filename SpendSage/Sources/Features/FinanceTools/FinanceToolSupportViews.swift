@@ -143,6 +143,7 @@ struct FinanceField: View {
     @Binding var text: String
     var keyboard: UIKeyboardType = .default
     var capitalization: TextInputAutocapitalization = .words
+    var accessibilityIdentifier: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -155,6 +156,7 @@ struct FinanceField: View {
                     .textInputAutocapitalization(capitalization)
                     .autocorrectionDisabled()
                     .padding()
+                    .accessibilityIdentifier(accessibilityIdentifier ?? "")
                 .background(BrandTheme.surfaceTint)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .overlay(
@@ -169,6 +171,7 @@ struct FinanceMultilineField: View {
     let label: String
     let placeholder: String
     @Binding var text: String
+    var accessibilityIdentifier: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -198,6 +201,7 @@ struct FinanceMultilineField: View {
                     .padding(.vertical, 8)
                     .foregroundStyle(BrandTheme.ink)
                     .background(Color.clear)
+                    .accessibilityIdentifier(accessibilityIdentifier ?? "")
             }
         }
     }

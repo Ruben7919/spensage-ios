@@ -91,15 +91,33 @@ final class AppViewModel: ObservableObject {
     @Published var backendStatusError: String?
     @Published var pushRegistrationStatus = PushRegistrationStatus()
     @Published var storeBillingState = StoreBillingState()
+    @Published var calendarSyncStatus = BillCalendarSyncStatus()
+    @Published var expenseLocationStatus = ExpenseLocationAuthorizationStatus.notDetermined
+    @Published var spaces: [SpaceSummary] = []
+    @Published var currentSpaceID: String?
+    @Published var familySharingModel: FamilySharingModel?
+    @Published var myInvites: [SpaceInvite] = []
+    @Published var spaceInvites: [SpaceInvite] = []
+    @Published var spaceMembers: [SpaceMember] = []
+    @Published var currentSpaceMember: SpaceMember?
+    @Published var lastCreatedInvite: CreateInviteResult?
+    @Published var sharingStatusError: String?
+    @Published var isRefreshingSharing = false
 
     private let authService: AuthServicing
     private let financeStore: FinanceDashboardStoring
     private let backendService: BackendServicing
     private let pushRegistrationService: PushRegistrationServicing
     private let storeBillingService: StoreBillingServicing
+    private let billCalendarSyncService: BillCalendarSyncServicing
+    private let expenseLocationService: ExpenseLocationServicing
+    private let selectedSpaceStore: SelectedSpaceStore
+    private let pendingInviteStore: PendingInviteStore
+    private let telemetryService: TelemetryServicing
     private let onboardingKey = "native_onboarding_completed"
     private let premiumStatusDefaultsKey = "native.premium.status"
     private let premiumPlanDefaultsKey = "native.premium.plan"
+    private let calendarBillSyncDefaultsKey = "native.settings.calendarBillSyncEnabled"
     private var queuedCelebrations: [GrowthCelebration] = []
     private var shouldPromptForReviewAfterCelebrations = false
     private var didBootstrapRememberedSession = false
@@ -109,20 +127,37 @@ final class AppViewModel: ObservableObject {
 
     init(
         authService: AuthServicing = DefaultAuthService.make(),
-        financeStore: FinanceDashboardStoring = LocalFinanceStore(),
+        financeStore: FinanceDashboardStoring? = nil,
         backendService: BackendServicing = DefaultBackendService.make(),
         pushRegistrationService: PushRegistrationServicing = DefaultPushRegistrationService.make(),
-        storeBillingService: StoreBillingServicing = DefaultStoreBillingService.make()
+        storeBillingService: StoreBillingServicing = DefaultStoreBillingService.make(),
+        billCalendarSyncService: BillCalendarSyncServicing = DefaultBillCalendarSyncService.make(),
+        expenseLocationService: ExpenseLocationServicing = DefaultExpenseLocationService.make(),
+        selectedSpaceStore: SelectedSpaceStore = SelectedSpaceStore(),
+        pendingInviteStore: PendingInviteStore = PendingInviteStore(),
+        telemetryService: TelemetryServicing? = nil
     ) {
         self.authService = authService
-        self.financeStore = financeStore
         self.backendService = backendService
         self.pushRegistrationService = pushRegistrationService
         self.storeBillingService = storeBillingService
+        self.billCalendarSyncService = billCalendarSyncService
+        self.expenseLocationService = expenseLocationService
+        self.selectedSpaceStore = selectedSpaceStore
+        self.pendingInviteStore = pendingInviteStore
+        self.telemetryService = telemetryService ?? DefaultTelemetryService.make(
+            authService: authService,
+            configuration: backendService.configuration
+        )
+        self.financeStore = financeStore ?? SyncedFinanceStore(
+            authService: authService,
+            backendConfiguration: backendService.configuration
+        )
         self.session = .signedOut
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: onboardingKey)
         self.selectedTab = .dashboard
         applyDebugLaunchOverrides()
+        self.telemetryService.start()
     }
 
     var authConfiguration: AuthConfiguration {
@@ -143,6 +178,23 @@ final class AppViewModel: ObservableObject {
 
     var subscriptionManagementURL: URL? {
         storeBillingService.managementURL()
+    }
+
+    var currentSpace: SpaceSummary? {
+        guard let currentSpaceID else { return nil }
+        return spaces.first(where: { $0.spaceId == currentSpaceID })
+    }
+
+    var currentSpaceRole: SpaceRole? {
+        familySharingModel?.permissions.callerRole ?? currentSpace?.role
+    }
+
+    var canManageCurrentSpaceMembers: Bool {
+        familySharingModel?.permissions.canManageMembers ?? false
+    }
+
+    var pendingInviteCode: String? {
+        pendingInviteStore.currentCode()
     }
 
     var accounts: [AccountRecord] {
@@ -181,43 +233,57 @@ final class AppViewModel: ObservableObject {
     func completeOnboarding() {
         hasCompletedOnboarding = true
         UserDefaults.standard.set(true, forKey: onboardingKey)
+        Task { await telemetryService.track("onboarding_completed", properties: [:]) }
     }
 
     func signIn(email: String, password: String) async throws {
         session = try await authService.signIn(email: email, password: password)
+        currentSpaceID = selectedSpaceStore.currentSpaceID(for: session)
         pendingProfileSetup = nil
         notice = nil
         requiresSessionUnlock = false
         sessionUnlockError = nil
         await refreshDashboard()
         await refreshBackendStatus(force: true)
+        await refreshSharingState(force: true)
         await refreshStoreBilling(force: true)
+        await telemetryService.track("auth_signed_in", properties: ["provider": "email"])
+        await telemetryService.flushIfPossible(session: session)
     }
 
     func createAccount(email: String, password: String) async throws {
         session = try await authService.createAccount(email: email, password: password)
+        currentSpaceID = selectedSpaceStore.currentSpaceID(for: session)
         pendingProfileSetup = nil
         notice = nil
         requiresSessionUnlock = false
         sessionUnlockError = nil
         await refreshDashboard()
         await refreshBackendStatus(force: true)
+        await refreshSharingState(force: true)
         await refreshStoreBilling(force: true)
+        await telemetryService.track("auth_account_created", properties: ["provider": "email"])
+        await telemetryService.flushIfPossible(session: session)
     }
 
     func signInWithSocial(_ provider: SocialProvider) async throws {
         session = try await authService.signInWithSocial(provider)
+        currentSpaceID = selectedSpaceStore.currentSpaceID(for: session)
         notice = AppLocalization.localized("Signed in with %@.", arguments: provider.displayName)
         requiresSessionUnlock = false
         sessionUnlockError = nil
         await refreshDashboard()
         await refreshBackendStatus(force: true)
+        await refreshSharingState(force: true)
         await refreshStoreBilling(force: true)
         pendingProfileSetup = makePendingProfileSetup(from: authService.consumeProfileSeed(), provider: provider)
+        await telemetryService.track("auth_signed_in", properties: ["provider": provider.rawValue.lowercased()])
+        await telemetryService.flushIfPossible(session: session)
     }
 
     func continueAsGuest() async {
         session = await authService.continueAsGuest()
+        currentSpaceID = nil
         notice = "Guest mode stays local on this device.".appLocalized
         await refreshDashboard()
         await refreshBackendStatus(force: true)
@@ -288,6 +354,8 @@ final class AppViewModel: ObservableObject {
         case .active:
             Task { await refreshPushRegistrationState() }
             Task { await refreshStoreBilling() }
+            Task { await refreshCalendarSyncState() }
+            Task { await refreshExpenseLocationState() }
 
             if !didBootstrapRememberedSession {
                 Task { await bootstrapRememberedSessionIfNeeded() }
@@ -351,6 +419,18 @@ final class AppViewModel: ObservableObject {
         backendStatus = nil
         backendStatusError = nil
         pushRegistrationStatus = PushRegistrationStatus()
+        calendarSyncStatus = BillCalendarSyncStatus()
+        expenseLocationStatus = .notDetermined
+        spaces = []
+        currentSpaceID = nil
+        familySharingModel = nil
+        myInvites = []
+        spaceInvites = []
+        spaceMembers = []
+        currentSpaceMember = nil
+        lastCreatedInvite = nil
+        sharingStatusError = nil
+        isRefreshingSharing = false
         isPresentingAddExpense = false
         isPresentingBudgetWizard = false
         scanFlowID = UUID()
@@ -383,7 +463,7 @@ final class AppViewModel: ObservableObject {
 
     func refreshDashboard() async {
         let previousGrowthSnapshot = growthSnapshot
-        let ledger = await financeStore.loadLedger(for: session)
+        let ledger = await financeStore.loadLedger(for: session, spaceID: currentSpaceID)
         let state = ledger.dashboardState()
         self.ledger = ledger
         dashboardState = state
@@ -397,6 +477,9 @@ final class AppViewModel: ObservableObject {
         if storeBillingState.products.isEmpty {
             await refreshStoreBilling()
         }
+        await refreshCalendarSyncState()
+        await refreshExpenseLocationState()
+        await telemetryService.flushIfPossible(session: session)
     }
 
     func storeProducts(for planID: String) -> [StoreCatalogProduct] {
@@ -490,6 +573,8 @@ final class AppViewModel: ObservableObject {
             applyStoreEntitlements(entitlements)
             notice = purchaseSuccessMessage(for: productID, entitlements: entitlements)
             await refreshBackendStatus(force: true)
+            await refreshSharingState(force: true)
+            await telemetryService.track("billing_purchase_succeeded", properties: ["productId": productID])
         } catch let error as StoreBillingError {
             handleStoreBillingError(error, productID: productID)
         } catch {
@@ -518,6 +603,11 @@ final class AppViewModel: ObservableObject {
                 ? "No se encontraron compras activas para restaurar en este Apple ID."
                 : "Compras restauradas desde App Store."
             await refreshBackendStatus(force: true)
+            await refreshSharingState(force: true)
+            await telemetryService.track(
+                "billing_restore_completed",
+                properties: ["activePlan": entitlements.activePlanKey?.rawValue ?? StorePlanKey.freeLocal.rawValue]
+            )
         } catch let error as StoreBillingError {
             storeBillingState.lastError = error.localizedDescription
             notice = error.localizedDescription
@@ -529,7 +619,11 @@ final class AppViewModel: ObservableObject {
         storeBillingState.isRestoring = false
     }
 
-    func refreshPushRegistrationState(lastError: String? = nil, isRegistering: Bool? = nil) async {
+    func refreshPushRegistrationState(
+        lastError: String? = nil,
+        isRegistering: Bool? = nil,
+        isSendingTestPush: Bool? = nil
+    ) async {
         let authorization = await pushRegistrationService.authorizationStatus()
         let cachedToken = pushRegistrationService.cachedToken()
         let marker = PushRegistrationPersistence.uploadMarker()
@@ -542,8 +636,82 @@ final class AppViewModel: ObservableObject {
             lastUploadedEnvironment: marker?.environmentName,
             lastUploadedEmail: marker?.email,
             lastError: lastError,
-            isRegistering: isRegistering ?? false
+            isRegistering: isRegistering ?? false,
+            isSendingTestPush: isSendingTestPush ?? false
         )
+    }
+
+    func refreshCalendarSyncState(lastError: String? = nil, isSyncing: Bool? = nil) async {
+        let authorization = await billCalendarSyncService.authorizationStatus()
+        let marker = BillCalendarSyncPersistence.marker(for: session)
+        calendarSyncStatus = BillCalendarSyncStatus(
+            authorization: authorization,
+            lastSyncedAt: marker?.syncedAt,
+            syncedBillCount: marker?.count,
+            lastError: lastError,
+            isSyncing: isSyncing ?? false
+        )
+    }
+
+    func refreshExpenseLocationState() async {
+        expenseLocationStatus = await expenseLocationService.authorizationStatus()
+    }
+
+    func requestExpenseLocationPermission() async {
+        do {
+            try await expenseLocationService.requestAuthorization()
+            notice = "Ubicación lista para etiquetar gastos cuando tú lo pidas."
+            await refreshExpenseLocationState()
+        } catch {
+            notice = error.localizedDescription
+            await refreshExpenseLocationState()
+        }
+    }
+
+    func captureCurrentExpenseLocation() async -> String? {
+        do {
+            let label = try await expenseLocationService.requestCurrentLocationLabel()
+            await refreshExpenseLocationState()
+            return label
+        } catch {
+            notice = error.localizedDescription
+            await refreshExpenseLocationState()
+            return nil
+        }
+    }
+
+    func syncBillsToCalendar() async {
+        guard let ledger else {
+            notice = "Todavía no hay un libro cargado para sincronizar facturas."
+            return
+        }
+
+        await refreshCalendarSyncState(isSyncing: true)
+        do {
+            let syncedCount = try await billCalendarSyncService.syncBills(bills, ledger: ledger, session: session)
+            notice = AppLocalization.localized("Calendario actualizado con %d recordatorios de facturas.", arguments: syncedCount)
+            await refreshCalendarSyncState()
+        } catch {
+            notice = error.localizedDescription
+            await refreshCalendarSyncState(lastError: error.localizedDescription)
+        }
+    }
+
+    func activateInternalTesterPlan(_ planID: InternalTesterPlanID) async {
+        guard let financeStore = financeStore as? FinanceCloudDebugControlling else {
+            notice = "Este build no tiene override interno de billing habilitado."
+            return
+        }
+
+        do {
+            try await financeStore.activateInternalTesterPlan(planID, for: session)
+            notice = AppLocalization.localized("Plan interno activo: %@.", arguments: planID.displayName)
+            await refreshBackendStatus(force: true)
+            await refreshSharingState(force: true)
+            await refreshDashboard()
+        } catch {
+            notice = error.localizedDescription
+        }
     }
 
     func chooseFreeLocalPlan() {
@@ -622,10 +790,12 @@ final class AppViewModel: ObservableObject {
 
         do {
             let token = try await pushRegistrationService.requestRemoteNotificationToken()
+            let apnsEnvironment = APNSEnvironment.current
             let request = BackendDeviceRegistrationRequest(
                 platform: "ios",
                 provider: "apns",
-                token: token
+                token: token,
+                apnsEnvironment: apnsEnvironment
             )
             _ = try await backendService.registerDevice(idToken: idToken, request: request)
 
@@ -636,11 +806,71 @@ final class AppViewModel: ObservableObject {
                 PushRegistrationPersistence.recordUpload(
                     token: token,
                     email: email,
-                    environmentName: environmentName
+                    environmentName: environmentName,
+                    apnsEnvironment: apnsEnvironment
                 )
             }
 
             notice = "Push activado y vinculado a tu cuenta en este iPhone."
+            await refreshPushRegistrationState()
+            await telemetryService.track(
+                "push_registered",
+                properties: [
+                    "provider": "apns",
+                    "apns_environment": apnsEnvironment.rawValue
+                ]
+            )
+            await telemetryService.flushIfPossible(session: session)
+        } catch {
+            let message = error.localizedDescription
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+        }
+    }
+
+    func sendTestPushNotification() async {
+        guard session.isAuthenticated else {
+            let message = "Inicia sesión antes de enviar un push de prueba."
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+            return
+        }
+
+        guard backendStatus?.capabilities.features.pushRegistration == true else {
+            let message = "El backend todavía no permite probar push para esta app."
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+            return
+        }
+
+        guard let token = pushRegistrationService.cachedToken(), !token.isEmpty else {
+            let message = "Primero registra este iPhone para push y vuelve a intentar."
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+            return
+        }
+
+        guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else {
+            let message = "No se pudo obtener un token válido de tu sesión."
+            notice = message
+            await refreshPushRegistrationState(lastError: message)
+            return
+        }
+
+        await refreshPushRegistrationState(isSendingTestPush: true)
+
+        do {
+            let apnsEnvironment = APNSEnvironment.current
+            let request = BackendDeviceTestPushRequest(
+                platform: "ios",
+                provider: "apns",
+                token: token,
+                apnsEnvironment: apnsEnvironment,
+                title: "SpendSage test",
+                body: "Si ves este aviso, APNs y SNS quedaron enlazados para este iPhone."
+            )
+            _ = try await backendService.sendTestPush(idToken: idToken, request: request)
+            notice = "Push de prueba enviado. Si este iPhone está activo y autorizado, debería llegar en pocos segundos."
             await refreshPushRegistrationState()
         } catch {
             let message = error.localizedDescription
@@ -650,6 +880,7 @@ final class AppViewModel: ObservableObject {
     }
 
     private func syncCachedPushRegistrationIfNeeded() async {
+        let apnsEnvironment = APNSEnvironment.current
         guard
             session.isAuthenticated,
             backendStatus?.capabilities.features.pushRegistration == true,
@@ -659,7 +890,12 @@ final class AppViewModel: ObservableObject {
             !idToken.isEmpty,
             let token = pushRegistrationService.cachedToken(),
             !token.isEmpty,
-            PushRegistrationPersistence.shouldUpload(token: token, email: email, environmentName: environmentName)
+            PushRegistrationPersistence.shouldUpload(
+                token: token,
+                email: email,
+                environmentName: environmentName,
+                apnsEnvironment: apnsEnvironment
+            )
         else {
             return
         }
@@ -668,13 +904,15 @@ final class AppViewModel: ObservableObject {
             let request = BackendDeviceRegistrationRequest(
                 platform: "ios",
                 provider: "apns",
-                token: token
+                token: token,
+                apnsEnvironment: apnsEnvironment
             )
             _ = try await backendService.registerDevice(idToken: idToken, request: request)
             PushRegistrationPersistence.recordUpload(
                 token: token,
                 email: email,
-                environmentName: environmentName
+                environmentName: environmentName,
+                apnsEnvironment: apnsEnvironment
             )
             await refreshPushRegistrationState()
         } catch {
@@ -699,9 +937,210 @@ final class AppViewModel: ObservableObject {
         let request = BackendDeviceRegistrationRequest(
             platform: "ios",
             provider: "apns",
-            token: token
+            token: token,
+            apnsEnvironment: APNSEnvironment.current
         )
         _ = try? await backendService.unregisterDevice(idToken: idToken, request: request)
+    }
+
+    func refreshSharingState(force: Bool = false) async {
+        guard session.isAuthenticated, backendService.configuration != nil else {
+            spaces = []
+            currentSpaceID = nil
+            familySharingModel = nil
+            myInvites = []
+            spaceInvites = []
+            spaceMembers = []
+            currentSpaceMember = nil
+            lastCreatedInvite = nil
+            sharingStatusError = nil
+            isRefreshingSharing = false
+            return
+        }
+
+        if !force, isRefreshingSharing {
+            return
+        }
+
+        guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else {
+            return
+        }
+
+        isRefreshingSharing = true
+        defer { isRefreshingSharing = false }
+
+        do {
+            let availableSpaces = try await backendService.listSpaces(idToken: idToken)
+            spaces = availableSpaces
+            myInvites = try await backendService.listInvites(idToken: idToken)
+
+            let persistedSpaceID = selectedSpaceStore.currentSpaceID(for: session)
+            let preferredSpaceID = currentSpaceID ?? persistedSpaceID ?? availableSpaces.first?.spaceId
+            let resolvedSpaceID = availableSpaces.contains(where: { $0.spaceId == preferredSpaceID })
+                ? preferredSpaceID
+                : availableSpaces.first?.spaceId
+
+            currentSpaceID = resolvedSpaceID
+            selectedSpaceStore.setCurrentSpaceID(resolvedSpaceID, for: session)
+
+            guard let resolvedSpaceID else {
+                familySharingModel = nil
+                spaceInvites = []
+                spaceMembers = []
+                currentSpaceMember = nil
+                sharingStatusError = nil
+                return
+            }
+
+            let resolvedFamilyModel = try await backendService.getFamilySharingModel(idToken: idToken, spaceID: resolvedSpaceID)
+            familySharingModel = resolvedFamilyModel
+            currentSpaceMember = try? await backendService.getSpaceMember(
+                idToken: idToken,
+                spaceID: resolvedSpaceID,
+                memberUserID: "me"
+            )
+
+            if resolvedFamilyModel.permissions.canManageMembers {
+                spaceMembers = try await backendService.listSpaceMembers(idToken: idToken, spaceID: resolvedSpaceID)
+                spaceInvites = try await backendService.listSpaceInvites(idToken: idToken, spaceID: resolvedSpaceID)
+            } else {
+                spaceMembers = currentSpaceMember.map { [$0] } ?? []
+                spaceInvites = []
+            }
+
+            sharingStatusError = nil
+        } catch {
+            sharingStatusError = error.localizedDescription
+        }
+    }
+
+    func selectSpace(_ spaceID: String) async {
+        guard spaces.contains(where: { $0.spaceId == spaceID }) else { return }
+        currentSpaceID = spaceID
+        selectedSpaceStore.setCurrentSpaceID(spaceID, for: session)
+        await telemetryService.track("sharing_space_selected", properties: ["spaceId": spaceID])
+        await refreshSharingState(force: true)
+        await refreshDashboard()
+    }
+
+    func createFamilyInvite(recipientEmail: String, role: SpaceRole, expiresInDays: Int?) async {
+        guard session.isAuthenticated else {
+            notice = "Inicia sesión antes de invitar a alguien."
+            return
+        }
+        guard let spaceID = currentSpaceID else {
+            notice = "No hay un espacio seleccionado para invitar miembros."
+            return
+        }
+        guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else {
+            notice = "No se pudo validar tu sesión cloud."
+            return
+        }
+
+        do {
+            let result = try await backendService.createInvite(
+                idToken: idToken,
+                input: CreateInviteInput(
+                    spaceId: spaceID,
+                    recipientEmail: recipientEmail,
+                    role: role,
+                    expiresInDays: expiresInDays
+                )
+            )
+            lastCreatedInvite = result
+            notice = "Invitación creada. Comparte el deep link o el correo del invitado."
+            await telemetryService.track("sharing_invite_created", properties: [
+                "spaceId": spaceID,
+                "role": role.rawValue
+            ])
+            await refreshSharingState(force: true)
+        } catch {
+            notice = error.localizedDescription
+        }
+    }
+
+    func acceptInvite(code: String) async {
+        guard session.isAuthenticated else {
+            notice = "Inicia sesión antes de aceptar una invitación."
+            return
+        }
+        let trimmed = code.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            notice = "Falta el código de invitación."
+            return
+        }
+        guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else {
+            notice = "No se pudo validar tu sesión cloud."
+            return
+        }
+
+        do {
+            let result = try await backendService.acceptInvite(idToken: idToken, code: trimmed)
+            pendingInviteStore.store(code: nil)
+            currentSpaceID = result.spaceId
+            selectedSpaceStore.setCurrentSpaceID(result.spaceId, for: session)
+            notice = "Invitación aceptada. Tu espacio compartido ya está activo."
+            await telemetryService.track("sharing_invite_accepted", properties: [
+                "spaceId": result.spaceId,
+                "role": result.role.rawValue
+            ])
+            await refreshSharingState(force: true)
+            await refreshDashboard()
+        } catch {
+            notice = error.localizedDescription
+        }
+    }
+
+    func updateSpaceMember(_ memberUserID: String, role: SpaceRole? = nil, notificationsEnabled: Bool? = nil) async {
+        guard let spaceID = currentSpaceID else { return }
+        guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else { return }
+        do {
+            try await backendService.updateSpaceMember(
+                idToken: idToken,
+                spaceID: spaceID,
+                memberUserID: memberUserID,
+                patch: UpdateSpaceMemberPatch(role: role, notificationsEnabled: notificationsEnabled)
+            )
+            await refreshSharingState(force: true)
+        } catch {
+            notice = error.localizedDescription
+        }
+    }
+
+    func removeSpaceMember(_ memberUserID: String) async {
+        guard let spaceID = currentSpaceID else { return }
+        guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else { return }
+        do {
+            let result = try await backendService.removeSpaceMember(idToken: idToken, spaceID: spaceID, memberUserID: memberUserID)
+            if result.left == true {
+                currentSpaceID = nil
+            }
+            await refreshSharingState(force: true)
+            await refreshDashboard()
+        } catch {
+            notice = error.localizedDescription
+        }
+    }
+
+    func revokeSpaceInvite(_ code: String) async {
+        guard let spaceID = currentSpaceID else { return }
+        guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else { return }
+        do {
+            try await backendService.revokeSpaceInvite(idToken: idToken, spaceID: spaceID, code: code)
+            await refreshSharingState(force: true)
+        } catch {
+            notice = error.localizedDescription
+        }
+    }
+
+    func handleIncomingURL(_ url: URL) {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
+        let host = components.host?.lowercased()
+        let path = components.path.lowercased()
+        guard host == "invite" || path == "/invite" else { return }
+        let code = components.queryItems?.first(where: { $0.name == "code" })?.value
+        pendingInviteStore.store(code: code)
+        notice = "Invitación detectada. Inicia sesión o entra a Spaces para aceptarla."
     }
 
     func presentAddExpense() {
@@ -726,7 +1165,7 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        await financeStore.saveExpense(draft, for: session)
+        await financeStore.saveExpense(draft, for: session, spaceID: currentSpaceID)
         if draft.category == .subscriptions, draft.recurringPlan != nil {
             notice = draft.recurringPlan?.autoRecord == true
                 ? "Suscripción guardada y lista para registrarse sola en cada renovación.".appLocalized
@@ -746,7 +1185,7 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        await financeStore.saveBudget(monthlyIncome: monthlyIncome, monthlyBudget: monthlyBudget, for: session)
+        await financeStore.saveBudget(monthlyIncome: monthlyIncome, monthlyBudget: monthlyBudget, for: session, spaceID: currentSpaceID)
         notice = "Budget updated locally on this device.".appLocalized
         isPresentingBudgetWizard = false
         await refreshDashboard()
@@ -758,19 +1197,30 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        await financeStore.saveAccount(draft, for: session)
+        await financeStore.saveAccount(draft, for: session, spaceID: currentSpaceID)
         notice = "Account saved locally on this device.".appLocalized
         await refreshDashboard()
     }
 
+    func updateAccount(_ accountID: UUID, draft: AccountDraft) async {
+        guard draft.isValid else {
+            notice = "Add an account name before saving.".appLocalized
+            return
+        }
+
+        await financeStore.updateAccount(accountID, draft: draft, for: session, spaceID: currentSpaceID)
+        notice = "Account updated for this space.".appLocalized
+        await refreshDashboard()
+    }
+
     func deleteAccount(_ accountID: UUID) async {
-        await financeStore.deleteAccount(accountID, for: session)
+        await financeStore.deleteAccount(accountID, for: session, spaceID: currentSpaceID)
         notice = "Account removed from your local ledger.".appLocalized
         await refreshDashboard()
     }
 
     func setPrimaryAccount(_ accountID: UUID) async {
-        await financeStore.setPrimaryAccount(accountID, for: session)
+        await financeStore.setPrimaryAccount(accountID, for: session, spaceID: currentSpaceID)
         notice = "Primary account updated locally on this device.".appLocalized
         await refreshDashboard()
     }
@@ -781,20 +1231,35 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        await financeStore.saveBill(draft, for: session)
+        await financeStore.saveBill(draft, for: session, spaceID: currentSpaceID)
         notice = "Recurring bill saved locally on this device.".appLocalized
+        await syncBillsToCalendarIfEnabled()
+        await refreshDashboard()
+    }
+
+    func updateBill(_ billID: UUID, draft: BillDraft) async {
+        guard draft.isValid else {
+            notice = "Add a bill title, amount, and due day.".appLocalized
+            return
+        }
+
+        await financeStore.updateBill(billID, draft: draft, for: session, spaceID: currentSpaceID)
+        notice = "Recurring bill updated for this space.".appLocalized
+        await syncBillsToCalendarIfEnabled()
         await refreshDashboard()
     }
 
     func deleteBill(_ billID: UUID) async {
-        await financeStore.deleteBill(billID, for: session)
+        await financeStore.deleteBill(billID, for: session, spaceID: currentSpaceID)
         notice = "Recurring bill removed from your local ledger.".appLocalized
+        await syncBillsToCalendarIfEnabled()
         await refreshDashboard()
     }
 
     func toggleBillAutopay(_ billID: UUID) async {
-        await financeStore.toggleBillAutopay(billID, for: session)
+        await financeStore.toggleBillAutopay(billID, for: session, spaceID: currentSpaceID)
         notice = "Bill autopay updated locally on this device.".appLocalized
+        await syncBillsToCalendarIfEnabled()
         await refreshDashboard()
     }
 
@@ -804,26 +1269,38 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        await financeStore.saveRule(draft, for: session)
+        await financeStore.saveRule(draft, for: session, spaceID: currentSpaceID)
         notice = "Rule saved locally on this device.".appLocalized
         await refreshDashboard()
     }
 
+    func updateRule(_ ruleID: UUID, draft: RuleDraft) async {
+        guard draft.isValid else {
+            notice = "Agrega una palabra clave del comercio antes de guardar una regla.".appLocalized
+            return
+        }
+
+        await financeStore.updateRule(ruleID, draft: draft, for: session, spaceID: currentSpaceID)
+        notice = "Rule updated for this space.".appLocalized
+        await refreshDashboard()
+    }
+
     func deleteRule(_ ruleID: UUID) async {
-        await financeStore.deleteRule(ruleID, for: session)
+        await financeStore.deleteRule(ruleID, for: session, spaceID: currentSpaceID)
         notice = "Rule removed from your local ledger.".appLocalized
         await refreshDashboard()
     }
 
     func toggleRuleEnabled(_ ruleID: UUID) async {
-        await financeStore.toggleRuleEnabled(ruleID, for: session)
+        await financeStore.toggleRuleEnabled(ruleID, for: session, spaceID: currentSpaceID)
         notice = "Rule activity updated locally on this device.".appLocalized
         await refreshDashboard()
     }
 
     func payBill(_ billID: UUID) async {
-        await financeStore.markBillPaid(billID, for: session)
+        await financeStore.markBillPaid(billID, for: session, spaceID: currentSpaceID)
         notice = "Bill payment saved to your local ledger.".appLocalized
+        await syncBillsToCalendarIfEnabled()
         await refreshDashboard()
     }
 
@@ -833,13 +1310,13 @@ final class AppViewModel: ObservableObject {
             return
         }
 
-        await financeStore.importExpenses(drafts, for: session)
+        await financeStore.importExpenses(drafts, for: session, spaceID: currentSpaceID)
         notice = AppLocalization.localized("%d expenses imported into your local ledger.", arguments: drafts.count)
         await refreshDashboard()
     }
 
     func saveProfile(_ profile: ProfileRecord) async {
-        await financeStore.saveProfile(profile, for: session)
+        await financeStore.saveProfile(profile, for: session, spaceID: currentSpaceID)
         if !profile.needsWelcomeProfile(for: session.emailAddress) {
             pendingProfileSetup = nil
         }
@@ -963,6 +1440,11 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    private func syncBillsToCalendarIfEnabled() async {
+        guard UserDefaults.standard.bool(forKey: calendarBillSyncDefaultsKey) else { return }
+        await syncBillsToCalendar()
+    }
+
     private func restoreRememberedSession() async {
         isRestoringRememberedSession = true
         defer { isRestoringRememberedSession = false }
@@ -975,11 +1457,14 @@ final class AppViewModel: ObservableObject {
         }
 
         session = restoredSession
+        currentSpaceID = selectedSpaceStore.currentSpaceID(for: restoredSession)
         notice = nil
         requiresSessionUnlock = false
         sessionUnlockError = nil
         await refreshDashboard()
         await refreshBackendStatus(force: true)
+        await refreshSharingState(force: true)
+        await refreshStoreBilling(force: true)
 
         if let provider = restoredSession.socialProvider {
             pendingProfileSetup = makePendingProfileSetup(from: authService.consumeProfileSeed(), provider: provider)
@@ -1083,6 +1568,7 @@ final class AppViewModel: ObservableObject {
 
         if session.isAuthenticated {
             didBootstrapRememberedSession = true
+            currentSpaceID = selectedSpaceStore.currentSpaceID(for: session)
         }
     }
 

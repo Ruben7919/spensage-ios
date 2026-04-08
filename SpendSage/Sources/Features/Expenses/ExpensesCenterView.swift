@@ -10,6 +10,10 @@ struct ExpensesCenterView: View {
         viewModel.ledger
     }
 
+    private var expandsToolsForUITests: Bool {
+        ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_EXPAND_EXPENSES_TOOLS"] == "1"
+    }
+
     private var expenseRecords: [ExpenseRecord] {
         (ledger?.expenses ?? []).sorted { $0.date > $1.date }
     }
@@ -85,6 +89,7 @@ struct ExpensesCenterView: View {
             .padding(.top, 18)
             .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
+        .accessibilityIdentifier("expenses.screen")
         .background(
             ZStack {
                 BrandTheme.canvas
@@ -160,11 +165,13 @@ struct ExpensesCenterView: View {
                         viewModel.presentAddExpense()
                     }
                     .buttonStyle(PrimaryCTAStyle())
+                    .accessibilityIdentifier("expenses.action.add")
 
                     Button("Escanear recibo") {
                         viewModel.startScanFlow()
                     }
                     .buttonStyle(SecondaryCTAStyle())
+                    .accessibilityIdentifier("expenses.action.scan")
                 }
 
                 BrandBadge(
@@ -348,7 +355,9 @@ struct ExpensesCenterView: View {
             title: "Más herramientas",
             summary: "Escanear queda a un toque. Cuentas, reglas, facturas, importaciones y el asistente se quedan plegados hasta que los necesites.",
             character: .manchas,
-            expression: .thinking
+            expression: .thinking,
+            initiallyExpanded: expandsToolsForUITests,
+            accessibilityIdentifier: "expenses.disclosure.tools"
         ) {
             toolsHubContent
         }
@@ -366,6 +375,7 @@ struct ExpensesCenterView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("expenses.tool.scan")
 
             NavigationLink {
                 FinanceCsvImportToolView(viewModel: viewModel)
@@ -376,6 +386,7 @@ struct ExpensesCenterView: View {
                     systemImage: "square.and.arrow.down.on.square.fill"
                 )
             }
+            .accessibilityIdentifier("expenses.tool.csv")
 
             NavigationLink {
                 FinanceAccountsToolView(viewModel: viewModel)
@@ -386,6 +397,7 @@ struct ExpensesCenterView: View {
                     systemImage: "wallet.pass.fill"
                 )
             }
+            .accessibilityIdentifier("expenses.tool.accounts")
 
             NavigationLink {
                 FinanceBillsToolView(viewModel: viewModel)
@@ -396,6 +408,7 @@ struct ExpensesCenterView: View {
                     systemImage: "calendar.badge.clock"
                 )
             }
+            .accessibilityIdentifier("expenses.tool.bills")
 
             NavigationLink {
                 FinanceRulesToolView(viewModel: viewModel)
@@ -406,11 +419,13 @@ struct ExpensesCenterView: View {
                     systemImage: "slider.horizontal.3"
                 )
             }
+            .accessibilityIdentifier("expenses.tool.rules")
 
             Button("Abrir asistente de presupuesto") {
                 viewModel.presentBudgetWizard()
             }
             .buttonStyle(SecondaryCTAStyle())
+            .accessibilityIdentifier("expenses.action.budgetWizard")
         }
     }
 

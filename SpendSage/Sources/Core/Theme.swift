@@ -177,8 +177,14 @@ private extension BrandPalette {
             light: UIColor(red: 0.98, green: 0.99, blue: 1.0, alpha: 1),
             dark: UIColor(red: 0.12, green: 0.18, blue: 0.20, alpha: 1)
         ),
-        guideArtworkStart: Color(red: 0.98, green: 0.99, blue: 1.0),
-        guideArtworkEnd: Color(red: 0.93, green: 0.96, blue: 0.99),
+        guideArtworkStart: Color.adaptive(
+            light: UIColor(red: 0.98, green: 0.99, blue: 1.0, alpha: 1),
+            dark: UIColor(red: 0.11, green: 0.16, blue: 0.21, alpha: 1)
+        ),
+        guideArtworkEnd: Color.adaptive(
+            light: UIColor(red: 0.93, green: 0.96, blue: 0.99, alpha: 1),
+            dark: UIColor(red: 0.08, green: 0.12, blue: 0.17, alpha: 1)
+        ),
         heroStart: Color.adaptive(
             light: UIColor(red: 0.08, green: 0.45, blue: 0.45, alpha: 0.96),
             dark: UIColor(red: 0.48, green: 0.87, blue: 0.84, alpha: 0.92)
@@ -340,10 +346,12 @@ struct SurfaceCard<Content: View>: View {
                         )
                     )
                     .padding(1)
+                    .allowsHitTesting(false)
             }
             .overlay(
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .stroke(BrandTheme.line.opacity(0.7), lineWidth: 1)
+                    .allowsHitTesting(false)
             )
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             .shadow(color: BrandTheme.shadow.opacity(0.1), radius: 22, x: 0, y: 12)

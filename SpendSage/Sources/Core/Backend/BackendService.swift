@@ -67,10 +67,49 @@ struct BackendRuntimeStatus: Equatable {
     let entitlements: BackendEntitlements?
 }
 
+enum APNSEnvironment: String, Codable, Equatable {
+    case sandbox
+    case production
+
+    static var current: APNSEnvironment {
+        #if DEBUG
+        return .sandbox
+        #else
+        return .production
+        #endif
+    }
+}
+
 struct BackendDeviceRegistrationRequest: Encodable, Equatable {
     let platform: String
     let provider: String
     let token: String
+    let apnsEnvironment: APNSEnvironment
+
+    private enum CodingKeys: String, CodingKey {
+        case platform
+        case provider
+        case token
+        case apnsEnvironment = "environment"
+    }
+}
+
+struct BackendDeviceTestPushRequest: Encodable, Equatable {
+    let platform: String
+    let provider: String
+    let token: String
+    let apnsEnvironment: APNSEnvironment
+    let title: String?
+    let body: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case platform
+        case provider
+        case token
+        case apnsEnvironment = "environment"
+        case title
+        case body
+    }
 }
 
 struct BackendDeviceRecord: Codable, Equatable {
@@ -93,12 +132,35 @@ struct BackendDeviceUnregistrationResult: Codable, Equatable {
     let existed: Bool
 }
 
+struct BackendDeviceTestPushResult: Codable, Equatable {
+    let sent: Bool
+    let endpointArn: String?
+    let messageId: String?
+}
+
+struct BackendSpaceMemberDeleteResult: Codable, Equatable {
+    let removed: Bool?
+    let left: Bool?
+}
+
 @MainActor
 protocol BackendServicing {
     var configuration: BackendConfiguration? { get }
     func fetchStatus(idToken: String?) async throws -> BackendRuntimeStatus
     func registerDevice(idToken: String, request: BackendDeviceRegistrationRequest) async throws -> BackendDeviceRegistrationResult
+    func sendTestPush(idToken: String, request: BackendDeviceTestPushRequest) async throws -> BackendDeviceTestPushResult
     func unregisterDevice(idToken: String, request: BackendDeviceRegistrationRequest) async throws -> BackendDeviceUnregistrationResult
+    func listSpaces(idToken: String) async throws -> [SpaceSummary]
+    func getFamilySharingModel(idToken: String, spaceID: String) async throws -> FamilySharingModel
+    func listInvites(idToken: String) async throws -> [SpaceInvite]
+    func createInvite(idToken: String, input: CreateInviteInput) async throws -> CreateInviteResult
+    func acceptInvite(idToken: String, code: String) async throws -> AcceptInviteResult
+    func listSpaceMembers(idToken: String, spaceID: String) async throws -> [SpaceMember]
+    func listSpaceInvites(idToken: String, spaceID: String) async throws -> [SpaceInvite]
+    func getSpaceMember(idToken: String, spaceID: String, memberUserID: String) async throws -> SpaceMember
+    func updateSpaceMember(idToken: String, spaceID: String, memberUserID: String, patch: UpdateSpaceMemberPatch) async throws
+    func removeSpaceMember(idToken: String, spaceID: String, memberUserID: String) async throws -> BackendSpaceMemberDeleteResult
+    func revokeSpaceInvite(idToken: String, spaceID: String, code: String) async throws
 }
 
 enum DefaultBackendService {
@@ -150,6 +212,57 @@ private struct BackendDeviceUnregistrationEnvelope: Decodable {
     let existed: Bool
 }
 
+private struct BackendDeviceTestPushEnvelope: Decodable {
+    let sent: Bool
+    let endpointArn: String?
+    let messageId: String?
+}
+
+private struct BackendSpacesEnvelope: Decodable {
+    let spaces: [SpaceSummary]
+}
+
+private struct BackendFamilyModelEnvelope: Decodable {
+    let model: FamilySharingModel
+}
+
+private struct BackendInvitesEnvelope: Decodable {
+    let invites: [SpaceInvite]
+}
+
+private struct BackendInviteCreateEnvelope: Decodable {
+    let invite: SpaceInvite
+    let deepLink: String
+    let webLink: String?
+}
+
+private struct BackendInviteAcceptEnvelope: Decodable {
+    let accepted: Bool
+    let spaceId: String
+    let role: SpaceRole
+}
+
+private struct BackendMembersEnvelope: Decodable {
+    let members: [SpaceMember]
+}
+
+private struct BackendMemberEnvelope: Decodable {
+    let member: SpaceMember
+}
+
+private struct BackendUpdatedEnvelope: Decodable {
+    let updated: Bool
+}
+
+private struct BackendRevokedEnvelope: Decodable {
+    let revoked: Bool
+}
+
+private struct BackendRemovedEnvelope: Decodable {
+    let removed: Bool?
+    let left: Bool?
+}
+
 @MainActor
 final class LiveBackendService: BackendServicing {
     let configuration: BackendConfiguration?
@@ -179,6 +292,21 @@ final class LiveBackendService: BackendServicing {
         return BackendDeviceRegistrationResult(registered: response.registered, device: response.device)
     }
 
+    func sendTestPush(
+        idToken: String,
+        request testPushRequest: BackendDeviceTestPushRequest
+    ) async throws -> BackendDeviceTestPushResult {
+        let body = try BackendJSON.encoder.encode(testPushRequest)
+        let request = try makeRequest(
+            path: "/devices/test-push",
+            method: "POST",
+            idToken: idToken,
+            body: body
+        )
+        let response = try await perform(request, as: BackendDeviceTestPushEnvelope.self)
+        return BackendDeviceTestPushResult(sent: response.sent, endpointArn: response.endpointArn, messageId: response.messageId)
+    }
+
     func unregisterDevice(
         idToken: String,
         request registrationRequest: BackendDeviceRegistrationRequest
@@ -192,6 +320,115 @@ final class LiveBackendService: BackendServicing {
         )
         let response = try await perform(request, as: BackendDeviceUnregistrationEnvelope.self)
         return BackendDeviceUnregistrationResult(unregistered: response.unregistered, existed: response.existed)
+    }
+
+    func listSpaces(idToken: String) async throws -> [SpaceSummary] {
+        let response = try await requestJSON(path: "/spaces", idToken: idToken, as: BackendSpacesEnvelope.self)
+        return response.spaces
+    }
+
+    func getFamilySharingModel(idToken: String, spaceID: String) async throws -> FamilySharingModel {
+        let response = try await requestJSON(
+            path: "/spaces/\(spaceID)/family-model",
+            idToken: idToken,
+            as: BackendFamilyModelEnvelope.self
+        )
+        return response.model
+    }
+
+    func listInvites(idToken: String) async throws -> [SpaceInvite] {
+        let response = try await requestJSON(path: "/spaces/invites", idToken: idToken, as: BackendInvitesEnvelope.self)
+        return response.invites
+    }
+
+    func createInvite(idToken: String, input: CreateInviteInput) async throws -> CreateInviteResult {
+        let body = try BackendJSON.encoder.encode(input)
+        let request = try makeRequest(
+            path: "/spaces/invites",
+            method: "POST",
+            idToken: idToken,
+            body: body
+        )
+        let response = try await perform(request, as: BackendInviteCreateEnvelope.self)
+        return CreateInviteResult(invite: response.invite, deepLink: response.deepLink, webLink: response.webLink)
+    }
+
+    func acceptInvite(idToken: String, code: String) async throws -> AcceptInviteResult {
+        let body = try BackendJSON.encoder.encode(["code": code])
+        let request = try makeRequest(
+            path: "/spaces/invites/accept",
+            method: "POST",
+            idToken: idToken,
+            body: body
+        )
+        let response = try await perform(request, as: BackendInviteAcceptEnvelope.self)
+        return AcceptInviteResult(accepted: response.accepted, spaceId: response.spaceId, role: response.role)
+    }
+
+    func listSpaceMembers(idToken: String, spaceID: String) async throws -> [SpaceMember] {
+        let response = try await requestJSON(
+            path: "/spaces/\(spaceID)/members",
+            idToken: idToken,
+            as: BackendMembersEnvelope.self
+        )
+        return response.members
+    }
+
+    func listSpaceInvites(idToken: String, spaceID: String) async throws -> [SpaceInvite] {
+        let response = try await requestJSON(
+            path: "/spaces/\(spaceID)/invites",
+            idToken: idToken,
+            as: BackendInvitesEnvelope.self
+        )
+        return response.invites
+    }
+
+    func getSpaceMember(idToken: String, spaceID: String, memberUserID: String) async throws -> SpaceMember {
+        let response = try await requestJSON(
+            path: "/spaces/\(spaceID)/members/\(memberUserID)",
+            idToken: idToken,
+            as: BackendMemberEnvelope.self
+        )
+        return response.member
+    }
+
+    func updateSpaceMember(
+        idToken: String,
+        spaceID: String,
+        memberUserID: String,
+        patch: UpdateSpaceMemberPatch
+    ) async throws {
+        let body = try BackendJSON.encoder.encode(patch)
+        let request = try makeRequest(
+            path: "/spaces/\(spaceID)/members/\(memberUserID)",
+            method: "PATCH",
+            idToken: idToken,
+            body: body
+        )
+        _ = try await perform(request, as: BackendUpdatedEnvelope.self)
+    }
+
+    func removeSpaceMember(
+        idToken: String,
+        spaceID: String,
+        memberUserID: String
+    ) async throws -> BackendSpaceMemberDeleteResult {
+        let request = try makeRequest(
+            path: "/spaces/\(spaceID)/members/\(memberUserID)",
+            method: "DELETE",
+            idToken: idToken
+        )
+        let response = try await perform(request, as: BackendRemovedEnvelope.self)
+        return BackendSpaceMemberDeleteResult(removed: response.removed, left: response.left)
+    }
+
+    func revokeSpaceInvite(idToken: String, spaceID: String, code: String) async throws {
+        let request = try makeRequest(
+            path: "/spaces/\(spaceID)/invites/\(code)",
+            method: "DELETE",
+            idToken: idToken
+        )
+        _ = try await perform(request, as: BackendRevokedEnvelope.self)
     }
 
     private func fetchCapabilities(idToken: String?) async throws -> BackendCapabilities {
@@ -306,7 +543,55 @@ struct PreviewBackendService: BackendServicing {
         throw BackendServiceError.configurationMissing
     }
 
+    func sendTestPush(idToken: String, request: BackendDeviceTestPushRequest) async throws -> BackendDeviceTestPushResult {
+        throw BackendServiceError.configurationMissing
+    }
+
     func unregisterDevice(idToken: String, request: BackendDeviceRegistrationRequest) async throws -> BackendDeviceUnregistrationResult {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func listSpaces(idToken: String) async throws -> [SpaceSummary] {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func getFamilySharingModel(idToken: String, spaceID: String) async throws -> FamilySharingModel {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func listInvites(idToken: String) async throws -> [SpaceInvite] {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func createInvite(idToken: String, input: CreateInviteInput) async throws -> CreateInviteResult {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func acceptInvite(idToken: String, code: String) async throws -> AcceptInviteResult {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func listSpaceMembers(idToken: String, spaceID: String) async throws -> [SpaceMember] {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func listSpaceInvites(idToken: String, spaceID: String) async throws -> [SpaceInvite] {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func getSpaceMember(idToken: String, spaceID: String, memberUserID: String) async throws -> SpaceMember {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func updateSpaceMember(idToken: String, spaceID: String, memberUserID: String, patch: UpdateSpaceMemberPatch) async throws {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func removeSpaceMember(idToken: String, spaceID: String, memberUserID: String) async throws -> BackendSpaceMemberDeleteResult {
+        throw BackendServiceError.configurationMissing
+    }
+
+    func revokeSpaceInvite(idToken: String, spaceID: String, code: String) async throws {
         throw BackendServiceError.configurationMissing
     }
 }

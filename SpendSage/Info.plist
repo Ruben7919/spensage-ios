@@ -39,8 +39,12 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Scan receipts and capture supporting images.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Create optional due-date reminders for your recurring bills.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Unlock your saved SpendSage account quickly and securely.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Tag an expense with your current place only when you ask SpendSage to do it.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Save exported images and documents.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -57,6 +61,8 @@
 	<string>https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/</string>
 	<key>SpendSageEnvironmentName</key>
 	<string>dev</string>
+	<key>SpendSageInternalTestingEnabled</key>
+	<string>$(SPENDSAGE_INTERNAL_TESTING_ENABLED)</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

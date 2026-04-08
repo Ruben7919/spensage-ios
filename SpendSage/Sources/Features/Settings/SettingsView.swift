@@ -44,6 +44,7 @@ struct SettingsView: View {
             .padding(.top, 20)
             .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
+        .accessibilityIdentifier("settings.screen")
         .background(FinanceScreenBackground())
         .sheet(isPresented: $showingGuideReplay) {
             GuideSheet(guide: GuideLibrary.guide(.dashboard))
@@ -126,6 +127,7 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.preferences")
 
                 NavigationLink {
                     SettingsNotificationsView(viewModel: viewModel)
@@ -137,11 +139,13 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.notifications")
 
                 Button("Abrir asistente de presupuesto") {
                     viewModel.presentBudgetWizard()
                 }
                 .buttonStyle(PrimaryCTAStyle())
+                .accessibilityIdentifier("settings.action.budgetWizard")
             }
         }
     }
@@ -183,6 +187,7 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.profile")
 
                 NavigationLink {
                     PremiumView(viewModel: viewModel)
@@ -194,6 +199,19 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.plans")
+
+                NavigationLink {
+                    SharedSpacesView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Spaces y familia",
+                        summary: "Selecciona espacios, invita miembros y administra el plan compartido.",
+                        systemImage: "person.3.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.spaces")
 
                 NavigationLink {
                     HelpCenterView(viewModel: viewModel)
@@ -205,6 +223,7 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.help")
 
                 NavigationLink {
                     SupportCenterView(viewModel: viewModel)
@@ -216,6 +235,7 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.support")
 
                 NavigationLink {
                     LegalCenterView()
@@ -227,6 +247,7 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.legal")
             }
         }
     }
@@ -248,6 +269,7 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.advanced")
 
                 if debugOverlayEnabled {
                     NavigationLink {
@@ -346,6 +368,7 @@ private struct SettingsPreferencesView: View {
 private struct SettingsNotificationsView: View {
     @ObservedObject var viewModel: AppViewModel
     @Environment(\.openURL) private var openURL
+    @AppStorage("native.settings.calendarBillSyncEnabled") private var calendarBillSyncEnabled = false
     @AppStorage("native.settings.reminders") private var remindersEnabled = true
     @AppStorage("native.settings.sound") private var soundStyle = "playful"
     @AppStorage("native.settings.quietHoursEnabled") private var quietHoursEnabled = true
@@ -421,6 +444,17 @@ private struct SettingsNotificationsView: View {
                                 || viewModel.pushRegistrationStatus.isRegistering
                         )
 
+                        Button("Enviar push de prueba") {
+                            Task { await viewModel.sendTestPushNotification() }
+                        }
+                        .buttonStyle(SecondaryCTAStyle())
+                        .disabled(
+                            !viewModel.session.isAuthenticated
+                                || !viewModel.pushRegistrationStatus.backendEnabled
+                                || viewModel.pushRegistrationStatus.cachedTokenSuffix == nil
+                                || viewModel.pushRegistrationStatus.isSendingTestPush
+                        )
+
                         if viewModel.pushRegistrationStatus.authorization == .denied {
                             Button("Abrir ajustes del sistema") {
                                 guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
@@ -433,7 +467,74 @@ private struct SettingsNotificationsView: View {
                             Text("La cuenta es obligatoria para registrar este iPhone contra `/devices/register`.")
                                 .font(.footnote)
                                 .foregroundStyle(BrandTheme.muted)
+                        } else {
+                            Text("Si no usaste la app o no cruzaste alertas de presupuesto, es normal no recibir pushes todavía. Usa el push de prueba para validar entrega.")
+                                .font(.footnote)
+                                .foregroundStyle(BrandTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
+                    }
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Calendario y ubicación")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        SettingsToggleRow(
+                            title: "Sincronizar facturas con Calendario",
+                            summary: "Crea recordatorios opcionales para tus facturas recurrentes usando el calendario del iPhone.",
+                            isOn: $calendarBillSyncEnabled
+                        )
+
+                        Divider()
+
+                        BrandFeatureRow(
+                            systemImage: viewModel.calendarSyncStatus.authorization.systemImage,
+                            title: "Permiso de Calendario",
+                            detail: viewModel.calendarSyncStatus.authorization.summary
+                        )
+
+                        if let lastSyncedAt = viewModel.calendarSyncStatus.lastSyncedAt {
+                            BrandFeatureRow(
+                                systemImage: "checkmark.seal.fill",
+                                title: "Última sincronización",
+                                detail: "Se actualizaron \(viewModel.calendarSyncStatus.syncedBillCount ?? 0) facturas el \(lastSyncedAt.formatted(date: .abbreviated, time: .shortened))."
+                            )
+                        }
+
+                        Button("Sincronizar facturas ahora") {
+                            Task { await viewModel.syncBillsToCalendar() }
+                        }
+                        .buttonStyle(PrimaryCTAStyle())
+                        .disabled(viewModel.calendarSyncStatus.isSyncing)
+
+                        Divider()
+
+                        BrandFeatureRow(
+                            systemImage: viewModel.expenseLocationStatus.systemImage,
+                            title: "Permiso de ubicación",
+                            detail: viewModel.expenseLocationStatus.summary
+                        )
+
+                        Button("Permitir ubicación para etiquetar gastos") {
+                            Task { await viewModel.requestExpenseLocationPermission() }
+                        }
+                        .buttonStyle(SecondaryCTAStyle())
+
+                        if viewModel.calendarSyncStatus.authorization == .denied || viewModel.expenseLocationStatus == .denied {
+                            Button("Abrir ajustes del sistema") {
+                                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                                openURL(url)
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                        }
+
+                        Text("SpendSage no usa ubicación en background. La ubicación solo se consulta cuando tú eliges etiquetar un gasto y el calendario solo se toca para recordatorios de facturas.")
+                            .font(.footnote)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
 
@@ -652,6 +753,7 @@ private struct SettingsNavigationRow: View {
                 .padding(.top, 6)
         }
         .padding(.vertical, 2)
+        .contentShape(Rectangle())
     }
 }
 

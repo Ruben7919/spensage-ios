@@ -30,13 +30,6 @@ struct AuthView: View {
     @State private var infoMessage: String?
     @FocusState private var focusedField: Field?
 
-    private var pendingInviteCode: String? {
-        let value = UserDefaults.standard.string(forKey: "native.pendingInviteCode")?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let value, !value.isEmpty else { return nil }
-        return value
-    }
-
     private var authStory: BrandNarrativeSpec {
         BrandStoryCatalog.spec(for: .auth)
     }
@@ -49,7 +42,7 @@ struct AuthView: View {
                     languagePicker
                 }
 
-                if pendingInviteCode != nil {
+                if viewModel.pendingInviteCode != nil {
                     invitePendingCard
                 }
 

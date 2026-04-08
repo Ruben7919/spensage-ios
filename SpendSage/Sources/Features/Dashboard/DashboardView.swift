@@ -43,6 +43,7 @@ struct DashboardView: View {
             .padding(.top, 18)
             .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
+        .accessibilityIdentifier("dashboard.screen")
         .background(FinanceScreenBackground())
         .navigationTitle("Inicio")
         .navigationBarTitleDisplayMode(.inline)
@@ -106,11 +107,13 @@ struct DashboardView: View {
                 viewModel.presentAddExpense()
             }
             .buttonStyle(PrimaryCTAStyle())
+            .accessibilityIdentifier("dashboard.action.addExpense")
 
             Button("Asistente de presupuesto") {
                 viewModel.presentBudgetWizard()
             }
             .buttonStyle(SecondaryCTAStyle())
+            .accessibilityIdentifier("dashboard.action.budgetWizard")
 
             guideButton
         }

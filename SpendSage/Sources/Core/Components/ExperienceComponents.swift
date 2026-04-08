@@ -202,6 +202,7 @@ struct ExperienceDisclosureCard<Content: View>: View {
     let summary: String
     let character: BrandCharacterID
     let expression: BrandExpression
+    let accessibilityIdentifier: String?
     @State private var isExpanded: Bool
     @ViewBuilder var content: Content
 
@@ -211,40 +212,52 @@ struct ExperienceDisclosureCard<Content: View>: View {
         character: BrandCharacterID,
         expression: BrandExpression = .thinking,
         initiallyExpanded: Bool = false,
+        accessibilityIdentifier: String? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
         self.summary = summary
         self.character = character
         self.expression = expression
+        self.accessibilityIdentifier = accessibilityIdentifier
         _isExpanded = State(initialValue: initiallyExpanded)
         self.content = content()
     }
 
     var body: some View {
         SurfaceCard {
-            DisclosureGroup(isExpanded: $isExpanded) {
-                VStack(alignment: .leading, spacing: 16) {
-                    Divider()
-                    content
-                }
-                .padding(.top, 8)
-            } label: {
-                HStack(alignment: .top, spacing: 14) {
-                    MascotAvatarView(character: character, expression: expression, size: 54)
+            if let accessibilityIdentifier {
+                disclosureGroup
+                    .accessibilityIdentifier(accessibilityIdentifier)
+            } else {
+                disclosureGroup
+            }
+        }
+    }
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(title.appLocalized)
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-                        Text(summary.appLocalized)
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+    private var disclosureGroup: some View {
+        DisclosureGroup(isExpanded: $isExpanded) {
+            VStack(alignment: .leading, spacing: 16) {
+                Divider()
+                content
+            }
+            .padding(.top, 8)
+        } label: {
+            HStack(alignment: .top, spacing: 14) {
+                MascotAvatarView(character: character, expression: expression, size: 54)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title.appLocalized)
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+                    Text(summary.appLocalized)
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .tint(BrandTheme.primary)
+            .contentShape(Rectangle())
         }
+        .tint(BrandTheme.primary)
     }
 }

@@ -7,6 +7,7 @@ struct GrowthCelebrationOverlay: View {
     let onDismiss: () -> Void
 
     @State private var sharePayload: GrowthCelebrationSharePayload?
+    @State private var didRequestShare = false
 
     var body: some View {
         ZStack {
@@ -31,16 +32,33 @@ struct GrowthCelebrationOverlay: View {
 
                 celebrationCard
 
+                Text("Si quieres, compártelo en Instagram, X, WhatsApp o cualquier red desde la hoja de compartir de iOS.")
+                    .font(.footnote)
+                    .foregroundStyle(Color.white.opacity(0.84))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("celebration.share.hint")
+
                 HStack(spacing: 12) {
-                    Button("Compartir logro") {
+                    Button("Compartir en redes") {
+                        didRequestShare = true
                         sharePayload = GrowthCelebrationSharePayload.make(for: celebration)
                     }
                     .buttonStyle(SecondaryCTAStyle())
+                    .accessibilityIdentifier("celebration.action.share")
 
                     Button("Cerrar") {
                         onDismiss()
                     }
                     .buttonStyle(PrimaryCTAStyle())
+                    .accessibilityIdentifier("celebration.action.close")
+                }
+
+                if didRequestShare {
+                    Color.clear
+                        .frame(width: 1, height: 1)
+                        .accessibilityElement()
+                        .accessibilityIdentifier("celebration.share.presented")
                 }
             }
             .padding(.horizontal, 20)
@@ -307,8 +325,14 @@ private struct ActivityShareSheet: UIViewControllerRepresentable {
     let items: [Any]
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        controller.view.isAccessibilityElement = true
+        controller.view.accessibilityIdentifier = "celebration.share.presented"
+        return controller
     }
 
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
+        uiViewController.view.isAccessibilityElement = true
+        uiViewController.view.accessibilityIdentifier = "celebration.share.presented"
+    }
 }

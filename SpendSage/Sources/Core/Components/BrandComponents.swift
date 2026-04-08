@@ -144,10 +144,12 @@ struct BrandArtworkSurface<Content: View>: View {
             .background(
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
                     .fill(BrandTheme.guideArtworkGradient)
+                    .allowsHitTesting(false)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
                     .stroke(BrandTheme.line.opacity(0.72), lineWidth: 1)
+                    .allowsHitTesting(false)
             )
             .shadow(color: BrandTheme.shadow.opacity(0.1), radius: 18, x: 0, y: 10)
     }
@@ -335,10 +337,12 @@ struct BrandMetricTile: View {
         .background(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(BrandTheme.surfaceTint)
+                .allowsHitTesting(false)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(BrandTheme.line.opacity(0.85), lineWidth: 1)
+                .allowsHitTesting(false)
         )
     }
 }
@@ -431,11 +435,14 @@ struct QuickActionTile: View {
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(BrandTheme.surfaceTint)
+                .allowsHitTesting(false)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+                .allowsHitTesting(false)
         )
+        .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 

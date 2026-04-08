@@ -203,9 +203,91 @@ private final class MockStoreBackendService: BackendServicing {
         )
     }
 
+    func sendTestPush(idToken: String, request: BackendDeviceTestPushRequest) async throws -> BackendDeviceTestPushResult {
+        BackendDeviceTestPushResult(sent: true, endpointArn: "arn:aws:sns:test", messageId: "msg-1")
+    }
+
     func unregisterDevice(idToken: String, request: BackendDeviceRegistrationRequest) async throws -> BackendDeviceUnregistrationResult {
         BackendDeviceUnregistrationResult(unregistered: true, existed: true)
     }
+
+    func listSpaces(idToken: String) async throws -> [SpaceSummary] { [] }
+
+    func getFamilySharingModel(idToken: String, spaceID: String) async throws -> FamilySharingModel {
+        FamilySharingModel(
+            spaceId: spaceID,
+            ownerUserId: "user-1",
+            mode: "family",
+            budgetScope: "shared",
+            memberCount: 1,
+            pendingInviteCount: 0,
+            maxMembers: 5,
+            remainingSlots: 4,
+            entitlements: FamilyEntitlements(
+                enforced: true,
+                ownerPlanId: "family",
+                ownerHasFamilyEntitlement: true,
+                memberEditorUpgradeRequiresEntitlement: false
+            ),
+            permissions: FamilyPermissions(
+                callerRole: .owner,
+                canWrite: true,
+                canManageMembers: true,
+                canInvite: true,
+                canPromoteToEditor: true
+            )
+        )
+    }
+
+    func listInvites(idToken: String) async throws -> [SpaceInvite] { [] }
+
+    func createInvite(idToken: String, input: CreateInviteInput) async throws -> CreateInviteResult {
+        CreateInviteResult(
+            invite: SpaceInvite(
+                code: "INVITE-1",
+                spaceId: input.spaceId ?? "space-1",
+                recipientEmailLower: input.recipientEmail.lowercased(),
+                role: input.role,
+                inviterUserId: "user-1",
+                inviterEmailLower: "owner@spendsage.ai",
+                createdAt: "2026-04-08T00:00:00Z",
+                expiresAt: nil,
+                status: .pending,
+                acceptedByUserId: nil,
+                acceptedAt: nil
+            ),
+            deepLink: "spendsage://invite/INVITE-1",
+            webLink: nil
+        )
+    }
+
+    func acceptInvite(idToken: String, code: String) async throws -> AcceptInviteResult {
+        AcceptInviteResult(accepted: true, spaceId: "space-1", role: .viewer)
+    }
+
+    func listSpaceMembers(idToken: String, spaceID: String) async throws -> [SpaceMember] { [] }
+
+    func listSpaceInvites(idToken: String, spaceID: String) async throws -> [SpaceInvite] { [] }
+
+    func getSpaceMember(idToken: String, spaceID: String, memberUserID: String) async throws -> SpaceMember {
+        SpaceMember(
+            spaceId: spaceID,
+            userId: memberUserID,
+            userEmailLower: "member@spendsage.ai",
+            role: .viewer,
+            notificationsEnabled: true,
+            addedAt: "2026-04-08T00:00:00Z",
+            addedByUserId: "user-1"
+        )
+    }
+
+    func updateSpaceMember(idToken: String, spaceID: String, memberUserID: String, patch: UpdateSpaceMemberPatch) async throws {}
+
+    func removeSpaceMember(idToken: String, spaceID: String, memberUserID: String) async throws -> BackendSpaceMemberDeleteResult {
+        BackendSpaceMemberDeleteResult(removed: true, left: nil)
+    }
+
+    func revokeSpaceInvite(idToken: String, spaceID: String, code: String) async throws {}
 }
 
 @MainActor
@@ -254,4 +336,3 @@ private final class MockStoreBillingService: StoreBillingServicing {
         URL(string: "https://apps.apple.com/account/subscriptions")
     }
 }
-

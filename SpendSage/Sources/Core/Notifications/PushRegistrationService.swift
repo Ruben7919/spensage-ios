@@ -20,12 +20,14 @@ struct PushRegistrationStatus: Equatable {
     var lastUploadedEmail: String?
     var lastError: String?
     var isRegistering = false
+    var isSendingTestPush = false
 }
 
 struct PushUploadMarker: Codable, Equatable {
     let tokenHash: String
     let email: String
     let environmentName: String
+    let apnsEnvironment: APNSEnvironment
     let uploadedAt: Date
 }
 
@@ -180,11 +182,18 @@ enum PushRegistrationPersistence {
         return token?.isEmpty == false ? token : nil
     }
 
-    static func recordUpload(token: String, email: String, environmentName: String, uploadedAt: Date = .now) {
+    static func recordUpload(
+        token: String,
+        email: String,
+        environmentName: String,
+        apnsEnvironment: APNSEnvironment,
+        uploadedAt: Date = .now
+    ) {
         let marker = PushUploadMarker(
             tokenHash: token.sha256Hex,
             email: email,
             environmentName: environmentName,
+            apnsEnvironment: apnsEnvironment,
             uploadedAt: uploadedAt
         )
         guard let data = try? JSONEncoder().encode(marker) else { return }
@@ -210,11 +219,12 @@ enum PushRegistrationPersistence {
         UserDefaults.standard.removeObject(forKey: uploadMarkerKey)
     }
 
-    static func shouldUpload(token: String, email: String, environmentName: String) -> Bool {
+    static func shouldUpload(token: String, email: String, environmentName: String, apnsEnvironment: APNSEnvironment) -> Bool {
         guard let marker = uploadMarker() else { return true }
         return marker.tokenHash != token.sha256Hex
             || marker.email.caseInsensitiveCompare(email) != .orderedSame
             || marker.environmentName != environmentName
+            || marker.apnsEnvironment != apnsEnvironment
     }
 }
 

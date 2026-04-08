@@ -29,20 +29,6 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F92411BCA530BEA029B91065"
-               BuildableName = "SpendSageTests.xctest"
-               BlueprintName = "SpendSageTests"
-               ReferencedContainer = "container:SpendSage.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "A9E5E4426A3CA126A8C06396"
                BuildableName = "SpendSageUITests.xctest"
                BlueprintName = "SpendSageUITests"
@@ -67,17 +53,6 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F92411BCA530BEA029B91065"
-               BuildableName = "SpendSageTests.xctest"
-               BlueprintName = "SpendSageTests"
-               ReferencedContainer = "container:SpendSage.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
          <TestableReference
             skipped = "NO"
             parallelizable = "NO">

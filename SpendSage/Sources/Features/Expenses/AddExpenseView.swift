@@ -26,6 +26,7 @@ struct AddExpenseView: View {
     @State private var amount = ""
     @State private var category = ExpenseCategory.groceries
     @State private var date = Date()
+    @State private var locationLabel = ""
     @State private var note = ""
     @State private var emailImportText = ""
     @State private var isRecurringSubscription = false
@@ -93,10 +94,12 @@ struct AddExpenseView: View {
                     .buttonStyle(PrimaryCTAStyle())
                     .disabled(!canSave)
                     .opacity(canSave ? 1 : 0.6)
+                    .accessibilityIdentifier("addExpense.action.save")
                 }
                 .padding(20)
                 .padding(.bottom, 24)
             }
+            .accessibilityIdentifier("addExpense.screen")
             .background(FinanceScreenBackground())
             .navigationTitle("Agregar gasto")
             .navigationBarTitleDisplayMode(.inline)
@@ -105,6 +108,7 @@ struct AddExpenseView: View {
                     Button("Cancelar") {
                         viewModel.dismissAddExpense()
                     }
+                    .accessibilityIdentifier("addExpense.action.cancel")
                 }
             }
         }
@@ -137,12 +141,14 @@ struct AddExpenseView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .accessibilityIdentifier("addExpense.field.entryMode")
 
                 if entryMode == .email {
                     FinanceMultilineField(
                         label: "Correo o resumen de compra",
                         placeholder: "Pega aquí el correo de confirmación, la factura online o el resumen del consumo.",
-                        text: $emailImportText
+                        text: $emailImportText,
+                        accessibilityIdentifier: "addExpense.field.emailImport"
                     )
 
                     Button {
@@ -168,14 +174,16 @@ struct AddExpenseView: View {
                 FinanceField(
                     label: "Comercio o título",
                     placeholder: "Supermercado",
-                    text: $merchant
+                    text: $merchant,
+                    accessibilityIdentifier: "addExpense.field.merchant"
                 )
                 FinanceField(
                     label: "Monto",
                     placeholder: "24.50",
                     text: $amount,
                     keyboard: .decimalPad,
-                    capitalization: .never
+                    capitalization: .never,
+                    accessibilityIdentifier: "addExpense.field.amount"
                 )
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -199,11 +207,37 @@ struct AddExpenseView: View {
                 }
                 .tint(BrandTheme.primary)
 
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Lugar")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(BrandTheme.muted)
+                        Spacer()
+                        Button("Usar ubicación actual") {
+                            Task {
+                                if let label = await viewModel.captureCurrentExpenseLocation() {
+                                    locationLabel = label
+                                }
+                            }
+                        }
+                        .font(.footnote.weight(.semibold))
+                    }
+
+                    FinanceField(
+                        label: "Etiqueta de lugar",
+                        placeholder: "Opcional",
+                        text: $locationLabel,
+                        capitalization: .words,
+                        accessibilityIdentifier: "addExpense.field.location"
+                    )
+                }
+
                 FinanceField(
                     label: "Nota",
                     placeholder: "Nota opcional",
                     text: $note,
-                    capitalization: .sentences
+                    capitalization: .sentences,
+                    accessibilityIdentifier: "addExpense.field.note"
                 )
 
                 if category == .subscriptions {
@@ -529,6 +563,7 @@ struct AddExpenseView: View {
             amount: amountValue,
             category: category,
             date: date,
+            locationLabel: locationLabel,
             note: note,
             source: entryMode == .email ? .email : .manual,
             sourceText: entryMode == .email ? emailImportText : "",

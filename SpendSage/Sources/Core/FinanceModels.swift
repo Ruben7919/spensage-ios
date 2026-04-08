@@ -202,45 +202,55 @@ struct AccountDraft: Equatable {
 
 struct AccountRecord: Identifiable, Codable, Equatable {
     let id: UUID
+    var cloudID: String?
     var name: String
     var institution: String
     var balance: Decimal
     var kind: AccountKind
     var isPrimary: Bool
+    var needsCloudUpdate: Bool
 
     enum CodingKeys: String, CodingKey {
         case id
+        case cloudID
         case name
         case institution
         case balance
         case kind
         case isPrimary
+        case needsCloudUpdate
     }
 
     init(
         id: UUID = UUID(),
+        cloudID: String? = nil,
         name: String,
         institution: String,
         balance: Decimal,
         kind: AccountKind,
-        isPrimary: Bool = false
+        isPrimary: Bool = false,
+        needsCloudUpdate: Bool = false
     ) {
         self.id = id
+        self.cloudID = cloudID
         self.name = name
         self.institution = institution
         self.balance = balance
         self.kind = kind
         self.isPrimary = isPrimary
+        self.needsCloudUpdate = needsCloudUpdate
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
+        cloudID = try container.decodeIfPresent(String.self, forKey: .cloudID)
         name = try container.decode(String.self, forKey: .name)
         institution = try container.decode(String.self, forKey: .institution)
         balance = try container.decode(Decimal.self, forKey: .balance)
         kind = try container.decode(AccountKind.self, forKey: .kind)
         isPrimary = try container.decodeIfPresent(Bool.self, forKey: .isPrimary) ?? false
+        needsCloudUpdate = try container.decodeIfPresent(Bool.self, forKey: .needsCloudUpdate) ?? false
     }
 
     var balanceState: AccountBalanceState {
@@ -294,6 +304,7 @@ struct BillDraft: Equatable {
 
 struct BillRecord: Identifiable, Codable, Equatable {
     let id: UUID
+    var cloudID: String?
     var title: String
     var amount: Decimal
     var dueDay: Int
@@ -302,6 +313,33 @@ struct BillRecord: Identifiable, Codable, Equatable {
     var lastPaidAt: Date?
     var cadence: RecurringCadence? = nil
     var renewalMonth: Int? = nil
+    var needsCloudUpdate: Bool = false
+
+    init(
+        id: UUID = UUID(),
+        cloudID: String? = nil,
+        title: String,
+        amount: Decimal,
+        dueDay: Int,
+        category: ExpenseCategory,
+        autopay: Bool,
+        lastPaidAt: Date?,
+        cadence: RecurringCadence? = nil,
+        renewalMonth: Int? = nil,
+        needsCloudUpdate: Bool = false
+    ) {
+        self.id = id
+        self.cloudID = cloudID
+        self.title = title
+        self.amount = amount
+        self.dueDay = dueDay
+        self.category = category
+        self.autopay = autopay
+        self.lastPaidAt = lastPaidAt
+        self.cadence = cadence
+        self.renewalMonth = renewalMonth
+        self.needsCloudUpdate = needsCloudUpdate
+    }
 
     func paymentState(referenceDate: Date = .now, ledger: LocalFinanceLedger? = nil) -> BillPaymentState {
         guard lastPaidAt == nil else {
@@ -354,40 +392,50 @@ struct RuleDraft: Equatable {
 
 struct RuleRecord: Identifiable, Codable, Equatable {
     let id: UUID
+    var cloudID: String?
     var merchantKeyword: String
     var category: ExpenseCategory
     var note: String?
     var isEnabled: Bool
+    var needsCloudUpdate: Bool
 
     enum CodingKeys: String, CodingKey {
         case id
+        case cloudID
         case merchantKeyword
         case category
         case note
         case isEnabled
+        case needsCloudUpdate
     }
 
     init(
         id: UUID = UUID(),
+        cloudID: String? = nil,
         merchantKeyword: String,
         category: ExpenseCategory,
         note: String? = nil,
-        isEnabled: Bool = true
+        isEnabled: Bool = true,
+        needsCloudUpdate: Bool = false
     ) {
         self.id = id
+        self.cloudID = cloudID
         self.merchantKeyword = merchantKeyword
         self.category = category
         self.note = note
         self.isEnabled = isEnabled
+        self.needsCloudUpdate = needsCloudUpdate
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
+        cloudID = try container.decodeIfPresent(String.self, forKey: .cloudID)
         merchantKeyword = try container.decode(String.self, forKey: .merchantKeyword)
         category = try container.decode(ExpenseCategory.self, forKey: .category)
         note = try container.decodeIfPresent(String.self, forKey: .note)
         isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
+        needsCloudUpdate = try container.decodeIfPresent(Bool.self, forKey: .needsCloudUpdate) ?? false
     }
 }
 
@@ -432,6 +480,7 @@ struct ExpenseDraft: Equatable {
     var amount: Decimal
     var category: ExpenseCategory
     var date: Date
+    var locationLabel: String
     var note: String
     var source: ExpenseEntrySource
     var sourceText: String
@@ -442,6 +491,7 @@ struct ExpenseDraft: Equatable {
         amount: Decimal = 0,
         category: ExpenseCategory = .groceries,
         date: Date = .now,
+        locationLabel: String = "",
         note: String = "",
         source: ExpenseEntrySource = .manual,
         sourceText: String = "",
@@ -451,6 +501,7 @@ struct ExpenseDraft: Equatable {
         self.amount = amount
         self.category = category
         self.date = date
+        self.locationLabel = locationLabel
         self.note = note
         self.source = source
         self.sourceText = sourceText
@@ -467,6 +518,7 @@ struct ExpenseDraft: Equatable {
             amount: amount,
             category: category,
             date: date,
+            locationLabel: locationLabel.trimmingCharacters(in: .whitespacesAndNewlines),
             note: note.trimmingCharacters(in: .whitespacesAndNewlines),
             source: source,
             sourceText: sourceText.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -477,14 +529,58 @@ struct ExpenseDraft: Equatable {
 
 struct ExpenseRecord: Identifiable, Codable, Equatable {
     let id: UUID
+    var cloudID: String?
     var merchant: String
     var category: ExpenseCategory
     var amount: Decimal
     var date: Date
+    var locationLabel: String?
     var note: String?
     var source: ExpenseEntrySource? = nil
     var sourceText: String? = nil
     var recurringPlan: RecurringExpensePlan? = nil
+    var needsCloudUpdate: Bool = false
+
+    init(
+        id: UUID = UUID(),
+        cloudID: String? = nil,
+        merchant: String,
+        category: ExpenseCategory,
+        amount: Decimal,
+        date: Date,
+        locationLabel: String? = nil,
+        note: String? = nil,
+        source: ExpenseEntrySource? = nil,
+        sourceText: String? = nil,
+        recurringPlan: RecurringExpensePlan? = nil,
+        needsCloudUpdate: Bool = false
+    ) {
+        self.id = id
+        self.cloudID = cloudID
+        self.merchant = merchant
+        self.category = category
+        self.amount = amount
+        self.date = date
+        self.locationLabel = locationLabel
+        self.note = note
+        self.source = source
+        self.sourceText = sourceText
+        self.recurringPlan = recurringPlan
+        self.needsCloudUpdate = needsCloudUpdate
+    }
+}
+
+enum PendingCloudDeletionKind: String, Codable, Equatable {
+    case expense
+    case account
+    case bill
+    case rule
+}
+
+struct PendingCloudDeletion: Codable, Equatable, Identifiable {
+    var id: String { "\(kind.rawValue):\(cloudID)" }
+    let kind: PendingCloudDeletionKind
+    let cloudID: String
 }
 
 struct CategoryBreakdown: Identifiable, Codable, Equatable {
@@ -556,6 +652,7 @@ struct LocalFinanceLedger: Codable, Equatable {
     var bills: [BillRecord]
     var rules: [RuleRecord]
     var profile: ProfileRecord
+    var pendingCloudDeletions: [PendingCloudDeletion]
     var updatedAt: Date
 
     enum CodingKeys: String, CodingKey {
@@ -566,6 +663,7 @@ struct LocalFinanceLedger: Codable, Equatable {
         case bills
         case rules
         case profile
+        case pendingCloudDeletions
         case updatedAt
     }
 
@@ -577,6 +675,7 @@ struct LocalFinanceLedger: Codable, Equatable {
         bills: [BillRecord] = [],
         rules: [RuleRecord] = [],
         profile: ProfileRecord = .default,
+        pendingCloudDeletions: [PendingCloudDeletion] = [],
         updatedAt: Date
     ) {
         self.monthlyIncome = monthlyIncome
@@ -586,6 +685,7 @@ struct LocalFinanceLedger: Codable, Equatable {
         self.bills = bills
         self.rules = rules
         self.profile = profile
+        self.pendingCloudDeletions = pendingCloudDeletions
         self.updatedAt = updatedAt
     }
 
@@ -598,6 +698,7 @@ struct LocalFinanceLedger: Codable, Equatable {
         bills = try container.decodeIfPresent([BillRecord].self, forKey: .bills) ?? []
         rules = try container.decodeIfPresent([RuleRecord].self, forKey: .rules) ?? []
         profile = try container.decodeIfPresent(ProfileRecord.self, forKey: .profile) ?? .default
+        pendingCloudDeletions = try container.decodeIfPresent([PendingCloudDeletion].self, forKey: .pendingCloudDeletions) ?? []
         updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? .now
     }
 
@@ -660,19 +761,22 @@ struct LocalFinanceLedger: Codable, Equatable {
         )
     }
 
-    mutating func appendExpense(_ draft: ExpenseDraft, id: UUID = UUID(), date: Date = .now) {
+    mutating func appendExpense(_ draft: ExpenseDraft, id: UUID = UUID(), cloudID: String? = nil, date: Date = .now) {
         let normalized = draft.normalized()
         expenses.insert(
             ExpenseRecord(
                 id: id,
+                cloudID: cloudID,
                 merchant: normalized.merchant,
                 category: normalized.category,
                 amount: normalized.amount,
                 date: normalized.date == .distantPast ? date : normalized.date,
+                locationLabel: normalized.locationLabel.isEmpty ? nil : normalized.locationLabel,
                 note: normalized.note.isEmpty ? nil : normalized.note,
                 source: normalized.source,
                 sourceText: normalized.sourceText.isEmpty ? nil : normalized.sourceText,
-                recurringPlan: normalized.recurringPlan
+                recurringPlan: normalized.recurringPlan,
+                needsCloudUpdate: false
             ),
             at: 0
         )
@@ -680,26 +784,29 @@ struct LocalFinanceLedger: Codable, Equatable {
         updatedAt = date
     }
 
-    mutating func appendAccount(_ draft: AccountDraft, id: UUID = UUID(), date: Date = .now) {
+    mutating func appendAccount(_ draft: AccountDraft, id: UUID = UUID(), cloudID: String? = nil, date: Date = .now) {
         let shouldMarkPrimary = primaryAccount == nil
         accounts.insert(
             AccountRecord(
                 id: id,
+                cloudID: cloudID,
                 name: draft.name.trimmingCharacters(in: .whitespacesAndNewlines),
                 institution: draft.institution.trimmingCharacters(in: .whitespacesAndNewlines),
                 balance: draft.balance,
                 kind: draft.kind,
-                isPrimary: shouldMarkPrimary
+                isPrimary: shouldMarkPrimary,
+                needsCloudUpdate: false
             ),
             at: 0
         )
         updatedAt = date
     }
 
-    mutating func appendBill(_ draft: BillDraft, id: UUID = UUID(), date: Date = .now) {
+    mutating func appendBill(_ draft: BillDraft, id: UUID = UUID(), cloudID: String? = nil, date: Date = .now) {
         bills.insert(
             BillRecord(
                 id: id,
+                cloudID: cloudID,
                 title: draft.title.trimmingCharacters(in: .whitespacesAndNewlines),
                 amount: draft.amount,
                 dueDay: draft.dueDay,
@@ -707,21 +814,24 @@ struct LocalFinanceLedger: Codable, Equatable {
                 autopay: draft.autopay,
                 lastPaidAt: nil,
                 cadence: draft.cadence,
-                renewalMonth: draft.renewalMonth
+                renewalMonth: draft.renewalMonth,
+                needsCloudUpdate: false
             ),
             at: 0
         )
         updatedAt = date
     }
 
-    mutating func appendRule(_ draft: RuleDraft, id: UUID = UUID(), date: Date = .now) {
+    mutating func appendRule(_ draft: RuleDraft, id: UUID = UUID(), cloudID: String? = nil, date: Date = .now) {
         rules.insert(
             RuleRecord(
                 id: id,
+                cloudID: cloudID,
                 merchantKeyword: draft.merchantKeyword.trimmingCharacters(in: .whitespacesAndNewlines),
                 category: draft.category,
                 note: draft.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : draft.note.trimmingCharacters(in: .whitespacesAndNewlines),
-                isEnabled: true
+                isEnabled: true,
+                needsCloudUpdate: false
             ),
             at: 0
         )
@@ -737,6 +847,7 @@ struct LocalFinanceLedger: Codable, Equatable {
                 amount: bills[index].amount,
                 category: bills[index].category,
                 date: date,
+                locationLabel: "",
                 note: bills[index].autopay ? "Autopay bill".appLocalized : "Bill payment".appLocalized,
                 source: bills[index].autopay ? .subscriptionAutomation : .manual,
                 recurringPlan: RecurringExpensePlan(
@@ -779,6 +890,28 @@ struct LocalFinanceLedger: Codable, Equatable {
             .reduce(Decimal.zero) { $0 + $1.balance }
     }
 
+    var hasPendingCloudSync: Bool {
+        expenses.contains(where: { $0.cloudID == nil })
+            || expenses.contains(where: { $0.needsCloudUpdate })
+            || accounts.contains(where: { $0.cloudID == nil })
+            || accounts.contains(where: { $0.needsCloudUpdate })
+            || bills.contains(where: { $0.cloudID == nil })
+            || bills.contains(where: { $0.needsCloudUpdate })
+            || rules.contains(where: { $0.cloudID == nil })
+            || rules.contains(where: { $0.needsCloudUpdate })
+            || !pendingCloudDeletions.isEmpty
+    }
+
+    var hasMeaningfulContent: Bool {
+        !expenses.isEmpty
+            || !accounts.isEmpty
+            || !bills.isEmpty
+            || !rules.isEmpty
+            || monthlyIncome > 0
+            || monthlyBudget > 0
+            || profile != .default
+    }
+
     func creditExposure() -> Decimal {
         accounts
             .filter { $0.kind == .creditCard || $0.balance < 0 }
@@ -797,7 +930,74 @@ struct LocalFinanceLedger: Codable, Equatable {
         return .active
     }
 
+    mutating func updateExpense(_ expenseID: UUID, draft: ExpenseDraft, date: Date = .now) {
+        guard let index = expenses.firstIndex(where: { $0.id == expenseID }) else { return }
+        let normalized = draft.normalized()
+        expenses[index].merchant = normalized.merchant
+        expenses[index].amount = normalized.amount
+        expenses[index].category = normalized.category
+        expenses[index].date = normalized.date
+        expenses[index].locationLabel = normalized.locationLabel.isEmpty ? nil : normalized.locationLabel
+        expenses[index].note = normalized.note.isEmpty ? nil : normalized.note
+        expenses[index].source = normalized.source
+        expenses[index].sourceText = normalized.sourceText.isEmpty ? nil : normalized.sourceText
+        expenses[index].recurringPlan = normalized.recurringPlan
+        if expenses[index].cloudID != nil {
+            expenses[index].needsCloudUpdate = true
+        }
+        updatedAt = date
+    }
+
+    mutating func updateAccount(_ accountID: UUID, draft: AccountDraft, date: Date = .now) {
+        guard let index = accounts.firstIndex(where: { $0.id == accountID }) else { return }
+        accounts[index].name = draft.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        accounts[index].institution = draft.institution.trimmingCharacters(in: .whitespacesAndNewlines)
+        accounts[index].balance = draft.balance
+        accounts[index].kind = draft.kind
+        if accounts[index].cloudID != nil {
+            accounts[index].needsCloudUpdate = true
+        }
+        updatedAt = date
+    }
+
+    mutating func updateBill(_ billID: UUID, draft: BillDraft, date: Date = .now) {
+        guard let index = bills.firstIndex(where: { $0.id == billID }) else { return }
+        bills[index].title = draft.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        bills[index].amount = draft.amount
+        bills[index].dueDay = draft.dueDay
+        bills[index].category = draft.category
+        bills[index].autopay = draft.autopay
+        bills[index].cadence = draft.cadence
+        bills[index].renewalMonth = draft.renewalMonth
+        if bills[index].cloudID != nil {
+            bills[index].needsCloudUpdate = true
+        }
+        updatedAt = date
+    }
+
+    mutating func updateRule(_ ruleID: UUID, draft: RuleDraft, date: Date = .now) {
+        guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
+        rules[index].merchantKeyword = draft.merchantKeyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        rules[index].category = draft.category
+        rules[index].note = draft.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : draft.note.trimmingCharacters(in: .whitespacesAndNewlines)
+        if rules[index].cloudID != nil {
+            rules[index].needsCloudUpdate = true
+        }
+        updatedAt = date
+    }
+
+    mutating func deleteExpense(_ expenseID: UUID, date: Date = .now) {
+        if let record = expenses.first(where: { $0.id == expenseID }), let cloudID = record.cloudID {
+            pendingCloudDeletions.append(PendingCloudDeletion(kind: .expense, cloudID: cloudID))
+        }
+        expenses.removeAll { $0.id == expenseID }
+        updatedAt = date
+    }
+
     mutating func deleteAccount(_ accountID: UUID, date: Date = .now) {
+        if let record = accounts.first(where: { $0.id == accountID }), let cloudID = record.cloudID {
+            pendingCloudDeletions.append(PendingCloudDeletion(kind: .account, cloudID: cloudID))
+        }
         accounts.removeAll { $0.id == accountID }
         updatedAt = date
     }
@@ -811,6 +1011,9 @@ struct LocalFinanceLedger: Codable, Equatable {
     }
 
     mutating func deleteBill(_ billID: UUID, date: Date = .now) {
+        if let record = bills.first(where: { $0.id == billID }), let cloudID = record.cloudID {
+            pendingCloudDeletions.append(PendingCloudDeletion(kind: .bill, cloudID: cloudID))
+        }
         bills.removeAll { $0.id == billID }
         updatedAt = date
     }
@@ -818,10 +1021,16 @@ struct LocalFinanceLedger: Codable, Equatable {
     mutating func toggleBillAutopay(_ billID: UUID, date: Date = .now) {
         guard let index = bills.firstIndex(where: { $0.id == billID }) else { return }
         bills[index].autopay.toggle()
+        if bills[index].cloudID != nil {
+            bills[index].needsCloudUpdate = true
+        }
         updatedAt = date
     }
 
     mutating func deleteRule(_ ruleID: UUID, date: Date = .now) {
+        if let record = rules.first(where: { $0.id == ruleID }), let cloudID = record.cloudID {
+            pendingCloudDeletions.append(PendingCloudDeletion(kind: .rule, cloudID: cloudID))
+        }
         rules.removeAll { $0.id == ruleID }
         updatedAt = date
     }
@@ -829,7 +1038,14 @@ struct LocalFinanceLedger: Codable, Equatable {
     mutating func toggleRuleEnabled(_ ruleID: UUID, date: Date = .now) {
         guard let index = rules.firstIndex(where: { $0.id == ruleID }) else { return }
         rules[index].isEnabled.toggle()
+        if rules[index].cloudID != nil {
+            rules[index].needsCloudUpdate = true
+        }
         updatedAt = date
+    }
+
+    mutating func clearPendingCloudDeletion(kind: PendingCloudDeletionKind, cloudID: String) {
+        pendingCloudDeletions.removeAll { $0.kind == kind && $0.cloudID == cloudID }
     }
 
     func upcomingBills(referenceDate: Date = .now) -> [BillRecord] {
@@ -1037,6 +1253,7 @@ struct LocalFinanceLedger: Codable, Equatable {
             bills.insert(
                 BillRecord(
                     id: UUID(),
+                    cloudID: nil,
                     title: draft.merchant,
                     amount: draft.amount,
                     dueDay: dueDay,

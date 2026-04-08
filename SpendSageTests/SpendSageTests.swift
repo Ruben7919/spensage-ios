@@ -24,7 +24,7 @@ struct SpendSageTests {
         defaults.removePersistentDomain(forName: suiteName)
 
         let store = LocalFinanceStore(defaults: defaults, seedLedger: PreviewFinanceData.seedLedger)
-        let before = await store.loadDashboardState(for: SessionState.guest)
+        let before = await store.loadDashboardState(for: SessionState.guest, spaceID: nil)
 
         await store.saveExpense(
             ExpenseDraft(
@@ -34,10 +34,11 @@ struct SpendSageTests {
                 date: .now,
                 note: "Airport run"
             ),
-            for: SessionState.guest
+            for: SessionState.guest,
+            spaceID: nil
         )
 
-        let after = await store.loadDashboardState(for: SessionState.guest)
+        let after = await store.loadDashboardState(for: SessionState.guest, spaceID: nil)
         #expect(after.budgetSnapshot.monthlySpent == before.budgetSnapshot.monthlySpent + 18.25)
         #expect(after.recentExpenses.first?.title == "Train ticket")
         #expect(after.categoryBreakdown.contains(where: { $0.category == ExpenseCategory.transport }))
@@ -54,18 +55,21 @@ struct SpendSageTests {
 
         await store.saveAccount(
             AccountDraft(name: "Travel Card", institution: "Atlas Bank", balance: 420, kind: .creditCard),
-            for: SessionState.guest
+            for: SessionState.guest,
+            spaceID: nil
         )
         await store.saveBill(
             BillDraft(title: "Phone", amount: 45, dueDay: 15, category: .bills, autopay: true),
-            for: SessionState.guest
+            for: SessionState.guest,
+            spaceID: nil
         )
         await store.saveRule(
             RuleDraft(merchantKeyword: "atlas", category: .transport, note: "Travel merchants"),
-            for: SessionState.guest
+            for: SessionState.guest,
+            spaceID: nil
         )
 
-        let ledger = await store.loadLedger(for: SessionState.guest)
+        let ledger = await store.loadLedger(for: SessionState.guest, spaceID: nil)
         #expect(ledger.accounts.contains(where: { $0.name == "Travel Card" }))
         #expect(ledger.bills.contains(where: { $0.title == "Phone" }))
         #expect(ledger.rules.contains(where: { $0.merchantKeyword == "atlas" }))
@@ -101,9 +105,9 @@ struct SpendSageTests {
         )
 
         let store = LocalFinanceStore(defaults: defaults, seedLedger: seedLedger)
-        await store.markBillPaid(billID, for: SessionState.guest)
+        await store.markBillPaid(billID, for: SessionState.guest, spaceID: nil)
 
-        let ledger = await store.loadLedger(for: SessionState.guest)
+        let ledger = await store.loadLedger(for: SessionState.guest, spaceID: nil)
         #expect(ledger.expenses.contains(where: { $0.merchant == "Internet" && $0.amount == 54.99 }))
         #expect(ledger.bills.first?.lastPaidAt != nil)
     }

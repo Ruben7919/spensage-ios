@@ -57,7 +57,33 @@ struct BackendAlignmentTests {
 
     @Test
     func pushUploadMarkerRequestsUploadWhenNoMarkerExists() {
-        #expect(PushRegistrationPersistence.shouldUpload(token: "abc-token", email: "user@spendsage.ai", environmentName: "dev"))
+        #expect(
+            PushRegistrationPersistence.shouldUpload(
+                token: "abc-token",
+                email: "user@spendsage.ai",
+                environmentName: "dev",
+                apnsEnvironment: .sandbox
+            )
+        )
+    }
+
+    @Test
+    func pushUploadMarkerRequestsUploadWhenApnsEnvironmentChanges() {
+        PushRegistrationPersistence.recordUpload(
+            token: "abc-token",
+            email: "user@spendsage.ai",
+            environmentName: "dev",
+            apnsEnvironment: .sandbox
+        )
+
+        #expect(
+            PushRegistrationPersistence.shouldUpload(
+                token: "abc-token",
+                email: "user@spendsage.ai",
+                environmentName: "dev",
+                apnsEnvironment: .production
+            )
+        )
     }
 
     @Test
@@ -65,7 +91,8 @@ struct BackendAlignmentTests {
         let request = BackendDeviceRegistrationRequest(
             platform: "ios",
             provider: "apns",
-            token: "abcd1234efgh5678"
+            token: "abcd1234efgh5678",
+            apnsEnvironment: .sandbox
         )
 
         let data = try JSONEncoder().encode(request)
@@ -74,6 +101,7 @@ struct BackendAlignmentTests {
         #expect(json["platform"] == "ios")
         #expect(json["provider"] == "apns")
         #expect(json["token"] == "abcd1234efgh5678")
+        #expect(json["environment"] == "sandbox")
     }
 
     @Test

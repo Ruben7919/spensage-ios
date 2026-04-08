@@ -1,6 +1,6 @@
 # SpendSage External Release Checklist
 
-Last updated: 2026-04-05
+Last updated: 2026-04-08
 
 ## Status Legend
 
@@ -34,8 +34,8 @@ Last updated: 2026-04-05
 - [x] App Privacy matrix prepared
 - [x] Review notes prepared
 - [x] Age rating guidance prepared
-- [ ] Live App Review contact email entered
-- [ ] Live App Review contact phone entered
+- [x] Live App Review contact email entered
+- [x] Live App Review contact phone entered
 
 ## Screenshots and Creative
 
@@ -47,18 +47,24 @@ Last updated: 2026-04-05
 
 ## Product Truthfulness
 
-- [x] Current copy avoids claiming active ads
-- [x] Current copy avoids claiming active geofence
-- [x] Current copy avoids claiming active push notifications
-- [x] Current copy avoids claiming active cloud sync where it is not live
-- [x] Current copy avoids claiming active billing where it is not live
-- [-] Final review of every App Store line against the exact submitted build
+- [x] Current copy avoids claiming ads or background geolocation.
+- [x] Current copy treats notifications as optional and explicitly enabled by the user.
+- [x] Current copy treats finance behavior as authenticated and local-first, not purely offline-only.
+- [x] Current copy treats StoreKit as real native billing while avoiding claims about full backend reconciliation.
+- [-] Final review of every App Store line against the exact submitted build and backend target.
+
+## Beta Environment
+
+- [x] Internal billing overrides are hidden from Release builds.
+- [-] Current Release/TestFlight target still points to `dev`.
+- [ ] Dedicated `beta` or `prod` backend target before public launch.
 
 ## Review Readiness
 
-- [ ] If login is required, provide working reviewer credentials or a review path
+- [x] If login is required, provide a simple reviewer path from the first screen
 - [x] In-app legal center is accessible
 - [x] Camera/photo permission strings exist
+- [x] Push, location, and calendar flows are explicit opt-ins inside Settings
 - [x] Export compliance already set to non-exempt encryption false in `Info.plist`
 - [ ] Public URLs deployed and reachable before submission
 

@@ -1,6 +1,6 @@
 # SpendSage External App Store Metadata
 
-Last updated: 2026-04-07
+Last updated: 2026-04-08
 
 ## Automation Source Of Truth
 
@@ -57,17 +57,22 @@ Con SpendSage puedes:
 - revisar y corregir el borrador antes de guardar;
 - ver análisis simples y tocar gráficas para leer el valor exacto;
 - configurar un presupuesto guiado paso a paso;
+- sincronizar un espacio personal autenticado entre dispositivos;
+- invitar miembros del hogar a un espacio familiar compartido;
 - seguir tu progreso con niveles, rachas, badges y celebraciones compartibles.
 
 SpendSage está diseñado para iPhone con una experiencia mobile-first, una UI clara y personajes que acompañan el progreso sin volver la app pesada o confusa.
 
 Privacidad primero:
 
-- la build actual es principalmente local-first;
+- el inicio de sesión es obligatorio para usar la app;
+- la build actual sigue siendo local-first, pero puede sincronizar datos financieros en sesiones autenticadas y por espacio compartido;
 - no hay tracking publicitario activo;
-- no hay geolocalización activa;
+- no hay geolocalización en background;
 - no hay anuncios activos;
-- el escaneo de recibos usa procesamiento local asistido y requiere revisión del usuario.
+- notificaciones, calendario y ubicación son permisos opcionales;
+- el escaneo de recibos usa procesamiento local asistido y requiere revisión del usuario;
+- diagnósticos de estabilidad y eventos de producto se recogen first-party, sin SDKs analíticos de terceros.
 
 SpendSage es una app de apoyo para finanzas personales. No es un banco ni reemplaza asesoría financiera, legal o tributaria profesional.
 ```
@@ -75,7 +80,7 @@ SpendSage es una app de apoyo para finanzas personales. No es un banco ni reempl
 ## What’s New for Version 1.0
 
 ```text
-Pulimos la primera experiencia de iPhone con un dashboard más claro, dock inferior anclado, captura de gastos más limpia, escaneo guiado de recibos, análisis simples y presupuesto paso a paso.
+Pulimos la experiencia de iPhone con sync autenticado, espacios familiares compartidos con invites, notificaciones opcionales, suscripciones nativas con StoreKit, mejores gráficas y un presupuesto paso a paso más amable.
 ```
 
 ## App Review Notes
@@ -84,11 +89,14 @@ Pulimos la primera experiencia de iPhone con un dashboard más claro, dock infer
 SpendSage es una app de finanzas personales local-first para iPhone.
 
 Puntos importantes para revisión:
-1. La build actual no usa anuncios, tracking entre apps, geolocalización ni notificaciones push.
-2. El escaneo de recibos usa VisionKit/Vision en el dispositivo para asistencia local; el usuario revisa y corrige el borrador antes de guardar.
-3. La app incluye Centro legal dentro de la navegación y la política de privacidad también se publica en el campo de Privacy Policy URL.
-4. Si el flujo de autenticación cloud está activo para esta submission, proporcione credenciales o un método de acceso de revisión antes de enviar.
-5. No describa como activas funciones que todavía no estén vivas en backend o billing al momento exacto de la submission.
+1. La build actual no usa anuncios, tracking entre apps ni geolocalización en background.
+2. El inicio de sesión es obligatorio. El reviewer puede crear una cuenta nueva con email o continuar con Apple / Google desde la primera pantalla.
+3. Esta línea de TestFlight beta externa sigue apuntando al backend autenticado `dev`. Eso es intencional para esta beta.
+4. El escaneo de recibos usa VisionKit/Vision en el dispositivo para asistencia local; el usuario revisa y corrige el borrador antes de guardar.
+5. Notificaciones, ubicación y calendario son permisos opcionales y se disparan desde Ajustes o desde acciones explícitas del usuario.
+6. La app ahora incluye sync autenticado, espacios familiares compartidos e invites, pero la revisión puede enfocarse en el flujo personal autenticado si lo prefiere.
+7. Los diagnósticos de estabilidad y eventos de producto son first-party; no hay SDKs analíticos de terceros.
+8. La app incluye Centro legal dentro de la navegación y la política de privacidad también se publica en el campo de Privacy Policy URL.
 ```
 
 ## Review Contact
@@ -121,8 +129,9 @@ Recommended resulting rating for the current implementation: `4+`
 - Monetization state for current external submission:
   - StoreKit 2 native purchase / restore wiring now exists in the iOS app.
   - App Store Connect products now exist for `spendsage.pro.monthly`, `spendsage.pro.annual`, `spendsage.family.monthly`, `spendsage.family.annual`, and `spendsage.remove_ads`.
-  - Store review copy and public metadata must still avoid claiming cloud entitlements are active until backend reconciliation is live.
-  - Keep paid plans disabled for an external submission until pricing, localizations, and backend entitlement sync are reviewable end-to-end.
+  - The current Release/TestFlight target still points to the authenticated `dev` backend, so treat this as external beta guidance, not public-launch guidance.
+  - Store review copy should describe authenticated sync and shared spaces conservatively as beta functionality, not as a public-launch guarantee.
+  - RevenueCat or App Store Server backend reconciliation is still optional future work; current beta validation is native StoreKit-first.
 
 Configured store pricing source of truth:
 
@@ -132,12 +141,16 @@ Configured store pricing source of truth:
 - `spendsage.family.monthly`: `USD 7.99`
 - `spendsage.family.annual`: `USD 49.99`
 
-Current App Store Connect sync status:
+Current App Store Connect sync state:
 
-- App info localizations are synced for `en-US` and `es-ES`.
-- App version localizations are synced for `en-US` and `es-ES`.
-- App Review contact and notes are synced.
-- iPhone screenshot sets are uploaded for `en-US` and `es-ES` using the current 6-shot pack.
+- The local source of truth is ready and updated for authenticated sync, family spaces, push, and first-party reliability telemetry.
+- The 2026-04-08 authenticated sync did update app/version/beta metadata from the current source of truth.
+- Global territory pricing is now applied for all five monetization SKUs, which was the missing piece keeping the four auto-renewable subscriptions out of reviewable state.
+- `spendsage.pro.monthly`, `spendsage.pro.annual`, `spendsage.family.monthly`, `spendsage.family.annual`, and `spendsage.remove_ads` are now `READY_TO_SUBMIT`.
+- Version `1.0` in App Store Connect now includes all five monetization components in the `Compras dentro de la app y suscripciones` section.
+- Build `1.0 (22)` was uploaded on 2026-04-08, promoted to the configured external TestFlight group, and is now `WAITING_FOR_REVIEW` for external beta review.
+- Internal testers receive the same App Store eligible build automatically once processed; the App Store Connect API does not require a separate internal-group attachment for this build type.
+- Re-apply from the authenticated Chrome session before each external-beta upload.
 
 ## Submission Positioning
 
@@ -147,13 +160,13 @@ Use the current external narrative:
 - fast expense capture;
 - guided receipt scan;
 - clear budget and monthly insight loop;
+- authenticated sync and shared household spaces;
 - playful progress system;
 - privacy-conscious local-first behavior.
 
 Avoid leading with:
 
-- family collaboration as if already live;
-- cloud sync as if already live;
+- family collaboration or sync as if they were already public-launch mature;
 - advanced AI coaching as if already live;
 - geofence nudges as if already live;
 - live cloud premium unlocks unless they are enabled and reviewable end-to-end.

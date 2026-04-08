@@ -46,6 +46,7 @@ struct OnboardingView: View {
             }
             .padding(24)
         }
+        .accessibilityIdentifier("onboarding.screen")
         .background(
             ZStack {
                 BrandTheme.canvas
@@ -159,6 +160,7 @@ struct OnboardingView: View {
                 }
                 .buttonStyle(PrimaryCTAStyle())
                 .disabled(!canAdvanceToGoal)
+                .accessibilityIdentifier("onboarding.action.continueToGoal")
             }
         }
     }
@@ -231,12 +233,14 @@ struct OnboardingView: View {
                         step = .basics
                     }
                     .buttonStyle(SecondaryCTAStyle())
+                    .accessibilityIdentifier("onboarding.action.backToBasics")
 
                     Button("Show preview") {
                         step = .preview
                     }
                     .buttonStyle(PrimaryCTAStyle())
                     .disabled(snapshot == nil)
+                    .accessibilityIdentifier("onboarding.action.showPreview")
                 }
             }
         }
@@ -302,6 +306,7 @@ struct OnboardingView: View {
                             step = .goal
                         }
                         .buttonStyle(SecondaryCTAStyle())
+                        .accessibilityIdentifier("onboarding.action.backToGoal")
 
                         Button {
                             onContinue()
@@ -309,6 +314,7 @@ struct OnboardingView: View {
                             Label("Get started", systemImage: "arrow.right.circle.fill")
                         }
                         .buttonStyle(PrimaryCTAStyle())
+                        .accessibilityIdentifier("onboarding.action.getStarted")
                     }
                 } else {
                     emptyPreviewCard
@@ -329,6 +335,7 @@ struct OnboardingView: View {
                 step = .goal
             }
             .buttonStyle(SecondaryCTAStyle())
+            .accessibilityIdentifier("onboarding.action.emptyBack")
         }
     }
 
@@ -524,12 +531,28 @@ struct OnboardingView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .padding()
+                .accessibilityIdentifier(onboardingFieldIdentifier(for: title))
                 .background(BrandTheme.surfaceTint)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
                 )
+        }
+    }
+
+    private func onboardingFieldIdentifier(for title: String) -> String {
+        switch title {
+        case "Monthly income":
+            return "onboarding.field.monthlyIncome"
+        case "Fixed bills":
+            return "onboarding.field.fixedBills"
+        case "Current balance":
+            return "onboarding.field.currentBalance"
+        case "Goal target":
+            return "onboarding.field.goalTarget"
+        default:
+            return "onboarding.field.unknown"
         }
     }
 }

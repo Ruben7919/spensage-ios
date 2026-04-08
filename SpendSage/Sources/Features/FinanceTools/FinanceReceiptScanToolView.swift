@@ -170,6 +170,7 @@ struct FinanceReceiptScanToolView: View {
             }
             .padding(24)
         }
+        .accessibilityIdentifier("scan.screen")
         .background(FinanceScreenBackground())
         .navigationTitle("Escaneo de recibos")
         .navigationBarTitleDisplayMode(.inline)
@@ -352,6 +353,7 @@ struct FinanceReceiptScanToolView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("scan.action.openCamera")
 
             PhotosPicker(selection: $photoPickerItem, matching: .images) {
                 ReceiptActionLabel(
@@ -361,6 +363,7 @@ struct FinanceReceiptScanToolView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("scan.action.importPhoto")
 
             Button {
                 viewModel.startManualExpenseFlow()
@@ -372,6 +375,7 @@ struct FinanceReceiptScanToolView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("scan.action.manual")
         }
     }
 
@@ -444,13 +448,19 @@ struct FinanceReceiptScanToolView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
 
-                    FinanceField(label: "Comercio", placeholder: "Blue Bottle Coffee", text: $merchant)
+                    FinanceField(
+                        label: "Comercio",
+                        placeholder: "Blue Bottle Coffee",
+                        text: $merchant,
+                        accessibilityIdentifier: "scan.field.merchant"
+                    )
                     FinanceField(
                         label: "Monto",
                         placeholder: "8.75",
                         text: $amount,
                         keyboard: .decimalPad,
-                        capitalization: .never
+                        capitalization: .never,
+                        accessibilityIdentifier: "scan.field.amount"
                     )
 
                     VStack(alignment: .leading, spacing: 8) {
@@ -473,7 +483,8 @@ struct FinanceReceiptScanToolView: View {
                     FinanceMultilineField(
                         label: "Nota",
                         placeholder: "Añade productos, contexto de reembolso o cualquier detalle que quieras recordar después.",
-                        text: $note
+                        text: $note,
+                        accessibilityIdentifier: "scan.field.note"
                     )
 
                     if let errorMessage {
@@ -487,6 +498,7 @@ struct FinanceReceiptScanToolView: View {
                             transitionToStep(.capture)
                         }
                         .buttonStyle(SecondaryCTAStyle())
+                        .accessibilityIdentifier("scan.action.backToCapture")
 
                         Button("Revisar gasto") {
                             goToReview()
@@ -494,6 +506,7 @@ struct FinanceReceiptScanToolView: View {
                         .buttonStyle(PrimaryCTAStyle())
                         .disabled(!canSave || isAnalyzingReceipt)
                         .opacity((canSave && !isAnalyzingReceipt) ? 1 : 0.7)
+                        .accessibilityIdentifier("scan.action.review")
                     }
                 }
             }
@@ -578,6 +591,7 @@ struct FinanceReceiptScanToolView: View {
                             transitionToStep(.autofill)
                         }
                         .buttonStyle(SecondaryCTAStyle())
+                        .accessibilityIdentifier("scan.action.backToAutofill")
 
                         Button {
                             Task { await saveDraft() }
@@ -591,6 +605,7 @@ struct FinanceReceiptScanToolView: View {
                         .buttonStyle(.plain)
                         .disabled(!canSave)
                         .opacity(canSave ? 1 : 0.7)
+                        .accessibilityIdentifier("scan.action.save")
                     }
                 }
             }

@@ -23,13 +23,17 @@ struct NativeAppShellView: View {
             get: { viewModel.isPresentingAddExpense },
             set: { viewModel.isPresentingAddExpense = $0 }
         )) {
-            AddExpenseView(viewModel: viewModel)
+            SheetPresentationProbe(identifier: "addExpense.presented") {
+                AddExpenseView(viewModel: viewModel)
+            }
         }
         .sheet(isPresented: Binding(
             get: { viewModel.isPresentingBudgetWizard },
             set: { viewModel.isPresentingBudgetWizard = $0 }
         )) {
-            BudgetWizardView(viewModel: viewModel)
+            SheetPresentationProbe(identifier: "budgetWizard.presented") {
+                BudgetWizardView(viewModel: viewModel)
+            }
         }
         .task {
             if viewModel.dashboardState == nil {
@@ -187,6 +191,7 @@ private struct ShellNavigationButton: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("shell.tab.\(tab.rawValue)")
     }
 }
 
@@ -232,6 +237,7 @@ private struct ReceiptScanDockButton: View {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
+        .accessibilityIdentifier("shell.tab.scan")
     }
 }
 
@@ -277,6 +283,28 @@ private struct ShellNavigationBackground: View {
             }
             .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 18, x: 0, y: -2)
             .frame(height: ShellBarMetrics.backgroundHeight + bottomInset, alignment: .top)
+    }
+}
+
+private struct SheetPresentationProbe<Content: View>: View {
+    let identifier: String
+    @ViewBuilder let content: Content
+
+    init(identifier: String, @ViewBuilder content: () -> Content) {
+        self.identifier = identifier
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            content
+            Text(identifier)
+                .font(.system(size: 1))
+                .foregroundStyle(Color.white.opacity(0.01))
+                .padding(.leading, 2)
+                .padding(.top, 2)
+                .accessibilityIdentifier(identifier)
+        }
     }
 }
 

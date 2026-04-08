@@ -399,29 +399,32 @@ struct FinanceAccountsToolView: View {
 
         let wasPrimary = primaryAccountID == editingAccountID
         let originalEditingID = editingAccountID
-        let previousIDs = Set(viewModel.accounts.map(\.id))
         let draftedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
         errorMessage = nil
 
         if let originalEditingID {
-            await viewModel.deleteAccount(originalEditingID)
-        }
-
-        await viewModel.addAccount(
-            AccountDraft(
-                name: name,
-                institution: institution,
-                balance: balanceValue,
-                kind: kind
+            await viewModel.updateAccount(
+                originalEditingID,
+                draft: AccountDraft(
+                    name: name,
+                    institution: institution,
+                    balance: balanceValue,
+                    kind: kind
+                )
             )
-        )
-
-        let newAccountID = Set(viewModel.accounts.map(\.id)).subtracting(previousIDs).first
-        let targetID = newAccountID ?? originalEditingID
-
-        if let originalEditingID, let newAccountID, originalEditingID != newAccountID {
-            removeMetadata(for: originalEditingID)
+        } else {
+            await viewModel.addAccount(
+                AccountDraft(
+                    name: name,
+                    institution: institution,
+                    balance: balanceValue,
+                    kind: kind
+                )
+            )
         }
+
+        let targetID = originalEditingID
+            ?? viewModel.accounts.first(where: { $0.name == name && $0.balance == balanceValue && $0.kind == kind })?.id
 
         if let targetID {
             updateMetadata(for: targetID) { metadata in
@@ -429,6 +432,10 @@ struct FinanceAccountsToolView: View {
                 metadata.isArchived = !active
                 metadata.includeInNetWorth = includeInNetWorth
             }
+        }
+
+        if let originalEditingID, let targetID, originalEditingID != targetID {
+            removeMetadata(for: originalEditingID)
         }
 
         if wasPrimary, active, let targetID {

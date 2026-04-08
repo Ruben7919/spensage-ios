@@ -105,6 +105,7 @@ struct BudgetWizardView: View {
                 }
                 .padding(24)
             }
+            .accessibilityIdentifier("budget.screen")
             .background(BrandTheme.canvas)
             .navigationTitle("Presupuesto")
             .navigationBarTitleDisplayMode(.inline)
@@ -113,11 +114,13 @@ struct BudgetWizardView: View {
                     Button("Cerrar") {
                         viewModel.dismissBudgetWizard()
                     }
+                    .accessibilityIdentifier("budget.action.close")
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button("Guía") {
                         isPresentingGuide = true
                     }
+                    .accessibilityIdentifier("budget.action.guide")
                 }
             }
             .sheet(isPresented: $isPresentingGuide) {
@@ -324,6 +327,7 @@ struct BudgetWizardView: View {
             TextField(placeholder.appLocalized, text: value)
                 .keyboardType(.decimalPad)
                 .padding()
+                .accessibilityIdentifier(title == "Ingreso mensual" ? "budget.field.income" : "budget.field.target")
                 .background(BrandTheme.surfaceTint)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -342,6 +346,7 @@ struct BudgetWizardView: View {
                     }
                 }
                 .buttonStyle(SecondaryCTAStyle())
+                .accessibilityIdentifier("budget.action.back")
             }
 
             Button(primaryTitle.appLocalized) {
@@ -356,6 +361,7 @@ struct BudgetWizardView: View {
             .buttonStyle(PrimaryCTAStyle())
             .disabled(!canAdvance)
             .opacity(canAdvance ? 1 : 0.72)
+            .accessibilityIdentifier(isFinal ? "budget.action.save" : "budget.action.next")
         }
     }
 

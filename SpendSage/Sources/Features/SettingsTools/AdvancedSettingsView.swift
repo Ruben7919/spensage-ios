@@ -22,6 +22,10 @@ struct AdvancedSettingsView: View {
     @State private var copiedState = false
     @State private var isPresentingGuide = false
 
+    private var internalTestingEnabled: Bool {
+        BuildConfiguration.internalTestingEnabled()
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
@@ -29,6 +33,7 @@ struct AdvancedSettingsView: View {
                 guideCard
                 deviceControlsCard
                 backendCloudCard
+                internalTesterBillingCard
                 exportCenterCard
                 ledgerSummaryCard
                 supportHandoffCard
@@ -268,6 +273,43 @@ struct AdvancedSettingsView: View {
                         value: state?.topCategory?.category.localizedTitle ?? "Sin datos",
                         systemImage: "sparkles.rectangle.stack"
                     )
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var internalTesterBillingCard: some View {
+        if internalTestingEnabled, viewModel.backendConfiguration?.environmentName == "dev" {
+            SurfaceCard {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Billing interno")
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+
+                    Text("Estos overrides existen solo para testing autenticado contra `dev`. Sirven para probar Free, Pro y Family sin cobro real en TestFlight interno.")
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    ForEach(InternalTesterPlanID.allCases, id: \.rawValue) { planID in
+                        let buttonTitle = "Activar " + planID.displayName
+                        if planID == .family {
+                            Button {
+                                Task { await viewModel.activateInternalTesterPlan(planID) }
+                            } label: {
+                                Text(buttonTitle)
+                            }
+                            .buttonStyle(PrimaryCTAStyle())
+                        } else {
+                            Button {
+                                Task { await viewModel.activateInternalTesterPlan(planID) }
+                            } label: {
+                                Text(buttonTitle)
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                        }
+                    }
                 }
             }
         }

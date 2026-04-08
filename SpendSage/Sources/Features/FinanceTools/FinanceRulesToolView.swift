@@ -343,40 +343,43 @@ struct FinanceRulesToolView: View {
 
         let wasEnabled = editingRule?.isEnabled ?? true
         let originalEditingID = editingRuleID
-        let previousIDs = Set(viewModel.rules.map(\.id))
         errorMessage = nil
 
         if let originalEditingID {
-            await viewModel.deleteRule(originalEditingID)
-        }
-
-        await viewModel.addRule(
-            RuleDraft(
-                merchantKeyword: trimmedMerchantContains,
-                category: category,
-                note: note
+            await viewModel.updateRule(
+                originalEditingID,
+                draft: RuleDraft(
+                    merchantKeyword: trimmedMerchantContains,
+                    category: category,
+                    note: note
+                )
             )
-        )
+        } else {
+            await viewModel.addRule(
+                RuleDraft(
+                    merchantKeyword: trimmedMerchantContains,
+                    category: category,
+                    note: note
+                )
+            )
+        }
 
-        let newRuleID = Set(viewModel.rules.map(\.id)).subtracting(previousIDs).first
+        let targetRuleID = originalEditingID
+            ?? viewModel.rules.first(where: { $0.merchantKeyword == trimmedMerchantContains && $0.category == category })?.id
 
-        if let newRuleID {
-            updatePresentationMetadata(for: newRuleID) { metadata in
-                metadata.name = trimmedName
-                metadata.paymentMethod = trimmedPaymentMethod
-            }
-            if let originalEditingID {
-                removePresentationMetadata(for: originalEditingID)
-            }
-        } else if let originalEditingID {
-            updatePresentationMetadata(for: originalEditingID) { metadata in
+        if let targetRuleID {
+            updatePresentationMetadata(for: targetRuleID) { metadata in
                 metadata.name = trimmedName
                 metadata.paymentMethod = trimmedPaymentMethod
             }
         }
 
-        if !wasEnabled, let newRuleID {
-            await viewModel.toggleRuleEnabled(newRuleID)
+        if let originalEditingID, let targetRuleID, originalEditingID != targetRuleID {
+            removePresentationMetadata(for: originalEditingID)
+        }
+
+        if !wasEnabled, let targetRuleID {
+            await viewModel.toggleRuleEnabled(targetRuleID)
         }
 
         resetForm()

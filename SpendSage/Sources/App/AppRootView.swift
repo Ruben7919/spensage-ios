@@ -106,7 +106,16 @@ struct AppRootView: View {
             await viewModel.refreshPushRegistrationState()
         }
         .task {
+            await viewModel.refreshCalendarSyncState()
+        }
+        .task {
+            await viewModel.refreshExpenseLocationState()
+        }
+        .task {
             await viewModel.refreshStoreBilling()
+        }
+        .task {
+            await viewModel.refreshSharingState()
         }
         .onChange(of: scenePhase) { _, phase in
             viewModel.handleScenePhaseChange(phase)
@@ -115,6 +124,9 @@ struct AppRootView: View {
             guard token != nil else { return }
             requestReview()
             viewModel.consumeReviewPrompt()
+        }
+        .onOpenURL { url in
+            viewModel.handleIncomingURL(url)
         }
     }
 

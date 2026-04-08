@@ -15,6 +15,7 @@ struct InsightsView: View {
     @State private var budgetDraft: [ExpenseCategory: String] = [:]
     @State private var plannerNotice: String?
     @State private var selectedChartIndex: Int?
+    @State private var hasAppliedDebugChartSelection = false
 
     private var currentState: FinanceDashboardState? {
         viewModel.dashboardState
@@ -207,6 +208,7 @@ struct InsightsView: View {
             .padding(.top, 18)
             .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
+        .accessibilityIdentifier("insights.screen")
         .background(
             ZStack {
                 BrandTheme.canvas
@@ -225,8 +227,12 @@ struct InsightsView: View {
         .onChange(of: selectedMetric) {
             selectedChartIndex = nil
         }
+        .onChange(of: selectedSeries.count) {
+            applyDebugChartSelectionIfNeeded()
+        }
         .task {
             seedBudgetDraftIfNeeded()
+            applyDebugChartSelectionIfNeeded()
         }
         .overlay(alignment: .bottom) {
             if let exportNotice {
@@ -388,12 +394,17 @@ struct InsightsView: View {
                             title: AppLocalization.localized("%@ seleccionado", arguments: selectedChartPoint.label),
                             detail: formattedChartValue(selectedChartPoint.value)
                         )
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier("insights.chart.selection")
+                        .accessibilityValue(formattedChartValue(selectedChartPoint.value))
                     } else {
                         BrandFeatureRow(
                             systemImage: "hand.tap.fill",
                             title: "Toca una barra",
                             detail: "El valor exacto aparece aquí cuando presionas un bloque."
                         )
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier("insights.chart.prompt")
                     }
 
                     Chart(selectedSeries) { row in
@@ -416,6 +427,7 @@ struct InsightsView: View {
                         }
                     }
                     .frame(height: 220)
+                    .accessibilityIdentifier("insights.mainChart")
                     .chartXAxis {
                         AxisMarks(values: selectedSeries.map(\.index)) { value in
                             AxisGridLine()
@@ -431,15 +443,43 @@ struct InsightsView: View {
                     }
                     .chartOverlay { proxy in
                         GeometryReader { geometry in
-                            Rectangle()
-                                .fill(Color.clear)
-                                .contentShape(Rectangle())
-                                .gesture(
-                                    DragGesture(minimumDistance: 0)
-                                        .onChanged { value in
-                                            updateChartSelection(at: value.location, proxy: proxy, geometry: geometry)
+                            if let plotFrame = proxy.plotFrame {
+                                let plotArea = geometry[plotFrame]
+
+                                ZStack {
+                                    Rectangle()
+                                        .fill(Color.clear)
+                                        .contentShape(Rectangle())
+                                        .frame(width: plotArea.width, height: plotArea.height)
+                                        .position(x: plotArea.midX, y: plotArea.midY)
+                                        .gesture(
+                                            DragGesture(minimumDistance: 0)
+                                                .onChanged { value in
+                                                    updateChartSelection(at: value.location, proxy: proxy, geometry: geometry)
+                                                }
+                                                .onEnded { value in
+                                                    updateChartSelection(at: value.location, proxy: proxy, geometry: geometry)
+                                                }
+                                        )
+
+                                    HStack(spacing: 0) {
+                                        ForEach(selectedSeries) { point in
+                                            Button {
+                                                selectedChartIndex = point.index
+                                            } label: {
+                                                Color.clear
+                                                    .contentShape(Rectangle())
+                                            }
+                                            .buttonStyle(.plain)
+                                            .accessibilityIdentifier("insights.chart.bar.\(point.index)")
+                                            .accessibilityLabel(point.label)
+                                            .accessibilityValue(formattedChartValue(point.value))
                                         }
-                                )
+                                    }
+                                    .frame(width: plotArea.width, height: plotArea.height)
+                                    .position(x: plotArea.midX, y: plotArea.midY)
+                                }
+                            }
                         }
                     }
 
@@ -460,9 +500,26 @@ struct InsightsView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("insights.link.trend")
                 }
             }
         }
+    }
+
+    private func applyDebugChartSelectionIfNeeded() {
+        guard !hasAppliedDebugChartSelection else { return }
+        guard !selectedSeries.isEmpty else { return }
+        guard let rawValue = ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_INSIGHTS_SELECTION"],
+              let requestedIndex = Int(rawValue) else {
+            return
+        }
+
+        let resolvedIndex = selectedSeries.first(where: { $0.index == requestedIndex })?.index
+            ?? selectedSeries.max(by: { $0.value < $1.value })?.index
+
+        guard let resolvedIndex else { return }
+        selectedChartIndex = resolvedIndex
+        hasAppliedDebugChartSelection = true
     }
 
     private func categoryCard(for state: FinanceDashboardState) -> some View {

@@ -48,6 +48,24 @@ enum SessionState: Equatable {
     var socialProvider: SocialProvider? {
         providerName.flatMap(SocialProvider.init(rawValue:))
     }
+
+    var storageNamespace: String {
+        switch self {
+        case .signedOut:
+            return "signed-out"
+        case .guest:
+            return "guest"
+        case let .signedIn(email, provider):
+            let raw = "\(email.lowercased())-\(provider ?? "email")"
+            let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_"))
+            let sanitizedScalars = raw.unicodeScalars.map { scalar in
+                allowed.contains(scalar) ? Character(scalar) : "_"
+            }
+            return String(sanitizedScalars)
+                .replacingOccurrences(of: "__", with: "_")
+                .trimmingCharacters(in: CharacterSet(charactersIn: "_"))
+        }
+    }
 }
 
 struct ExpenseItem: Identifiable, Equatable {
