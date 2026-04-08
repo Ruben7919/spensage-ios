@@ -29,6 +29,7 @@ struct GrowthCelebrationTests {
         #expect(celebrations.contains(where: { $0.kind == .levelUp && $0.reachedLevel == 3 }))
         #expect(celebrations.contains(where: { $0.kind == .trophyUnlocked && $0.id == "trophy-rookie-ledger" }))
         #expect(celebrations.contains(where: { $0.kind == .missionCompleted && $0.id == "mission-ledger-momentum" }))
+        #expect(celebrations.first(where: { $0.kind == .levelUp })?.detail.contains("loop local") == false)
     }
 
     @Test

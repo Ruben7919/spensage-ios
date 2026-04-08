@@ -48,7 +48,7 @@ final class SpendSageUITests: XCTestCase {
     func testSettingsNotificationsNavigationOpensDestination() {
         assertSettingsRoute(
             triggerID: "settings.link.notifications",
-            destinationTitle: "Notificaciones y calma"
+            destinationTitle: "Avisos y permisos"
         )
     }
 
@@ -138,9 +138,10 @@ final class SpendSageUITests: XCTestCase {
         let button = app.buttons["expenses.action.add"].firstMatch
         XCTAssertTrue(button.waitForExistence(timeout: 8))
 
-        button.tap()
+        tap(button)
 
-        XCTAssertTrue(element("addExpense.presented", in: app).waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["addExpense.action.cancel"].firstMatch.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["addExpense.action.save"].firstMatch.waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["addExpense.action.cancel"].firstMatch.waitForExistence(timeout: 5))
     }
 
@@ -152,8 +153,9 @@ final class SpendSageUITests: XCTestCase {
         let button = app.buttons["expenses.action.scan"].firstMatch
         XCTAssertTrue(button.waitForExistence(timeout: 8))
 
-        button.tap()
+        tap(button)
 
+        XCTAssertTrue(app.navigationBars["Escaneo de recibos"].firstMatch.waitForExistence(timeout: 8))
         XCTAssertTrue(app.buttons["Guía"].firstMatch.waitForExistence(timeout: 8))
     }
 
@@ -198,9 +200,11 @@ final class SpendSageUITests: XCTestCase {
         XCTAssertTrue(button.waitForExistence(timeout: 8))
         reveal(button, in: app, maxSwipes: 2)
 
-        button.tap()
+        tap(button)
 
-        XCTAssertTrue(app.buttons["Cerrar"].firstMatch.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["budget.action.close"].firstMatch.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["budget.action.guide"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["budget.action.close"].firstMatch.waitForExistence(timeout: 8))
     }
 
     @MainActor
@@ -212,7 +216,7 @@ final class SpendSageUITests: XCTestCase {
         let shareButton = app.buttons["celebration.action.share"].firstMatch
         XCTAssertTrue(shareButton.waitForExistence(timeout: 8))
         XCTAssertTrue(app.staticTexts["celebration.share.hint"].firstMatch.waitForExistence(timeout: 5))
-        shareButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        tap(shareButton, postPause: 0.8)
 
         XCTAssertTrue(element("celebration.share.presented", in: app).waitForExistence(timeout: 5))
 
@@ -258,6 +262,13 @@ final class SpendSageUITests: XCTestCase {
     }
 
     @MainActor
+    private func tap(_ element: XCUIElement, timeout: TimeInterval = 8, postPause: Double = 0.7) {
+        XCTAssertTrue(element.waitForExistence(timeout: timeout))
+        element.tap()
+        usleep(useconds_t(postPause * 1_000_000))
+    }
+
+    @MainActor
     private func assertNavigationTitle(_ title: String, in app: XCUIApplication, timeout: TimeInterval = 8) {
         XCTAssertTrue(app.navigationBars[title].firstMatch.waitForExistence(timeout: timeout))
     }
@@ -273,7 +284,11 @@ final class SpendSageUITests: XCTestCase {
         app.launchEnvironment["SPENDSAGE_DEBUG_SCREEN"] = "shell"
         app.launchEnvironment["SPENDSAGE_DEBUG_TAB"] = startingTab
         app.launchEnvironment["SPENDSAGE_DEBUG_SKIP_SPLASH"] = "1"
+        app.launchEnvironment["SPENDSAGE_DEBUG_HIDE_GUIDES"] = "1"
         app.launchEnvironment["SPENDSAGE_DEBUG_EXPAND_EXPENSES_TOOLS"] = "1"
+        app.launchEnvironment["SPENDSAGE_DEBUG_DISABLE_PERMISSION_BOOTSTRAP"] = "1"
+        app.launchEnvironment["SPENDSAGE_DEBUG_DISABLE_AUTO_CAMERA"] = "1"
+        app.launchEnvironment["SPENDSAGE_DEBUG_DISABLE_SHARE_SHEET"] = "1"
         return app
     }
 }

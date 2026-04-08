@@ -140,6 +140,10 @@ struct FinanceReceiptScanToolView: View {
         currentStep != .capture || errorMessage != nil || isSavingDraft || isAnalyzingReceipt || lastSavedSummary != nil
     }
 
+    private var shouldAutoOpenCamera: Bool {
+        ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_DISABLE_AUTO_CAMERA"] == nil
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
@@ -198,7 +202,7 @@ struct FinanceReceiptScanToolView: View {
             await loadPhotoSelection()
         }
         .sheet(isPresented: $isPresentingCamera, onDismiss: handleCameraDismiss) {
-            ReceiptCameraPicker { image in
+            ReceiptCameraSheet(photoPickerItem: $photoPickerItem) { image in
                 didCaptureInCurrentCameraSession = true
                 attachImage(image, source: .camera)
             }
@@ -227,6 +231,11 @@ struct FinanceReceiptScanToolView: View {
         }
         .onChange(of: note) { _, _ in
             clearTransientState()
+        }
+        .onChange(of: photoPickerItem) { _, newValue in
+            guard newValue != nil else { return }
+            didCaptureInCurrentCameraSession = true
+            isPresentingCamera = false
         }
     }
 
@@ -991,6 +1000,10 @@ struct FinanceReceiptScanToolView: View {
     }
 
     private func triggerAutomaticCameraIfNeeded() async {
+        guard shouldAutoOpenCamera else {
+            showCaptureFallback = true
+            return
+        }
         guard !hasAttemptedAutomaticCamera else { return }
         guard currentStep == .capture, capturedImage == nil else { return }
         hasAttemptedAutomaticCamera = true
@@ -1658,6 +1671,30 @@ private struct ReceiptSnapshotRow: View {
         .padding(14)
         .background(BrandTheme.surfaceTint)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+}
+
+private struct ReceiptCameraSheet: View {
+    @Binding var photoPickerItem: PhotosPickerItem?
+    let onImagePicked: (UIImage) -> Void
+
+    var body: some View {
+        ZStack(alignment: .bottomTrailing) {
+            ReceiptCameraPicker(onImagePicked: onImagePicked)
+                .ignoresSafeArea()
+
+            PhotosPicker(selection: $photoPickerItem, matching: .images) {
+                Label("Usar una foto", systemImage: "photo.on.rectangle")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color.black.opacity(0.72))
+                    .clipShape(Capsule())
+            }
+            .padding(.trailing, 20)
+            .padding(.bottom, 34)
+        }
     }
 }
 

@@ -10,7 +10,7 @@ final class SpendSageTutorialUITests: XCTestCase {
         let app = makeApp(screen: "onboarding")
         app.launch()
 
-        XCTAssertTrue(element("onboarding.screen", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["onboarding.action.continueToGoal"].firstMatch.waitForExistence(timeout: 10))
         pause(1.0)
 
         type("3200", into: app.textFields["onboarding.field.monthlyIncome"].firstMatch)
@@ -32,15 +32,15 @@ final class SpendSageTutorialUITests: XCTestCase {
         let app = makeApp(startingTab: "dashboard")
         app.launch()
 
-        XCTAssertTrue(element("dashboard.screen", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(app.navigationBars["Inicio"].firstMatch.waitForExistence(timeout: 10))
         pause(1.2)
 
         tap(app.buttons["shell.tab.expenses"].firstMatch)
-        XCTAssertTrue(element("expenses.screen", in: app).waitForExistence(timeout: 8))
+        XCTAssertTrue(app.navigationBars["Gastos"].firstMatch.waitForExistence(timeout: 8))
         pause(0.8)
 
         tap(app.buttons["expenses.action.add"].firstMatch)
-        XCTAssertTrue(element("addExpense.screen", in: app).waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["addExpense.action.save"].firstMatch.waitForExistence(timeout: 8))
         pause(0.8)
 
         type("Supermaxi", into: app.textFields["addExpense.field.merchant"].firstMatch)
@@ -48,7 +48,7 @@ final class SpendSageTutorialUITests: XCTestCase {
         pause(0.6)
 
         tap(app.buttons["addExpense.action.save"].firstMatch)
-        XCTAssertTrue(element("expenses.screen", in: app).waitForExistence(timeout: 8))
+        XCTAssertTrue(app.navigationBars["Gastos"].firstMatch.waitForExistence(timeout: 8))
         pause(1.4)
     }
 
@@ -58,7 +58,7 @@ final class SpendSageTutorialUITests: XCTestCase {
         app.launchEnvironment["SPENDSAGE_DEBUG_SCAN_STATE"] = "review"
         app.launch()
 
-        XCTAssertTrue(element("scan.screen", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["scan.action.backToAutofill"].firstMatch.waitForExistence(timeout: 10))
         pause(1.2)
 
         tap(app.buttons["scan.action.backToAutofill"].firstMatch)
@@ -77,7 +77,7 @@ final class SpendSageTutorialUITests: XCTestCase {
         let app = makeApp(startingTab: "insights")
         app.launch()
 
-        XCTAssertTrue(element("insights.screen", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["insights.link.trend"].firstMatch.waitForExistence(timeout: 10))
         pause(1.0)
 
         tap(app.buttons["insights.chart.bar.3"].firstMatch)
@@ -90,7 +90,7 @@ final class SpendSageTutorialUITests: XCTestCase {
         back(app)
 
         tap(app.buttons["shell.tab.dashboard"].firstMatch)
-        XCTAssertTrue(element("dashboard.screen", in: app).waitForExistence(timeout: 8))
+        XCTAssertTrue(app.navigationBars["Inicio"].firstMatch.waitForExistence(timeout: 8))
         pause(0.8)
 
         tap(app.buttons["dashboard.action.budgetWizard"].firstMatch)
@@ -104,7 +104,7 @@ final class SpendSageTutorialUITests: XCTestCase {
         pause(1.0)
         tap(app.buttons["budget.action.save"].firstMatch)
 
-        XCTAssertTrue(element("dashboard.screen", in: app).waitForExistence(timeout: 8))
+        XCTAssertTrue(app.navigationBars["Inicio"].firstMatch.waitForExistence(timeout: 8))
         pause(1.4)
     }
 
@@ -137,7 +137,7 @@ final class SpendSageTutorialUITests: XCTestCase {
         let app = makeApp(startingTab: "settings")
         app.launch()
 
-        XCTAssertTrue(element("settings.screen", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["settings.link.profile"].firstMatch.waitForExistence(timeout: 10))
         pause(1.0)
 
         tap(app.buttons["settings.link.profile"].firstMatch)
@@ -190,6 +190,9 @@ final class SpendSageTutorialUITests: XCTestCase {
         app.launchEnvironment["SPENDSAGE_DEBUG_SKIP_SPLASH"] = "1"
         app.launchEnvironment["SPENDSAGE_DEBUG_HIDE_GUIDES"] = "1"
         app.launchEnvironment["SPENDSAGE_DEBUG_EXPAND_EXPENSES_TOOLS"] = "1"
+        app.launchEnvironment["SPENDSAGE_DEBUG_DISABLE_PERMISSION_BOOTSTRAP"] = "1"
+        app.launchEnvironment["SPENDSAGE_DEBUG_DISABLE_AUTO_CAMERA"] = "1"
+        app.launchEnvironment["SPENDSAGE_DEBUG_DISABLE_SHARE_SHEET"] = "1"
 
         if let screen {
             app.launchEnvironment["SPENDSAGE_DEBUG_SCREEN"] = screen
@@ -216,18 +219,36 @@ final class SpendSageTutorialUITests: XCTestCase {
     @MainActor
     private func type(_ text: String, into element: XCUIElement, clear: Bool = true, timeout: TimeInterval = 8, postPause: Double = 0.6) {
         XCTAssertTrue(element.waitForExistence(timeout: timeout))
-        element.tap()
+        focus(element)
 
         if clear {
             let existingValue = (element.value as? String) ?? ""
             if !existingValue.isEmpty, existingValue != element.label {
                 let deleteCount = min(existingValue.count, 32)
-                element.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: deleteCount))
+                XCUIApplication().typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: deleteCount))
             }
         }
 
-        element.typeText(text)
+        XCUIApplication().typeText(text)
         pause(postPause)
+    }
+
+    @MainActor
+    private func focus(_ element: XCUIElement) {
+        let coordinate = element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+
+        element.tap()
+        pause(0.15)
+
+        if !(element.value(forKey: "hasKeyboardFocus") as? Bool ?? false) {
+            coordinate.tap()
+            pause(0.15)
+        }
+
+        if !(element.value(forKey: "hasKeyboardFocus") as? Bool ?? false) {
+            element.tap()
+            pause(0.2)
+        }
     }
 
     @MainActor

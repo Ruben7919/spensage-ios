@@ -7,7 +7,6 @@ struct ProfileView: View {
     @AppStorage("native.settings.language") private var language = "auto"
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
-    @AppStorage("native.settings.sound") private var soundStyle = "playful"
     @State private var draft: ProfileRecord
     @State private var isSaving = false
 
@@ -169,13 +168,12 @@ struct ProfileView: View {
                     ProfilePreferencesDetailView(
                         language: $language,
                         currency: $currency,
-                        theme: $theme,
-                        soundStyle: $soundStyle
+                        theme: $theme
                     )
                 } label: {
                     profileRouteRow(
                         title: "Preferencias",
-                        summary: "Idioma, moneda, tema y sonido.",
+                        summary: "Idioma, moneda y tema.",
                         systemImage: "paintpalette.fill"
                     )
                 }
@@ -282,7 +280,6 @@ private struct ProfilePreferencesDetailView: View {
     @Binding var language: String
     @Binding var currency: String
     @Binding var theme: String
-    @Binding var soundStyle: String
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -293,7 +290,7 @@ private struct ProfilePreferencesDetailView: View {
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Cambia presentación y sonido aquí sin recargar la pantalla principal de perfil.")
+                        Text("Cambia la presentación aquí sin recargar la pantalla principal de perfil.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
@@ -329,22 +326,6 @@ private struct ProfilePreferencesDetailView: View {
                             Text("Midnight").tag("midnight")
                             Text("Sunrise").tag("sunrise")
                         }
-
-                        Divider()
-
-                        profilePreferenceMenu(title: "Sonido", selection: $soundStyle) {
-                            Text("Off").tag("off")
-                            Text("Meow").tag("miau")
-                            Text("Playful").tag("playful")
-                        }
-
-                        Button("Probar sonido") {
-                            NotificationSoundPreviewService.shared.play(
-                                style: AppNotificationSoundStyle(rawPreference: soundStyle)
-                            )
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
-                        .disabled(AppNotificationSoundStyle(rawPreference: soundStyle) == .off)
                     }
                 }
             }

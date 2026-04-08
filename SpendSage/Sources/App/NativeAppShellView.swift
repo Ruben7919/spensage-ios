@@ -2,6 +2,13 @@ import SwiftUI
 import UIKit
 
 struct NativeAppShellView: View {
+    private enum ActiveSheet: String, Identifiable {
+        case addExpense
+        case budgetWizard
+
+        var id: String { rawValue }
+    }
+
     @ObservedObject var viewModel: AppViewModel
 
     private let leadingTabs: [AppViewModel.AppTab] = [.dashboard, .expenses]
@@ -9,30 +16,28 @@ struct NativeAppShellView: View {
     @Namespace private var shellSelectionAnimation
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .bottom) {
             currentTabContent
                 .tint(BrandTheme.primary)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .environment(\.shellBottomInset, ShellBarMetrics.contentBottomInset)
+                .environment(\.shellBottomInset, bottomNavigationInset)
+                .id(viewModel.selectedTab)
 
             bottomNavigation
+                .zIndex(10)
         }
         .ignoresSafeArea(edges: .bottom)
         .background(BrandTheme.background.ignoresSafeArea())
-        .sheet(isPresented: Binding(
-            get: { viewModel.isPresentingAddExpense },
-            set: { viewModel.isPresentingAddExpense = $0 }
-        )) {
-            SheetPresentationProbe(identifier: "addExpense.presented") {
-                AddExpenseView(viewModel: viewModel)
-            }
-        }
-        .sheet(isPresented: Binding(
-            get: { viewModel.isPresentingBudgetWizard },
-            set: { viewModel.isPresentingBudgetWizard = $0 }
-        )) {
-            SheetPresentationProbe(identifier: "budgetWizard.presented") {
-                BudgetWizardView(viewModel: viewModel)
+        .sheet(item: activeSheet) { sheet in
+            switch sheet {
+            case .addExpense:
+                SheetPresentationProbe(identifier: "addExpense.presented") {
+                    AddExpenseView(viewModel: viewModel)
+                }
+            case .budgetWizard:
+                SheetPresentationProbe(identifier: "budgetWizard.presented") {
+                    BudgetWizardView(viewModel: viewModel)
+                }
             }
         }
         .task {
@@ -130,11 +135,34 @@ struct NativeAppShellView: View {
     private var bottomNavigationContentPadding: CGFloat {
         max(deviceBottomInset - 14, 2)
     }
+
+    private var bottomNavigationInset: CGFloat {
+        ShellBarMetrics.backgroundHeight + bottomNavigationContentPadding + 12
+    }
+
+    private var activeSheet: Binding<ActiveSheet?> {
+        Binding(
+            get: {
+                if viewModel.isPresentingAddExpense {
+                    return .addExpense
+                }
+
+                if viewModel.isPresentingBudgetWizard {
+                    return .budgetWizard
+                }
+
+                return nil
+            },
+            set: { newValue in
+                viewModel.isPresentingAddExpense = newValue == .addExpense
+                viewModel.isPresentingBudgetWizard = newValue == .budgetWizard
+            }
+        )
+    }
 }
 
 private enum ShellBarMetrics {
     static let backgroundHeight: CGFloat = 66
-    static let contentBottomInset: CGFloat = 20
 }
 
 private struct ShellBottomInsetKey: EnvironmentKey {

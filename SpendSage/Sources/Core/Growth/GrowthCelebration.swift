@@ -44,7 +44,7 @@ enum GrowthCelebrationBuilder {
                         ? AppLocalization.localized("Subiste del nivel %d al %d.", arguments: previous.level, current.level)
                         : AppLocalization.localized("Saltaste del nivel %d al %d.", arguments: previous.level, current.level),
                     detail: AppLocalization.localized(
-                        "Tu loop local ya tiene suficiente ritmo para abrir un nuevo tramo del progreso. Te faltan %@ para el siguiente nivel.",
+                        "Vas por muy buen camino. Te faltan %@ para seguir subiendo.",
                         arguments: "\(current.xpToNextLevel) XP"
                     ),
                     badgeAsset: "badge_level_up_v2.png",
@@ -52,7 +52,7 @@ enum GrowthCelebrationBuilder {
                     rewardXP: nil,
                     reachedLevel: current.level,
                     shareText: AppLocalization.localized(
-                        "Acabo de subir al %@ en SpendSage. Un paso más en mi loop de ahorro.",
+                        "Acabo de subir al %@ en SpendSage. Vamos por el siguiente paso.",
                         arguments: "nivel \(current.level)"
                     )
                 )

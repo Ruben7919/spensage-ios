@@ -9,6 +9,10 @@ struct GrowthCelebrationOverlay: View {
     @State private var sharePayload: GrowthCelebrationSharePayload?
     @State private var didRequestShare = false
 
+    private var shouldSuppressSystemShareSheetForQA: Bool {
+        ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_DISABLE_SHARE_SHEET"] == "1"
+    }
+
     var body: some View {
         ZStack {
             Color.black.opacity(0.42)
@@ -32,7 +36,7 @@ struct GrowthCelebrationOverlay: View {
 
                 celebrationCard
 
-                Text("Si quieres, compártelo en Instagram, X, WhatsApp o cualquier red desde la hoja de compartir de iOS.")
+                Text("Si te nace, compártelo desde la hoja de compartir de tu iPhone.")
                     .font(.footnote)
                     .foregroundStyle(Color.white.opacity(0.84))
                     .multilineTextAlignment(.center)
@@ -40,8 +44,9 @@ struct GrowthCelebrationOverlay: View {
                     .accessibilityIdentifier("celebration.share.hint")
 
                 HStack(spacing: 12) {
-                    Button("Compartir en redes") {
+                    Button("Compartir") {
                         didRequestShare = true
+                        guard !shouldSuppressSystemShareSheetForQA else { return }
                         sharePayload = GrowthCelebrationSharePayload.make(for: celebration)
                     }
                     .buttonStyle(SecondaryCTAStyle())

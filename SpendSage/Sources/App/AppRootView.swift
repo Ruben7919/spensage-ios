@@ -7,6 +7,15 @@ struct AppRootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var showLaunchExperience = true
 
+    private var permissionsBootstrapID: String {
+        [
+            String(describing: viewModel.screen),
+            viewModel.session.storageNamespace,
+            viewModel.backendStatus?.capabilities.features.pushRegistration == true ? "push-on" : "push-off"
+        ]
+        .joined(separator: "::")
+    }
+
     private var shouldShowSplash: Bool {
         viewModel.debugRoute == nil
             && ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_SKIP_SPLASH"] == nil
@@ -14,6 +23,10 @@ struct AppRootView: View {
 
     private var shouldHoldSplashForQA: Bool {
         ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_HOLD_SPLASH"] != nil
+    }
+
+    private var shouldBootstrapPermissions: Bool {
+        ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_DISABLE_PERMISSION_BOOTSTRAP"] == nil
     }
 
     var body: some View {
@@ -116,6 +129,10 @@ struct AppRootView: View {
         }
         .task {
             await viewModel.refreshSharingState()
+        }
+        .task(id: permissionsBootstrapID) {
+            guard shouldBootstrapPermissions else { return }
+            await viewModel.bootstrapEssentialPermissionsIfNeeded()
         }
         .onChange(of: scenePhase) { _, phase in
             viewModel.handleScenePhaseChange(phase)

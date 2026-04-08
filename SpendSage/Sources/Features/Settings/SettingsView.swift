@@ -68,7 +68,7 @@ struct SettingsView: View {
                 SettingsSummaryHeader(
                     badge: "Configuración simple",
                     title: "Ajustes",
-                    summary: "Mantén esta área corta. Abre una sección solo cuando quieras cambiar cómo se ve, suena o te recuerda algo la app.",
+                    summary: "Mantén esta área corta. Abre una sección solo cuando quieras cambiar cómo se ve la app o revisar permisos importantes del iPhone.",
                     character: .tikki,
                     expression: .proud
                 )
@@ -112,7 +112,7 @@ struct SettingsView: View {
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Separa lo básico de los recordatorios para que la pantalla principal se sienta más liviana y fácil de revisar.")
+                Text("Separa lo visual de los permisos del iPhone para que la pantalla principal se sienta más liviana y fácil de revisar.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -133,8 +133,8 @@ struct SettingsView: View {
                     SettingsNotificationsView(viewModel: viewModel)
                 } label: {
                     SettingsNavigationRow(
-                        title: "Notificaciones y calma",
-                        summary: "Recordatorios, horas de silencio y sonido quedan juntos.",
+                        title: "Avisos y permisos",
+                        summary: "Revisa notificaciones, calendario y ubicación sin llenar esta app de toggles.",
                         systemImage: "bell.badge.fill"
                     )
                 }
@@ -368,24 +368,33 @@ private struct SettingsPreferencesView: View {
 private struct SettingsNotificationsView: View {
     @ObservedObject var viewModel: AppViewModel
     @Environment(\.openURL) private var openURL
-    @AppStorage("native.settings.calendarBillSyncEnabled") private var calendarBillSyncEnabled = false
-    @AppStorage("native.settings.reminders") private var remindersEnabled = true
-    @AppStorage("native.settings.sound") private var soundStyle = "playful"
-    @AppStorage("native.settings.quietHoursEnabled") private var quietHoursEnabled = true
-    @AppStorage("native.settings.quietHoursStart") private var quietHoursStart = "22:00"
-    @AppStorage("native.settings.quietHoursEnd") private var quietHoursEnd = "07:00"
-    @AppStorage("native.settings.weekendQuietMode") private var weekendQuietMode = true
-    @AppStorage("native.settings.maxNotificationsPerDay") private var maxNotificationsPerDay = 2
-    @AppStorage("native.settings.maxNotificationsPerWeek") private var maxNotificationsPerWeek = 5
+
+    private var internalTestingEnabled: Bool {
+        BuildConfiguration.internalTestingEnabled()
+    }
+
+    private var shouldOpenSystemSettings: Bool {
+        viewModel.pushRegistrationStatus.authorization == .denied
+            || viewModel.calendarSyncStatus.authorization == .denied
+            || viewModel.calendarSyncStatus.authorization == .restricted
+            || viewModel.expenseLocationStatus == .denied
+            || viewModel.expenseLocationStatus == .restricted
+    }
+
+    private var shouldOfferPermissionRetry: Bool {
+        viewModel.pushRegistrationStatus.authorization == .notDetermined
+            || viewModel.calendarSyncStatus.authorization == .notDetermined
+            || viewModel.expenseLocationStatus == .notDetermined
+    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 SurfaceCard {
                     SettingsSummaryHeader(
-                        badge: "Recordatorios tranquilos",
-                        title: "Notificaciones y calma",
-                        summary: "Mantén los recordatorios útiles y ligeros. Si una opción no afecta tu día a día, déjala como está.",
+                        badge: "Permisos simples",
+                        title: "Avisos y permisos",
+                        summary: "SpendSage hereda el comportamiento del iPhone. Aquí solo revisas si el dispositivo está listo y, si hace falta, abres Ajustes del sistema.",
                         character: .manchas,
                         expression: .happy
                     )
@@ -393,69 +402,38 @@ private struct SettingsNotificationsView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Push de este iPhone")
+                        Text("Avisos del iPhone")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
                         BrandFeatureRow(
-                            systemImage: viewModel.pushRegistrationStatus.backendEnabled ? "checkmark.icloud.fill" : "icloud.slash.fill",
-                            title: "Backend",
-                            detail: viewModel.pushRegistrationStatus.backendEnabled
-                                ? "El backend permite registro push para esta app."
-                                : "Dev aún no tiene APNs/SNS activos para esta app."
-                        )
-
-                        BrandFeatureRow(
                             systemImage: viewModel.pushRegistrationStatus.authorization.systemImage,
-                            title: "Permiso del iPhone",
+                            title: "Notificaciones",
                             detail: viewModel.pushRegistrationStatus.authorization.summary
                         )
 
                         BrandFeatureRow(
-                            systemImage: viewModel.pushRegistrationStatus.cachedTokenSuffix == nil ? "iphone.slash" : "iphone.radiowaves.left.and.right",
-                            title: "Token APNs",
-                            detail: viewModel.pushRegistrationStatus.cachedTokenSuffix.map { "Registrado localmente \($0)" }
-                                ?? "Todavía no hay token APNs guardado en este iPhone."
+                            systemImage: "moon.zzz.fill",
+                            title: "Silencio y concentración",
+                            detail: "SpendSage respeta el modo silencio y los modos de concentración del iPhone automáticamente. No hace falta configurar nada aquí."
                         )
 
-                        if let lastUploadedAt = viewModel.pushRegistrationStatus.lastUploadedAt {
+                        if let lastUploadedAt = viewModel.pushRegistrationStatus.lastUploadedAt, viewModel.session.isAuthenticated {
                             BrandFeatureRow(
                                 systemImage: "checkmark.seal.fill",
-                                title: "Última vinculación cloud",
-                                detail: "Subido el \(lastUploadedAt.formatted(date: .abbreviated, time: .shortened))"
+                                title: "Última verificación",
+                                detail: "Este iPhone quedó vinculado el \(lastUploadedAt.formatted(date: .abbreviated, time: .shortened))."
                             )
                         }
 
-                        if let lastError = viewModel.pushRegistrationStatus.lastError, !lastError.isEmpty {
-                            BrandFeatureRow(
-                                systemImage: "exclamationmark.triangle.fill",
-                                title: "Último error",
-                                detail: lastError
-                            )
+                        if shouldOfferPermissionRetry {
+                            Button("Revisar permisos ahora") {
+                                Task { await viewModel.bootstrapEssentialPermissionsIfNeeded(force: true) }
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
                         }
 
-                        Button(viewModel.pushRegistrationStatus.cachedTokenSuffix == nil ? "Activar push en este iPhone" : "Revalidar push en este iPhone") {
-                            Task { await viewModel.registerPushNotifications() }
-                        }
-                        .buttonStyle(PrimaryCTAStyle())
-                        .disabled(
-                            !viewModel.session.isAuthenticated
-                                || !viewModel.pushRegistrationStatus.backendEnabled
-                                || viewModel.pushRegistrationStatus.isRegistering
-                        )
-
-                        Button("Enviar push de prueba") {
-                            Task { await viewModel.sendTestPushNotification() }
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
-                        .disabled(
-                            !viewModel.session.isAuthenticated
-                                || !viewModel.pushRegistrationStatus.backendEnabled
-                                || viewModel.pushRegistrationStatus.cachedTokenSuffix == nil
-                                || viewModel.pushRegistrationStatus.isSendingTestPush
-                        )
-
-                        if viewModel.pushRegistrationStatus.authorization == .denied {
+                        if shouldOpenSystemSettings {
                             Button("Abrir ajustes del sistema") {
                                 guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                                 openURL(url)
@@ -463,16 +441,10 @@ private struct SettingsNotificationsView: View {
                             .buttonStyle(SecondaryCTAStyle())
                         }
 
-                        if !viewModel.session.isAuthenticated {
-                            Text("La cuenta es obligatoria para registrar este iPhone contra `/devices/register`.")
-                                .font(.footnote)
-                                .foregroundStyle(BrandTheme.muted)
-                        } else {
-                            Text("Si no usaste la app o no cruzaste alertas de presupuesto, es normal no recibir pushes todavía. Usa el push de prueba para validar entrega.")
-                                .font(.footnote)
-                                .foregroundStyle(BrandTheme.muted)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
+                        Text("Si el iPhone está en silencio, con un modo de concentración activo o sin conexión, Apple decide cómo se entrega el aviso. La app no necesita un ajuste extra para eso.")
+                            .font(.footnote)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
 
@@ -482,48 +454,40 @@ private struct SettingsNotificationsView: View {
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        SettingsToggleRow(
-                            title: "Sincronizar facturas con Calendario",
-                            summary: "Crea recordatorios opcionales para tus facturas recurrentes usando el calendario del iPhone.",
-                            isOn: $calendarBillSyncEnabled
-                        )
-
-                        Divider()
-
                         BrandFeatureRow(
                             systemImage: viewModel.calendarSyncStatus.authorization.systemImage,
-                            title: "Permiso de Calendario",
+                            title: "Calendario",
                             detail: viewModel.calendarSyncStatus.authorization.summary
                         )
 
                         if let lastSyncedAt = viewModel.calendarSyncStatus.lastSyncedAt {
                             BrandFeatureRow(
-                                systemImage: "checkmark.seal.fill",
+                                systemImage: "calendar.badge.checkmark",
                                 title: "Última sincronización",
                                 detail: "Se actualizaron \(viewModel.calendarSyncStatus.syncedBillCount ?? 0) facturas el \(lastSyncedAt.formatted(date: .abbreviated, time: .shortened))."
                             )
                         }
 
-                        Button("Sincronizar facturas ahora") {
-                            Task { await viewModel.syncBillsToCalendar() }
-                        }
-                        .buttonStyle(PrimaryCTAStyle())
-                        .disabled(viewModel.calendarSyncStatus.isSyncing)
-
-                        Divider()
-
                         BrandFeatureRow(
                             systemImage: viewModel.expenseLocationStatus.systemImage,
-                            title: "Permiso de ubicación",
+                            title: "Ubicación",
                             detail: viewModel.expenseLocationStatus.summary
                         )
 
-                        Button("Permitir ubicación para etiquetar gastos") {
-                            Task { await viewModel.requestExpenseLocationPermission() }
+                        if viewModel.calendarSyncStatus.authorization == .granted {
+                            Button("Sincronizar facturas ahora") {
+                                Task { await viewModel.syncBillsToCalendar() }
+                            }
+                            .buttonStyle(PrimaryCTAStyle())
+                            .disabled(viewModel.calendarSyncStatus.isSyncing)
+                        } else if shouldOfferPermissionRetry {
+                            Button("Volver a pedir permisos") {
+                                Task { await viewModel.bootstrapEssentialPermissionsIfNeeded(force: true) }
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
                         }
-                        .buttonStyle(SecondaryCTAStyle())
 
-                        if viewModel.calendarSyncStatus.authorization == .denied || viewModel.expenseLocationStatus == .denied {
+                        if shouldOpenSystemSettings {
                             Button("Abrir ajustes del sistema") {
                                 guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                                 openURL(url)
@@ -531,130 +495,64 @@ private struct SettingsNotificationsView: View {
                             .buttonStyle(SecondaryCTAStyle())
                         }
 
-                        Text("SpendSage no usa ubicación en background. La ubicación solo se consulta cuando tú eliges etiquetar un gasto y el calendario solo se toca para recordatorios de facturas.")
+                        Text("SpendSage pide calendario y ubicación al iniciar si todavía no los aprobaste. El calendario se usa para facturas y la ubicación solo mientras la app está abierta para etiquetar un gasto.")
                             .font(.footnote)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
 
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Recordatorios")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
+                if internalTestingEnabled {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Diagnóstico interno")
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
 
-                        SettingsToggleRow(
-                            title: "Recordatorios diarios",
-                            summary: "Activa o apaga recordatorios de rutina para este dispositivo.",
-                            isOn: $remindersEnabled
-                        )
+                            BrandFeatureRow(
+                                systemImage: viewModel.pushRegistrationStatus.backendEnabled ? "checkmark.icloud.fill" : "icloud.slash.fill",
+                                title: "Backend push",
+                                detail: viewModel.pushRegistrationStatus.backendEnabled
+                                    ? "El backend permite registro push para esta app."
+                                    : "El backend todavía no expone push para esta app."
+                            )
 
-                        Divider()
+                            BrandFeatureRow(
+                                systemImage: viewModel.pushRegistrationStatus.cachedTokenSuffix == nil ? "iphone.slash" : "iphone.radiowaves.left.and.right",
+                                title: "Token APNs",
+                                detail: viewModel.pushRegistrationStatus.cachedTokenSuffix.map { "Registrado localmente \($0)" }
+                                    ?? "Todavía no hay token APNs guardado en este iPhone."
+                            )
 
-                        SettingsChoiceRow(
-                            title: "Máximo de notificaciones por día",
-                            summary: "Define un límite diario ligero para que la app siga siendo útil.",
-                            selection: $maxNotificationsPerDay
-                        ) {
-                            Text("1").tag(1)
-                            Text("2").tag(2)
-                            Text("3").tag(3)
-                        }
+                            if let lastError = viewModel.pushRegistrationStatus.lastError, !lastError.isEmpty {
+                                BrandFeatureRow(
+                                    systemImage: "exclamationmark.triangle.fill",
+                                    title: "Último error",
+                                    detail: lastError
+                                )
+                            }
 
-                        Divider()
+                            Button(viewModel.pushRegistrationStatus.cachedTokenSuffix == nil ? "Activar push en este iPhone" : "Revalidar push en este iPhone") {
+                                Task { await viewModel.registerPushNotifications() }
+                            }
+                            .buttonStyle(PrimaryCTAStyle())
+                            .disabled(
+                                !viewModel.session.isAuthenticated
+                                    || !viewModel.pushRegistrationStatus.backendEnabled
+                                    || viewModel.pushRegistrationStatus.isRegistering
+                            )
 
-                        SettingsChoiceRow(
-                            title: "Máximo de notificaciones por semana",
-                            summary: "Limita cuántas veces la app te recuerda algo a lo largo de la semana.",
-                            selection: $maxNotificationsPerWeek
-                        ) {
-                            Text("3").tag(3)
-                            Text("4").tag(4)
-                            Text("5").tag(5)
-                            Text("6").tag(6)
-                            Text("7").tag(7)
-                        }
-                    }
-                }
-
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Horas de silencio")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        SettingsToggleRow(
-                            title: "Horas de silencio",
-                            summary: "Pausa el ruido de recordatorios durante la franja que elijas.",
-                            isOn: $quietHoursEnabled
-                        )
-
-                        Divider()
-
-                        SettingsChoiceRow(
-                            title: "Inicio del silencio",
-                            summary: "Elige cuándo comienza la ventana tranquila.",
-                            selection: $quietHoursStart
-                        ) {
-                            Text("21:00").tag("21:00")
-                            Text("22:00").tag("22:00")
-                            Text("23:00").tag("23:00")
-                            Text("00:00").tag("00:00")
-                        }
-
-                        Divider()
-
-                        SettingsChoiceRow(
-                            title: "Fin del silencio",
-                            summary: "Elige cuándo pueden volver los recordatorios.",
-                            selection: $quietHoursEnd
-                        ) {
-                            Text("06:00").tag("06:00")
-                            Text("07:00").tag("07:00")
-                            Text("08:00").tag("08:00")
-                            Text("09:00").tag("09:00")
-                        }
-
-                        Divider()
-
-                        SettingsToggleRow(
-                            title: "Silencio en fin de semana",
-                            summary: "Mantén los fines de semana más tranquilos salvo que abras la app tú mismo.",
-                            isOn: $weekendQuietMode
-                        )
-                    }
-                }
-
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Sonido")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        SettingsChoiceRow(
-                            title: "Sonido de notificación",
-                            summary: "Elige un estilo de respuesta y pruébalo aquí.",
-                            selection: $soundStyle
-                        ) {
-                            Text("Silencio").tag("off")
-                            Text("Miau").tag("miau")
-                            Text("Juguetón").tag("playful")
-                        }
-
-                        Button("Probar sonido de notificación") {
-                            NotificationSoundPreviewService.shared.play(
-                                style: AppNotificationSoundStyle(rawPreference: soundStyle)
+                            Button("Enviar push de prueba") {
+                                Task { await viewModel.sendTestPushNotification() }
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                            .disabled(
+                                !viewModel.session.isAuthenticated
+                                    || !viewModel.pushRegistrationStatus.backendEnabled
+                                    || viewModel.pushRegistrationStatus.cachedTokenSuffix == nil
+                                    || viewModel.pushRegistrationStatus.isSendingTestPush
                             )
                         }
-                        .buttonStyle(SecondaryCTAStyle())
-                        .disabled(AppNotificationSoundStyle(rawPreference: soundStyle) == .off)
-
-                        BrandFeatureRow(
-                            systemImage: "speaker.wave.2.fill",
-                            title: "Sonido actual",
-                            detail: AppNotificationSoundStyle(rawPreference: soundStyle).displayName
-                        )
                     }
                 }
             }
@@ -668,8 +566,10 @@ private struct SettingsNotificationsView: View {
         }
         .task {
             await viewModel.refreshPushRegistrationState()
+            await viewModel.refreshCalendarSyncState()
+            await viewModel.refreshExpenseLocationState()
         }
-        .navigationTitle("Notificaciones y calma")
+        .navigationTitle("Avisos y permisos")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -686,7 +586,7 @@ private extension PushAuthorizationState {
         case .denied:
             return "Las notificaciones están bloqueadas en Ajustes del sistema."
         case .notDetermined:
-            return "Todavía no se ha pedido permiso push en este iPhone."
+            return "SpendSage te pedirá permiso cuando abras la app con tu cuenta."
         }
     }
 

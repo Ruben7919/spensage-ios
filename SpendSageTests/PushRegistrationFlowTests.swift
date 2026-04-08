@@ -71,6 +71,41 @@ struct PushRegistrationFlowTests {
         #expect(viewModel.session == .signedOut)
     }
 
+    @Test
+    func bootstrapsEssentialPermissionsOnlyOncePerSessionState() async {
+        PushRegistrationPersistence.resetForTesting()
+
+        let auth = MockAuthService(idToken: "id-token")
+        let backend = MockBackendService()
+        let push = MockPushRegistrationService(
+            authorization: .notDetermined,
+            cachedToken: nil,
+            requestedToken: .success("apns-token-boot-123456")
+        )
+        let calendar = MockBillCalendarSyncService(authorization: .notDetermined)
+        let location = MockExpenseLocationService(authorization: .notDetermined)
+        let viewModel = AppViewModel(
+            authService: auth,
+            financeStore: LocalFinanceStore(),
+            backendService: backend,
+            pushRegistrationService: push,
+            billCalendarSyncService: calendar,
+            expenseLocationService: location
+        )
+
+        viewModel.hasCompletedOnboarding = true
+        viewModel.session = .signedIn(email: "bootstrap@spendsage.ai", provider: "Apple")
+        viewModel.backendStatus = BackendRuntimeStatus(capabilities: makeCapabilities(pushRegistration: true), entitlements: nil)
+
+        await viewModel.bootstrapEssentialPermissionsIfNeeded(force: true)
+        await viewModel.bootstrapEssentialPermissionsIfNeeded()
+
+        #expect(push.requestRemoteNotificationTokenCallCount == 1)
+        #expect(backend.registeredRequests.count == 1)
+        #expect(calendar.requestAccessCallCount == 1)
+        #expect(location.requestAuthorizationCallCount == 1)
+    }
+
     private func makeCapabilities(pushRegistration: Bool) -> BackendCapabilities {
         BackendCapabilities(
             mode: "live",
@@ -266,9 +301,10 @@ private final class MockBackendService: BackendServicing {
 
 @MainActor
 private final class MockPushRegistrationService: PushRegistrationServicing {
-    let authorization: PushAuthorizationState
-    let cachedTokenValue: String?
+    var authorization: PushAuthorizationState
+    var cachedTokenValue: String?
     let requestedTokenResult: Result<String, Error>
+    private(set) var requestRemoteNotificationTokenCallCount = 0
 
     init(
         authorization: PushAuthorizationState,
@@ -289,6 +325,56 @@ private final class MockPushRegistrationService: PushRegistrationServicing {
     }
 
     func requestRemoteNotificationToken() async throws -> String {
-        try requestedTokenResult.get()
+        requestRemoteNotificationTokenCallCount += 1
+        let token = try requestedTokenResult.get()
+        cachedTokenValue = token
+        authorization = .authorized
+        return token
+    }
+}
+
+@MainActor
+private final class MockBillCalendarSyncService: BillCalendarSyncServicing {
+    var authorization: BillCalendarAuthorizationState
+    private(set) var requestAccessCallCount = 0
+
+    init(authorization: BillCalendarAuthorizationState) {
+        self.authorization = authorization
+    }
+
+    func authorizationStatus() async -> BillCalendarAuthorizationState {
+        authorization
+    }
+
+    func requestAccessIfNeeded() async throws {
+        requestAccessCallCount += 1
+        authorization = .granted
+    }
+
+    func syncBills(_ bills: [BillRecord], ledger: LocalFinanceLedger, session: SessionState) async throws -> Int {
+        bills.count
+    }
+}
+
+@MainActor
+private final class MockExpenseLocationService: ExpenseLocationServicing {
+    var authorization: ExpenseLocationAuthorizationStatus
+    private(set) var requestAuthorizationCallCount = 0
+
+    init(authorization: ExpenseLocationAuthorizationStatus) {
+        self.authorization = authorization
+    }
+
+    func authorizationStatus() async -> ExpenseLocationAuthorizationStatus {
+        authorization
+    }
+
+    func requestAuthorization() async throws {
+        requestAuthorizationCallCount += 1
+        authorization = .granted
+    }
+
+    func requestCurrentLocationLabel() async throws -> String {
+        "Quito, EC"
     }
 }

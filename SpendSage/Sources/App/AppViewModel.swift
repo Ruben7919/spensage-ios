@@ -117,10 +117,11 @@ final class AppViewModel: ObservableObject {
     private let onboardingKey = "native_onboarding_completed"
     private let premiumStatusDefaultsKey = "native.premium.status"
     private let premiumPlanDefaultsKey = "native.premium.plan"
-    private let calendarBillSyncDefaultsKey = "native.settings.calendarBillSyncEnabled"
     private var queuedCelebrations: [GrowthCelebration] = []
     private var shouldPromptForReviewAfterCelebrations = false
     private var didBootstrapRememberedSession = false
+    private var permissionBootstrapKey: String?
+    private var isBootstrappingPermissions = false
     private var backgroundedAt: Date?
     private var backendStatusUpdatedAt: Date?
     private var storeBillingUpdatedAt: Date?
@@ -444,6 +445,8 @@ final class AppViewModel: ObservableObject {
         requiresSessionUnlock = false
         isRestoringRememberedSession = false
         sessionUnlockError = nil
+        permissionBootstrapKey = nil
+        isBootstrappingPermissions = false
         backgroundedAt = nil
         backendStatusUpdatedAt = nil
         storeBillingUpdatedAt = nil
@@ -657,13 +660,17 @@ final class AppViewModel: ObservableObject {
         expenseLocationStatus = await expenseLocationService.authorizationStatus()
     }
 
-    func requestExpenseLocationPermission() async {
+    func requestExpenseLocationPermission(showNotice: Bool = true) async {
         do {
             try await expenseLocationService.requestAuthorization()
-            notice = "Ubicación lista para etiquetar gastos cuando tú lo pidas."
+            if showNotice {
+                notice = "Ubicación lista para etiquetar gastos cuando tú lo pidas."
+            }
             await refreshExpenseLocationState()
         } catch {
-            notice = error.localizedDescription
+            if showNotice {
+                notice = error.localizedDescription
+            }
             await refreshExpenseLocationState()
         }
     }
@@ -680,19 +687,25 @@ final class AppViewModel: ObservableObject {
         }
     }
 
-    func syncBillsToCalendar() async {
+    func syncBillsToCalendar(showNotice: Bool = true) async {
         guard let ledger else {
-            notice = "Todavía no hay un libro cargado para sincronizar facturas."
+            if showNotice {
+                notice = "Todavía no hay un libro cargado para sincronizar facturas."
+            }
             return
         }
 
         await refreshCalendarSyncState(isSyncing: true)
         do {
             let syncedCount = try await billCalendarSyncService.syncBills(bills, ledger: ledger, session: session)
-            notice = AppLocalization.localized("Calendario actualizado con %d recordatorios de facturas.", arguments: syncedCount)
+            if showNotice {
+                notice = AppLocalization.localized("Calendario actualizado con %d recordatorios de facturas.", arguments: syncedCount)
+            }
             await refreshCalendarSyncState()
         } catch {
-            notice = error.localizedDescription
+            if showNotice {
+                notice = error.localizedDescription
+            }
             await refreshCalendarSyncState(lastError: error.localizedDescription)
         }
     }
@@ -764,24 +777,30 @@ final class AppViewModel: ObservableObject {
         )
     }
 
-    func registerPushNotifications() async {
+    func registerPushNotifications(showNotice: Bool = true) async {
         guard session.isAuthenticated else {
             let message = "Inicia sesión antes de registrar este iPhone para notificaciones push."
-            notice = message
+            if showNotice {
+                notice = message
+            }
             await refreshPushRegistrationState(lastError: message)
             return
         }
 
         guard backendStatus?.capabilities.features.pushRegistration == true else {
             let message = "El backend todavía no tiene APNs/SNS configurado para esta app."
-            notice = message
+            if showNotice {
+                notice = message
+            }
             await refreshPushRegistrationState(lastError: message)
             return
         }
 
         guard let idToken = await authService.currentIDToken(), !idToken.isEmpty else {
             let message = "No se pudo obtener un token válido de tu sesión."
-            notice = message
+            if showNotice {
+                notice = message
+            }
             await refreshPushRegistrationState(lastError: message)
             return
         }
@@ -811,7 +830,9 @@ final class AppViewModel: ObservableObject {
                 )
             }
 
-            notice = "Push activado y vinculado a tu cuenta en este iPhone."
+            if showNotice {
+                notice = "Push activado y vinculado a tu cuenta en este iPhone."
+            }
             await refreshPushRegistrationState()
             await telemetryService.track(
                 "push_registered",
@@ -823,7 +844,9 @@ final class AppViewModel: ObservableObject {
             await telemetryService.flushIfPossible(session: session)
         } catch {
             let message = error.localizedDescription
-            notice = message
+            if showNotice {
+                notice = message
+            }
             await refreshPushRegistrationState(lastError: message)
         }
     }
@@ -1233,7 +1256,7 @@ final class AppViewModel: ObservableObject {
 
         await financeStore.saveBill(draft, for: session, spaceID: currentSpaceID)
         notice = "Recurring bill saved locally on this device.".appLocalized
-        await syncBillsToCalendarIfEnabled()
+        await syncBillsToCalendarIfAuthorized()
         await refreshDashboard()
     }
 
@@ -1245,21 +1268,21 @@ final class AppViewModel: ObservableObject {
 
         await financeStore.updateBill(billID, draft: draft, for: session, spaceID: currentSpaceID)
         notice = "Recurring bill updated for this space.".appLocalized
-        await syncBillsToCalendarIfEnabled()
+        await syncBillsToCalendarIfAuthorized()
         await refreshDashboard()
     }
 
     func deleteBill(_ billID: UUID) async {
         await financeStore.deleteBill(billID, for: session, spaceID: currentSpaceID)
         notice = "Recurring bill removed from your local ledger.".appLocalized
-        await syncBillsToCalendarIfEnabled()
+        await syncBillsToCalendarIfAuthorized()
         await refreshDashboard()
     }
 
     func toggleBillAutopay(_ billID: UUID) async {
         await financeStore.toggleBillAutopay(billID, for: session, spaceID: currentSpaceID)
         notice = "Bill autopay updated locally on this device.".appLocalized
-        await syncBillsToCalendarIfEnabled()
+        await syncBillsToCalendarIfAuthorized()
         await refreshDashboard()
     }
 
@@ -1300,7 +1323,7 @@ final class AppViewModel: ObservableObject {
     func payBill(_ billID: UUID) async {
         await financeStore.markBillPaid(billID, for: session, spaceID: currentSpaceID)
         notice = "Bill payment saved to your local ledger.".appLocalized
-        await syncBillsToCalendarIfEnabled()
+        await syncBillsToCalendarIfAuthorized()
         await refreshDashboard()
     }
 
@@ -1410,6 +1433,48 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    func bootstrapEssentialPermissionsIfNeeded(force: Bool = false) async {
+        guard case .app = screen, session.isAuthenticated else { return }
+        guard !isBootstrappingPermissions else { return }
+
+        if backendService.configuration != nil, backendStatus == nil {
+            await refreshBackendStatus(force: true)
+        }
+
+        await refreshPushRegistrationState()
+        await refreshCalendarSyncState()
+        await refreshExpenseLocationState()
+
+        let pushEnabled = pushRegistrationStatus.backendEnabled
+        let bootstrapKey = "\(session.storageNamespace)-\(pushEnabled ? "push-on" : "push-off")"
+        if !force, permissionBootstrapKey == bootstrapKey {
+            return
+        }
+
+        isBootstrappingPermissions = true
+        defer {
+            isBootstrappingPermissions = false
+            permissionBootstrapKey = bootstrapKey
+        }
+
+        if pushEnabled, pushRegistrationStatus.authorization == .notDetermined {
+            await registerPushNotifications(showNotice: false)
+        }
+
+        switch calendarSyncStatus.authorization {
+        case .notDetermined:
+            await requestCalendarAccessIfNeeded(showNotice: false)
+        case .granted:
+            await syncBillsToCalendarIfAuthorized(showNotice: false)
+        case .denied, .restricted:
+            break
+        }
+
+        if expenseLocationStatus == .notDetermined {
+            await requestExpenseLocationPermission(showNotice: false)
+        }
+    }
+
     private func enqueueCelebrations(_ celebrations: [GrowthCelebration]) {
         guard !celebrations.isEmpty else { return }
 
@@ -1440,9 +1505,38 @@ final class AppViewModel: ObservableObject {
         }
     }
 
-    private func syncBillsToCalendarIfEnabled() async {
-        guard UserDefaults.standard.bool(forKey: calendarBillSyncDefaultsKey) else { return }
-        await syncBillsToCalendar()
+    private func requestCalendarAccessIfNeeded(showNotice: Bool) async {
+        let authorization = await billCalendarSyncService.authorizationStatus()
+        switch authorization {
+        case .granted:
+            await syncBillsToCalendarIfAuthorized(showNotice: showNotice)
+        case .notDetermined:
+            do {
+                try await billCalendarSyncService.requestAccessIfNeeded()
+                if showNotice {
+                    notice = "Calendario listo para recordatorios de facturas."
+                }
+                await refreshCalendarSyncState()
+                await syncBillsToCalendarIfAuthorized(showNotice: showNotice)
+            } catch {
+                if showNotice {
+                    notice = error.localizedDescription
+                }
+                await refreshCalendarSyncState(lastError: error.localizedDescription)
+            }
+        case .denied, .restricted:
+            await refreshCalendarSyncState()
+        }
+    }
+
+    private func syncBillsToCalendarIfAuthorized(showNotice: Bool = false) async {
+        guard ledger != nil else { return }
+        let authorization = await billCalendarSyncService.authorizationStatus()
+        guard authorization == .granted else {
+            await refreshCalendarSyncState()
+            return
+        }
+        await syncBillsToCalendar(showNotice: showNotice)
     }
 
     private func restoreRememberedSession() async {
