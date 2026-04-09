@@ -68,13 +68,13 @@
     }
   },
   "build": {
-    "id": "e16ea185-44d5-4b50-82a9-a2dd5e55e947",
+    "id": "da3f142f-348b-4ebc-a282-0371c7cbf419",
     "betaLocalizations": {
       "en-US": {
-        "whatsNew": "Build 25 closes the beta QA pass with cleaner settings, automatic permission prompts, simpler receipt scanning, stronger navigation stability, authenticated sync and family spaces, native StoreKit subscriptions, verified iPhone push delivery, and first-party reliability telemetry."
+        "whatsNew": "Build 26 refines the beta UX with cleaner mission boards, seasonal event visibility, simpler receipt scanning, safer spacing above the tab bar, smoother family-sharing surfaces, and the latest authenticated cloud and TestFlight readiness fixes."
       },
       "es-MX": {
-        "whatsNew": "La build 25 cierra el pase de QA de beta con ajustes más simples, permisos automáticos al inicio, escaneo de recibos más fluido, navegación más estable, sync autenticado con espacios familiares, suscripciones nativas con StoreKit, push validado en iPhone y telemetría first-party de estabilidad."
+        "whatsNew": "La build 26 pule la UX de beta con misiones más claras, calendario de eventos de temporada, escaneo de recibos más simple, mejor espacio sobre el tab bar, superficies family más fluidas y los últimos ajustes para sync autenticado y salida por TestFlight."
       }
     }
   },
