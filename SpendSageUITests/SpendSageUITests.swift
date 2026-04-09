@@ -228,6 +228,23 @@ final class SpendSageUITests: XCTestCase {
     }
 
     @MainActor
+    func testTrophyHistoryShowsMissionTracksAndEventCalendar() {
+        let app = makeApp(startingTab: "dashboard")
+        app.launch()
+
+        let trigger = app.otherElements["dashboard.link.trophies"].firstMatch
+        XCTAssertTrue(trigger.waitForExistence(timeout: 8))
+        reveal(trigger, in: app, maxSwipes: 4)
+        tap(trigger, in: app)
+
+        assertElement("trophies.screen", in: app)
+        XCTAssertTrue(app.staticTexts["Local"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Cloud"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Especiales"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Calendario de eventos"].firstMatch.waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     private func assertSettingsRoute(
         triggerID: String,
         destinationTitle: String? = nil,

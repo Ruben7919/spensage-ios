@@ -333,6 +333,7 @@
 		FBC03606B0E1F8179DE5D2E3 /* tikki_love_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2450941FFBDC4A60872D7095 /* tikki_love_holiday_v2.png */; };
 		FBC655CF4E29C9D2978B7F5A /* guide_26_loading_yarn_team_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = E1AEE565C1DE710FBCABCD65 /* guide_26_loading_yarn_team_halloween_v2.png */; };
 		FC145E49F50B5C0BAEE5C1B5 /* tikki_confused_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = FB982FE9B965A9970C6B6F02 /* tikki_confused_new_year_v2.png */; };
+		FC7E11054D7C13272A9C70D8 /* GrowthSnapshotCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A4AC7DEA4DB2178B06726D /* GrowthSnapshotCatalogTests.swift */; };
 		FDC9CF4BAB873272B35E87BB /* FinanceAccountsToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7EA145E6EEC82916F75C622 /* FinanceAccountsToolView.swift */; };
 		FE1C60A5DC2AC13467F9E2C7 /* ExpenseImportAndAutomationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283352ABDE81A2ADE6B81092 /* ExpenseImportAndAutomationTests.swift */; };
 		FEA1ABA07D5A5269B43ECB98 /* ExpenseLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97209BCC313C76B927A2FDCC /* ExpenseLocationService.swift */; };
@@ -615,6 +616,7 @@
 		C1E64C438F1553E4639812E3 /* guide_09_weekly_boss_tikki_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_09_weekly_boss_tikki_manchas_v2.png; sourceTree = "<group>"; };
 		C21073C0C9AA6223F9F37057 /* mei_neutral_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_neutral_v2.png; sourceTree = "<group>"; };
 		C2E79067C26031AA1666C0F5 /* tikki_neutral_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_neutral_new_year_v2.png; sourceTree = "<group>"; };
+		C3A4AC7DEA4DB2178B06726D /* GrowthSnapshotCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthSnapshotCatalogTests.swift; sourceTree = "<group>"; };
 		C3BBD9C9389B38F4A67936B4 /* acc_trophy_star_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_trophy_star_v2.png; sourceTree = "<group>"; };
 		C53A1AE95E7C021246FA5580 /* PreviewFinanceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewFinanceData.swift; sourceTree = "<group>"; };
 		C65D3EB1639597D338721CE9 /* app_icon_dark_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_dark_v2.png; sourceTree = "<group>"; };
@@ -1311,6 +1313,7 @@
 				F33ED27E7545FFE71B7BB40F /* CrashGuardTests.swift */,
 				283352ABDE81A2ADE6B81092 /* ExpenseImportAndAutomationTests.swift */,
 				849574DD6B6ABAA23CB11EE0 /* GrowthCelebrationTests.swift */,
+				C3A4AC7DEA4DB2178B06726D /* GrowthSnapshotCatalogTests.swift */,
 				CE57325664004CBCF267818B /* ProfileCompletionTests.swift */,
 				C835E2C1589A57B5B0A4CBBE /* PushRegistrationFlowTests.swift */,
 				DC1238852B64244DC049D08D /* ReceiptVisionServiceTests.swift */,
@@ -1858,6 +1861,7 @@
 				D5C90E37142F70A5E45F3523 /* CrashGuardTests.swift in Sources */,
 				FE1C60A5DC2AC13467F9E2C7 /* ExpenseImportAndAutomationTests.swift in Sources */,
 				199E1A30C5CDA340DEDB8C97 /* GrowthCelebrationTests.swift in Sources */,
+				FC7E11054D7C13272A9C70D8 /* GrowthSnapshotCatalogTests.swift in Sources */,
 				98C41737F7E240D39122F33B /* ProfileCompletionTests.swift in Sources */,
 				2DE47C0BEC0B21D7AFB17C47 /* PushRegistrationFlowTests.swift in Sources */,
 				F6D4F13256E68E49F659F817 /* ReceiptVisionServiceTests.swift in Sources */,
@@ -1959,7 +1963,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -2086,7 +2090,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_NS_ASSERTIONS = NO;

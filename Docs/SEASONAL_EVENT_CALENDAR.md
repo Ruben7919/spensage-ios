@@ -1,14 +1,14 @@
 # Seasonal Event Calendar
 
-Last updated: 2026-04-04
+Last updated: 2026-04-09
 
 ## Shipped windows
 
 | Season | Active window | Missions | Live badge | Main scene swaps |
 | --- | --- | --- | --- | --- |
-| Halloween Hunt | October 20 to November 2 | `Night watch streak`, `Log six spooky purchases` | `badge_event_halloween_v2.png` | dashboard, splash, loading |
-| Holiday Gift Guard | December 1 to December 28 | `Guard the gift budget`, `Log five festive moments` | `badge_event_holiday_v2.png` | dashboard, splash, loading |
-| New Year Reset | December 29 to January 14 | `Fresh ledger reset`, `Reset with two active days` | `badge_event_new_year_v2.png` | dashboard, splash, loading |
+| Halloween Hunt | October 20 to November 2 | `Halloween sin sustos`, `Captura los extras` | `badge_event_halloween_v2.png` | dashboard, splash, loading |
+| Holiday Gift Guard | December 1 to December 28 | `Regalos bajo control`, `Diciembre con vista clara` | `badge_event_holiday_v2.png` | dashboard, splash, loading |
+| New Year Reset | December 29 to January 14 | `Arranque limpio`, `Vuelve al ritmo` | `badge_event_new_year_v2.png` | dashboard, splash, loading |
 
 ## Character art packs shipped
 
@@ -64,6 +64,7 @@ These guides were added so each live season has explicit character art, not only
 ## UI surfaces already using the seasonal system
 
 - Dashboard live event card
+- Trophy history event calendar
 - Dashboard quest art
 - Splash screen
 - Loading screen with yarn animation

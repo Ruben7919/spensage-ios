@@ -42,7 +42,7 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20)
             .padding(.top, 20)
-            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
+            .padding(.bottom, shellBottomInset + 18)
         }
         .accessibilityIdentifier("settings.screen")
         .overlay(alignment: .topLeading) {

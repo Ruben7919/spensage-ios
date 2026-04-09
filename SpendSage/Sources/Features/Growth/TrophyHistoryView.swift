@@ -14,7 +14,8 @@ struct TrophyHistoryView: View {
             accounts: viewModel.accounts,
             bills: viewModel.bills,
             rules: viewModel.rules,
-            profile: viewModel.profile
+            profile: viewModel.profile,
+            cloudStatus: viewModel.growthCloudStatus
         )
     }
 
@@ -23,13 +24,14 @@ struct TrophyHistoryView: View {
             VStack(alignment: .leading, spacing: 20) {
                 heroCard
                 missionCollection
+                eventCalendarCollection
                 trophyCollection
                 trophyTimeline
                 trophyFootnotes
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
+            .padding(.bottom, shellBottomInset + 18)
         }
         .background(
             ZStack {
@@ -38,6 +40,10 @@ struct TrophyHistoryView: View {
             }
             .ignoresSafeArea()
         )
+        .accessibilityIdentifier("trophies.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "trophies.screen")
+        }
         .background(alignment: .top) {
             BrandBackdropView()
         }
@@ -54,25 +60,25 @@ struct TrophyHistoryView: View {
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Sigue los logros que hacen que el loop financiero se sienta vivo: rachas, presupuesto sano, categorías limpias y hábitos más fuertes.")
+                Text("Aquí ves tus misiones locales, tus pasos cloud, los retos especiales y los logros que van haciendo más liviano tu presupuesto.")
                     .foregroundStyle(BrandTheme.muted)
 
                 LazyVGrid(
                     columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                     spacing: 12
                 ) {
-                    BrandMetricTile(title: "Nivel", value: "\(growthSnapshot.level)", systemImage: "bolt.fill")
-                    BrandMetricTile(title: "XP", value: "\(growthSnapshot.totalXP)", systemImage: "sparkles")
-                    BrandMetricTile(title: "Desbloqueados", value: "\(growthSnapshot.trophies.filter(\.unlocked).count)", systemImage: "rosette")
-                    BrandMetricTile(title: "Siguiente nivel", value: "\(growthSnapshot.xpToNextLevel) XP", systemImage: "arrow.up.forward")
+                    BrandMetricTile(title: "Locales", value: "\(growthSnapshot.localMissions.filter { $0.status == .completed }.count)/\(growthSnapshot.localMissions.count)", systemImage: "house.fill")
+                    BrandMetricTile(title: "Cloud", value: "\(growthSnapshot.cloudMissions.filter { $0.status == .completed }.count)/\(growthSnapshot.cloudMissions.count)", systemImage: "icloud.fill")
+                    BrandMetricTile(title: "Especiales", value: "\(growthSnapshot.specialMissions.filter { $0.status == .completed }.count)/\(growthSnapshot.specialMissions.count)", systemImage: "sparkles")
+                    BrandMetricTile(title: "Logros", value: "\(growthSnapshot.trophies.filter(\.unlocked).count)", systemImage: "rosette")
                 }
 
                 BrandArtworkSurface {
                     MascotSpeechCard(
                         character: .manchas,
                         expression: .proud,
-                        title: "El progreso vive aquí",
-                        message: "Los logros y las rachas reflejan los hábitos que ya se ven en tu libro local."
+                        title: "Tu progreso vive aquí",
+                        message: "Cada misión completada hace más claro qué estás cuidando bien y dónde todavía puedes ahorrar un poco más."
                     )
                 }
             }
@@ -144,64 +150,90 @@ struct TrophyHistoryView: View {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeading(
                     title: "Misiones",
-                    detail: "Aquí ves el tablero completo: lo que ya cerraste, lo que está listo y lo que todavía empuja tu progreso."
+                    detail: "El tablero se divide por tipo para que sepas rápido qué depende de tus hábitos, qué depende del respaldo cloud y qué misiones especiales están activas."
                 )
 
-                LazyVGrid(columns: collectionColumns, spacing: 14) {
-                    ForEach(growthSnapshot.allMissions) { mission in
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack(alignment: .top) {
-                                GrowthMissionBadgeView(mission: mission, size: 52)
+                missionTrackSection(
+                    title: "Local",
+                    detail: growthSnapshot.localMissions.isEmpty
+                        ? "Aún no hay hábitos locales visibles."
+                        : GrowthMissionTrack.local.summary,
+                    missions: growthSnapshot.localMissions
+                )
 
-                                Spacer(minLength: 0)
+                missionTrackSection(
+                    title: "Cloud",
+                    detail: growthSnapshot.cloudMissions.isEmpty
+                        ? "Las misiones cloud aparecen cuando el respaldo y los espacios compartidos ya están disponibles."
+                        : GrowthMissionTrack.cloud.summary,
+                    missions: growthSnapshot.cloudMissions
+                )
 
-                                BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
+                missionTrackSection(
+                    title: "Especiales",
+                    detail: growthSnapshot.specialMissions.isEmpty
+                        ? "Cuando haya un reto grande o evento de temporada, aparecerá aquí."
+                        : GrowthMissionTrack.special.summary,
+                    missions: growthSnapshot.specialMissions
+                )
+            }
+        }
+    }
+
+    private var eventCalendarCollection: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeading(
+                    title: "Calendario de eventos",
+                    detail: "Temporadas pensadas para ayudarte a ordenar gastos típicos del año sin perder el hilo del ahorro."
+                )
+
+                ForEach(growthSnapshot.eventCalendar) { event in
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(alignment: .top, spacing: 12) {
+                            eventCalendarBadge(event)
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack(spacing: 8) {
+                                    BrandBadge(
+                                        text: event.isActive ? "Activo" : "Próximo",
+                                        systemImage: event.isActive ? "sparkles" : "calendar"
+                                    )
+                                    Text(event.dateLabel)
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(BrandTheme.primary)
+                                }
+
+                                Text(event.title.appLocalized)
+                                    .font(.headline)
+                                    .foregroundStyle(BrandTheme.ink)
+
+                                Text(event.detail.appLocalized)
+                                    .font(.subheadline)
+                                    .foregroundStyle(BrandTheme.muted)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
 
-                            Text(mission.title.appLocalized)
-                                .font(.headline)
-                                .foregroundStyle(BrandTheme.ink)
+                            Spacer(minLength: 0)
+                        }
 
-                            Text(mission.detail.appLocalized)
-                                .font(.subheadline)
-                                .foregroundStyle(BrandTheme.muted)
-                                .fixedSize(horizontal: false, vertical: true)
-
-                            ProgressView(value: mission.progressRatio)
-                                .tint(mission.status == .completed ? BrandTheme.primary : BrandTheme.muted.opacity(0.8))
-
-                            HStack {
-                                Text("\(mission.progressText) · \(mission.rewardXP) XP")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(BrandTheme.primary)
-
-                                Spacer()
-
-                                if mission.isSeasonal {
-                                    BrandBadge(text: "Evento", systemImage: "wand.and.stars")
-                                } else {
-                                    Text(mission.cadenceLabel.appLocalized)
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(BrandTheme.muted)
+                        if !event.featuredMissionTitles.isEmpty {
+                            FlowStack(spacing: 8, rowSpacing: 8) {
+                                ForEach(event.featuredMissionTitles, id: \.self) { title in
+                                    StoryTag(text: title.appLocalized, systemImage: "checkmark.seal.fill")
                                 }
                             }
-
-                            Text(mission.coachNote.appLocalized)
-                                .font(.footnote)
-                                .foregroundStyle(BrandTheme.muted)
-                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                .fill(BrandTheme.surfaceTint)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
-                        )
                     }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .fill(BrandTheme.surfaceTint)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                    )
                 }
             }
         }
@@ -231,15 +263,121 @@ struct TrophyHistoryView: View {
             VStack(alignment: .leading, spacing: 12) {
                 sectionHeading(
                     title: "Cómo se consiguen",
-                    detail: "Los logros reaccionan a los hábitos visibles en tu libro actual y convierten la rutina financiera en un loop repetible."
+                    detail: "Las misiones y logros están pensados para que ahorrar se sienta claro: registrar, ordenar, anticipar y compartir cuando haga falta."
                 )
 
-                Label("Registrar gastos con constancia acelera los badges basados en rachas.", systemImage: "flame.fill")
-                Label("Cuentas, facturas y reglas desbloquean logros más profundos porque el dashboard ve mejor el mes.", systemImage: "square.stack.3d.up")
-                Label("Un presupuesto limpio y una revisión frecuente suelen abrir primero las victorias más visibles.", systemImage: "checkmark.seal.fill")
+                Label("Las misiones locales te ayudan a construir el hábito diario de registrar y revisar.", systemImage: "house.fill")
+                Label("Las misiones cloud protegen tu respaldo y facilitan compartir el presupuesto con familia.", systemImage: "icloud.fill")
+                Label("Las especiales aparecen para empujarte a ahorrar mejor en momentos importantes del año.", systemImage: "sparkles")
             }
             .foregroundStyle(BrandTheme.ink)
         }
+    }
+
+    private func missionTrackSection(title: String, detail: String, missions: [GrowthMission]) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            sectionHeading(title: title, detail: detail)
+
+            if missions.isEmpty {
+                FinanceEmptyStateCard(
+                    title: AppLocalization.localized("Sin misiones %@", arguments: title.lowercased()),
+                    summary: detail,
+                    systemImage: "sparkles"
+                )
+            } else {
+                LazyVGrid(columns: collectionColumns, spacing: 14) {
+                    ForEach(missions) { mission in
+                        missionCard(mission)
+                    }
+                }
+            }
+        }
+    }
+
+    private func missionCard(_ mission: GrowthMission) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                GrowthMissionBadgeView(mission: mission, size: 52)
+
+                Spacer(minLength: 0)
+
+                VStack(alignment: .trailing, spacing: 6) {
+                    BrandBadge(text: mission.track.badgeText, systemImage: mission.track.systemImage)
+                    BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
+                }
+            }
+
+            Text(mission.title.appLocalized)
+                .font(.headline)
+                .foregroundStyle(BrandTheme.ink)
+
+            Text(mission.detail.appLocalized)
+                .font(.subheadline)
+                .foregroundStyle(BrandTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ProgressView(value: mission.progressRatio)
+                .tint(mission.status == .completed ? BrandTheme.primary : BrandTheme.muted.opacity(0.8))
+
+            HStack {
+                Text("\(mission.progressText) · \(mission.rewardXP) XP")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(BrandTheme.primary)
+
+                Spacer()
+
+                if mission.isSeasonal {
+                    BrandBadge(text: "Evento", systemImage: "wand.and.stars")
+                } else {
+                    Text(mission.cadenceLabel.appLocalized)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(BrandTheme.muted)
+                }
+            }
+
+            Text(mission.coachNote.appLocalized)
+                .font(.footnote)
+                .foregroundStyle(BrandTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(BrandTheme.surfaceTint)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+        )
+    }
+
+    private func eventCalendarBadge(_ event: GrowthEventCalendarEntry) -> some View {
+        ZStack {
+            if event.isActive {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(BrandTheme.heroGlowGradient)
+            } else {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(BrandTheme.surface)
+            }
+
+            if let image = BrandAssetCatalog.shared.image(for: BrandAssetCatalog.shared.badge(named: event.badgeAsset)) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(8)
+            } else {
+                Image(systemName: event.isActive ? "sparkles" : "calendar")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(BrandTheme.primary)
+            }
+        }
+        .frame(width: 56, height: 56)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+        )
     }
 
     private var emptyTimeline: some View {

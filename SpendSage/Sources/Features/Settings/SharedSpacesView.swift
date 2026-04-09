@@ -21,7 +21,7 @@ struct SharedSpacesView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
-            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
+            .padding(.bottom, shellBottomInset + 18)
         }
         .background(FinanceScreenBackground())
         .navigationTitle("Spaces")

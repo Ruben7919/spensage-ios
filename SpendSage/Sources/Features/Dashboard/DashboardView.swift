@@ -41,7 +41,7 @@ struct DashboardView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
+            .padding(.bottom, shellBottomInset + 18)
         }
         .accessibilityIdentifier("dashboard.screen")
         .overlay(alignment: .topLeading) {
@@ -75,7 +75,8 @@ struct DashboardView: View {
             accounts: viewModel.accounts,
             bills: viewModel.bills,
             rules: viewModel.rules,
-            profile: viewModel.profile
+            profile: viewModel.profile,
+            cloudStatus: viewModel.growthCloudStatus
         )
     }
 
@@ -241,7 +242,7 @@ struct DashboardView: View {
     private func missionSummaryCard(growth: DashboardGrowthSnapshot) -> some View {
         GuidedSectionCard(
             title: "Tablero de misiones",
-            summary: "Mantén visible una misión activa, el evento vivo y los logros más nuevos sin convertir inicio en una pared de UI de juego.",
+            summary: "Una mezcla corta de misiones locales, cloud y especiales para ayudarte a ahorrar sin volver compleja la pantalla principal.",
             character: .manchas,
             expression: .excited,
             systemImage: "checklist"
@@ -250,9 +251,9 @@ struct DashboardView: View {
                 columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                 spacing: 12
             ) {
-                BrandMetricTile(title: "Nivel", value: "\(growth.level)", systemImage: "bolt.fill")
-                BrandMetricTile(title: "XP", value: "\(growth.totalXP)", systemImage: "sparkles")
-                BrandMetricTile(title: "Siguiente desbloqueo", value: "\(growth.xpToNextLevel) XP", systemImage: "arrow.up.forward")
+                BrandMetricTile(title: "Locales", value: "\(growth.localMissions.filter { $0.status == .completed }.count)/\(growth.localMissions.count)", systemImage: "house.fill")
+                BrandMetricTile(title: "Cloud", value: "\(growth.cloudMissions.filter { $0.status == .completed }.count)/\(growth.cloudMissions.count)", systemImage: "icloud.fill")
+                BrandMetricTile(title: "Especiales", value: "\(growth.specialMissions.filter { $0.status == .completed }.count)/\(growth.specialMissions.count)", systemImage: "sparkles")
                 BrandMetricTile(title: "Logros", value: "\(growth.trophies.filter { $0.unlocked }.count)", systemImage: "trophy.fill")
             }
 
@@ -270,7 +271,7 @@ struct DashboardView: View {
                     systemImage: "sparkles"
                 )
             } else {
-                ForEach(Array(growth.missions.prefix(1))) { mission in
+                ForEach(Array(growth.missions.prefix(2))) { mission in
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(alignment: .top, spacing: 14) {
                             GrowthMissionBadgeView(mission: mission, size: 54)
@@ -293,6 +294,7 @@ struct DashboardView: View {
                         }
 
                         FlowStack(spacing: 8, rowSpacing: 8) {
+                            BrandBadge(text: mission.track.badgeText, systemImage: mission.track.systemImage)
                             BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
                             BrandBadge(text: mission.cadenceLabel, systemImage: "calendar")
                             if mission.isSeasonal {
@@ -330,8 +332,8 @@ struct DashboardView: View {
                 if growth.missions.count > 1 {
                     BrandFeatureRow(
                         systemImage: "checklist.checked",
-                        title: AppLocalization.localized("%d misiones más disponibles", arguments: growth.missions.count - 1),
-                        detail: "Abre el historial de logros para ver cada misión, ruta de desbloqueo y recompensa de evento en un solo lugar."
+                        title: AppLocalization.localized("%d misiones más disponibles", arguments: growth.allMissions.count - min(growth.missions.count, 2)),
+                        detail: "Abre el historial para ver el tablero completo de misiones locales, cloud, especiales y el calendario de eventos."
                     )
                 }
             }
@@ -348,6 +350,7 @@ struct DashboardView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("dashboard.link.trophies")
         }
     }
 

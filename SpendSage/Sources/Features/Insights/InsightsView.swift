@@ -206,7 +206,7 @@ struct InsightsView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
+            .padding(.bottom, shellBottomInset + 18)
         }
         .accessibilityIdentifier("insights.screen")
         .overlay(alignment: .topLeading) {
@@ -1161,7 +1161,7 @@ private struct InsightsTrendDetailView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
+            .padding(.bottom, shellBottomInset + 18)
         }
         .background(
             ZStack {
@@ -1275,7 +1275,7 @@ private struct InsightsCategoryDetailView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
+            .padding(.bottom, shellBottomInset + 18)
         }
         .background(
             ZStack {

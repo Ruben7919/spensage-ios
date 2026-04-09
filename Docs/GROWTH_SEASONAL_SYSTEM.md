@@ -1,16 +1,19 @@
 # Growth Seasonal System
 
-Last updated: 2026-04-04
+Last updated: 2026-04-09
 
 ## What landed
 
 - `Dashboard` now exposes the main game loop near the top fold with level progress, mission cards, trophy rail, and a live-event slot.
-- Core missions and seasonal event missions are defined from blueprints inside `SpendSage/Sources/Features/Growth/GrowthSnapshot.swift`.
+- Core missions, cloud missions, special milestone missions, and seasonal event missions are defined from blueprints inside `SpendSage/Sources/Features/Growth/GrowthSnapshot.swift`.
 - Seasonal art activation is centralized in `SpendSage/Sources/Core/Brand/BrandAssets.swift` and resolved automatically by `BrandAssetCatalog`.
+- `TrophyHistoryView` now shows the full mission board grouped as `Local`, `Cloud`, and `Especial`, plus an explicit event calendar.
 
 ## Mission catalog shape
 
-- Core missions stay permanent and map to reusable finance behaviors: logging expenses, protecting streaks, adding accounts, enabling bills, creating rules, and staying inside budget.
+- Local missions stay permanent and map to reusable finance behaviors: logging expenses, protecting streaks, adding accounts, enabling bills, creating rules, and staying inside budget.
+- Cloud missions react to authenticated sync, shared spaces, member growth, and invite flow.
+- Special missions cover deeper savings milestones and active seasonal quests.
 - Seasonal missions only join the active mission list when their date window is live.
 - Seasonal mission progress uses event-window activity counts where possible instead of blindly reusing all-time totals.
 

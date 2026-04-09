@@ -7,6 +7,7 @@ import VisionKit
 struct FinanceReceiptScanToolView: View {
     @ObservedObject var viewModel: AppViewModel
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     @State private var merchant = ""
     @State private var amount = ""
@@ -98,21 +99,6 @@ struct FinanceReceiptScanToolView: View {
         }
     }
 
-    private var extractedTextPreview: String {
-        let lines = [
-            receiptAnalysis?.recognizedText,
-            AppLocalization.localized("Merchant: %@", arguments: merchant.isEmpty ? "..." : merchant),
-            AppLocalization.localized("Amount: %@", arguments: amount.isEmpty ? "..." : amount),
-            AppLocalization.localized("Category: %@", arguments: category.localizedTitle),
-            AppLocalization.localized("Date: %@", arguments: date.formatted(date: .abbreviated, time: .omitted)),
-            AppLocalization.localized("Notes: %@", arguments: note.isEmpty ? "..." : note),
-            AppLocalization.localized("Source: %@", arguments: captureSource?.title.appLocalized ?? "Manual draft".appLocalized)
-        ]
-            .compactMap { $0 }
-            .filter { !$0.isEmpty }
-        return lines.joined(separator: "\n")
-    }
-
     private var prefersCompactGuidance: Bool {
         GuideProgressStore.isSeen(.scan) || (viewModel.dashboardState?.transactionCount ?? 0) >= 3
     }
@@ -177,7 +163,7 @@ struct FinanceReceiptScanToolView: View {
                 stepContent
             }
             .padding(24)
-            .padding(.bottom, showsStepActionBar ? 110 : 24)
+            .padding(.bottom, (showsStepActionBar ? 110 : 24) + shellBottomInset)
         }
         .accessibilityIdentifier("scan.screen")
         .overlay(alignment: .topLeading) {
@@ -521,9 +507,6 @@ struct FinanceReceiptScanToolView: View {
                 smartFillSupportCard
             }
 
-            if shouldShowOCRPreview {
-                ocrPreviewCard
-            }
         }
     }
 
@@ -840,61 +823,6 @@ struct FinanceReceiptScanToolView: View {
                     }
                 }
             }
-        }
-    }
-
-    private var shouldShowOCRPreview: Bool {
-        capturedImage != nil || !(receiptAnalysis?.recognizedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
-    }
-
-    private var ocrPreviewCard: some View {
-        Group {
-            if prefersCompactGuidance {
-                ExperienceDisclosureCard(
-                    title: "Texto detectado",
-                    summary: "Ábrelo solo si algo se ve raro en el autollenado.",
-                    character: .mei,
-                    expression: .thinking
-                ) {
-                    ocrPreviewContent
-                }
-            } else {
-                SurfaceCard {
-                    ocrPreviewContent
-                }
-            }
-        }
-    }
-
-    private var ocrPreviewContent: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Texto detectado")
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Spacer()
-                BrandBadge(text: capturedImage == nil ? "Manual" : "En el dispositivo", systemImage: "text.viewfinder")
-            }
-
-            Text("Ábrelo solo si algo se ve raro. La mayoría de recibos debería necesitar solo una revisión rápida arriba.")
-                .font(.subheadline)
-                .foregroundStyle(BrandTheme.muted)
-
-            ScrollView {
-                Text(extractedTextPreview)
-                    .font(.system(.footnote, design: .monospaced))
-                    .foregroundStyle(BrandTheme.ink)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
-            }
-            .frame(minHeight: 150)
-            .padding(14)
-            .background(BrandTheme.surfaceTint)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
-            )
         }
     }
 
@@ -1711,21 +1639,30 @@ private struct ReceiptCameraSheet: View {
     let onImagePicked: (UIImage) -> Void
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
+        ZStack(alignment: .bottom) {
             ReceiptCameraPicker(onImagePicked: onImagePicked)
                 .ignoresSafeArea()
 
-            PhotosPicker(selection: $photoPickerItem, matching: .images) {
-                Label("Usar una foto", systemImage: "photo.on.rectangle")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Color.black.opacity(0.72))
-                    .clipShape(Capsule())
+            HStack {
+                PhotosPicker(selection: $photoPickerItem, matching: .images) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.black.opacity(0.74))
+                        Circle()
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundStyle(.white)
+                    }
+                    .frame(width: 54, height: 54)
+                    .shadow(color: Color.black.opacity(0.16), radius: 12, x: 0, y: 6)
+                }
+                .accessibilityIdentifier("scan.action.importPhoto")
+
+                Spacer()
             }
-            .padding(.trailing, 20)
-            .padding(.bottom, 34)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 22)
         }
     }
 }

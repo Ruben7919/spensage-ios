@@ -220,6 +220,20 @@ final class AppViewModel: ObservableObject {
         ledger?.profile ?? .default
     }
 
+    var growthCloudStatus: GrowthCloudStatus {
+        let syncState = FinanceSyncMetadataStore.load(for: session, spaceID: currentSpaceID)
+        let pendingInvitesCount = (familySharingModel?.pendingInviteCount)
+            ?? spaceInvites.filter { $0.status == .pending }.count
+
+        return GrowthCloudStatus(
+            syncReady: session.isAuthenticated && syncState.lastSuccessfulPullAt != nil,
+            sharedSpaceCount: spaces.filter { !$0.isPersonalSpace }.count,
+            sharedMemberCount: familySharingModel?.memberCount ?? (currentSpace?.isPersonalSpace == false ? 1 : 0),
+            pendingInviteCount: pendingInvitesCount,
+            canInviteMembers: familySharingModel?.permissions.canInvite ?? false
+        )
+    }
+
     var screen: Screen {
         if !hasCompletedOnboarding {
             return .onboarding
@@ -1405,7 +1419,8 @@ final class AppViewModel: ObservableObject {
             accounts: accounts,
             bills: bills,
             rules: rules,
-            profile: profile
+            profile: profile,
+            cloudStatus: growthCloudStatus
         )
     }
 

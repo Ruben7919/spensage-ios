@@ -92,11 +92,15 @@ struct GrowthCelebrationTests {
             strategies: [],
             allMissions: completedMissions,
             missions: completedMissions,
+            localMissions: completedMissions,
+            cloudMissions: [],
+            specialMissions: [],
             seasonalMissions: [],
             trophies: unlockedTrophies,
             highlightedTrophies: unlockedTrophies,
             events: [],
-            liveEvent: nil
+            liveEvent: nil,
+            eventCalendar: []
         )
     }
 
@@ -125,6 +129,7 @@ struct GrowthCelebrationTests {
             rewardXP: 80,
             systemImage: "sparkles",
             hybridBadgeAsset: "badge_quest_daily_v2.png",
+            track: .local,
             progressValue: 1,
             progressTarget: 1,
             status: .completed,

@@ -1,52 +1,69 @@
 # Missions And Events
 
-Last updated: 2026-04-04
+Last updated: 2026-04-09
 
-## Core missions shipped
+## Mission board shape
 
-- `Log five expenses`: wake up the coach and the first badge loop.
-- `Protect a three-day streak`: reward repeat check-ins instead of one big cleanup.
-- `Add two account buckets`: make net worth and runway more reliable.
-- `Turn on bills radar`: surface upcoming obligations before they become surprises.
-- `Create one smart rule`: automate repeated merchants into the right category.
-- `Keep the month inside budget`: hold the plan through the next review.
+The mission board now ships in three user-facing tracks so the app feels easier to understand:
+
+- `Local`: daily and weekly habits that improve budgeting on this device.
+- `Cloud`: backup, shared-space, and family collaboration steps.
+- `Special`: bigger milestone missions plus live seasonal quests.
+
+The runtime catalog lives in `/Users/rubenlazaro/Projects/spensage-ios/SpendSage/Sources/Features/Growth/GrowthSnapshot.swift`.
+
+## Local missions shipped
+
+- `Despierta tu ahorro`: log 3 real expenses so the app starts reading spending habits.
+- `Cuatro días en ritmo`: keep a 4-day streak to stabilize the routine.
+- `Mapa del dinero`: add 2 account buckets so spending and savings stop mixing.
+- `Radar de pagos`: add 1 recurring bill to surface future pressure earlier.
+- `Autopiloto inteligente`: create 1 smart rule for repeated merchants.
+- `Mes en verde`: keep the current month inside budget.
+
+## Cloud missions shipped
+
+- `Respaldo al día`: finish one successful authenticated sync.
+- `Casa compartida`: join or create a shared family space.
+- `Primer asiento ocupado`: reach 2 members inside a shared space.
+- `Invitación enviada`: send the first family invite when the caller can invite members.
+
+## Special missions shipped
+
+- `Base de ahorro armada`: complete the setup trio of 2 accounts + 1 bill + 1 rule.
+- `Semana bajo control`: reach the full rhythm score of 8 transactions + 4 active days + budget still green.
 
 ## Seasonal missions shipped
 
 ### Halloween Hunt
-- `Night watch streak`: stay active on four separate event days.
-- `Log six spooky purchases`: track seasonal extras before they blur into the month.
+
+- `Halloween sin sustos`
+- `Captura los extras`
 
 ### Holiday Gift Guard
-- `Guard the gift budget`: keep the month inside plan while the holiday pack is active.
-- `Log five festive moments`: capture gifts, travel, and hosting spend while the event is live.
+
+- `Regalos bajo control`
+- `Diciembre con vista clara`
 
 ### New Year Reset
-- `Fresh ledger reset`: log three early-January entries to restart visibility fast.
-- `Reset with two active days`: bring the coach back with two separate cleanup days.
 
-## Event windows shipped
+- `Arranque limpio`
+- `Vuelve al ritmo`
 
-- Halloween Hunt: October 20 to November 2
-- Holiday Gift Guard: December 1 to December 28
-- New Year Reset: December 29 to January 14
+## Event calendar shipped
+
+- The trophy history screen now includes a dedicated `Calendario de eventos` section.
+- It lists each shipped season, its current status (`Activo` or `Próximo`), the date window, and the featured mission titles.
+- The dashboard still surfaces the current or next live event near the top fold for faster discovery.
 
 ## Seasonal art behavior shipped
 
 - The active season swaps dashboard quest art, splash art, loading art, and live-event badge art automatically by date.
 - `Halloween Hunt` uses dedicated dashboard, splash, loading, and badge variants.
 - `Holiday Gift Guard` uses dedicated dashboard, splash, loading, and badge variants.
-- `New Year Reset` currently reuses the holiday art pack and swaps the live-event copy plus New Year badge.
+- `New Year Reset` currently reuses the holiday scene pack and swaps the live-event copy plus New Year badge.
 
-## Common event backlog
+## Badge art note
 
-- Valentine savings streak
-- Easter budget basket
-- Back-to-school reset
-- Black Friday impulse shield
-- Birthday week treat budget
-
-## Prompting note
-
-- Any future event art should keep the official `tikki`, `mei`, and `manchas` sprite families intact, with no extra limbs and no off-model anatomy.
-- For shipped windows, scene swaps, and the explicit seasonal art inventory, see `/Users/rubenlazaro/Projects/spensage-ios/Docs/SEASONAL_EVENT_CALENDAR.md`.
+- This update keeps the current badge family so the shipped visual style stays consistent with existing trophies.
+- If the team wants custom art for the new `cloud` or `special` mission families later, use `/Users/rubenlazaro/Projects/spensage-ios/Docs/prompts/MISSION_BADGE_REFRESH_PROMPTS.md`.

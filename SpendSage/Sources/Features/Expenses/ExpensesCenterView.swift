@@ -88,7 +88,7 @@ struct ExpensesCenterView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
+            .padding(.bottom, shellBottomInset + 18)
         }
         .accessibilityIdentifier("expenses.screen")
         .overlay(alignment: .topLeading) {
