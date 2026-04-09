@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,200
+Así sí da ganas
+guardar recibos.
+
+2
+00:00:02,200 --> 00:00:05,000
+La app deja el borrador
+casi listo.
+
+3
+00:00:05,000 --> 00:00:08,000
+Menos trabajo manual,
+mismo control.

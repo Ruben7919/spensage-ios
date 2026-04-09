@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SpendSage Sprint 2 Growth Dashboard</title>
+    <style>
+        :root {
+            --bg: #071213;
+            --ink: #f4fbfa;
+            --muted: #9fbab7;
+            --line: rgba(130, 236, 226, 0.18);
+            --surface: rgba(15, 30, 33, 0.82);
+            --surface-strong: rgba(18, 39, 42, 0.95);
+            --accent: #83efe4;
+            --accent-2: #d8fff8;
+            --warn: #ffe1a8;
+            --good: #93f2bf;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Avenir Next", "SF Pro Rounded", system-ui, sans-serif;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(131, 239, 228, 0.22), transparent 24%),
+                radial-gradient(circle at 82% 6%, rgba(121, 189, 255, 0.10), transparent 24%),
+                linear-gradient(180deg, #061112 0%, #0b181a 54%, #071213 100%);
+        }
+
+        .shell {
+            width: min(1240px, calc(100vw - 48px));
+            margin: 0 auto;
+            padding: 34px 0 44px;
+        }
+
+        .topbar,
+        .panel,
+        .metric,
+        .funnel-step,
+        .timeline-card {
+            border: 1px solid var(--line);
+            background: var(--surface);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+            backdrop-filter: blur(18px);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            border-radius: 28px;
+            padding: 18px 22px;
+            margin-bottom: 30px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), #2b6e68);
+            box-shadow: 0 0 0 6px rgba(131, 239, 228, 0.08);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 34px;
+            padding: 0 14px;
+            border: 1px solid rgba(131, 239, 228, 0.34);
+            border-radius: 999px;
+            color: var(--accent);
+            font-size: 0.86rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 0.96fr) minmax(360px, 0.72fr);
+            gap: 26px;
+            margin-bottom: 26px;
+        }
+
+        .panel {
+            border-radius: 34px;
+            padding: 30px;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin-top: 0;
+        }
+
+        h1 {
+            max-width: 14ch;
+            margin-bottom: 18px;
+            font-size: clamp(3.9rem, 7.4vw, 6.7rem);
+            line-height: 0.92;
+            letter-spacing: -0.075em;
+        }
+
+        h2 {
+            margin-bottom: 16px;
+            font-size: clamp(2rem, 3vw, 3.5rem);
+            line-height: 1;
+            letter-spacing: -0.055em;
+        }
+
+        h3 {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        p {
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .hero-copy {
+            max-width: 66ch;
+            font-size: 1.18rem;
+        }
+
+        .north-star {
+            min-height: 100%;
+            background:
+                linear-gradient(145deg, rgba(131, 239, 228, 0.13), transparent 56%),
+                var(--surface-strong);
+        }
+
+        .north-star strong {
+            display: block;
+            margin: 18px 0 12px;
+            font-size: clamp(3rem, 5.4vw, 5rem);
+            letter-spacing: -0.06em;
+            line-height: 0.94;
+            color: var(--accent-2);
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 26px;
+        }
+
+        .metric {
+            border-radius: 26px;
+            padding: 22px;
+            min-height: 168px;
+        }
+
+        .metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .metric strong {
+            display: block;
+            margin: 20px 0 10px;
+            font-size: 2.7rem;
+            letter-spacing: -0.08em;
+            line-height: 0.9;
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.72fr);
+            gap: 26px;
+        }
+
+        .funnel {
+            display: grid;
+            gap: 12px;
+        }
+
+        .funnel-step {
+            display: grid;
+            grid-template-columns: 52px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 14px;
+            border-radius: 22px;
+            padding: 14px;
+        }
+
+        .num {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 15px;
+            color: #082022;
+            background: var(--accent);
+            font-weight: 900;
+        }
+
+        .event-code {
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: rgba(131, 239, 228, 0.09);
+            color: var(--accent);
+            font-family: "SF Mono", "Menlo", monospace;
+            font-size: 0.78rem;
+        }
+
+        .timeline {
+            display: grid;
+            gap: 14px;
+        }
+
+        .timeline-card {
+            border-radius: 24px;
+            padding: 20px;
+        }
+
+        .timeline-card strong {
+            display: inline-block;
+            margin-bottom: 8px;
+            color: var(--accent);
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .creative-row {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .creative {
+            min-height: 170px;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 16px;
+            background: linear-gradient(145deg, rgba(131, 239, 228, 0.14), rgba(255, 255, 255, 0.025));
+        }
+
+        .creative b {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.12rem;
+        }
+
+        @media (max-width: 900px) {
+            .hero,
+            .split,
+            .grid-4,
+            .creative-row {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: clamp(3.5rem, 18vw, 5.8rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <nav class="topbar">
+            <div class="brand"><span class="brand-mark"></span>SpendSage Growth</div>
+            <span class="pill">Sprint 2 · v0</span>
+        </nav>
+
+        <section class="hero">
+            <article class="panel">
+                <span class="pill">Dashboard de funnel</span>
+                <h1>De vista social a primer hábito.</h1>
+                <p class="hero-copy">Este tablero convierte la campaña B2C en un sistema medible: cada pieza orgánica o paid debe mover a la persona desde el hook hasta una acción real dentro de la app.</p>
+            </article>
+            <aside class="panel north-star">
+                <span class="pill">North Star</span>
+                <strong>Usuarios activados</strong>
+                <p>Un usuario activado completa onboarding y guarda su primer gasto, escaneo o presupuesto dentro de los primeros 7 días.</p>
+            </aside>
+        </section>
+
+        <section class="grid-4">
+            <article class="metric"><span>CTR social</span><strong>1.8%+</strong><p>Primer objetivo para orgánico y paid testing.</p></article>
+            <article class="metric"><span>Install rate</span><strong>22%+</strong><p>Click a instalación o TestFlight join.</p></article>
+            <article class="metric"><span>Activation</span><strong>45%+</strong><p>Onboarding + primera acción útil.</p></article>
+            <article class="metric"><span>D7 signal</span><strong>18%+</strong><p>Regresa, guarda o revisa progreso.</p></article>
+        </section>
+
+        <section class="split">
+            <article class="panel">
+                <span class="pill">Funnel operativo</span>
+                <h2>Eventos mínimos para decidir rápido.</h2>
+                <div class="funnel">
+                    <div class="funnel-step"><span class="num">01</span><div><h3>Vista del creative</h3><p>Dato de plataforma: YouTube, Reels, TikTok o paid.</p></div><code class="event-code">platform_impression</code></div>
+                    <div class="funnel-step"><span class="num">02</span><div><h3>Click al enlace</h3><p>Medido por UTM y link de campaña.</p></div><code class="event-code">utm_click</code></div>
+                    <div class="funnel-step"><span class="num">03</span><div><h3>Cuenta o login</h3><p>La app ya trackea auth y creación de cuenta.</p></div><code class="event-code">auth_account_created</code></div>
+                    <div class="funnel-step"><span class="num">04</span><div><h3>Onboarding completo</h3><p>Primer paso de activación real.</p></div><code class="event-code">onboarding_completed</code></div>
+                    <div class="funnel-step"><span class="num">05</span><div><h3>Primer gasto</h3><p>Nuevo evento first-party sin monto exacto.</p></div><code class="event-code">expense_saved</code></div>
+                    <div class="funnel-step"><span class="num">06</span><div><h3>Escaneo guardado</h3><p>Señal de feature “wow” y fricción baja.</p></div><code class="event-code">receipt_scan_expense_saved</code></div>
+                    <div class="funnel-step"><span class="num">07</span><div><h3>Presupuesto guardado</h3><p>Señal de intención y valor futuro.</p></div><code class="event-code">budget_saved</code></div>
+                    <div class="funnel-step"><span class="num">08</span><div><h3>Pago / restore</h3><p>Monetización cuando billing esté activo.</p></div><code class="event-code">billing_purchase_succeeded</code></div>
+                </div>
+            </article>
+
+            <aside class="panel">
+                <span class="pill">Lifecycle básico</span>
+                <h2>Qué decir después del install.</h2>
+                <div class="timeline">
+                    <div class="timeline-card"><strong>D0</strong><h3>Primer gasto sin presión</h3><p>“Empieza con una compra real. No tiene que quedar perfecto.”</p></div>
+                    <div class="timeline-card"><strong>D1</strong><h3>Escaneo como speed win</h3><p>“Si tienes un recibo por ahí, SpendSage te ayuda a revisarlo rápido.”</p></div>
+                    <div class="timeline-card"><strong>D3</strong><h3>Presupuesto guiado</h3><p>“Dale un marco a tu mes antes de que se sienta tarde.”</p></div>
+                    <div class="timeline-card"><strong>D7</strong><h3>Progreso y logro</h3><p>“Mira qué avanzó esta semana y comparte si te dio orgullo.”</p></div>
+                </div>
+            </aside>
+        </section>
+
+        <section class="panel" style="margin-top: 26px;">
+            <span class="pill">Paid testing</span>
+            <h2>5 ángulos para probar antes de escalar presupuesto.</h2>
+            <div class="creative-row">
+                <div class="creative"><b>Caos a claridad</b><p>Dolor diario: gastos sueltos y memoria saturada.</p></div>
+                <div class="creative"><b>Escaneo con control</b><p>Speed win sin prometer magia perfecta.</p></div>
+                <div class="creative"><b>Dato que ayuda</b><p>Insights accionables, no dashboard pesado.</p></div>
+                <div class="creative"><b>Logro compartible</b><p>Celebración ligera para activar orgullo.</p></div>
+                <div class="creative"><b>Hogar ordenado</b><p>Cuentas, reglas y facturas en una ruta clara.</p></div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

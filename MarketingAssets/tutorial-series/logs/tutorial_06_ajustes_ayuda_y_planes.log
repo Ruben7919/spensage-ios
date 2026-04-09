@@ -1,0 +1,153 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/rubenlazaro/Projects/spensage-ios/SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=5C6156AE-37BA-45CD-81AE-0A16A530E5A8" -parallel-testing-enabled NO "-only-testing:SpendSageUITests/SpendSageTutorialUITests/testTutorial06SettingsHelpSupportAndPlans" ONLY_ACTIVE_ARCH=YES ARCHS=arm64
+
+Build settings from command line:
+    ARCHS = arm64
+    ONLY_ACTIVE_ARCH = YES
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+2026-04-08 14:05:21.037457-0500 SpendSageUITests-Runner[2351:2278101] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-04-08 14:05:22.053.
+Test Suite 'SpendSageUITests.xctest' started at 2026-04-08 14:05:22.054.
+Test Suite 'SpendSageTutorialUITests' started at 2026-04-08 14:05:22.054.
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial06SettingsHelpSupportAndPlans]' started.
+    t =     0.00s Start Test at 2026-04-08 14:05:22.056
+    t =     0.03s Set Up
+    t =     0.04s Open com.spendsage.ai
+    t =     0.04s     Launch com.spendsage.ai
+2026-04-08 14:05:22.451 xcodebuild[2347:2277838] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:05:22.451 xcodebuild[2347:2277838] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     3.14s         Setting up automation session
+    t =     6.41s         Wait for com.spendsage.ai to idle
+    t =     9.65s Waiting 10.0s for "settings.screen" Any to exist
+    t =    10.73s     Checking `Expect predicate `existsNoRetry == 1` for object "settings.screen" Any`
+    t =    10.73s         Checking existence of `"settings.screen" Any`
+    t =    12.35s Waiting 8.0s for "settings.link.profile" Button to exist
+    t =    13.43s     Checking `Expect predicate `existsNoRetry == 1` for object "settings.link.profile" Button`
+    t =    13.43s         Checking existence of `"settings.link.profile" Button`
+    t =    13.50s Tap "settings.link.profile" Button
+    t =    13.50s     Wait for com.spendsage.ai to idle
+    t =    13.51s     Find the "settings.link.profile" Button
+    t =    13.57s     Check for interrupting elements affecting "settings.link.profile" Button
+    t =    13.64s     Synthesize event
+    t =    13.67s         Scroll element to visible
+    t =    13.68s         Find the "settings.link.profile" Button
+    t =    13.83s         Computed hit point {201, 737.5} after scrolling to visible
+    t =    14.14s     Wait for com.spendsage.ai to idle
+    t =    15.30s Waiting 8.0s for "Perfil" NavigationBar to exist
+    t =    16.38s     Checking `Expect predicate `existsNoRetry == 1` for object "Perfil" NavigationBar`
+    t =    16.38s         Checking existence of `"Perfil" NavigationBar`
+    t =    17.31s Waiting 8.0s for Button (First Match) to exist
+    t =    18.38s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =    18.38s         Checking existence of `Button (First Match)`
+    t =    18.42s Tap Button (First Match)
+    t =    18.42s     Wait for com.spendsage.ai to idle
+    t =    18.42s     Find the Button (First Match)
+    t =    18.45s     Check for interrupting elements affecting "Ajustes" Button
+    t =    18.50s     Synthesize event
+    t =    18.79s     Wait for com.spendsage.ai to idle
+    t =    19.86s Waiting 8.0s for "settings.link.help" Button to exist
+    t =    20.93s     Checking `Expect predicate `existsNoRetry == 1` for object "settings.link.help" Button`
+    t =    20.93s         Checking existence of `"settings.link.help" Button`
+    t =    21.00s Tap "settings.link.help" Button
+    t =    21.00s     Wait for com.spendsage.ai to idle
+    t =    21.00s     Find the "settings.link.help" Button
+    t =    21.04s     Check for interrupting elements affecting "settings.link.help" Button
+    t =    21.07s     Synthesize event
+    t =    21.08s         Scroll element to visible
+    t =    21.08s         Find the "settings.link.help" Button
+    t =    21.14s         Computed hit point {201, 737.50000000000034} after scrolling to visible
+    t =    21.54s     Wait for com.spendsage.ai to idle
+    t =    22.27s Waiting 8.0s for "Centro de ayuda" NavigationBar to exist
+    t =    23.35s     Checking `Expect predicate `existsNoRetry == 1` for object "Centro de ayuda" NavigationBar`
+    t =    23.35s         Checking existence of `"Centro de ayuda" NavigationBar`
+    t =    24.28s Waiting 8.0s for Button (First Match) to exist
+    t =    25.35s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =    25.35s         Checking existence of `Button (First Match)`
+    t =    25.38s Tap Button (First Match)
+    t =    25.38s     Wait for com.spendsage.ai to idle
+    t =    25.38s     Find the Button (First Match)
+    t =    25.41s     Check for interrupting elements affecting "Ajustes" Button
+    t =    25.44s     Synthesize event
+    t =    25.74s     Wait for com.spendsage.ai to idle
+    t =    26.79s Waiting 8.0s for "settings.link.support" Button to exist
+    t =    27.87s     Checking `Expect predicate `existsNoRetry == 1` for object "settings.link.support" Button`
+    t =    27.87s         Checking existence of `"settings.link.support" Button`
+    t =    27.94s Tap "settings.link.support" Button
+    t =    27.94s     Wait for com.spendsage.ai to idle
+    t =    27.94s     Find the "settings.link.support" Button
+    t =    28.04s     Check for interrupting elements affecting "settings.link.support" Button
+    t =    28.08s     Synthesize event
+    t =    28.09s         Scroll element to visible
+    t =    28.09s         Find the "settings.link.support" Button
+    t =    28.20s         Computed hit point {201, 737.5} after scrolling to visible
+    t =    28.49s     Wait for com.spendsage.ai to idle
+    t =    29.47s Waiting 8.0s for "Centro de soporte" NavigationBar to exist
+    t =    30.53s     Checking `Expect predicate `existsNoRetry == 1` for object "Centro de soporte" NavigationBar`
+    t =    30.53s         Checking existence of `"Centro de soporte" NavigationBar`
+    t =    31.48s Waiting 8.0s for Button (First Match) to exist
+    t =    32.55s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =    32.55s         Checking existence of `Button (First Match)`
+    t =    32.59s Tap Button (First Match)
+    t =    32.59s     Wait for com.spendsage.ai to idle
+    t =    32.59s     Find the Button (First Match)
+    t =    32.63s     Check for interrupting elements affecting "Ajustes" Button
+    t =    32.74s     Synthesize event
+    t =    33.07s     Wait for com.spendsage.ai to idle
+    t =    34.18s Waiting 8.0s for "settings.link.legal" Button to exist
+    t =    35.24s     Checking `Expect predicate `existsNoRetry == 1` for object "settings.link.legal" Button`
+    t =    35.24s         Checking existence of `"settings.link.legal" Button`
+    t =    35.29s Tap "settings.link.legal" Button
+    t =    35.29s     Wait for com.spendsage.ai to idle
+    t =    35.29s     Find the "settings.link.legal" Button
+    t =    35.34s     Check for interrupting elements affecting "settings.link.legal" Button
+    t =    35.37s     Synthesize event
+    t =    35.39s         Scroll element to visible
+    t =    35.39s         Find the "settings.link.legal" Button
+    t =    35.50s         Computed hit point {201, 737.5} after scrolling to visible
+    t =    35.79s     Wait for com.spendsage.ai to idle
+    t =    36.97s Waiting 8.0s for "Centro legal" NavigationBar to exist
+    t =    38.05s     Checking `Expect predicate `existsNoRetry == 1` for object "Centro legal" NavigationBar`
+    t =    38.05s         Checking existence of `"Centro legal" NavigationBar`
+    t =    38.98s Waiting 8.0s for Button (First Match) to exist
+    t =    40.05s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =    40.06s         Checking existence of `Button (First Match)`
+    t =    40.07s Tap Button (First Match)
+    t =    40.07s     Wait for com.spendsage.ai to idle
+    t =    40.08s     Find the Button (First Match)
+    t =    40.11s     Check for interrupting elements affecting "Ajustes" Button
+    t =    40.14s     Synthesize event
+    t =    40.44s     Wait for com.spendsage.ai to idle
+    t =    41.49s Waiting 8.0s for "settings.link.plans" Button to exist
+    t =    42.55s     Checking `Expect predicate `existsNoRetry == 1` for object "settings.link.plans" Button`
+    t =    42.55s         Checking existence of `"settings.link.plans" Button`
+    t =    42.63s Tap "settings.link.plans" Button
+    t =    42.63s     Wait for com.spendsage.ai to idle
+    t =    42.63s     Find the "settings.link.plans" Button
+    t =    42.69s     Check for interrupting elements affecting "settings.link.plans" Button
+    t =    42.74s     Synthesize event
+    t =    43.04s     Wait for com.spendsage.ai to idle
+    t =    43.93s Waiting 8.0s for "Planes" NavigationBar to exist
+    t =    44.99s     Checking `Expect predicate `existsNoRetry == 1` for object "Planes" NavigationBar`
+    t =    44.99s         Checking existence of `"Planes" NavigationBar`
+    t =    46.43s Tear Down
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial06SettingsHelpSupportAndPlans]' passed (46.719 seconds).
+Test Suite 'SpendSageTutorialUITests' passed at 2026-04-08 14:06:08.776.
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.719 (46.721) seconds
+Test Suite 'SpendSageUITests.xctest' passed at 2026-04-08 14:06:08.778.
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.719 (46.723) seconds
+Test Suite 'Selected tests' passed at 2026-04-08 14:06:08.778.
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.719 (46.725) seconds
+2026-04-08 14:06:09.387 xcodebuild[2347:2277838] [MT] IDETestOperationsObserverDebug: 52.124 elapsed -- Testing started completed.
+2026-04-08 14:06:09.387 xcodebuild[2347:2277838] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-04-08 14:06:09.387 xcodebuild[2347:2277838] [MT] IDETestOperationsObserverDebug: 52.124 sec, +52.124 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/rubenlazaro/Library/Developer/Xcode/DerivedData/SpendSage-cgwioapamhwzhmfhyiwoniotpclb/Logs/Test/Test-SpendSage-2026.04.08_14-05-15--0500.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

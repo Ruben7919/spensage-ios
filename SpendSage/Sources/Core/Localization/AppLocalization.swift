@@ -75,6 +75,26 @@ enum AppLocalization {
     }
 }
 
+enum AppCurrencyFormat {
+    static let defaultsKey = "native.settings.currency"
+    static let defaultCode = "USD"
+
+    static func currentCode(defaults: UserDefaults = .standard) -> String {
+        let value = defaults.string(forKey: defaultsKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        return (value?.isEmpty == false ? value : nil) ?? defaultCode
+    }
+
+    static func format(_ value: Decimal, defaults: UserDefaults = .standard) -> String {
+        value.formatted(.currency(code: currentCode(defaults: defaults)))
+    }
+
+    static func format(cents: Int, defaults: UserDefaults = .standard) -> String {
+        format(Decimal(cents) / 100, defaults: defaults)
+    }
+}
+
 extension String {
     var appLocalized: String {
         AppLocalization.localized(self)

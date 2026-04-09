@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,000
+No copies el recibo a mano.
+Escanéalo y revísalo.
+
+2
+00:00:02,000 --> 00:00:06,000
+SpendSage te arma un borrador
+para que no empieces desde cero.
+
+3
+00:00:06,000 --> 00:00:09,000
+Escanea para acelerar.
+Revisa para tener control.

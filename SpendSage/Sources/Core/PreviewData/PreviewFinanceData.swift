@@ -98,7 +98,7 @@ enum PreviewFinanceData {
         ],
         profile: ProfileRecord(
             fullName: "Ruben",
-            householdName: "SpendSage Home",
+            householdName: "Hogar SpendSage",
             email: "rubenl97m@gmail.com",
             countryCode: "US",
             marketingOptIn: true

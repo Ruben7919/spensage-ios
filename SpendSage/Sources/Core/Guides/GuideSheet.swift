@@ -65,7 +65,7 @@ struct GuideSheet: View {
             Spacer()
 
             Button("Close".appLocalized) {
-                close(markSeen: false)
+                close(markSeen: true)
             }
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(BrandTheme.primary)
@@ -109,7 +109,7 @@ struct GuideSheet: View {
         .padding(.top, 12)
         .padding(.bottom, 18)
         .background(BrandTheme.surface.opacity(0.96))
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             Rectangle()
                 .fill(BrandTheme.line.opacity(0.4))
                 .frame(height: 1)

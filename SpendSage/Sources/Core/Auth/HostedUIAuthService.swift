@@ -6,6 +6,8 @@ import UIKit
 @MainActor
 final class HostedUIAuthService: NSObject, AuthServicing {
     let configuration: AuthConfiguration
+    private var lastProfileSeed: AuthProfileSeed?
+    private var activeIDToken: String?
 
     init(configuration: AuthConfiguration) {
         self.configuration = configuration
@@ -42,6 +44,79 @@ final class HostedUIAuthService: NSObject, AuthServicing {
 
     func hostedUIRequest(for provider: SocialProvider) -> AuthHostedUIRequest? {
         configuration.hostedUIRequest(for: provider, action: .social)
+    }
+
+    func consumeProfileSeed() -> AuthProfileSeed? {
+        defer { lastProfileSeed = nil }
+        return lastProfileSeed
+    }
+
+    func hasRememberedSession() -> Bool {
+        AuthSessionPreferences.rememberDeviceEnabled() && AuthSessionVault.hasSession()
+    }
+
+    func restoreRememberedSession() async -> SessionState? {
+        guard
+            AuthSessionPreferences.rememberDeviceEnabled(),
+            let hostedUI = configuration.hostedUI,
+            let persisted = AuthSessionVault.load()
+        else {
+            return nil
+        }
+
+        do {
+            let tokenResponse = try await refreshSession(refreshToken: persisted.refreshToken, hostedUI: hostedUI)
+            let profileSeed = Self.profileSeed(fromIDToken: tokenResponse.idToken, fallbackEmail: persisted.email)
+            lastProfileSeed = profileSeed
+
+            let email = profileSeed.preferredEmail ?? persisted.email
+            let refreshToken = tokenResponse.refreshToken ?? persisted.refreshToken
+            activeIDToken = tokenResponse.idToken
+            persistRememberedSession(email: email, provider: persisted.provider, refreshToken: refreshToken)
+
+            return .signedIn(email: email, provider: persisted.provider)
+        } catch {
+            AuthSessionVault.delete()
+            lastProfileSeed = nil
+            activeIDToken = nil
+            return nil
+        }
+    }
+
+    func currentIDToken() async -> String? {
+        if let activeIDToken, !activeIDToken.isEmpty {
+            return activeIDToken
+        }
+
+        guard
+            AuthSessionPreferences.rememberDeviceEnabled(),
+            let hostedUI = configuration.hostedUI,
+            let persisted = AuthSessionVault.load()
+        else {
+            return nil
+        }
+
+        do {
+            let tokenResponse = try await refreshSession(refreshToken: persisted.refreshToken, hostedUI: hostedUI)
+            let email = Self.profileSeed(fromIDToken: tokenResponse.idToken, fallbackEmail: persisted.email).preferredEmail ?? persisted.email
+            activeIDToken = tokenResponse.idToken
+            persistRememberedSession(
+                email: email,
+                provider: persisted.provider,
+                refreshToken: tokenResponse.refreshToken ?? persisted.refreshToken
+            )
+            return tokenResponse.idToken
+        } catch {
+            activeIDToken = nil
+            AuthSessionVault.delete()
+            return nil
+        }
+    }
+
+    func forgetRememberedSession() {
+        AuthSessionVault.delete()
+        lastProfileSeed = nil
+        activeIDToken = nil
     }
 
     private func authorize(
@@ -82,8 +157,15 @@ final class HostedUIAuthService: NSObject, AuthServicing {
             hostedUI: hostedUI
         )
 
-        let email = Self.email(fromIDToken: tokenResponse.idToken) ?? loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
-        let providerLabel = provider?.rawValue ?? "Hosted UI"
+        let profileSeed = Self.profileSeed(
+            fromIDToken: tokenResponse.idToken,
+            fallbackEmail: loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
+        )
+        lastProfileSeed = profileSeed
+        let email = profileSeed.preferredEmail ?? loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
+        let providerLabel = provider?.rawValue ?? "Email"
+        activeIDToken = tokenResponse.idToken
+        persistRememberedSession(email: email, provider: providerLabel, refreshToken: tokenResponse.refreshToken)
         return .signedIn(email: email, provider: providerLabel)
     }
 
@@ -103,7 +185,7 @@ final class HostedUIAuthService: NSObject, AuthServicing {
                 }
                 continuation.resume(returning: callbackURL)
             }
-            session.prefersEphemeralWebBrowserSession = true
+            session.prefersEphemeralWebBrowserSession = !AuthSessionPreferences.rememberDeviceEnabled()
             session.presentationContextProvider = PresentationAnchorProvider.shared
             if !session.start() {
                 continuation.resume(throwing: NSError(domain: "HostedUIAuthService", code: 5, userInfo: [NSLocalizedDescriptionKey: "Unable to start secure browser session."]))
@@ -141,6 +223,52 @@ final class HostedUIAuthService: NSObject, AuthServicing {
         return try JSONDecoder().decode(HostedUITokenResponse.self, from: data)
     }
 
+    private func refreshSession(
+        refreshToken: String,
+        hostedUI: AuthConfiguration.HostedUI
+    ) async throws -> HostedUITokenResponse {
+        var request = URLRequest(url: hostedUI.tokenURL)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+
+        let formItems = [
+            URLQueryItem(name: "grant_type", value: "refresh_token"),
+            URLQueryItem(name: "client_id", value: hostedUI.clientId),
+            URLQueryItem(name: "refresh_token", value: refreshToken),
+        ]
+
+        var components = URLComponents()
+        components.queryItems = formItems
+        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) else {
+            let body = String(data: data, encoding: .utf8) ?? "Unknown refresh token error."
+            throw NSError(domain: "HostedUIAuthService", code: 7, userInfo: [NSLocalizedDescriptionKey: body])
+        }
+
+        return try JSONDecoder().decode(HostedUITokenResponse.self, from: data)
+    }
+
+    private func persistRememberedSession(email: String, provider: String?, refreshToken: String?) {
+        guard AuthSessionPreferences.rememberDeviceEnabled() else {
+            AuthSessionVault.delete()
+            return
+        }
+
+        guard let refreshToken, !refreshToken.isEmpty else {
+            return
+        }
+
+        let session = PersistedAuthSession(
+            email: email,
+            provider: provider,
+            refreshToken: refreshToken,
+            storedAt: .now
+        )
+        try? AuthSessionVault.save(session)
+    }
+
     private static func randomVerifier() -> String {
         let data = Data((0..<32).map { _ in UInt8.random(in: 0...255) })
         return base64url(data)
@@ -158,7 +286,7 @@ final class HostedUIAuthService: NSObject, AuthServicing {
             .replacingOccurrences(of: "=", with: "")
     }
 
-    private static func email(fromIDToken token: String) -> String? {
+    private static func tokenPayload(from token: String) -> [String: Any]? {
         let segments = token.split(separator: ".")
         guard segments.count > 1 else { return nil }
         var payload = String(segments[1])
@@ -173,7 +301,23 @@ final class HostedUIAuthService: NSObject, AuthServicing {
         else {
             return nil
         }
-        return json["email"] as? String ?? json["cognito:username"] as? String
+        return json
+    }
+
+    private static func profileSeed(fromIDToken token: String, fallbackEmail: String?) -> AuthProfileSeed {
+        let payload = tokenPayload(from: token)
+        let givenName = payload?["given_name"] as? String
+        let familyName = payload?["family_name"] as? String
+        let fullName = (payload?["name"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let mergedName = [givenName, familyName]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+
+        return AuthProfileSeed(
+            fullName: (fullName?.isEmpty == false ? fullName : nil) ?? (mergedName.isEmpty ? nil : mergedName),
+            email: (payload?["email"] as? String) ?? (payload?["cognito:username"] as? String) ?? fallbackEmail
+        )
     }
 }
 

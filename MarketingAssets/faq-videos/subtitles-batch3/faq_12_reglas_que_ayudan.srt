@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,000
+Automatizar bien no se siente
+robotico.
+
+2
+00:00:02,000 --> 00:00:04,300
+Creas una regla local
+y ahorras trabajo manual.
+
+3
+00:00:04,300 --> 00:00:06,400
+La mejor automatizacion
+se siente invisible.

@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,000
+Si abres la app y no entiendes nada,
+la cierras.
+
+2
+00:00:02,000 --> 00:00:04,300
+Aqui ves gasto semanal, racha
+y dias restantes al instante.
+
+3
+00:00:04,300 --> 00:00:06,400
+El home no adorna.
+Te orienta.

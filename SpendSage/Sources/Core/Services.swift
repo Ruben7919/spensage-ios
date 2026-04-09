@@ -8,6 +8,11 @@ protocol AuthServicing {
     func signInWithSocial(_ provider: SocialProvider) async throws -> SessionState
     func continueAsGuest() async -> SessionState
     func hostedUIRequest(for provider: SocialProvider) -> AuthHostedUIRequest?
+    func consumeProfileSeed() -> AuthProfileSeed?
+    func hasRememberedSession() -> Bool
+    func restoreRememberedSession() async -> SessionState?
+    func currentIDToken() async -> String?
+    func forgetRememberedSession()
 }
 
 @MainActor
@@ -27,31 +32,35 @@ enum DefaultAuthService {
 }
 
 @MainActor
-struct PreviewAuthService: AuthServicing {
+final class PreviewAuthService: AuthServicing {
     let configuration: AuthConfiguration
+    private var lastProfileSeed: AuthProfileSeed?
+    private var rememberedSession: SessionState?
 
     init(configuration: AuthConfiguration = .preview) {
         self.configuration = configuration
     }
 
     func signIn(email: String, password: String) async throws -> SessionState {
-        try AuthValidation.validate(
-            email: email,
-            password: password,
-            minimumPasswordLength: configuration.minimumPasswordLength
-        )
+        try AuthValidation.validate(email: email)
         try await Task.sleep(for: .milliseconds(150))
-        return .signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: nil)
+        lastProfileSeed = AuthProfileSeed(email: email.trimmingCharacters(in: .whitespacesAndNewlines))
+        let session = SessionState.signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: "Email")
+        if AuthSessionPreferences.rememberDeviceEnabled() {
+            rememberedSession = session
+        }
+        return session
     }
 
     func createAccount(email: String, password: String) async throws -> SessionState {
-        try AuthValidation.validate(
-            email: email,
-            password: password,
-            minimumPasswordLength: configuration.minimumPasswordLength
-        )
+        try AuthValidation.validate(email: email)
         try await Task.sleep(for: .milliseconds(180))
-        return .signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: "Email")
+        lastProfileSeed = AuthProfileSeed(email: email.trimmingCharacters(in: .whitespacesAndNewlines))
+        let session = SessionState.signedIn(email: email.trimmingCharacters(in: .whitespacesAndNewlines), provider: "Email")
+        if AuthSessionPreferences.rememberDeviceEnabled() {
+            rememberedSession = session
+        }
+        return session
     }
 
     func signInWithSocial(_ provider: SocialProvider) async throws -> SessionState {
@@ -59,7 +68,15 @@ struct PreviewAuthService: AuthServicing {
             throw AuthError.providerUnavailable(provider)
         }
         try await Task.sleep(for: .milliseconds(180))
-        return .signedIn(email: "\(provider.rawValue.lowercased())@spendsage.ai", provider: provider.rawValue)
+        lastProfileSeed = AuthProfileSeed(
+            fullName: nil,
+            email: "\(provider.rawValue.lowercased())@spendsage.ai"
+        )
+        let session = SessionState.signedIn(email: "\(provider.rawValue.lowercased())@spendsage.ai", provider: provider.rawValue)
+        if AuthSessionPreferences.rememberDeviceEnabled() {
+            rememberedSession = session
+        }
+        return session
     }
 
     func continueAsGuest() async -> SessionState {
@@ -68,6 +85,29 @@ struct PreviewAuthService: AuthServicing {
 
     func hostedUIRequest(for provider: SocialProvider) -> AuthHostedUIRequest? {
         configuration.hostedUIRequest(for: provider, action: .social)
+    }
+
+    func consumeProfileSeed() -> AuthProfileSeed? {
+        defer { lastProfileSeed = nil }
+        return lastProfileSeed
+    }
+
+    func hasRememberedSession() -> Bool {
+        rememberedSession != nil
+    }
+
+    func restoreRememberedSession() async -> SessionState? {
+        try? await Task.sleep(for: .milliseconds(120))
+        return rememberedSession
+    }
+
+    func currentIDToken() async -> String? {
+        nil
+    }
+
+    func forgetRememberedSession() {
+        rememberedSession = nil
+        lastProfileSeed = nil
     }
 }
 

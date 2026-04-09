@@ -1,14 +1,12 @@
 import SwiftUI
 import UIKit
-import AudioToolbox
 
 struct ProfileView: View {
     @ObservedObject var viewModel: AppViewModel
 
     @AppStorage("native.settings.language") private var language = "auto"
-    @AppStorage("native.settings.currency") private var currency = "USD"
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
-    @AppStorage("native.settings.sound") private var soundStyle = "playful"
     @State private var draft: ProfileRecord
     @State private var isSaving = false
 
@@ -25,18 +23,22 @@ struct ProfileView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 heroCard
-                snapshotCard
                 identityCard
-                preferencesCard
-                updatesCard
+                routesCard
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
+        .scrollDismissesKeyboard(.interactively)
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
-        .navigationTitle("Profile")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "profile.screen")
+        }
+        .accessibilityIdentifier("profile.screen")
+        .navigationTitle("Perfil")
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: viewModel.profile) { _, profile in
             if !isSaving {
@@ -46,12 +48,29 @@ struct ProfileView: View {
     }
 
     private var heroCard: some View {
-        FinanceToolsHeaderCard(
-            eyebrow: "Local identity",
-            title: "Profile",
-            summary: "Manage the identity and household details stored with your local finance ledger. These details flow into exports, support packets, and the local account snapshot.",
-            systemImage: "person.crop.circle.fill"
-        )
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                BrandCardHeader(
+                    badgeText: "Identidad local",
+                    badgeSystemImage: "person.crop.circle.fill",
+                    title: "Perfil",
+                    summary: "Mantén tu identidad clara aquí. Los detalles de cuenta y las preferencias viven en rutas separadas para no convertir perfil en un panel pesado.",
+                    titleSize: 32
+                ) {
+                    MascotAvatarView(
+                        character: .mei,
+                        expression: viewModel.session.isAuthenticated ? .proud : .thinking,
+                        size: 76
+                    )
+                }
+
+                FlowStack(spacing: 8, rowSpacing: 8) {
+                    StoryTag(text: "Cuenta local", systemImage: "lock.fill")
+                    StoryTag(text: "Preferencias separadas", systemImage: "slider.horizontal.3")
+                    StoryTag(text: "Edición rápida", systemImage: "square.and.pencil")
+                }
+            }
+        }
     }
 
     private var snapshotCard: some View {
@@ -59,7 +78,7 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 14) {
                     MascotAvatarView(
-                        character: .mei,
+                        character: .manchas,
                         expression: viewModel.session.isAuthenticated ? .proud : .thinking,
                         size: 72
                     )
@@ -70,23 +89,23 @@ struct ProfileView: View {
                             systemImage: viewModel.session.isAuthenticated ? "person.crop.circle.badge.checkmark" : "person.crop.circle.badge.xmark"
                         )
 
-                        Text("Local account snapshot")
+                        Text("Resumen local de la cuenta")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("This screen stays local-first until you connect a cloud account.")
+                        Text("Esta pantalla se mantiene atada a tu cuenta para que los datos del perfil sigan siendo personales y listos para futuras funciones de cuenta.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                     }
                 }
 
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                    BrandMetricTile(title: "Accounts", value: "\(viewModel.accounts.count)", systemImage: "wallet.pass.fill")
-                    BrandMetricTile(title: "Bills", value: "\(viewModel.bills.count)", systemImage: "calendar.badge.clock")
-                    BrandMetricTile(title: "Rules", value: "\(viewModel.rules.count)", systemImage: "line.3.horizontal.decrease.circle")
-                    BrandMetricTile(title: "Expenses", value: "\(viewModel.dashboardState?.transactionCount ?? 0)", systemImage: "receipt")
-                    BrandMetricTile(title: "Country", value: draft.countryCode, systemImage: "globe")
-                    BrandMetricTile(title: "Device", value: deviceLabel, systemImage: "iphone.gen3")
+                    BrandMetricTile(title: "Cuentas", value: "\(viewModel.accounts.count)", systemImage: "wallet.pass.fill")
+                    BrandMetricTile(title: "Facturas", value: "\(viewModel.bills.count)", systemImage: "calendar.badge.clock")
+                    BrandMetricTile(title: "Reglas", value: "\(viewModel.rules.count)", systemImage: "line.3.horizontal.decrease.circle")
+                    BrandMetricTile(title: "Gastos", value: "\(viewModel.dashboardState?.transactionCount ?? 0)", systemImage: "receipt")
+                    BrandMetricTile(title: "País", value: draft.countryCode, systemImage: "globe")
+                    BrandMetricTile(title: "Dispositivo", value: deviceLabel, systemImage: "iphone.gen3")
                 }
             }
         }
@@ -95,33 +114,45 @@ struct ProfileView: View {
     private var identityCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Identity")
+                Text("Identidad")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
                 VStack(spacing: 12) {
-                    TextField("Full name", text: $draft.fullName)
-                        .textInputAutocapitalization(.words)
-                        .textContentType(.name)
+                    FinanceField(
+                        label: "Nombre completo",
+                        placeholder: "Escribe tu nombre completo",
+                        text: $draft.fullName,
+                        keyboard: .default,
+                        capitalization: .words
+                    )
 
-                    TextField("Household name", text: $draft.householdName)
-                        .textInputAutocapitalization(.words)
+                    FinanceField(
+                        label: "Nombre del hogar",
+                        placeholder: "Escribe un nombre para el hogar",
+                        text: $draft.householdName,
+                        keyboard: .default,
+                        capitalization: .words
+                    )
 
-                    TextField("Email", text: $draft.email)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
+                    FinanceField(
+                        label: "Correo",
+                        placeholder: "name@domain.com",
+                        text: $draft.email,
+                        keyboard: .emailAddress,
+                        capitalization: .never
+                    )
 
-                    Picker("Country", selection: $draft.countryCode) {
+                    Picker("País", selection: $draft.countryCode) {
                         ForEach(["US", "EC", "ES", "MX", "GB"], id: \.self) { code in
                             Text(code).tag(code)
                         }
                     }
 
-                    Toggle("Send local product and launch updates", isOn: $draft.marketingOptIn)
+                    Toggle("Recibir novedades del producto", isOn: $draft.marketingOptIn)
                 }
 
-                Button(isSaving ? "Saving..." : "Save profile on this device") {
+                Button(isSaving ? "Guardando..." : "Guardar perfil en este dispositivo") {
                     saveProfile()
                 }
                 .buttonStyle(PrimaryCTAStyle())
@@ -130,79 +161,42 @@ struct ProfileView: View {
         }
     }
 
-    private var updatesCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("What this updates")
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-
-                BrandFeatureRow(
-                    systemImage: "person.text.rectangle",
-                    title: "Profile identity",
-                    detail: "Your name, household label, and email flow into local exports and support packets."
-                )
-                BrandFeatureRow(
-                    systemImage: "square.and.arrow.down.on.square",
-                    title: "Local-first persistence",
-                    detail: "Changes are saved with the on-device ledger using the existing profile record."
-                )
-                BrandFeatureRow(
-                    systemImage: "sparkles.rectangle.stack",
-                    title: "Settings nearby",
-                    detail: "Profile now mirrors the most personal display preferences too, so identity and presentation can be reviewed together."
-                )
-            }
-        }
-    }
-
-    private var preferencesCard: some View {
+    private var routesCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Display and feedback")
+                Text("Más opciones")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                preferenceMenu(title: "Language", selection: $language) {
-                    Text("Auto").tag("auto")
-                    Text("English").tag("en")
-                    Text("Español").tag("es")
+                NavigationLink {
+                    ProfilePreferencesDetailView(
+                        language: $language,
+                        currency: $currency,
+                        theme: $theme
+                    )
+                } label: {
+                    profileRouteRow(
+                        title: "Preferencias",
+                        summary: "Idioma, moneda y tema.",
+                        systemImage: "paintpalette.fill"
+                    )
                 }
+                .buttonStyle(.plain)
 
-                Divider()
-
-                preferenceMenu(title: "Currency", selection: $currency) {
-                    Text("USD").tag("USD")
-                    Text("EUR").tag("EUR")
-                    Text("GBP").tag("GBP")
-                    Text("JPY").tag("JPY")
-                    Text("MXN").tag("MXN")
+                NavigationLink {
+                    ProfileAccountDetailsView(
+                        viewModel: viewModel,
+                        draft: draft,
+                        deviceLabel: deviceLabel
+                    )
+                } label: {
+                    profileRouteRow(
+                        title: "Detalle de cuenta",
+                        summary: "Resumen local, país, dispositivo y efecto de tus cambios.",
+                        systemImage: "person.text.rectangle"
+                    )
                 }
-
-                Divider()
-
-                preferenceMenu(title: "Theme", selection: $theme) {
-                    Text("Finance").tag("finance")
-                    Text("Midnight").tag("midnight")
-                    Text("Sunrise").tag("sunrise")
-                }
-
-                Divider()
-
-                preferenceMenu(title: "Sound style", selection: $soundStyle) {
-                    Text("Off").tag("off")
-                    Text("Meow").tag("miau")
-                    Text("Playful").tag("playful")
-                }
-
-                Button("Test sound") {
-                    guard soundStyle != "off" else { return }
-                    let generator = UINotificationFeedbackGenerator()
-                    generator.notificationOccurred(.success)
-                    AudioServicesPlaySystemSound(1104)
-                }
-                .buttonStyle(SecondaryCTAStyle())
-                .disabled(soundStyle == "off")
+                .buttonStyle(.plain)
             }
         }
     }
@@ -235,7 +229,7 @@ struct ProfileView: View {
                 Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text("Saved locally for this device.")
+                Text("Guardado localmente en este dispositivo.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
             }
@@ -248,10 +242,207 @@ struct ProfileView: View {
             .labelsHidden()
             .pickerStyle(.menu)
             .tint(BrandTheme.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(BrandTheme.surfaceTint, in: Capsule())
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
+        }
+    }
+
+    private func profileRouteRow(title: String, summary: String, systemImage: String) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: systemImage)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(BrandTheme.primary)
+                .frame(width: 42, height: 42)
+                .background(BrandTheme.accent.opacity(0.18))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(summary)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.bold))
+                .foregroundStyle(BrandTheme.muted)
+                .padding(.top, 6)
         }
     }
 }
 
+private struct ProfilePreferencesDetailView: View {
+    @Binding var language: String
+    @Binding var currency: String
+    @Binding var theme: String
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Preferencias")
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text("Cambia la presentación aquí sin recargar la pantalla principal de perfil.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Pantalla y feedback")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        profilePreferenceMenu(title: "Idioma", selection: $language) {
+                            Text("Auto").tag("auto")
+                            Text("English").tag("en")
+                            Text("Español").tag("es")
+                        }
+
+                        Divider()
+
+                        profilePreferenceMenu(title: "Moneda", selection: $currency) {
+                            Text("USD").tag("USD")
+                            Text("EUR").tag("EUR")
+                            Text("GBP").tag("GBP")
+                            Text("JPY").tag("JPY")
+                            Text("MXN").tag("MXN")
+                        }
+
+                        Divider()
+
+                        profilePreferenceMenu(title: "Tema", selection: $theme) {
+                            Text("Finance").tag("finance")
+                            Text("Midnight").tag("midnight")
+                            Text("Sunrise").tag("sunrise")
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(24)
+        }
+        .background(BrandTheme.canvas)
+        .background(alignment: .top) {
+            BrandBackdropView()
+        }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "profilePreferences.screen")
+        }
+        .accessibilityIdentifier("profilePreferences.screen")
+        .navigationTitle("Preferencias")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct ProfileAccountDetailsView: View {
+    @ObservedObject var viewModel: AppViewModel
+    let draft: ProfileRecord
+    let deviceLabel: String
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Detalle de cuenta")
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text("Aquí vive el contexto local de la cuenta. Separamos esta información para que perfil principal siga enfocado en identidad.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Resumen local")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                            BrandMetricTile(title: "Cuentas", value: "\(viewModel.accounts.count)", systemImage: "wallet.pass.fill")
+                            BrandMetricTile(title: "Facturas", value: "\(viewModel.bills.count)", systemImage: "calendar.badge.clock")
+                            BrandMetricTile(title: "Reglas", value: "\(viewModel.rules.count)", systemImage: "line.3.horizontal.decrease.circle")
+                            BrandMetricTile(title: "Gastos", value: "\(viewModel.dashboardState?.transactionCount ?? 0)", systemImage: "receipt")
+                            BrandMetricTile(title: "País", value: draft.countryCode, systemImage: "globe")
+                            BrandMetricTile(title: "Dispositivo", value: deviceLabel, systemImage: "iphone.gen3")
+                        }
+                    }
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Efecto de tus cambios")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        BrandFeatureRow(
+                            systemImage: "person.text.rectangle",
+                            title: "Identidad de perfil",
+                            detail: "Tu nombre, nombre del hogar y correo entran en exportaciones locales y paquetes de soporte."
+                        )
+                        BrandFeatureRow(
+                            systemImage: "square.and.arrow.down.on.square",
+                            title: "Persistencia local",
+                            detail: "Los cambios se guardan con el libro financiero local de esta cuenta."
+                        )
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(24)
+        }
+        .background(BrandTheme.canvas)
+        .background(alignment: .top) {
+            BrandBackdropView()
+        }
+        .navigationTitle("Detalle de cuenta")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private func profilePreferenceMenu<SelectionValue: Hashable, Content: View>(
+    title: String,
+    selection: Binding<SelectionValue>,
+    @ViewBuilder content: () -> Content
+) -> some View {
+    VStack(alignment: .leading, spacing: 12) {
+        Text(title.appLocalized)
+            .font(.headline)
+            .foregroundStyle(BrandTheme.ink)
+
+        Picker(title, selection: selection) {
+            content()
+        }
+        .labelsHidden()
+        .pickerStyle(.menu)
+        .tint(BrandTheme.primary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(BrandTheme.surfaceTint, in: Capsule())
+        .overlay(
+            Capsule(style: .continuous)
+                .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+        )
+    }
+}
 private extension String {
     func ifEmpty(replacingWith fallback: String) -> String {
         isEmpty ? fallback : self

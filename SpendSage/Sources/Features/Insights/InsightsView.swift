@@ -1,17 +1,21 @@
+import Charts
 import SwiftUI
 import UIKit
 
 struct InsightsView: View {
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
+    @Environment(\.shellBottomInset) private var shellBottomInset
+
     @State private var exportNotice: String?
-    @State private var selectedPeriod: InsightsPeriod = .month
+    @State private var selectedPeriod: InsightsPeriod = .week
     @State private var selectedMetric: InsightsMetric = .expense
     @State private var generatedInsight: GeneratedInsightResult?
     @State private var isPresentingGuide = false
     @State private var budgetDraft: [ExpenseCategory: String] = [:]
     @State private var plannerNotice: String?
-
-    private let currencyCode = "USD"
+    @State private var selectedChartIndex: Int?
+    @State private var hasAppliedDebugChartSelection = false
 
     private var currentState: FinanceDashboardState? {
         viewModel.dashboardState
@@ -28,27 +32,6 @@ struct InsightsView: View {
     private var monthExpenses: [ExpenseRecord] {
         let calendar = Calendar.autoupdatingCurrent
         return recentExpenses.filter { calendar.isDate($0.date, equalTo: .now, toGranularity: .month) }
-    }
-
-    private var daysInMonth: Int {
-        let calendar = Calendar.autoupdatingCurrent
-        guard let range = calendar.range(of: .day, in: .month, for: .now) else { return 0 }
-        return range.count
-    }
-
-    private var daysElapsedInMonth: Int {
-        let calendar = Calendar.autoupdatingCurrent
-        return max(calendar.component(.day, from: .now), 1)
-    }
-
-    private var spendPerDay: Decimal {
-        guard daysElapsedInMonth > 0 else { return 0 }
-        return monthSpending / Decimal(daysElapsedInMonth)
-    }
-
-    private var budgetPerDay: Decimal {
-        guard daysInMonth > 0 else { return 0 }
-        return (currentState?.budgetSnapshot.monthlyBudget ?? 0) / Decimal(daysInMonth)
     }
 
     private var monthSpending: Decimal {
@@ -83,11 +66,11 @@ struct InsightsView: View {
         filteredExpenses.reduce(Decimal.zero) { partial, expense in
             switch selectedMetric {
             case .expense:
-                return partial + expense.amount
+                return partial + max(expense.amount, 0)
             case .refund:
                 return partial + (expense.amount < 0 ? -expense.amount : 0)
             case .income:
-                return partial + (expense.amount > 0 ? expense.amount : 0)
+                return partial + min(expense.amount, 0) * -1
             }
         }
     }
@@ -106,13 +89,13 @@ struct InsightsView: View {
             case .day:
                 return monthlyIncome / Decimal(max(daysInMonth, 1))
             case .week:
-                return monthlyIncome / Decimal(4)
+                return monthlyIncome / 4
             case .month:
                 return monthlyIncome
             }
         }
 
-        return filteredExpenses.reduce(Decimal.zero) { $0 + max($1.amount, 0) }
+        return 0
     }
 
     private var assetsTotal: Decimal {
@@ -127,6 +110,27 @@ struct InsightsView: View {
         assetsTotal - liabilitiesTotal
     }
 
+    private var daysInMonth: Int {
+        let calendar = Calendar.autoupdatingCurrent
+        guard let range = calendar.range(of: .day, in: .month, for: .now) else { return 0 }
+        return range.count
+    }
+
+    private var daysElapsedInMonth: Int {
+        let calendar = Calendar.autoupdatingCurrent
+        return max(calendar.component(.day, from: .now), 1)
+    }
+
+    private var spendPerDay: Decimal {
+        guard daysElapsedInMonth > 0 else { return 0 }
+        return monthSpending / Decimal(daysElapsedInMonth)
+    }
+
+    private var budgetPerDay: Decimal {
+        guard daysInMonth > 0 else { return 0 }
+        return (currentState?.budgetSnapshot.monthlyBudget ?? 0) / Decimal(daysInMonth)
+    }
+
     private var savingsRate: Double? {
         guard let monthlyIncome = currentState?.budgetSnapshot.monthlyIncome, monthlyIncome > 0 else {
             return nil
@@ -138,7 +142,7 @@ struct InsightsView: View {
         return max(-1, min(1, (income - spent) / income))
     }
 
-    private var monthlyTrendRows: [(label: String, expense: Decimal, net: Decimal)] {
+    private var monthlyTrendRows: [TrendRow] {
         let calendar = Calendar.autoupdatingCurrent
 
         return (0..<6).reversed().compactMap { offset in
@@ -148,55 +152,65 @@ struct InsightsView: View {
                 .filter { calendar.isDate($0.date, equalTo: date, toGranularity: .month) }
                 .reduce(Decimal.zero) { $0 + max($1.amount, 0) }
             let net = (currentState?.budgetSnapshot.monthlyIncome ?? 0) - expense
-            return (label: label, expense: expense, net: net)
+
+            return TrendRow(
+                label: label,
+                expense: NSDecimalNumber(decimal: expense).doubleValue,
+                net: NSDecimalNumber(decimal: net).doubleValue
+            )
         }
     }
 
-    private var monthlyAverageSpend: Decimal {
-        guard !monthlyTrendRows.isEmpty else { return 0 }
-        return monthlyTrendRows.reduce(Decimal.zero) { $0 + $1.expense } / Decimal(monthlyTrendRows.count)
+    private var selectedSeries: [InsightsSeriesPoint] {
+        buildSeries(for: selectedPeriod, metric: selectedMetric, expenses: recentExpenses)
     }
 
-    private var monthlyAverageNet: Decimal {
-        guard !monthlyTrendRows.isEmpty else { return 0 }
-        return monthlyTrendRows.reduce(Decimal.zero) { $0 + $1.net } / Decimal(monthlyTrendRows.count)
-    }
-
-    private var strongestMonthLabel: String {
-        monthlyTrendRows.max { lhs, rhs in
-            (lhs.net as NSDecimalNumber).doubleValue < (rhs.net as NSDecimalNumber).doubleValue
-        }?.label ?? "n/a"
+    private var selectedChartPoint: InsightsSeriesPoint? {
+        guard let selectedChartIndex else { return nil }
+        return selectedSeries.first(where: { $0.index == selectedChartIndex })
     }
 
     private var plannerCategories: [ExpenseCategory] {
         Array(ExpenseCategory.allCases.prefix(6))
     }
 
+    private var prefersCompactInsights: Bool {
+        GuideProgressStore.isSeen(.insights) || recentExpenses.count >= 5
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                headerCard
+                heroCard
 
-                if let state = currentState {
-                    reportPulseCard(for: state)
-                    filtersCard(for: state)
-                    summaryCard(for: state)
-                    balanceSheetCard
-                    pacingCard(for: state)
-                    trendCard
-                    categoryCard(for: state)
-                    nextMovesCard(for: state)
-                    plannerCard(for: state)
-                    generatedActionsCard(for: state)
-                    exportCard(for: state)
-                    toolsCard
+                if let currentState {
+                    filtersCard
+                    overviewCard(for: currentState)
+                    chartCard
+                    categoryCard(for: currentState)
+                    ExperienceDisclosureCard(
+                        title: "Herramientas extra de Ludo",
+                        summary: prefersCompactInsights
+                            ? "Planificador, exportaciones y herramientas relacionadas se quedan ocultas hasta que las necesites."
+                            : "Planificador, exportaciones y herramientas relacionadas viven aquí cuando quieres más control.",
+                        character: .mei,
+                        expression: .thinking
+                    ) {
+                        plannerCard(for: currentState)
+                        exportCard(for: currentState)
+                        toolsCard
+                    }
                 } else {
                     loadingCard
                 }
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 40)
+            .padding(.bottom, shellBottomInset + 18)
+        }
+        .accessibilityIdentifier("insights.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "insights.screen")
         }
         .background(
             ZStack {
@@ -205,13 +219,23 @@ struct InsightsView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Insights")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("Análisis")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {
             GuideSheet(guide: GuideLibrary.guide(.insights))
         }
+        .onChange(of: selectedPeriod) {
+            selectedChartIndex = nil
+        }
+        .onChange(of: selectedMetric) {
+            selectedChartIndex = nil
+        }
+        .onChange(of: selectedSeries.count) {
+            applyDebugChartSelectionIfNeeded()
+        }
         .task {
             seedBudgetDraftIfNeeded()
+            applyDebugChartSelectionIfNeeded()
         }
         .overlay(alignment: .bottom) {
             if let exportNotice {
@@ -223,65 +247,62 @@ struct InsightsView: View {
                     .background(BrandTheme.surface)
                     .clipShape(Capsule(style: .continuous))
                     .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 12, x: 0, y: 6)
-                    .padding(.bottom, 18)
+                    .padding(.bottom, shellBottomInset + 18)
             }
         }
     }
 
-    private var headerCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        BrandBadge(text: "On-device report", systemImage: "chart.xyaxis.line")
-
-                        Text("Insights")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-
-                        Text("See where your money is going, how fast the month is moving, and what to fix next.")
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    HStack(spacing: 10) {
-                        Button {
-                            isPresentingGuide = true
-                        } label: {
-                            Label("Guide", systemImage: "questionmark.circle")
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
-
-                        Button("Adjust budget") {
-                            viewModel.presentBudgetWizard()
-                        }
-                        .buttonStyle(PrimaryCTAStyle())
-                    }
-                }
-
-                HStack(spacing: 12) {
-                    BrandMetricTile(
-                        title: "Days left",
-                        value: "\(stateRemainingDays)",
-                        systemImage: "calendar"
-                    )
-                    BrandMetricTile(
-                        title: "Transactions",
-                        value: "\(currentState?.transactionCount ?? 0)",
-                        systemImage: "receipt.fill"
-                    )
-                }
-            }
-        }
+    private var heroCard: some View {
+        BrandStoryCard(
+            surface: .insights,
+            title: "Análisis",
+            message: prefersCompactInsights
+                ? "Toca una barra para ver el valor exacto y abre detalle solo si algo pide acción."
+                : "Mira qué cambió, qué categoría necesita atención y cuál es el siguiente paso que hace el mes más fácil de controlar.",
+            highlights: [
+                selectedPeriod.title,
+                selectedMetric.title,
+                currentState.map { paceLabel(for: $0) } ?? "Cargando"
+            ],
+            showsNarrativeFooter: !prefersCompactInsights
+        )
     }
 
-    private func summaryCard(for state: FinanceDashboardState) -> some View {
+    private var filtersCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Report summary",
-                    detail: "A concise view of the current month with local-only data."
+                CompactSectionHeader(
+                    title: "Rango y foco",
+                    detail: prefersCompactInsights
+                        ? "Elige la ventana y el número que quieres mirar."
+                        : "Elige la ventana de tiempo y el número que quieres entender."
+                )
+
+                Picker("Periodo", selection: $selectedPeriod) {
+                    ForEach(InsightsPeriod.allCases) { period in
+                        Text(period.title).tag(period)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                Picker("Métrica", selection: $selectedMetric) {
+                    ForEach(InsightsMetric.allCases) { metric in
+                        Text(metric.title).tag(metric)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+        }
+    }
+
+    private func overviewCard(for state: FinanceDashboardState) -> some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                CompactSectionHeader(
+                    title: "Lo importante ahora",
+                    detail: prefersCompactInsights
+                        ? "Total, margen restante y un chequeo de ritmo."
+                        : "Mantén el resumen práctico: total, margen restante y una lectura clara del ritmo."
                 )
 
                 LazyVGrid(
@@ -289,318 +310,330 @@ struct InsightsView: View {
                     spacing: 12
                 ) {
                     BrandMetricTile(
-                        title: "Spent",
-                        value: state.budgetSnapshot.monthlySpent.formatted(.currency(code: currencyCode)),
-                        systemImage: "creditcard.fill"
+                        title: "Total elegido",
+                        value: filteredMetricTotal.formatted(.currency(code: currencyCode)),
+                        systemImage: selectedMetric.systemImage
                     )
                     BrandMetricTile(
-                        title: "Remaining",
+                        title: "Restante",
                         value: state.budgetSnapshot.remaining.formatted(.currency(code: currencyCode)),
                         systemImage: "banknote.fill"
                     )
                     BrandMetricTile(
-                        title: "Average",
-                        value: state.averageExpense.formatted(.currency(code: currencyCode)),
-                        systemImage: "chart.bar.fill"
-                    )
-                    BrandMetricTile(
-                        title: "Largest",
-                        value: state.largestExpense?.amount.formatted(.currency(code: currencyCode)) ?? "None",
-                        systemImage: "arrow.up.right.circle.fill"
-                    )
-                }
-
-                if let nextBill {
-                    let dueText = ledger.map { $0.dueDate(for: nextBill).formatted(date: .abbreviated, time: .omitted) } ?? "soon"
-                    BrandFeatureRow(
-                        systemImage: "calendar.badge.clock",
-                        title: "Next bill",
-                        detail: "\(nextBill.title) due \(dueText) for \(nextBill.amount.formatted(.currency(code: currencyCode)))"
-                    )
-                }
-            }
-        }
-    }
-
-    private func filtersCard(for state: FinanceDashboardState) -> some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Range and metric",
-                    detail: "Start by choosing the timeframe and signal you want to review."
-                )
-
-                HStack(spacing: 12) {
-                    Picker("Timeframe", selection: $selectedPeriod) {
-                        ForEach(InsightsPeriod.allCases) { period in
-                            Text(period.title).tag(period)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-
-                    Picker("Metric", selection: $selectedMetric) {
-                        ForEach(InsightsMetric.allCases) { metric in
-                            Text(metric.title).tag(metric)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-
-                LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                    spacing: 12
-                ) {
-                    BrandMetricTile(title: "Expense", value: expenseTotal.formatted(.currency(code: currencyCode)), systemImage: InsightsMetric.expense.systemImage)
-                    BrandMetricTile(title: "Refund", value: refundTotal.formatted(.currency(code: currencyCode)), systemImage: InsightsMetric.refund.systemImage)
-                    BrandMetricTile(title: "Income", value: incomeTotal.formatted(.currency(code: currencyCode)), systemImage: InsightsMetric.income.systemImage)
-                }
-
-                LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                    spacing: 12
-                ) {
-                    BrandMetricTile(title: "Selected", value: filteredMetricTotal.formatted(.currency(code: currencyCode)), systemImage: selectedMetric.systemImage)
-                    BrandMetricTile(title: "Transactions", value: "\(filteredExpenses.count)", systemImage: "list.bullet.rectangle")
-                    BrandMetricTile(title: "Net cashflow", value: (state.budgetSnapshot.monthlyIncome - state.budgetSnapshot.monthlySpent).formatted(.currency(code: currencyCode)), systemImage: "arrow.left.arrow.right")
-                }
-
-                LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                    spacing: 12
-                ) {
-                    BrandMetricTile(
-                        title: "Savings rate",
-                        value: savingsRate.map { String(format: "%.0f%%", $0 * 100) } ?? "n/a",
+                        title: "Tasa de ahorro",
+                        value: savingsRate.map { String(format: "%.0f%%", $0 * 100) } ?? "n/d",
                         systemImage: "percent"
                     )
                     BrandMetricTile(
-                        title: "Net worth",
+                        title: "Patrimonio",
                         value: netWorthTotal.formatted(.currency(code: currencyCode)),
                         systemImage: "scale.3d"
                     )
                 }
-            }
-        }
-    }
-
-    private var balanceSheetCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Balance sheet",
-                    detail: viewModel.accounts.isEmpty
-                        ? "No manual accounts yet. Add balances to track net worth and debt payoff progress here."
-                        : "\(viewModel.accounts.count) active manual account\(viewModel.accounts.count == 1 ? "" : "s") are included in this snapshot."
-                )
-
-                LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                    spacing: 12
-                ) {
-                    BrandMetricTile(title: "Assets", value: assetsTotal.formatted(.currency(code: currencyCode)), systemImage: "arrow.up.circle.fill")
-                    BrandMetricTile(title: "Liabilities", value: liabilitiesTotal.formatted(.currency(code: currencyCode)), systemImage: "arrow.down.circle.fill")
-                    BrandMetricTile(title: "Net worth", value: netWorthTotal.formatted(.currency(code: currencyCode)), systemImage: "scale.3d")
-                }
-
-                NavigationLink {
-                    FinanceAccountsToolView(viewModel: viewModel)
-                } label: {
-                    Label("Open accounts", systemImage: "wallet.pass.fill")
-                }
-                .buttonStyle(SecondaryCTAStyle())
-            }
-        }
-    }
-
-    private func reportPulseCard(for state: FinanceDashboardState) -> some View {
-        let alerts = insightRows(for: state)
-        let status = paceLabel(for: state)
-        let nextBillDetail: String
-        if let nextBill, let ledger {
-            let dueText = ledger.dueDate(for: nextBill).formatted(date: .abbreviated, time: .omitted)
-            nextBillDetail = "\(nextBill.title) due \(dueText) for \(nextBill.amount.formatted(.currency(code: currencyCode)))."
-        } else {
-            nextBillDetail = "The report can stay focused on spend and category pressure for now."
-        }
-
-        return SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        sectionHeading(
-                            title: "Report pulse",
-                            detail: "A local report is ready to review, export, and turn into the next move."
-                        )
-                    }
-
-                    Spacer(minLength: 0)
-
-                    BrandBadge(text: status, systemImage: "doc.text.magnifyingglass")
-                }
-
-                LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                    spacing: 12
-                ) {
-                    BrandMetricTile(title: "Status", value: status, systemImage: "chart.line.uptrend.xyaxis")
-                    BrandMetricTile(title: "Alerts", value: "\(alerts.count)", systemImage: "exclamationmark.triangle.fill")
-                    BrandMetricTile(title: "Exports", value: "4 ready", systemImage: "square.and.arrow.up")
-                }
-
-                BrandFeatureRow(
-                    systemImage: "calendar.badge.clock",
-                    title: nextBill.map { "Next bill: \($0.title)" } ?? "No bills queued",
-                    detail: nextBillDetail
-                )
-            }
-        }
-    }
-
-    private func pacingCard(for state: FinanceDashboardState) -> some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Pacing",
-                    detail: "Compare how fast you are spending against the month that remains."
-                )
 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Budget utilization")
+                        Text("Ritmo del presupuesto")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(BrandTheme.ink)
+
                         Spacer()
+
                         Text(paceLabel(for: state))
                             .font(.footnote.weight(.semibold))
-                            .foregroundStyle(BrandTheme.muted)
+                            .foregroundStyle(BrandTheme.primary)
                     }
 
                     ProgressView(value: min(max(state.utilizationRatio, 0), 1))
                         .tint(BrandTheme.primary)
 
                     HStack {
-                        Text("Spend/day \(spendPerDay.formatted(.currency(code: currencyCode)))")
+                        Text(AppLocalization.localized("Gasto/día %@", arguments: spendPerDay.formatted(.currency(code: currencyCode))))
                         Spacer()
-                        Text("Budget/day \(budgetPerDay.formatted(.currency(code: currencyCode)))")
+                        Text(AppLocalization.localized("Presupuesto/día %@", arguments: budgetPerDay.formatted(.currency(code: currencyCode))))
                     }
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(BrandTheme.muted)
                 }
 
-                HStack(spacing: 12) {
-                    BrandMetricTile(
-                        title: "Days in month",
-                        value: "\(daysInMonth)",
-                        systemImage: "calendar.circle.fill"
+                if let nextBill {
+                    BrandFeatureRow(
+                        systemImage: "calendar.badge.clock",
+                        title: "Próxima factura",
+                        detail: "\(nextBill.title) · \(FinanceToolFormatting.dueDateText(for: nextBill, ledger: ledger))"
                     )
-                    BrandMetricTile(
-                        title: "Pace ratio",
-                        value: "\(Int((min(max(state.utilizationRatio, 0), 1) * 100).rounded()))%",
-                        systemImage: "speedometer"
+                }
+
+                MascotSpeechCard(
+                    character: .mei,
+                    expression: state.utilizationRatio >= 1 ? .warning : .thinking,
+                    title: "Ludo",
+                    message: generatedSuggestion(for: state).summary
+                )
+            }
+        }
+    }
+
+    private var chartCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                CompactSectionHeader(
+                    title: "Gráfico principal",
+                    detail: prefersCompactInsights
+                        ? "Toca una barra para ver el valor exacto."
+                        : "Usa el gráfico para ver el patrón rápido. Abre el detalle solo si quieres la lectura completa."
+                )
+
+                if selectedSeries.isEmpty {
+                    BrandFeatureRow(
+                        systemImage: "chart.bar.fill",
+                        title: "Todavía no hay señal",
+                        detail: "Agrega algunos gastos y el gráfico empezará a mostrar un patrón más claro."
                     )
+                } else {
+                    if let selectedChartPoint {
+                        BrandFeatureRow(
+                            systemImage: selectedMetric.systemImage,
+                            title: AppLocalization.localized("%@ seleccionado", arguments: selectedChartPoint.label),
+                            detail: formattedChartValue(selectedChartPoint.value)
+                        )
+                        .overlay(alignment: .topLeading) {
+                            AccessibilityProbe(identifier: "insights.chart.selection")
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier("insights.chart.selection")
+                        .accessibilityValue(formattedChartValue(selectedChartPoint.value))
+                    } else {
+                        BrandFeatureRow(
+                            systemImage: "hand.tap.fill",
+                            title: "Toca una barra",
+                            detail: "El valor exacto aparece aquí cuando presionas un bloque."
+                        )
+                        .overlay(alignment: .topLeading) {
+                            AccessibilityProbe(identifier: "insights.chart.prompt")
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier("insights.chart.prompt")
+                    }
+
+                    Chart(selectedSeries) { row in
+                        BarMark(
+                            x: .value("Bloque", row.index),
+                            y: .value("Valor", row.value)
+                        )
+                        .foregroundStyle(selectedChartIndex == row.index ? BrandTheme.accent : BrandTheme.primary)
+                        .opacity(selectedChartIndex == nil || selectedChartIndex == row.index ? 1 : 0.45)
+                        .cornerRadius(6)
+                        .annotation(position: .top, spacing: 8) {
+                            if selectedChartIndex == row.index {
+                                Text(formattedChartValue(row.value))
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(BrandTheme.ink)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 6)
+                                    .background(BrandTheme.surface, in: Capsule())
+                            }
+                        }
+                    }
+                    .frame(height: 220)
+                    .accessibilityIdentifier("insights.mainChart")
+                    .chartXAxis {
+                        AxisMarks(values: selectedSeries.map(\.index)) { value in
+                            AxisGridLine()
+                            AxisTick()
+                            if let index = value.as(Int.self),
+                               let point = selectedSeries.first(where: { $0.index == index }) {
+                                AxisValueLabel(point.label)
+                            }
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading)
+                    }
+                    .chartOverlay { proxy in
+                        GeometryReader { geometry in
+                            if let plotFrame = proxy.plotFrame {
+                                let plotArea = geometry[plotFrame]
+
+                                ZStack {
+                                    Rectangle()
+                                        .fill(Color.clear)
+                                        .contentShape(Rectangle())
+                                        .frame(width: plotArea.width, height: plotArea.height)
+                                        .position(x: plotArea.midX, y: plotArea.midY)
+                                        .gesture(
+                                            DragGesture(minimumDistance: 0)
+                                                .onChanged { value in
+                                                    updateChartSelection(at: value.location, proxy: proxy, geometry: geometry)
+                                                }
+                                                .onEnded { value in
+                                                    updateChartSelection(at: value.location, proxy: proxy, geometry: geometry)
+                                                }
+                                        )
+
+                                    HStack(spacing: 0) {
+                                        ForEach(selectedSeries) { point in
+                                            Button {
+                                                selectedChartIndex = point.index
+                                            } label: {
+                                                Color.clear
+                                                    .contentShape(Rectangle())
+                                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .accessibilityLabel(point.label)
+                                            .accessibilityValue(formattedChartValue(point.value))
+                                        }
+                                    }
+                                    .frame(width: plotArea.width, height: plotArea.height)
+                                    .position(x: plotArea.midX, y: plotArea.midY)
+                                }
+                            }
+                        }
+                    }
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(selectedSeries) { point in
+                                Button {
+                                    selectedChartIndex = point.index
+                                } label: {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(point.label)
+                                            .font(.caption.weight(.semibold))
+                                        Text(formattedChartValue(point.value))
+                                            .font(.caption2)
+                                            .foregroundStyle(BrandTheme.muted)
+                                    }
+                                    .frame(minWidth: 72, alignment: .leading)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 10)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .fill(selectedChartIndex == point.index ? BrandTheme.accent.opacity(0.22) : BrandTheme.surfaceTint)
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .stroke(selectedChartIndex == point.index ? BrandTheme.primary.opacity(0.35) : BrandTheme.line.opacity(0.75), lineWidth: 1)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityIdentifier("insights.chart.bar.\(point.index)")
+                                .accessibilityLabel(point.label)
+                                .accessibilityValue(formattedChartValue(point.value))
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
+
+                    NavigationLink {
+                        InsightsTrendDetailView(
+                            monthlyTrendRows: monthlyTrendRows,
+                            averageMonthlySpend: averageMonthlySpend,
+                            strongestMonthLabel: strongestMonthLabel,
+                            series: selectedSeries,
+                            metric: selectedMetric,
+                            currencyCode: currencyCode
+                        )
+                    } label: {
+                        QuickActionTile(
+                            title: "Abrir tendencia",
+                            detail: "Mira el gasto promedio, el mejor mes y cada bloque reciente en una pantalla aparte.",
+                            systemImage: "chart.bar.xaxis"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("insights.link.trend")
                 }
             }
         }
+    }
+
+    private func applyDebugChartSelectionIfNeeded() {
+        guard !hasAppliedDebugChartSelection else { return }
+        guard !selectedSeries.isEmpty else { return }
+        guard let rawValue = ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_INSIGHTS_SELECTION"],
+              let requestedIndex = Int(rawValue) else {
+            return
+        }
+
+        let resolvedIndex = selectedSeries.first(where: { $0.index == requestedIndex })?.index
+            ?? selectedSeries.max(by: { $0.value < $1.value })?.index
+
+        guard let resolvedIndex else { return }
+        selectedChartIndex = resolvedIndex
+        hasAppliedDebugChartSelection = true
     }
 
     private func categoryCard(for state: FinanceDashboardState) -> some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Category mix",
-                    detail: categoryBreakdown.isEmpty
-                        ? "No categories yet. Add an expense to reveal the mix."
-                        : "\(state.transactionCount) transactions are shaping the month."
+                CompactSectionHeader(
+                    title: "Presión por categoría",
+                    detail: prefersCompactInsights
+                        ? "Empieza por las categorías más pesadas."
+                        : "Empieza por las categorías principales. Abre el detalle cuando quieras el desglose completo."
                 )
 
                 if categoryBreakdown.isEmpty {
-                    emptyRow(
-                        title: "No category signal yet",
-                        detail: "The first few expenses will reveal where the budget is tilting."
+                    BrandFeatureRow(
+                        systemImage: "square.grid.2x2.fill",
+                        title: "Todavía no hay categorías",
+                        detail: "Los primeros gastos van a revelar hacia dónde se inclina el presupuesto."
                     )
                 } else {
-                    ForEach(categoryBreakdown) { category in
-                        categoryRow(category, total: monthSpending)
-                    }
-                }
-            }
-        }
-    }
-
-    private var trendCard: some View {
-        let rows = monthlyTrendRows
-        let maxValue = rows.map(\.expense).max() ?? 1
-
-        return SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Six-month trend",
-                    detail: "See how spending, cashflow, and category pressure have shifted over recent months."
-                )
-
-                if rows.isEmpty {
-                    emptyRow(
-                        title: "Not enough history yet",
-                        detail: "As more months accumulate, the trend view will show whether spend is improving."
-                    )
-                } else {
-                    LazyVGrid(
-                        columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                        spacing: 12
-                    ) {
-                        BrandMetricTile(title: "Avg monthly spend", value: monthlyAverageSpend.formatted(.currency(code: currencyCode)), systemImage: "chart.bar.fill")
-                        BrandMetricTile(title: "Avg net cashflow", value: monthlyAverageNet.formatted(.currency(code: currencyCode)), systemImage: "arrow.left.arrow.right")
-                        BrandMetricTile(title: "Strongest month", value: strongestMonthLabel, systemImage: "trophy.fill")
-                    }
-
-                    ForEach(rows, id: \.label) { row in
-                        VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(categoryBreakdown.prefix(3))) { category in
+                        VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Text(row.label)
-                                    .font(.footnote.weight(.semibold))
+                                Text(category.category.localizedTitle)
+                                    .font(.headline)
                                     .foregroundStyle(BrandTheme.ink)
+
                                 Spacer()
-                                VStack(alignment: .trailing, spacing: 2) {
-                                    Text(row.expense.formatted(.currency(code: currencyCode)))
-                                    Text("Net \(row.net.formatted(.currency(code: currencyCode)))")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(BrandTheme.muted)
-                                }
-                                    .font(.footnote.weight(.semibold))
+
+                                Text(category.total.formatted(.currency(code: currencyCode)))
+                                    .font(.headline)
+                                    .foregroundStyle(BrandTheme.ink)
                             }
 
-                            GeometryReader { proxy in
-                                ZStack(alignment: .leading) {
-                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                        .fill(BrandTheme.surfaceTint)
-                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                        .fill(BrandTheme.primary)
-                                        .frame(width: max(18, proxy.size.width * CGFloat((row.expense as NSDecimalNumber).doubleValue / max((maxValue as NSDecimalNumber).doubleValue, 1))))
-                                }
-                            }
-                            .frame(height: 10)
+                            ProgressView(value: share(for: category, total: monthSpending))
+                                .tint(BrandTheme.primary)
+
+                            Text(categoryCountLabel(for: category.count))
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(BrandTheme.muted)
                         }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .fill(BrandTheme.surfaceTint)
+                        )
                     }
                 }
-            }
-        }
-    }
 
-    private func nextMovesCard(for state: FinanceDashboardState) -> some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Alerts and decisions",
-                    detail: "Warnings, opportunities, and the next practical move the report wants you to notice."
-                )
-
-                ForEach(insightRows(for: state)) { row in
+                if let row = insightRows(for: state).first {
                     BrandFeatureRow(
                         systemImage: row.systemImage,
                         title: row.title,
                         detail: row.detail
                     )
                 }
+
+                NavigationLink {
+                    InsightsCategoryDetailView(
+                        categories: categoryBreakdown,
+                        monthSpending: monthSpending,
+                        currencyCode: currencyCode,
+                        rows: insightRows(for: state)
+                    )
+                } label: {
+                    QuickActionTile(
+                        title: "Abrir categorías",
+                        detail: "Mira la lista completa de categorías y las recomendaciones en una pantalla aparte.",
+                        systemImage: "list.bullet.rectangle.portrait"
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -608,22 +641,9 @@ struct InsightsView: View {
     private func plannerCard(for state: FinanceDashboardState) -> some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Budget planner",
-                    detail: "Turn what you see here into a workable category plan without leaving this report."
-                )
-
-                BrandFeatureRow(
-                    systemImage: "target",
-                    title: "Top pressure area",
-                    detail: state.topCategory.map {
-                        AppLocalization.localized(
-                            "%@ is currently leading the month at %@.",
-                            arguments: $0.category.localizedTitle,
-                            $0.total.formatted(.currency(code: currencyCode))
-                        )
-                    }
-                        ?? "Add more expenses to reveal where category pressure is landing."
+                CompactSectionHeader(
+                    title: "Planificador",
+                    detail: "Convierte el análisis en una acción realista sobre tu presupuesto."
                 )
 
                 LazyVGrid(
@@ -647,36 +667,44 @@ struct InsightsView: View {
                             .textInputAutocapitalization(.never)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 12)
-                            .background(Color.black.opacity(0.03), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(BrandTheme.surfaceTint)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                            )
                         }
                     }
                 }
 
                 HStack(spacing: 12) {
-                    Button("Apply suggested mix") {
+                    Button("Aplicar mezcla sugerida") {
                         budgetDraft = suggestedBudgetDraft(from: state)
-                        plannerNotice = "Suggested category mix loaded.".appLocalized
+                        plannerNotice = "Se cargó la mezcla sugerida."
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    Button("Save local budget") {
+                    Button("Guardar presupuesto local") {
                         Task {
                             let totalBudget = parsedBudgetDraftTotal()
                             guard totalBudget > 0 else {
-                                plannerNotice = "Add at least one category amount before saving.".appLocalized
+                                plannerNotice = "Agrega al menos un monto por categoría antes de guardar."
                                 return
                             }
+
                             await viewModel.saveBudget(
                                 monthlyIncome: state.budgetSnapshot.monthlyIncome,
                                 monthlyBudget: totalBudget
                             )
-                            plannerNotice = "Local budget updated from planner categories.".appLocalized
+                            plannerNotice = "El presupuesto local se actualizó desde el planificador."
                         }
                     }
                     .buttonStyle(PrimaryCTAStyle())
                 }
 
-                Button("Open budget wizard") {
+                Button("Abrir asistente de presupuesto") {
                     viewModel.presentBudgetWizard()
                 }
                 .buttonStyle(SecondaryCTAStyle())
@@ -690,113 +718,39 @@ struct InsightsView: View {
         }
     }
 
-    private func generatedActionsCard(for state: FinanceDashboardState) -> some View {
+    private func exportCard(for state: FinanceDashboardState) -> some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Generated suggestions",
-                    detail: "Generate a quick summary of alerts and next moves from the data already in this report."
+                CompactSectionHeader(
+                    title: "Resumen y siguiente paso",
+                    detail: "Mantén la lectura clara y la recomendación fácil de ejecutar."
                 )
 
-                Button("Generate suggestions") {
+                Button("Generar sugerencias") {
                     generatedInsight = generatedSuggestion(for: state)
                 }
                 .buttonStyle(PrimaryCTAStyle())
 
                 if let generatedInsight {
-                    BrandFeatureRow(systemImage: "sparkles", title: "Summary", detail: generatedInsight.summary)
+                    BrandFeatureRow(systemImage: "sparkles", title: "Resumen", detail: generatedInsight.summary)
 
-                    if !generatedInsight.alerts.isEmpty {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Alerts")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(BrandTheme.ink)
-                            ForEach(generatedInsight.alerts, id: \.self) { alert in
-                                BrandFeatureRow(systemImage: "exclamationmark.triangle.fill", title: "Watch this", detail: alert)
-                            }
-                        }
+                    ForEach(generatedInsight.alerts, id: \.self) { alert in
+                        BrandFeatureRow(systemImage: "exclamationmark.triangle.fill", title: "Alerta", detail: alert)
                     }
 
-                    if !generatedInsight.actions.isEmpty {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Actions")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(BrandTheme.ink)
-                            ForEach(generatedInsight.actions, id: \.self) { action in
-                                BrandFeatureRow(systemImage: "checkmark.circle.fill", title: "Do this next", detail: action)
-                            }
-                        }
+                    ForEach(generatedInsight.actions, id: \.self) { action in
+                        BrandFeatureRow(systemImage: "checkmark.circle.fill", title: "Acción", detail: action)
                     }
                 }
 
-                ForEach(insightRows(for: state)) { row in
-                    BrandFeatureRow(
-                        systemImage: row.systemImage,
-                        title: row.title,
-                        detail: row.detail
-                    )
-                }
-            }
-        }
-    }
-
-    private func exportCard(for state: FinanceDashboardState) -> some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Export pack",
-                    detail: "CSV, summary, category breakdown, and a full snapshot are all ready from the device."
-                )
-
-                BrandFeatureRow(
-                    systemImage: "chart.line.uptrend.xyaxis",
-                    title: "Report status: \(paceLabel(for: state))",
-                    detail: "Everything below is generated from local data only."
-                )
-
-                BrandFeatureRow(
-                    systemImage: "doc.text.fill",
-                    title: "CSV export",
-                    detail: "Best for bookkeeping, spreadsheets, or a quick handoff."
-                )
-
-                BrandFeatureRow(
-                    systemImage: "square.and.arrow.up.on.square",
-                    title: "Summary export",
-                    detail: "A markdown review with cashflow context and recurring bills."
-                )
-
-                BrandFeatureRow(
-                    systemImage: "chart.bar.fill",
-                    title: "Snapshot export",
-                    detail: "A fuller report that includes categories and account balances."
-                )
-
-                Text("Everything leaves local storage only when you choose to share it.")
-                    .font(.footnote)
-                    .foregroundStyle(BrandTheme.muted)
-
-                LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                    spacing: 12
-                ) {
-                    Button("Copy CSV") {
-                        copyExport(exportCSVText, label: "CSV export copied")
+                HStack(spacing: 12) {
+                    Button("Copiar resumen") {
+                        copyExport(LocalLedgerExportComposer.readableSummary(viewModel: viewModel), label: "Resumen copiado")
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    Button("Copy summary") {
-                        copyExport(exportSummaryText, label: "Summary export copied")
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
-
-                    Button("Copy categories") {
-                        copyExport(exportCategoriesCSVText, label: "Category export copied")
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
-
-                    Button("Copy snapshot") {
-                        copyExport(exportSnapshotText, label: "Snapshot export copied")
+                    Button("Copiar snapshot") {
+                        copyExport(LocalLedgerExportComposer.jsonSnapshot(viewModel: viewModel), label: "Snapshot copiado")
                     }
                     .buttonStyle(SecondaryCTAStyle())
                 }
@@ -807,115 +761,114 @@ struct InsightsView: View {
     private var toolsCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "More money tools",
-                    detail: "Jump directly into the related local workflows."
+                CompactSectionHeader(
+                    title: "Herramientas relacionadas",
+                    detail: "Abre una herramienta más profunda solo cuando el análisis te diga que vale la pena."
                 )
 
                 NavigationLink {
                     FinanceBillsToolView(viewModel: viewModel)
                 } label: {
-                    FinanceToolRowLabel(
-                        title: "Bills",
-                        summary: "Track recurring bills, due dates, and payment history locally.",
+                    QuickActionTile(
+                        title: "Facturas",
+                        detail: "Revisa obligaciones recurrentes y fechas de vencimiento.",
                         systemImage: "calendar.badge.clock"
                     )
                 }
+                .buttonStyle(.plain)
 
                 NavigationLink {
                     FinanceAccountsToolView(viewModel: viewModel)
                 } label: {
-                    FinanceToolRowLabel(
-                        title: "Accounts",
-                        summary: "See balances across checking, savings, cash, and cards.",
+                    QuickActionTile(
+                        title: "Cuentas",
+                        detail: "Revisa saldos y exposición a deuda.",
                         systemImage: "wallet.pass.fill"
                     )
                 }
+                .buttonStyle(.plain)
 
                 NavigationLink {
                     FinanceRulesToolView(viewModel: viewModel)
                 } label: {
-                    FinanceToolRowLabel(
-                        title: "Rules",
-                        summary: "Map merchant keywords to categories for cleaner imports.",
-                        systemImage: "slider.horizontal.3"
+                    QuickActionTile(
+                        title: "Reglas",
+                        detail: "Limpia comerciantes recurrentes y categorías.",
+                        systemImage: "line.3.horizontal.decrease.circle.fill"
                     )
                 }
-
-                NavigationLink {
-                    FinanceCsvImportToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "CSV Import",
-                        summary: "Paste rows from a spreadsheet and preview them before saving.",
-                        systemImage: "tablecells.fill"
-                    )
-                }
-
-                NavigationLink {
-                    FinanceReceiptScanToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "Receipt Scan",
-                        summary: "Capture a receipt image and finish the expense draft manually.",
-                        systemImage: "camera.viewfinder"
-                    )
-                }
+                .buttonStyle(.plain)
             }
         }
     }
 
     private var loadingCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                BrandBadge(text: "Loading insights", systemImage: "sparkles")
-                Text("Your local report is being assembled.")
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text("Once the dashboard snapshot arrives, these cards will show pacing, category share, and next actions.")
-                    .foregroundStyle(BrandTheme.muted)
-            }
+        MascotLoadingCard(
+            badgeText: "Cargando análisis",
+            title: "Cargando análisis",
+            summary: "Estamos preparando tu lectura local.",
+            character: .mei,
+            expression: .thinking
+        )
+    }
+
+    private var averageMonthlySpend: Decimal {
+        guard !monthlyTrendRows.isEmpty else { return 0 }
+        let total = monthlyTrendRows.reduce(0.0) { $0 + $1.expense }
+        return Decimal(total / Double(monthlyTrendRows.count))
+    }
+
+    private var strongestMonthLabel: String {
+        monthlyTrendRows.max { $0.net < $1.net }?.label ?? "n/d"
+    }
+
+    private func share(for category: CategoryBreakdown, total: Decimal) -> Double {
+        let totalNumber = NSDecimalNumber(decimal: total).doubleValue
+        guard totalNumber > 0 else { return 0 }
+        return NSDecimalNumber(decimal: category.total).doubleValue / totalNumber
+    }
+
+    private func categoryCountLabel(for count: Int) -> String {
+        if count == 1 {
+            return "\(count) transacción"
         }
+        return "\(count) transacciones"
     }
 
-    private var exportCSVText: String {
-        let rows = recentExpenses
-            .sorted { $0.date > $1.date }
-            .map { expense in
-                let note = (expense.note ?? "").replacingOccurrences(of: ",", with: " ")
-                return [
-                    expense.date.formatted(date: .numeric, time: .omitted),
-                    expense.merchant,
-                    expense.category.localizedTitle,
-                    NSDecimalNumber(decimal: expense.amount).stringValue,
-                    note
-                ].joined(separator: ",")
-            }
-        return (["date,merchant,category,amount,note"] + rows).joined(separator: "\n")
+    private func formattedChartValue(_ value: Double) -> String {
+        NSDecimalNumber(value: value).decimalValue.formatted(.currency(code: currencyCode))
     }
 
-    private var exportCategoriesCSVText: String {
-        let rows = categoryBreakdown.map { item in
-            [
-                item.category.localizedTitle,
-                NSDecimalNumber(decimal: item.total).stringValue,
-                "\(item.count)"
-            ].joined(separator: ",")
+    private func updateChartSelection(at location: CGPoint, proxy: ChartProxy, geometry: GeometryProxy) {
+        guard !selectedSeries.isEmpty else {
+            selectedChartIndex = nil
+            return
         }
-        return (["category,total,count"] + rows).joined(separator: "\n")
-    }
 
-    private var exportSummaryText: String {
-        LocalLedgerExportComposer.readableSummary(viewModel: viewModel)
-    }
+        guard let plotFrame = proxy.plotFrame else {
+            selectedChartIndex = nil
+            return
+        }
 
-    private var exportSnapshotText: String {
-        LocalLedgerExportComposer.jsonSnapshot(viewModel: viewModel)
+        let plotArea = geometry[plotFrame]
+        guard plotArea.contains(location) else {
+            selectedChartIndex = nil
+            return
+        }
+
+        let relativeX = location.x - plotArea.minX
+        let stepWidth = plotArea.width / CGFloat(selectedSeries.count)
+        guard stepWidth > 0 else { return }
+
+        let rawIndex = Int(relativeX / stepWidth)
+        let boundedIndex = min(max(rawIndex, 0), selectedSeries.count - 1)
+        selectedChartIndex = selectedSeries[boundedIndex].index
     }
 
     private func copyExport(_ text: String, label: String) {
         UIPasteboard.general.string = text
         exportNotice = label
+
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
             if exportNotice == label {
@@ -927,22 +880,24 @@ struct InsightsView: View {
     private func generatedSuggestion(for state: FinanceDashboardState) -> GeneratedInsightResult {
         if state.transactionCount == 0 {
             return GeneratedInsightResult(
-                summary: "Start with one expense so Insights can generate a more specific summary and alert stack.",
-                alerts: ["No transactions are available yet for pacing or category pressure."],
-                actions: ["Add your first expense to unlock the full report."]
+                summary: "Empieza con un gasto para que Análisis pueda generar un resumen más específico.".appLocalized,
+                alerts: ["Todavía no hay transacciones disponibles para leer el ritmo ni la presión por categoría.".appLocalized],
+                actions: ["Agrega tu primer gasto para desbloquear el análisis completo.".appLocalized]
             )
         }
 
         if state.utilizationRatio >= 1 {
             return GeneratedInsightResult(
-                summary: "You are already over budget this month. Trim the top category first and review the next bill before adding new discretionary spend.",
+                summary: "Ya estás por encima del presupuesto este mes. Recorta primero la categoría principal y revisa la próxima factura antes de sumar gasto discrecional.".appLocalized,
                 alerts: [
-                    "Monthly utilization is already above budget.",
-                    state.topCategory.map { AppLocalization.localized("%@ is the heaviest category right now.", arguments: $0.category.localizedTitle) } ?? "The top category is adding the strongest pressure."
+                    "La utilización mensual ya está por encima del presupuesto.".appLocalized,
+                    state.topCategory.map {
+                        AppLocalization.localized("%@ es la categoría más pesada ahora mismo.", arguments: $0.category.localizedTitle)
+                    } ?? "La categoría principal es la que más presión está sumando.".appLocalized
                 ],
                 actions: [
-                    "Reduce one discretionary purchase in the top category today.",
-                    "Review the next bill before the next spend decision."
+                    "Reduce hoy una compra discrecional dentro de la categoría principal.".appLocalized,
+                    "Revisa la próxima factura antes de la siguiente decisión de gasto.".appLocalized
                 ]
             )
         }
@@ -950,9 +905,9 @@ struct InsightsView: View {
         if let topCategory = state.topCategory {
             return GeneratedInsightResult(
                 summary: AppLocalization.localized(
-                    "%@ is the strongest pressure point right now. Keep the next %d days focused there to protect the monthly runway.",
+                    "%@ is the strongest pressure point right now. Keep the next %d days focused there.",
                     arguments: topCategory.category.localizedTitle,
-                    safeSuggestionDaysLeft(for: state)
+                    max(state.remainingDaysInMonth, 1)
                 ),
                 alerts: [
                     AppLocalization.localized(
@@ -962,73 +917,25 @@ struct InsightsView: View {
                     )
                 ],
                 actions: [
-                    "Hold this category flat for the next few days.",
-                    "Open the budget wizard if the current cap feels unrealistic."
+                    "Mantén esta categoría estable durante los próximos días.".appLocalized,
+                    "Abre el asistente de presupuesto si el tope actual se siente irreal.".appLocalized
                 ]
             )
         }
 
         return GeneratedInsightResult(
-            summary: "The month is still calm. Use this window to clean categories, review recurring bills, and lock one budget decision before the pace tightens.",
-            alerts: ["The ledger looks stable enough to plan ahead instead of reacting."],
+            summary: "El mes sigue tranquilo. Aprovecha esta ventana para limpiar categorías, revisar facturas recurrentes y fijar una decisión de presupuesto.".appLocalized,
+            alerts: ["El libro se ve lo bastante estable como para planificar en vez de reaccionar.".appLocalized],
             actions: [
-                "Clean one recurring merchant rule.",
-                "Lock one budget decision while the month is still calm."
+                "Limpia una regla de comercio recurrente.".appLocalized,
+                "Fija una decisión de presupuesto mientras el mes sigue tranquilo.".appLocalized
             ]
         )
     }
 
-    private func sectionHeading(title: String, detail: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title.appLocalized)
-                .font(.headline)
-                .foregroundStyle(BrandTheme.ink)
-            Text(detail.appLocalized)
-                .font(.subheadline)
-                .foregroundStyle(BrandTheme.muted)
-        }
-    }
-
-    private func categoryRow(_ category: CategoryBreakdown, total: Decimal) -> some View {
-        let share = total > 0
-            ? NSDecimalNumber(decimal: category.total).doubleValue / NSDecimalNumber(decimal: total).doubleValue
-            : 0
-
-        return VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(category.category.localizedTitle)
-                        .font(.headline)
-                        .foregroundStyle(BrandTheme.ink)
-                    Text("\(category.count) expense\(category.count == 1 ? "" : "s")")
-                        .font(.footnote)
-                        .foregroundStyle(BrandTheme.muted)
-                }
-
-                Spacer()
-
-                Text(category.total, format: .currency(code: currencyCode))
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-            }
-
-            ProgressView(value: share)
-                .tint(BrandTheme.primary)
-
-            Text("\(Int((share * 100).rounded()))% of this month's spend")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(BrandTheme.muted)
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(BrandTheme.surfaceTint)
-        )
-    }
-
     private func seedBudgetDraftIfNeeded() {
-        guard budgetDraft.isEmpty, let state = currentState else { return }
-        budgetDraft = suggestedBudgetDraft(from: state)
+        guard budgetDraft.isEmpty, let currentState else { return }
+        budgetDraft = suggestedBudgetDraft(from: currentState)
     }
 
     private func suggestedBudgetDraft(from state: FinanceDashboardState) -> [ExpenseCategory: String] {
@@ -1050,38 +957,17 @@ struct InsightsView: View {
         }
     }
 
-    private func safeSuggestionDaysLeft(for state: FinanceDashboardState) -> Int {
-        max(state.remainingDaysInMonth, 1)
-    }
-
-    private func emptyRow(title: String, detail: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.headline)
-                .foregroundStyle(BrandTheme.ink)
-            Text(detail)
-                .font(.subheadline)
-                .foregroundStyle(BrandTheme.muted)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(BrandTheme.surfaceTint)
-        )
-    }
-
     private func paceLabel(for state: FinanceDashboardState) -> String {
         if state.transactionCount == 0 {
-            return "Kickoff"
+            return "Inicio"
         }
         if state.utilizationRatio < 0.82 {
-            return "Calm pace"
+            return "Ritmo tranquilo"
         }
         if state.utilizationRatio < 1 {
-            return "Watch pace"
+            return "Ritmo en observación"
         }
-        return "Over budget"
+        return "Sobre presupuesto"
     }
 
     private func insightRows(for state: FinanceDashboardState) -> [InsightRow] {
@@ -1091,8 +977,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "first-expense",
-                    title: "Add the first expense",
-                    detail: "One transaction unlocks pacing, category mix, and a more useful monthly report.",
+                    title: "Agrega el primer gasto",
+                    detail: "Una transacción desbloquea el ritmo, la mezcla por categoría y un análisis mensual más útil.",
                     systemImage: "plus.circle.fill"
                 )
             )
@@ -1102,8 +988,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "over-budget",
-                    title: "Trim the top category",
-                    detail: "Spending is already above the current budget track, so the fastest relief is usually in the largest bucket.",
+                    title: "Recorta la categoría principal",
+                    detail: "El gasto ya está por encima del ritmo actual, así que el alivio más rápido suele vivir en el bloque más grande.",
                     systemImage: "exclamationmark.triangle.fill"
                 )
             )
@@ -1111,8 +997,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "watch-pace",
-                    title: "Watch the pace",
-                    detail: "The month is heating up; one small trim or one bill review keeps the report comfortable.",
+                    title: "Vigila el ritmo",
+                    detail: "El mes se está calentando; un pequeño recorte o una revisión de facturas mantiene el plan cómodo.",
                     systemImage: "speedometer"
                 )
             )
@@ -1122,8 +1008,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "create-rule",
-                    title: "Create a merchant rule",
-                    detail: "Repeated merchants are still manual, so the next rule will clean up the ledger quickly.",
+                    title: "Crea una regla de comercio",
+                    detail: "Los comercios repetidos siguen siendo manuales, así que la siguiente regla va a limpiar el libro rápidamente.",
                     systemImage: "slider.horizontal.3"
                 )
             )
@@ -1133,8 +1019,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "add-bill",
-                    title: "Make obligations visible",
-                    detail: "Recurring bills are still hidden. Add one to let the report warn you earlier.",
+                    title: "Haz visibles las obligaciones",
+                    detail: "Las facturas recurrentes siguen ocultas. Agrega una para que la app pueda avisarte antes.",
                     systemImage: "calendar.badge.clock"
                 )
             )
@@ -1144,8 +1030,8 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "add-account",
-                    title: "Add another account bucket",
-                    detail: "A second account or cash bucket gives the report a fuller local snapshot.",
+                    title: "Agrega otra cuenta",
+                    detail: "Una segunda cuenta o bolsillo de efectivo le da al análisis una foto local mucho más completa.",
                     systemImage: "wallet.pass.fill"
                 )
             )
@@ -1155,19 +1041,21 @@ struct InsightsView: View {
             rows.append(
                 InsightRow(
                     id: "steady",
-                    title: "Keep the rhythm",
-                    detail: "The report already has enough signal. Keep feeding it clean transactions and the month will stay readable.",
+                    title: "Mantén el ritmo",
+                    detail: "El análisis ya tiene suficiente señal. Sigue alimentándolo con transacciones limpias y el mes se mantendrá legible.",
                     systemImage: "checkmark.seal.fill"
                 )
             )
         }
 
-        return rows.prefix(4).map { $0 }
+        return Array(rows.prefix(4))
     }
+}
 
-    private var stateRemainingDays: Int {
-        currentState?.remainingDaysInMonth ?? 0
-    }
+private struct GeneratedInsightResult {
+    let summary: String
+    let alerts: [String]
+    let actions: [String]
 }
 
 private struct InsightRow: Identifiable {
@@ -1177,10 +1065,241 @@ private struct InsightRow: Identifiable {
     let systemImage: String
 }
 
-private struct GeneratedInsightResult {
-    let summary: String
-    let alerts: [String]
-    let actions: [String]
+private struct TrendRow: Identifiable {
+    let label: String
+    let expense: Double
+    let net: Double
+
+    var id: String { label }
+}
+
+private struct InsightsSeriesPoint: Identifiable {
+    let index: Int
+    let label: String
+    let value: Double
+
+    var id: Int { index }
+}
+
+private struct InsightsTrendDetailView: View {
+    let monthlyTrendRows: [TrendRow]
+    let averageMonthlySpend: Decimal
+    let strongestMonthLabel: String
+    let series: [InsightsSeriesPoint]
+    let metric: InsightsMetric
+    let currencyCode: String
+    @Environment(\.shellBottomInset) private var shellBottomInset
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        CompactSectionHeader(
+                            title: "Tendencia",
+                            detail: "Aquí ves el contexto extra del rango actual sin cargar la pantalla principal."
+                        )
+
+                        HStack(spacing: 12) {
+                            BrandMetricTile(
+                                title: "Promedio",
+                                value: averageMonthlySpend.formatted(.currency(code: currencyCode)),
+                                systemImage: "chart.line.uptrend.xyaxis"
+                            )
+                            BrandMetricTile(
+                                title: "Mejor mes",
+                                value: strongestMonthLabel,
+                                systemImage: "trophy.fill"
+                            )
+                        }
+                    }
+                }
+
+                if !series.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            CompactSectionHeader(
+                                title: "Bloques del rango",
+                                detail: "Cada bloque muestra el total exacto de \(metric.title.lowercased()) en el rango elegido."
+                            )
+
+                            ForEach(series) { point in
+                                detailRow(title: point.label, value: formattedCurrency(point.value))
+                            }
+                        }
+                    }
+                }
+
+                if !monthlyTrendRows.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            CompactSectionHeader(
+                                title: "Vista de seis meses",
+                                detail: "El gasto mensual reciente y el flujo neto viven aquí en vez de cargar el gráfico principal."
+                            )
+
+                            ForEach(monthlyTrendRows) { row in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text(row.label)
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+
+                                        Spacer()
+
+                                        Text(formattedCurrency(row.expense))
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+                                    }
+
+                                    detailRow(title: "Neto", value: formattedCurrency(row.net))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, shellBottomInset + 18)
+        }
+        .background(
+            ZStack {
+                BrandTheme.canvas
+                BrandBackdropView()
+            }
+            .ignoresSafeArea()
+        )
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "insightsTrend.screen")
+        }
+        .accessibilityIdentifier("insightsTrend.screen")
+        .navigationTitle("Tendencia")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func formattedCurrency(_ value: Double) -> String {
+        NSDecimalNumber(value: value).decimalValue.formatted(.currency(code: currencyCode))
+    }
+
+    @ViewBuilder
+    private func detailRow(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(BrandTheme.muted)
+
+            Spacer()
+
+            Text(value)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(BrandTheme.ink)
+                .multilineTextAlignment(.trailing)
+        }
+    }
+}
+
+private struct InsightsCategoryDetailView: View {
+    let categories: [CategoryBreakdown]
+    let monthSpending: Decimal
+    let currencyCode: String
+    let rows: [InsightRow]
+    @Environment(\.shellBottomInset) private var shellBottomInset
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 14) {
+                        CompactSectionHeader(
+                            title: "Categorías",
+                            detail: "Aquí vive la presión completa por categoría y las recomendaciones asociadas."
+                        )
+
+                        if categories.isEmpty {
+                            BrandFeatureRow(
+                                systemImage: "square.grid.2x2.fill",
+                                title: "Todavía no hay categorías",
+                                detail: "Agrega algunos gastos y el desglose aparecerá aquí."
+                            )
+                        } else {
+                            ForEach(categories) { category in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text(category.category.localizedTitle)
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+
+                                        Spacer()
+
+                                        Text(category.total.formatted(.currency(code: currencyCode)))
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+                                    }
+
+                                    ProgressView(value: share(for: category))
+                                        .tint(BrandTheme.primary)
+
+                                    Text(categoryCountLabel(for: category.count))
+                                        .font(.footnote.weight(.semibold))
+                                        .foregroundStyle(BrandTheme.muted)
+                                }
+                                .padding(16)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                        .fill(BrandTheme.surfaceTint)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if !rows.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            CompactSectionHeader(
+                                title: "Siguientes pasos",
+                                detail: "Estas son las acciones recomendadas que nacen del análisis actual."
+                            )
+
+                            ForEach(rows) { row in
+                                BrandFeatureRow(
+                                    systemImage: row.systemImage,
+                                    title: row.title,
+                                    detail: row.detail
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, shellBottomInset + 18)
+        }
+        .background(
+            ZStack {
+                BrandTheme.canvas
+                BrandBackdropView()
+            }
+            .ignoresSafeArea()
+        )
+        .navigationTitle("Categorías")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func share(for category: CategoryBreakdown) -> Double {
+        let total = NSDecimalNumber(decimal: monthSpending).doubleValue
+        guard total > 0 else { return 0 }
+        return NSDecimalNumber(decimal: category.total).doubleValue / total
+    }
+
+    private func categoryCountLabel(for count: Int) -> String {
+        if count == 1 {
+            return AppLocalization.localized("%d transaction", arguments: count)
+        }
+        return AppLocalization.localized("%d transactions", arguments: count)
+    }
 }
 
 private enum InsightsPeriod: String, CaseIterable, Identifiable {
@@ -1192,9 +1311,12 @@ private enum InsightsPeriod: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .day: return "Day"
-        case .week: return "Week"
-        case .month: return "Month"
+        case .day:
+            return "Day".appLocalized
+        case .week:
+            return "Week".appLocalized
+        case .month:
+            return "Month".appLocalized
         }
     }
 }
@@ -1208,17 +1330,85 @@ private enum InsightsMetric: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .expense: return "Expense"
-        case .refund: return "Refund"
-        case .income: return "Income"
+        case .expense:
+            return "Expense".appLocalized
+        case .refund:
+            return "Refund".appLocalized
+        case .income:
+            return "Income".appLocalized
         }
     }
 
     var systemImage: String {
         switch self {
-        case .expense: return "creditcard.fill"
-        case .refund: return "arrow.uturn.backward.circle.fill"
-        case .income: return "banknote.fill"
+        case .expense:
+            return "arrow.down.circle.fill"
+        case .refund:
+            return "arrow.uturn.backward.circle.fill"
+        case .income:
+            return "arrow.up.circle.fill"
         }
     }
+}
+
+private func buildSeries(for period: InsightsPeriod, metric: InsightsMetric, expenses: [ExpenseRecord]) -> [InsightsSeriesPoint] {
+    let calendar = Calendar.autoupdatingCurrent
+    let now = Date()
+
+    switch period {
+    case .day:
+        return Array(0..<6).map { offset in
+            let start = calendar.date(bySettingHour: offset * 4, minute: 0, second: 0, of: now) ?? now
+            let end = calendar.date(byAdding: .hour, value: 4, to: start) ?? start
+            return InsightsSeriesPoint(
+                index: offset,
+                label: start.formatted(.dateTime.hour(.defaultDigits(amPM: .omitted))),
+                value: metricValue(
+                    for: expenses.filter { $0.date >= start && $0.date < end },
+                    metric: metric
+                )
+            )
+        }
+    case .week:
+        return Array(0..<7).map { offset in
+            let start = calendar.date(byAdding: .day, value: -(6 - offset), to: calendar.startOfDay(for: now)) ?? now
+            let end = calendar.date(byAdding: .day, value: 1, to: start) ?? start
+            return InsightsSeriesPoint(
+                index: offset,
+                label: start.formatted(.dateTime.weekday(.abbreviated)),
+                value: metricValue(
+                    for: expenses.filter { $0.date >= start && $0.date < end },
+                    metric: metric
+                )
+            )
+        }
+    case .month:
+        return Array(0..<4).map { offset in
+            let weekStart = calendar.date(byAdding: .day, value: -(21 - (offset * 7)), to: calendar.startOfDay(for: now)) ?? now
+            let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart) ?? weekStart
+            return InsightsSeriesPoint(
+                index: offset,
+                label: "W\(offset + 1)",
+                value: metricValue(
+                    for: expenses.filter { $0.date >= weekStart && $0.date < weekEnd },
+                    metric: metric
+                )
+            )
+        }
+    }
+}
+
+private func metricValue(for expenses: [ExpenseRecord], metric: InsightsMetric) -> Double {
+    let total = expenses.reduce(Decimal.zero) { partial, expense in
+        switch metric {
+        case .expense:
+            return partial + max(expense.amount, 0)
+        case .refund:
+            return partial + (expense.amount < 0 ? -expense.amount : 0)
+        case .income:
+            return partial + min(expense.amount, 0) * -1
+        }
+    }
+
+    return NSDecimalNumber(decimal: total).doubleValue
 }

@@ -2,10 +2,10 @@ import SwiftUI
 import UIKit
 
 private enum SupportIssueType: String, CaseIterable, Identifiable {
-    case account = "Account"
-    case budget = "Budget"
-    case importExport = "Import / Export"
-    case growth = "Growth"
+    case account = "Cuenta"
+    case budget = "Presupuesto"
+    case importExport = "Importación / Exportación"
+    case growth = "Crecimiento"
     case bug = "Bug"
 
     var id: String { rawValue }
@@ -16,10 +16,10 @@ private enum SupportIssueType: String, CaseIterable, Identifiable {
 }
 
 private enum SupportPriority: String, CaseIterable, Identifiable {
-    case low = "Low"
-    case medium = "Medium"
-    case high = "High"
-    case urgent = "Urgent"
+    case low = "Baja"
+    case medium = "Media"
+    case high = "Alta"
+    case urgent = "Urgente"
 
     var id: String { rawValue }
 
@@ -55,12 +55,14 @@ private struct RecentSupportPacket: Identifiable {
 
 struct SupportCenterView: View {
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
 
     @Environment(\.openURL) private var openURL
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     @State private var issueType: SupportIssueType = .bug
     @State private var priority: SupportPriority = .medium
-    @State private var subject = "SpendSage support request"
+    @State private var subject = "Solicitud de soporte de SpendSage"
     @State private var detail = ""
     @State private var includeDiagnostics = true
     @State private var copiedState = false
@@ -81,135 +83,155 @@ struct SupportCenterView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                FinanceToolsHeaderCard(
-                    eyebrow: "Support-ready packet",
-                    title: "Support Center",
-                    summary: "Describe the issue, package a local summary, and share a cleaner troubleshooting packet from this device. Priority, category, and recent context stay visible so you can write a better report faster.",
-                    systemImage: "lifepreserver.fill"
-                )
-
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Packet at a glance")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        HStack(spacing: 12) {
-                            BrandMetricTile(title: "Expenses", value: "\(viewModel.dashboardState?.transactionCount ?? 0)", systemImage: "receipt.fill")
-                            BrandMetricTile(title: "Accounts", value: "\(viewModel.accounts.count)", systemImage: "creditcard.fill")
-                            BrandMetricTile(title: "Rules", value: "\(viewModel.rules.count)", systemImage: "line.3.horizontal.decrease.circle.fill")
+                        BrandCardHeader(
+                            badgeText: "Soporte",
+                            badgeSystemImage: "lifepreserver.fill",
+                            title: "Centro de soporte",
+                            summary: "Describe el problema, genera un paquete local y compártelo solo si decides enviarlo.",
+                            titleSize: 32
+                        ) {
+                            MascotAvatarView(character: .manchas, expression: .thinking, size: 76)
                         }
+                    }
+                }
 
+                ExperienceDisclosureCard(
+                    title: "Contexto desde este dispositivo",
+                    summary: "Ábrelo solo si quieres revisar el contexto local que entrará al paquete.",
+                    character: .tikki,
+                    expression: .thinking
+                ) {
+                    LazyVGrid(
+                        columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                        spacing: 12
+                    ) {
+                        BrandMetricTile(title: "Gastos", value: "\(viewModel.dashboardState?.transactionCount ?? 0)", systemImage: "receipt.fill")
+                        BrandMetricTile(title: "Cuentas", value: "\(viewModel.accounts.count)", systemImage: "creditcard.fill")
+                        BrandMetricTile(title: "Reglas", value: "\(viewModel.rules.count)", systemImage: "line.3.horizontal.decrease.circle.fill")
+                    }
+
+                    BrandFeatureRow(
+                        systemImage: includeDiagnostics ? "checkmark.shield.fill" : "shield.slash.fill",
+                        title: includeDiagnostics ? "Diagnóstico incluido" : "Diagnóstico excluido",
+                        detail: includeDiagnostics
+                            ? "El paquete incluye resumen local de presupuesto y libro para acelerar la revisión."
+                            : "Solo se compartirá tu descripción del problema."
+                    )
+
+                    if let recentExpense {
                         BrandFeatureRow(
-                            systemImage: includeDiagnostics ? "checkmark.shield.fill" : "shield.slash.fill",
-                            title: includeDiagnostics ? "Diagnostics included" : "Diagnostics excluded",
-                            detail: includeDiagnostics
-                                ? "The generated packet includes local budget and ledger summary details to speed up troubleshooting."
-                                : "Only the issue description will be shared. You can toggle diagnostics back on any time."
+                            systemImage: "receipt.fill",
+                            title: recentExpense.title,
+                            detail: AppLocalization.localized(
+                                "%@ · %@",
+                                arguments: recentExpense.category.appLocalized,
+                                recentExpense.amount.formatted(.currency(code: currencyCode))
+                            )
                         )
+                    }
+
+                    if let nextBill {
                         BrandFeatureRow(
-                            systemImage: "exclamationmark.bubble.fill",
-                            title: "Current ticket framing",
-                            detail: "Category, priority, and recent context are captured before you copy or share the packet, which keeps the note focused."
+                            systemImage: "calendar.badge.clock",
+                            title: nextBill.title,
+                            detail: "Próximo vencimiento \(FinanceToolFormatting.dueDateText(for: nextBill, ledger: viewModel.ledger)) · \(nextBill.amount.formatted(.currency(code: currencyCode)))"
                         )
+                    }
+
+                    if let topRule {
+                        let matches = viewModel.ledger?.matchingExpensesCount(for: topRule) ?? 0
                         BrandFeatureRow(
-                            systemImage: "icloud.slash.fill",
-                            title: "Local only for now",
-                            detail: "Tickets stay on this device in the free build. Cloud history and sync-style ticketing are intentionally hidden until premium sign-in is available."
+                            systemImage: "slider.horizontal.3",
+                            title: topRule.merchantKeyword,
+                            detail: matches == 1
+                                ? "\(topRule.category.localizedTitle) · \(matches) transacción coincidente"
+                                : "\(topRule.category.localizedTitle) · \(matches) transacciones coincidentes"
                         )
                     }
                 }
 
                 SurfaceCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("Recent local signals")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        if let recentExpense {
-                            BrandFeatureRow(
-                                systemImage: "receipt.fill",
-                                title: recentExpense.title,
-                                detail: "\(recentExpense.category) · \(recentExpense.amount.formatted(.currency(code: "USD")))"
-                            )
-                        }
-
-                        if let nextBill {
-                            BrandFeatureRow(
-                                systemImage: "calendar.badge.clock",
-                                title: nextBill.title,
-                                detail: "Next due \(FinanceToolFormatting.dueDateText(for: nextBill, ledger: viewModel.ledger)) · \(nextBill.amount.formatted(.currency(code: "USD")))"
-                            )
-                        }
-
-                        if let topRule {
-                            let matches = viewModel.ledger?.matchingExpensesCount(for: topRule) ?? 0
-                            BrandFeatureRow(
-                                systemImage: "slider.horizontal.3",
-                                title: topRule.merchantKeyword,
-                                detail: AppLocalization.localized(
-                                    "%@ · %d matching transaction%@",
-                                    arguments: topRule.category.localizedTitle,
-                                    matches,
-                                    matches == 1 ? "" : "s"
-                                )
-                            )
-                        }
-                    }
-                }
-
-                SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Compose packet")
+                        Text("Redactar paquete")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Picker("Priority", selection: $priority) {
-                            ForEach(SupportPriority.allCases) { value in
-                                Text(value.localizedTitle).tag(value)
-                            }
-                        }
-                        .pickerStyle(.segmented)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Prioridad")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(BrandTheme.muted)
 
-                        Picker("Issue type", selection: $issueType) {
-                            ForEach(SupportIssueType.allCases) { type in
-                                Text(type.localizedTitle).tag(type)
+                            Picker("Prioridad", selection: $priority) {
+                                ForEach(SupportPriority.allCases) { value in
+                                    Text(value.localizedTitle).tag(value)
+                                }
                             }
+                            .pickerStyle(.menu)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(BrandTheme.surfaceTint)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                            )
                         }
-                        .pickerStyle(.segmented)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Tipo de incidencia")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(BrandTheme.muted)
+
+                            Picker("Tipo de incidencia", selection: $issueType) {
+                                ForEach(SupportIssueType.allCases) { type in
+                                    Text(type.localizedTitle).tag(type)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(BrandTheme.surfaceTint)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+                            )
+                        }
 
                         FinanceField(
-                            label: "Subject",
-                            placeholder: "Briefly summarize the issue",
+                            label: "Asunto",
+                            placeholder: "Resume brevemente el problema",
                             text: $subject,
                             keyboard: .default,
                             capitalization: .sentences
                         )
 
                         FinanceMultilineField(
-                            label: "What happened?",
-                            placeholder: "Include what you expected, what you saw instead, and any recent step that might help reproduce it.",
+                            label: "¿Qué ocurrió?",
+                            placeholder: "Incluye qué esperabas, qué viste en su lugar y cualquier paso reciente que ayude a reproducirlo.",
                             text: $detail
                         )
 
-                        Toggle("Include local diagnostics", isOn: $includeDiagnostics)
+                        Toggle("Incluir diagnóstico local", isOn: $includeDiagnostics)
                             .tint(BrandTheme.primary)
 
                         HStack(spacing: 12) {
-                            Button("Copy packet") {
+                            Button("Copiar paquete") {
                                 recordRecentPacket()
                                 UIPasteboard.general.string = supportPacket
                                 showCopiedToast()
                             }
                             .buttonStyle(SecondaryCTAStyle())
 
-                            ShareLink(item: supportPacket, preview: SharePreview("SpendSage Support Packet")) {
-                                Text("Share packet")
+                            ShareLink(item: supportPacket, preview: SharePreview("Paquete de soporte de SpendSage")) {
+                                Text("Compartir paquete")
                             }
                             .buttonStyle(PrimaryCTAStyle())
                         }
 
-                        Button("Open support email draft") {
+                        Button("Abrir borrador de correo") {
                             recordRecentPacket()
                             guard let url = mailtoURL else { return }
                             openURL(url)
@@ -219,39 +241,25 @@ struct SupportCenterView: View {
                         NavigationLink {
                             LegalCenterView()
                         } label: {
-                            HStack(alignment: .top, spacing: 14) {
-                                Image(systemName: "doc.text.fill")
-                                    .font(.headline.weight(.semibold))
-                                    .foregroundStyle(BrandTheme.primary)
-                                    .frame(width: 42, height: 42)
-                                    .background(BrandTheme.accent.opacity(0.18))
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Review legal and public support links")
-                                        .font(.headline)
-                                        .foregroundStyle(BrandTheme.ink)
-                                    Text("Open the public privacy, terms, and support pages if you need a policy or contact reference.")
-                                        .font(.subheadline)
-                                        .foregroundStyle(BrandTheme.muted)
-                                }
-
-                                Spacer(minLength: 0)
-
-                                Image(systemName: "chevron.right")
-                                    .font(.footnote.weight(.bold))
-                                    .foregroundStyle(BrandTheme.muted)
-                                    .padding(.top, 6)
-                            }
+                            supportRouteRow(
+                                title: "Abrir Centro legal",
+                                summary: "Revisa privacidad, términos, aviso beta y contacto.",
+                                systemImage: "doc.text.fill"
+                            )
                         }
                         .buttonStyle(.plain)
                     }
                 }
 
-                SurfaceCard {
+                ExperienceDisclosureCard(
+                    title: "Vista previa e historial",
+                    summary: "Ábrelo solo cuando quieras auditar el paquete o revisar tickets locales recientes.",
+                    character: .mei,
+                    expression: .thinking
+                ) {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Packet preview")
+                            Text("Vista previa del paquete")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
                             Spacer()
@@ -265,7 +273,7 @@ struct SupportCenterView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .textSelection(.enabled)
                         }
-                        .frame(minHeight: 240)
+                        .frame(minHeight: 220)
                         .padding(14)
                         .background(BrandTheme.surfaceTint)
                         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -273,58 +281,61 @@ struct SupportCenterView: View {
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
                                 .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
                         )
-                    }
-                }
 
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Recent tickets")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Tickets locales recientes")
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
 
-                        if recentPackets.isEmpty {
-                            Text("Copy or email a packet to build a local ticket trail on this device.")
-                                .font(.subheadline)
-                                .foregroundStyle(BrandTheme.muted)
-                        } else {
-                            ForEach(recentPackets) { packet in
-                                HStack(alignment: .top, spacing: 12) {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(packet.subject)
-                                            .font(.headline)
-                                            .foregroundStyle(BrandTheme.ink)
-                                        Text("\(packet.ticketID) · \(packet.issueType.localizedTitle) · \(packet.priority.localizedTitle)")
-                                            .font(.footnote)
-                                            .foregroundStyle(BrandTheme.muted)
-                                        Text(packet.createdAt.formatted(date: .abbreviated, time: .shortened))
-                                            .font(.footnote)
-                                            .foregroundStyle(BrandTheme.muted)
-                                        Text(packet.includeDiagnostics ? "Context included" : "Context excluded")
-                                            .font(.footnote)
-                                            .foregroundStyle(packet.includeDiagnostics ? BrandTheme.primary : BrandTheme.muted)
+                            if recentPackets.isEmpty {
+                                Text("Copia o envía un paquete para construir un rastro local de tickets en este dispositivo.")
+                                    .font(.subheadline)
+                                    .foregroundStyle(BrandTheme.muted)
+                            } else {
+                                ForEach(recentPackets) { packet in
+                                    HStack(alignment: .top, spacing: 12) {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(packet.subject)
+                                                .font(.headline)
+                                                .foregroundStyle(BrandTheme.ink)
+                                            Text("\(packet.ticketID) · \(packet.issueType.localizedTitle) · \(packet.priority.localizedTitle)")
+                                                .font(.footnote)
+                                                .foregroundStyle(BrandTheme.muted)
+                                            Text(packet.createdAt.formatted(date: .abbreviated, time: .shortened))
+                                                .font(.footnote)
+                                                .foregroundStyle(BrandTheme.muted)
+                                            Text(packet.includeDiagnostics ? "Contexto incluido" : "Contexto excluido")
+                                                .font(.footnote)
+                                                .foregroundStyle(packet.includeDiagnostics ? BrandTheme.primary : BrandTheme.muted)
+                                        }
+
+                                        Spacer()
+
+                                        BrandBadge(
+                                            text: packet.includeDiagnostics ? "Contexto" : "Sin contexto",
+                                            systemImage: packet.includeDiagnostics ? "checkmark.shield.fill" : "shield.slash.fill"
+                                        )
                                     }
-
-                                    Spacer()
-
-                                    BrandBadge(
-                                        text: packet.includeDiagnostics ? "Context" : "No context",
-                                        systemImage: packet.includeDiagnostics ? "checkmark.shield.fill" : "shield.slash.fill"
-                                    )
                                 }
                             }
                         }
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
+        .accessibilityIdentifier("support.screen")
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
+        }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "support.screen")
         }
         .overlay(alignment: .bottom) {
             if copiedState {
-                Text("Support packet copied")
+                Text("Paquete de soporte copiado")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(BrandTheme.ink)
                     .padding(.horizontal, 14)
@@ -332,11 +343,38 @@ struct SupportCenterView: View {
                     .background(BrandTheme.surface)
                     .clipShape(Capsule(style: .continuous))
                     .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 12, x: 0, y: 6)
-                    .padding(.bottom, 18)
+                    .padding(.bottom, shellBottomInset + 18)
             }
         }
-        .navigationTitle("Support Center")
+        .navigationTitle("Centro de soporte")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func supportRouteRow(title: String, summary: String, systemImage: String) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: systemImage)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(BrandTheme.primary)
+                .frame(width: 42, height: 42)
+                .background(BrandTheme.accent.opacity(0.18))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(summary)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.bold))
+                .foregroundStyle(BrandTheme.muted)
+                .padding(.top, 6)
+        }
     }
 
     private var supportPacket: String {
@@ -367,7 +405,7 @@ struct SupportCenterView: View {
         let packet = RecentSupportPacket(
             issueType: issueType,
             priority: priority,
-            subject: subject.isEmpty ? "SpendSage support request" : subject,
+            subject: subject.isEmpty ? "Solicitud de soporte de SpendSage" : subject,
             includeDiagnostics: includeDiagnostics
         )
         recentPackets.insert(packet, at: 0)

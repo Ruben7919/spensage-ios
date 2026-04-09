@@ -2,13 +2,16 @@ import SwiftUI
 
 struct ExpensesCenterView: View {
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
+    @Environment(\.shellBottomInset) private var shellBottomInset
     @State private var isPresentingGuide = false
-
-    private let currencyCode = "USD"
-    private let freeLocalExpenseLimit = 40
 
     private var ledger: LocalFinanceLedger? {
         viewModel.ledger
+    }
+
+    private var expandsToolsForUITests: Bool {
+        ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_EXPAND_EXPENSES_TOOLS"] == "1"
     }
 
     private var expenseRecords: [ExpenseRecord] {
@@ -25,7 +28,7 @@ struct ExpensesCenterView: View {
     }
 
     private var categoryBreakdown: [CategoryBreakdown] {
-        ledger?.categoryBreakdown(limit: 6) ?? []
+        ledger?.categoryBreakdown(limit: 3) ?? []
     }
 
     private var totalSpentThisMonth: Decimal {
@@ -45,28 +48,6 @@ struct ExpensesCenterView: View {
         ledger?.upcomingBills().first
     }
 
-    private var remainingFreeEntries: Int {
-        max(0, freeLocalExpenseLimit - expenseRecords.count)
-    }
-
-    private var merchantSuggestions: [String] {
-        var counts: [String: Int] = [:]
-        for expense in expenseRecords {
-            let merchant = expense.merchant.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !merchant.isEmpty else { continue }
-            counts[merchant, default: 0] += 1
-        }
-
-        let rankedMerchants = counts.sorted { lhs, rhs in
-            lhs.value > rhs.value || (
-                lhs.value == rhs.value &&
-                lhs.key.localizedCaseInsensitiveCompare(rhs.key) == .orderedAscending
-            )
-        }
-
-        return rankedMerchants.prefix(3).map(\.key)
-    }
-
     private var daysElapsedInMonth: Int {
         let calendar = Calendar.autoupdatingCurrent
         return max(calendar.component(.day, from: .now), 1)
@@ -84,18 +65,34 @@ struct ExpensesCenterView: View {
 
                 if let state = currentState {
                     snapshotCard(for: state)
-                    categoryCard(for: state)
-                    importAndScanCard
-                    sponsorCard
-                    recentLedgerCard
-                    toolsCard
+                    if !categoryBreakdown.isEmpty {
+                        ExperienceDisclosureCard(
+                            title: "Más detalle",
+                            summary: "Abre la mezcla por categoría solo cuando quieras una lectura más profunda del mes.",
+                            character: .mei,
+                            expression: .thinking
+                        ) {
+                            categoryCard(for: state)
+                        }
+                    }
+
+                    if case .guest = viewModel.session {
+                        sponsorCard
+                    }
                 } else {
                     loadingCard
                 }
+
+                recentLedgerCard
+                toolsDisclosureCard
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 40)
+            .padding(.bottom, shellBottomInset + 18)
+        }
+        .accessibilityIdentifier("expenses.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "expenses.screen")
         }
         .background(
             ZStack {
@@ -104,8 +101,8 @@ struct ExpensesCenterView: View {
             }
             .ignoresSafeArea()
         )
-        .navigationTitle("Expenses")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle("Gastos")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {
             GuideSheet(guide: GuideLibrary.guide(.expenses))
         }
@@ -118,57 +115,72 @@ struct ExpensesCenterView: View {
 
     private var headerCard: some View {
         SurfaceCard {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        BrandBadge(
-                            text: expenseRecords.isEmpty ? "Fresh local ledger" : "Local ledger",
-                            systemImage: "iphone.gen3"
-                        )
-
-                        Text("Expense center")
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(BrandTheme.ink)
-
-                        Text("Add expenses quickly, review the month, and keep the local-first ledger moving.")
-                            .foregroundStyle(BrandTheme.muted)
-                    }
-
-                    Spacer(minLength: 0)
-
+            VStack(alignment: .leading, spacing: 18) {
+                BrandCardHeader(
+                    badgeText: expenseRecords.isEmpty ? "Empieza aquí" : "Este mes",
+                    badgeSystemImage: "creditcard.fill",
+                    title: "Gastos",
+                    summary: "Registra una compra rápido, revisa el mes y abre más herramientas solo cuando haga falta."
+                ) {
                     Text(lastUpdatedLabel)
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(BrandTheme.muted)
                         .multilineTextAlignment(.trailing)
                 }
 
+                BrandArtworkSurface {
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("Manchas mantiene esta pantalla corta: primero capturas, luego revisas y al final profundizas si hace falta.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        BrandMetricTile(
+                            title: "Este mes",
+                            value: totalSpentThisMonth.formatted(.currency(code: currencyCode)),
+                            systemImage: "creditcard.fill"
+                        )
+
+                        BrandBadge(
+                            text: AppLocalization.localized("%d registros", arguments: expenseRecords.count),
+                            systemImage: "list.bullet.rectangle"
+                        )
+
+                        BrandAssetImage(
+                            source: BrandAssetCatalog.shared.guide("guide_02_log_expense_manchas"),
+                            fallbackSystemImage: "receipt.fill"
+                        )
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity, maxHeight: 132, alignment: .center)
+                    }
+                }
+
+                MascotSpeechCard(
+                    character: .manchas,
+                    expression: expenseRecords.isEmpty ? .thinking : .happy,
+                    title: "Manchas",
+                    message: expenseRecords.isEmpty
+                        ? "Empieza con un gasto real. Todo lo demás se vuelve útil en cuanto cae el primer registro."
+                        : "Revisa el resumen, mira los últimos movimientos y profundiza solo si algo se ve raro."
+                )
+
                 HStack(spacing: 12) {
-                    Button("Add expense") {
+                    Button("Agregar gasto") {
                         viewModel.presentAddExpense()
                     }
                     .buttonStyle(PrimaryCTAStyle())
+                    .accessibilityIdentifier("expenses.action.add")
 
-                    Button("Budget wizard") {
-                        viewModel.presentBudgetWizard()
+                    Button("Escanear recibo") {
+                        viewModel.startScanFlow()
                     }
                     .buttonStyle(SecondaryCTAStyle())
-                }
-
-                HStack(spacing: 12) {
-                    Button("Open guide") {
-                        isPresentingGuide = true
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
-
-                    NavigationLink("CSV Import") {
-                        FinanceCsvImportToolView(viewModel: viewModel)
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
+                    .accessibilityIdentifier("expenses.action.scan")
                 }
 
                 BrandBadge(
-                    text: "Free local ledger \(expenseRecords.count)/\(freeLocalExpenseLimit)",
-                    systemImage: "shield.lefthalf.filled"
+                    text: AppLocalization.localized("Ledger ready %d", arguments: expenseRecords.count),
+                    systemImage: "checkmark.seal.fill"
                 )
             }
         }
@@ -178,8 +190,8 @@ struct ExpensesCenterView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeading(
-                    title: "Ledger snapshot",
-                    detail: "The month at a glance, tuned for the local-first mode."
+                    title: "Este mes",
+                    detail: "La lectura más corta y útil de tu gasto ahora mismo."
                 )
 
                 LazyVGrid(
@@ -187,44 +199,34 @@ struct ExpensesCenterView: View {
                     spacing: 12
                 ) {
                     BrandMetricTile(
-                        title: "Spent",
+                        title: "Gastado",
                         value: state.budgetSnapshot.monthlySpent.formatted(.currency(code: currencyCode)),
                         systemImage: "creditcard.fill"
                     )
                     BrandMetricTile(
-                        title: "Average",
+                        title: "Restante",
+                        value: state.budgetSnapshot.remaining.formatted(.currency(code: currencyCode)),
+                        systemImage: "banknote.fill"
+                    )
+                    BrandMetricTile(
+                        title: "Promedio",
                         value: averageExpense.formatted(.currency(code: currencyCode)),
                         systemImage: "chart.bar.fill"
                     )
                     BrandMetricTile(
-                        title: "Largest",
-                        value: largestExpense?.amount.formatted(.currency(code: currencyCode)) ?? "None",
+                        title: "Mayor",
+                        value: largestExpense?.amount.formatted(.currency(code: currencyCode)) ?? "Ninguno",
                         systemImage: "arrow.up.right.circle.fill"
-                    )
-                    BrandMetricTile(
-                        title: "Rules",
-                        value: "\(ledger?.rules.count ?? 0)",
-                        systemImage: "line.3.horizontal.decrease.circle.fill"
-                    )
-                    BrandMetricTile(
-                        title: "Accounts",
-                        value: "\(ledger?.accounts.count ?? 0)",
-                        systemImage: "wallet.pass.fill"
-                    )
-                    BrandMetricTile(
-                        title: "Bills",
-                        value: "\(ledger?.bills.count ?? 0)",
-                        systemImage: "calendar.badge.clock"
                     )
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Budget pace")
+                        Text("Ritmo del presupuesto")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(BrandTheme.ink)
                         Spacer()
-                        Text(paceLabel(for: state))
+                        Text(paceLabel(for: state).appLocalized)
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.muted)
                     }
@@ -233,9 +235,19 @@ struct ExpensesCenterView: View {
                         .tint(BrandTheme.primary)
 
                     HStack {
-                        Text("Per day \(monthlySpendPerDay.formatted(.currency(code: currencyCode)))")
+                        Text(
+                            AppLocalization.localized(
+                                "Por día %@",
+                                arguments: monthlySpendPerDay.formatted(.currency(code: currencyCode))
+                            )
+                        )
                         Spacer()
-                        Text("Remaining \(state.budgetSnapshot.remaining.formatted(.currency(code: currencyCode)))")
+                        Text(
+                            AppLocalization.localized(
+                                "Restante %@",
+                                arguments: state.budgetSnapshot.remaining.formatted(.currency(code: currencyCode))
+                            )
+                        )
                     }
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(BrandTheme.muted)
@@ -243,23 +255,15 @@ struct ExpensesCenterView: View {
 
                 HStack(alignment: .top, spacing: 12) {
                     infoPill(
-                        title: "Next bill",
-                        detail: nextBill.map { nextBillText(for: $0) } ?? "No recurring bills yet",
+                        title: "Próxima factura",
+                        detail: nextBill.map { nextBillText(for: $0) } ?? "Todavía no hay facturas recurrentes",
                         systemImage: "calendar.badge.clock"
                     )
 
                     infoPill(
-                        title: "Velocity",
-                        detail: "\(recentMonthExpenses.count) expenses this month",
+                        title: "Ritmo",
+                        detail: AppLocalization.localized("%d gastos este mes", arguments: recentMonthExpenses.count),
                         systemImage: "speedometer"
-                    )
-                }
-
-                if case .guest = viewModel.session {
-                    BrandFeatureRow(
-                        systemImage: "iphone.gen3",
-                        title: "Local free mode",
-                        detail: "\(remainingFreeEntries) of \(freeLocalExpenseLimit) free local entries remain. Upgrade later for cloud sync, imports across devices, and a quieter billing experience."
                     )
                 }
             }
@@ -270,16 +274,16 @@ struct ExpensesCenterView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeading(
-                    title: "Category mix",
+                    title: "Mezcla por categoría",
                     detail: state.categoryBreakdown.isEmpty
-                        ? "Add an expense to see category pressure and share."
-                        : "\(state.transactionCount) transactions are shaping the month."
+                        ? "Agrega un gasto para ver la presión y el peso por categoría."
+                        : AppLocalization.localized("%d transacciones están dando forma al mes.", arguments: state.transactionCount)
                 )
 
                 if categoryBreakdown.isEmpty {
                     emptyRow(
-                        title: "No category signal yet",
-                        detail: "The first few expenses will reveal where the budget is tilting."
+                        title: "Todavía no hay señal por categoría",
+                        detail: "Los primeros gastos van a revelar hacia dónde se inclina el presupuesto."
                     )
                 } else {
                     ForEach(categoryBreakdown) { category in
@@ -291,40 +295,36 @@ struct ExpensesCenterView: View {
     }
 
     private var sponsorCard: some View {
-        Group {
-            if case .guest = viewModel.session {
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Sponsor-supported free mode")
-                                    .font(.headline)
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("This sponsor surface stays visible in free mode, between the capture tools and the recent ledger, so the experience remains supported and upgrade-ready.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-
-                            Spacer(minLength: 0)
-
-                            BrandBadge(text: "Free mode", systemImage: "sparkles")
-                        }
-
-                        HStack(spacing: 12) {
-                            NavigationLink {
-                                PremiumView(viewModel: viewModel)
-                            } label: {
-                                Label("Unlock premium", systemImage: "sparkles")
-                            }
-                            .buttonStyle(PrimaryCTAStyle())
-
-                            Button("Why this appears") {
-                                isPresentingGuide = true
-                            }
-                            .buttonStyle(SecondaryCTAStyle())
-                        }
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Modo gratis con patrocinio")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text("Esta superficie patrocinada se mantiene visible en modo gratis, entre las herramientas de captura y el libro reciente, para sostener la experiencia y dejar clara la mejora futura.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
+
+                    Spacer(minLength: 0)
+
+                    BrandBadge(text: "Modo gratis", systemImage: "sparkles")
+                }
+
+                HStack(spacing: 12) {
+                    NavigationLink {
+                        PremiumView(viewModel: viewModel)
+                    } label: {
+                        Label("Desbloquear premium", systemImage: "sparkles")
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+
+                    Button("Por qué aparece") {
+                        isPresentingGuide = true
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
                 }
             }
         }
@@ -334,19 +334,19 @@ struct ExpensesCenterView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeading(
-                    title: "Recent ledger",
+                    title: "Libro reciente",
                     detail: expenseRecords.isEmpty
-                        ? "The newest activity lands here first."
-                        : "Latest entries from the local ledger."
+                        ? "La actividad más nueva aterriza aquí primero."
+                        : "Últimos registros de tu libro de gastos."
                 )
 
                 if expenseRecords.isEmpty {
                     emptyRow(
-                        title: "Recent activity will show up here",
-                        detail: "Once the ledger moves, this list becomes the fastest way to audit what just happened."
+                        title: "La actividad reciente aparecerá aquí",
+                        detail: "Cuando el libro se mueva, esta lista será la forma más rápida de auditar lo que acaba de pasar."
                     )
                 } else {
-                    ForEach(expenseRecords.prefix(8)) { expense in
+                    ForEach(expenseRecords.prefix(6)) { expense in
                         expenseRow(expense)
                     }
                 }
@@ -354,129 +354,101 @@ struct ExpensesCenterView: View {
         }
     }
 
-    private var importAndScanCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Import, suggestions, and limits",
-                    detail: "The free ledger stays on-device. Use CSV import for bulk rows, scan receipts for one-offs, and lean on merchant hints when the next expense feels repetitive."
-                )
-
-                HStack(spacing: 12) {
-                    infoPill(
-                        title: "Saved locally",
-                        detail: "\(expenseRecords.count) expenses are already on the device.",
-                        systemImage: "iphone.gen3"
-                    )
-
-                    infoPill(
-                        title: "Free left",
-                        detail: "\(remainingFreeEntries) of \(freeLocalExpenseLimit) entries remain in the free window.",
-                        systemImage: "shield.lefthalf.filled"
-                    )
-                }
-
-                if merchantSuggestions.isEmpty {
-                    emptyRow(
-                        title: "No merchant hints yet",
-                        detail: "Once a few entries land, this card will surface the names you type most."
-                    )
-                } else {
-                    VStack(spacing: 10) {
-                        ForEach(merchantSuggestions, id: \.self) { merchant in
-                            merchantSuggestionRow(merchant)
-                        }
-                    }
-                }
-
-                HStack(spacing: 12) {
-                    NavigationLink("CSV Import") {
-                        FinanceCsvImportToolView(viewModel: viewModel)
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
-
-                    NavigationLink("Scan Receipts") {
-                        FinanceReceiptScanToolView(viewModel: viewModel)
-                    }
-                    .buttonStyle(PrimaryCTAStyle())
-                }
-
-                Text("Use CSV when the spreadsheet already exists. Use scan when you want a receipt image turned into a draft you can finish manually.")
-                    .font(.footnote)
-                    .foregroundStyle(BrandTheme.muted)
-
-                if case .guest = viewModel.session {
-                    NavigationLink {
-                        PremiumView(viewModel: viewModel)
-                    } label: {
-                        Label("Unlock premium", systemImage: "sparkles")
-                    }
-                    .buttonStyle(PrimaryCTAStyle())
-                }
-            }
+    private var toolsDisclosureCard: some View {
+        ExperienceDisclosureCard(
+            title: "Más herramientas",
+            summary: "Escanear queda a un toque. Cuentas, reglas, facturas, importaciones y el asistente se quedan plegados hasta que los necesites.",
+            character: .manchas,
+            expression: .thinking,
+            initiallyExpanded: expandsToolsForUITests,
+            accessibilityIdentifier: "expenses.disclosure.tools"
+        ) {
+            toolsHubContent
         }
     }
 
-    private var toolsCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                sectionHeading(
-                    title: "Finance tools",
-                    detail: "Accounts, bills, and rules stay close so the ledger feels complete."
-                )
-
-                NavigationLink {
-                    FinanceAccountsToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "Accounts",
-                        summary: "Add cash, cards, and manual balances for a fuller local snapshot.",
-                        systemImage: "wallet.pass.fill"
-                    )
-                }
-
-                NavigationLink {
-                    FinanceBillsToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "Bills",
-                        summary: "Track recurring payments and mark them paid into the ledger.",
-                        systemImage: "calendar.badge.clock"
-                    )
-                }
-
-                NavigationLink {
-                    FinanceRulesToolView(viewModel: viewModel)
-                } label: {
-                    FinanceToolRowLabel(
-                        title: "Rules",
-                        summary: "Save merchant keywords to auto-categorize imported expenses.",
-                        systemImage: "slider.horizontal.3"
-                    )
-                }
+    private var toolsHubContent: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Button("Abrir asistente de presupuesto") {
+                viewModel.presentBudgetWizard()
             }
+            .buttonStyle(SecondaryCTAStyle())
+            .accessibilityIdentifier("expenses.action.budgetWizard")
+
+            Button {
+                viewModel.startScanFlow()
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Escanear recibos",
+                    summary: "Convierte una foto del recibo en un borrador que puedes revisar antes de guardar.",
+                    systemImage: "camera.viewfinder"
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("expenses.tool.scan")
+
+            NavigationLink {
+                FinanceCsvImportToolView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Importar CSV",
+                    summary: "Trae varios gastos cuando ya tienes una exportación en hoja de cálculo.",
+                    systemImage: "square.and.arrow.down.on.square.fill"
+                )
+            }
+            .accessibilityIdentifier("expenses.tool.csv")
+
+            NavigationLink {
+                FinanceAccountsToolView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Cuentas",
+                    summary: "Revisa efectivo, tarjetas y saldos manuales en un solo lugar.",
+                    systemImage: "wallet.pass.fill"
+                )
+            }
+            .accessibilityIdentifier("expenses.tool.accounts")
+
+            NavigationLink {
+                FinanceBillsToolView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Facturas",
+                    summary: "Sigue pagos recurrentes y vencimientos sin saturar la pantalla principal.",
+                    systemImage: "calendar.badge.clock"
+                )
+            }
+            .accessibilityIdentifier("expenses.tool.bills")
+
+            NavigationLink {
+                FinanceRulesToolView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(
+                    title: "Reglas",
+                    summary: "Guarda reglas por comercio para que los gastos repetidos se organicen automáticamente.",
+                    systemImage: "slider.horizontal.3"
+                )
+            }
+            .accessibilityIdentifier("expenses.tool.rules")
         }
     }
 
     private var loadingCard: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 12) {
-                BrandBadge(text: "Loading ledger", systemImage: "sparkles")
-                Text("Your local expense data is being prepared.")
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text("Once the dashboard snapshot arrives, this center will surface totals, pacing, and category pressure.")
-                    .foregroundStyle(BrandTheme.muted)
-            }
-        }
+        MascotLoadingCard(
+            badgeText: "Loading ledger",
+            title: "Estamos preparando tus gastos.",
+            summary: "Cuando llegue el snapshot del dashboard, esta pantalla mostrará tu resumen, actividad reciente y herramientas más profundas.",
+            character: .manchas,
+            expression: .thinking
+        )
     }
 
     private func sectionHeading(title: String, detail: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title)
+            Text(title.appLocalized)
                 .font(.headline)
                 .foregroundStyle(BrandTheme.ink)
-            Text(detail)
+            Text(detail.appLocalized)
                 .font(.subheadline)
                 .foregroundStyle(BrandTheme.muted)
         }
@@ -493,10 +465,10 @@ struct ExpensesCenterView: View {
             .frame(width: 40, height: 40)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(title)
+                Text(title.appLocalized)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(BrandTheme.ink)
-                Text(detail)
+                Text(detail.appLocalized)
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -532,7 +504,7 @@ struct ExpensesCenterView: View {
                     Text(category.category.localizedTitle)
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
-                    Text("\(category.count) expense\(category.count == 1 ? "" : "s")")
+                    Text(categoryCountLabel(for: category.count))
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -561,7 +533,13 @@ struct ExpensesCenterView: View {
                 Text(expense.merchant)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
-                Text("\(expense.category.localizedTitle) · \(expense.date.formatted(date: .abbreviated, time: .omitted))")
+                Text(
+                    AppLocalization.localized(
+                        "%@ · %@",
+                        arguments: expense.category.localizedTitle,
+                        expense.date.formatted(date: .abbreviated, time: .omitted)
+                    )
+                )
                     .font(.footnote)
                     .foregroundStyle(BrandTheme.muted)
                 if let note = expense.note, !note.isEmpty {
@@ -597,34 +575,6 @@ struct ExpensesCenterView: View {
         )
     }
 
-    private func merchantSuggestionRow(_ merchant: String) -> some View {
-        HStack(spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(BrandTheme.accent.opacity(0.18))
-                Image(systemName: "sparkles")
-                    .foregroundStyle(BrandTheme.primary)
-            }
-            .frame(width: 46, height: 46)
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(merchant)
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text("Reuse this merchant name to keep import and categorization cleaner.")
-                    .font(.footnote)
-                    .foregroundStyle(BrandTheme.muted)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(BrandTheme.surfaceTint)
-        )
-    }
-
     private func paceLabel(for state: FinanceDashboardState) -> String {
         if state.transactionCount == 0 {
             return "Kickoff"
@@ -638,16 +588,28 @@ struct ExpensesCenterView: View {
         return "Over budget"
     }
 
+    private func categoryCountLabel(for count: Int) -> String {
+        if count == 1 {
+            return AppLocalization.localized("%d expense", arguments: count)
+        }
+        return AppLocalization.localized("%d expenses", arguments: count)
+    }
+
     private func nextBillText(for bill: BillRecord) -> String {
         let dueDate = ledger?.dueDate(for: bill)
-        let dueText = dueDate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "Soon"
-        return "\(bill.title) · \(bill.amount.formatted(.currency(code: currencyCode))) · \(dueText)"
+        let dueText = dueDate.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "Soon".appLocalized
+        return AppLocalization.localized(
+            "%@ · %@ · %@",
+            arguments: bill.title,
+            bill.amount.formatted(.currency(code: currencyCode)),
+            dueText
+        )
     }
 
     private var lastUpdatedLabel: String {
         guard let updatedAt = ledger?.updatedAt else {
-            return "Updating locally"
+            return "Updating".appLocalized
         }
-        return "Updated \(updatedAt.formatted(date: .abbreviated, time: .shortened))"
+        return AppLocalization.localized("Updated %@", arguments: updatedAt.formatted(date: .abbreviated, time: .shortened))
     }
 }

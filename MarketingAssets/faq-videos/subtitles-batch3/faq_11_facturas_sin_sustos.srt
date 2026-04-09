@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,000
+Las facturas no deberian
+sorprenderte.
+
+2
+00:00:02,000 --> 00:00:04,300
+Ves total mensual,
+por vencer y atrasadas.
+
+3
+00:00:04,300 --> 00:00:06,400
+Anticiparte siempre sale mejor
+que apagar incendios.

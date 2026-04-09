@@ -7,7 +7,7 @@ settings:
   base:
     PRODUCT_NAME: SpendSage
     SWIFT_VERSION: "6.0"
-    CURRENT_PROJECT_VERSION: 6
+    CURRENT_PROJECT_VERSION: 27
     MARKETING_VERSION: 1.0
     DEVELOPMENT_TEAM: YU855NB22W
     CODE_SIGN_STYLE: Automatic
@@ -32,16 +32,24 @@ targets:
         UIRequiresFullScreen: true
         ITSAppUsesNonExemptEncryption: false
         NSCameraUsageDescription: Scan receipts and capture supporting images.
+        NSCalendarsUsageDescription: Create optional due-date reminders for your recurring bills.
+        NSFaceIDUsageDescription: Unlock your saved SpendSage account quickly and securely.
+        NSLocationWhenInUseUsageDescription: Tag an expense with your current place only when you ask SpendSage to do it.
         NSPhotoLibraryUsageDescription: Import receipts and supporting images.
         NSPhotoLibraryAddUsageDescription: Save exported images and documents.
         CFBundleURLTypes:
           - CFBundleURLName: com.spendsage.ai
             CFBundleURLSchemes:
               - spendsage
-        SpendSageCognitoHostedUIDomain: ""
-        SpendSageCognitoUserPoolClientId: ""
+        SpendSageCognitoHostedUIDomain: "spendsage-dev-177600645043.auth.us-east-1.amazoncognito.com"
+        SpendSageCognitoUserPoolClientId: "7t375oqkn6ihh1rnk3lt0qffv3"
         SpendSageCognitoRedirectSignIn: "spendsage://auth-callback"
         SpendSageCognitoRedirectSignOut: "spendsage://auth-logout"
+        SpendSageAPIBaseURL: "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/"
+        SpendSageEnvironmentName: "dev"
+        SpendSageInternalTestingEnabled: "$(SPENDSAGE_INTERNAL_TESTING_ENABLED)"
+        UIBackgroundModes:
+          - remote-notification
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
     settings:
@@ -52,6 +60,14 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleIconName: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_ENTITLEMENTS: SpendSage/SpendSage.entitlements
+      configs:
+        Debug:
+          APS_ENVIRONMENT: development
+          SPENDSAGE_INTERNAL_TESTING_ENABLED: YES
+        Release:
+          APS_ENVIRONMENT: production
+          SPENDSAGE_INTERNAL_TESTING_ENABLED: NO
   SpendSageTests:
     type: bundle.unit-test
     platform: iOS
@@ -65,12 +81,36 @@ targets:
         PRODUCT_NAME: SpendSageTests
         PRODUCT_BUNDLE_IDENTIFIER: com.spendsage.ai.tests
         GENERATE_INFOPLIST_FILE: true
+  SpendSageUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: SpendSageUITests
+    dependencies:
+      - target: SpendSage
+    settings:
+      base:
+        PRODUCT_NAME: SpendSageUITests
+        PRODUCT_BUNDLE_IDENTIFIER: com.spendsage.ai.uitests
+        GENERATE_INFOPLIST_FILE: true
+        TEST_TARGET_NAME: SpendSage
 schemes:
   SpendSage:
     build:
       targets:
         SpendSage: all
         SpendSageTests: [test]
+        SpendSageUITests: [test]
     test:
       targets:
         - SpendSageTests
+        - SpendSageUITests
+  SpendSageUI:
+    build:
+      targets:
+        SpendSage: all
+        SpendSageUITests: [test]
+    test:
+      targets:
+        - SpendSageUITests

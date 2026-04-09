@@ -1,164 +1,343 @@
 import SwiftUI
 import UIKit
-import AudioToolbox
 
 struct SettingsView: View {
     @ObservedObject var viewModel: AppViewModel
 
     @AppStorage("native.settings.language") private var language = "auto"
-    @AppStorage("native.settings.currency") private var currency = "USD"
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
-    @AppStorage("native.settings.reminders") private var remindersEnabled = true
-    @AppStorage("native.settings.sound") private var soundStyle = "playful"
-    @AppStorage("native.settings.quietHoursEnabled") private var quietHoursEnabled = true
-    @AppStorage("native.settings.quietHoursStart") private var quietHoursStart = "22:00"
-    @AppStorage("native.settings.quietHoursEnd") private var quietHoursEnd = "07:00"
-    @AppStorage("native.settings.weekendQuietMode") private var weekendQuietMode = true
-    @AppStorage("native.settings.maxNotificationsPerDay") private var maxNotificationsPerDay = 2
-    @AppStorage("native.settings.maxNotificationsPerWeek") private var maxNotificationsPerWeek = 5
+    @Environment(\.shellBottomInset) private var shellBottomInset
+    @AppStorage("native.settings.localDebugOverlay") private var debugOverlayEnabled = false
+    @AppStorage(AuthSessionPreferences.rememberDeviceKey) private var rememberDeviceEnabled = true
+    @AppStorage(AuthSessionPreferences.biometricUnlockKey) private var biometricUnlockEnabled = true
     @State private var showingGuideReplay = false
 
-    private var deviceLabel: String {
-        UIDevice.current.localizedModel
+    private var biometricLabel: String {
+        viewModel.biometricKind.displayName
     }
 
-    private var systemVersionLabel: String {
-        "iOS \(UIDevice.current.systemVersion)"
-    }
-
-    private func soundDisplayName(_ value: String) -> String {
-        switch value {
-        case "miau":
-            return "Meow".appLocalized
-        case "off":
-            return "Off".appLocalized
-        default:
-            return "Playful".appLocalized
+    private var sessionModeLabel: String {
+        switch viewModel.session {
+        case .signedOut:
+            return "Sesión cerrada"
+        case .guest:
+            return "Vista previa"
+        case let .signedIn(email, provider):
+            if provider == "Preview" {
+                return "Cuenta"
+            }
+            return email.components(separatedBy: "@").first ?? "Sesión iniciada"
         }
     }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                FinanceToolsHeaderCard(
-                    eyebrow: "Local-first settings",
-                    title: "Settings",
-                    summary: "Tune local preferences, open the budget wizard, and keep support, legal, and growth tools close in one place. Language, currency, notifications, and export cues stay visible without leaving the app.",
-                    systemImage: "gearshape.fill"
+                overviewCard
+                personalizeCard
+                accountAndHelpCard
+                moreCard
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, shellBottomInset + 18)
+        }
+        .accessibilityIdentifier("settings.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "settings.screen")
+        }
+        .background(FinanceScreenBackground())
+        .sheet(isPresented: $showingGuideReplay) {
+            GuideSheet(guide: GuideLibrary.guide(.dashboard))
+        }
+        .onChange(of: rememberDeviceEnabled) { _, newValue in
+            viewModel.updateRememberDevicePreference(enabled: newValue)
+            if !newValue {
+                biometricUnlockEnabled = false
+            }
+        }
+        .onChange(of: biometricUnlockEnabled) { _, newValue in
+            viewModel.updateBiometricUnlockPreference(enabled: newValue)
+        }
+        .navigationTitle("Ajustes")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var overviewCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                SettingsSummaryHeader(
+                    badge: "Configuración simple",
+                    title: "Ajustes",
+                    summary: "Mantén esta área corta. Abre una sección solo cuando quieras cambiar cómo se ve la app o revisar permisos importantes del iPhone.",
+                    character: .tikki,
+                    expression: .proud
                 )
 
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Session snapshot")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
-
-                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                            BrandMetricTile(
-                                title: "Mode",
-                                value: sessionModeLabel,
-                                systemImage: "person.crop.circle"
-                            )
-                            BrandMetricTile(
-                                title: "Language",
-                                value: AppLocalization.menuLabel(for: language),
-                                systemImage: "globe"
-                            )
-                            BrandMetricTile(
-                                title: "Currency",
-                                value: currency,
-                                systemImage: "dollarsign.circle.fill"
-                            )
-                            BrandMetricTile(
-                                title: "Theme",
-                                value: themeDisplayName(theme),
-                                systemImage: "paintpalette.fill"
-                            )
-                            BrandMetricTile(
-                                title: "Sound",
-                                value: soundDisplayName(soundStyle),
-                                systemImage: "speaker.wave.2.fill"
-                            )
-                            BrandMetricTile(
-                                title: "Device",
-                                value: deviceLabel,
-                                systemImage: "iphone.gen3"
-                            )
-                            BrandMetricTile(
-                                title: "Export",
-                                value: "Ready",
-                                systemImage: "square.and.arrow.up"
-                            )
-                        }
-
-                        VStack(spacing: 12) {
-                            Button("Open budget wizard") {
-                                viewModel.presentBudgetWizard()
-                            }
-                            .buttonStyle(PrimaryCTAStyle())
-
-                            NavigationLink {
-                                AdvancedSettingsView(viewModel: viewModel)
-                            } label: {
-                                settingsRouteLabel(
-                                    title: "Advanced settings",
-                                    summary: "Inspect exports, support packets, device controls, and local debug tools.",
-                                    systemImage: "switch.2"
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+                FlowStack(spacing: 8, rowSpacing: 8) {
+                    BrandBadge(
+                        text: rememberDeviceEnabled ? "Inicio rápido" : "Ingreso manual",
+                        systemImage: "iphone.gen3"
+                    )
+                    BrandBadge(
+                        text: viewModel.biometricKind == .none
+                            ? "Seguridad local"
+                            : (biometricUnlockEnabled ? biometricLabel : "Biometría lista"),
+                        systemImage: viewModel.biometricKind == .none
+                            ? "lock.shield"
+                            : viewModel.biometricKind.systemImage
+                    )
+                    BrandBadge(
+                        text: settingsThemeDisplayName(theme),
+                        systemImage: "paintpalette.fill"
+                    )
                 }
 
-                subscriptionSurface
+                LazyVGrid(
+                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                    spacing: 12
+                ) {
+                    BrandMetricTile(title: "Modo", value: sessionModeLabel, systemImage: "person.crop.circle")
+                    BrandMetricTile(title: "Idioma", value: AppLocalization.menuLabel(for: language), systemImage: "globe")
+                    BrandMetricTile(title: "Moneda", value: currency, systemImage: "dollarsign.circle.fill")
+                    BrandMetricTile(title: "Tema", value: settingsThemeDisplayName(theme), systemImage: "paintpalette.fill")
+                }
+            }
+        }
+    }
 
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("App data preview")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
+    private var personalizeCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Configuración de la app")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
 
-                        Text("Preview a strip of brand assets and guides so the local experience keeps the same visual tone as the rest of the app.")
-                            .font(.subheadline)
-                            .foregroundStyle(BrandTheme.muted)
+                Text("Separa lo visual de los permisos del iPhone para que la pantalla principal se sienta más liviana y fácil de revisar.")
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(Array(BrandAssetCatalog.shared.allBadgeAssets().prefix(4).enumerated()), id: \.offset) { _, asset in
-                                    previewAssetCard(title: asset.fileName, source: asset, fallback: "seal.fill")
-                                }
+                NavigationLink {
+                    SettingsPreferencesView()
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Apariencia y región",
+                        summary: "Idioma, moneda y tema viven aquí.",
+                        systemImage: "paintpalette.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.preferences")
 
-                                ForEach(Array(BrandAssetCatalog.shared.allAccessoryAssets().prefix(4).enumerated()), id: \.offset) { _, asset in
-                                    previewAssetCard(title: asset.fileName, source: asset, fallback: "wand.and.stars")
-                                }
-                            }
-                            .padding(.horizontal, 2)
-                        }
+                NavigationLink {
+                    SettingsNotificationsView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Avisos y permisos",
+                        summary: "Revisa notificaciones, calendario y ubicación sin llenar esta app de toggles.",
+                        systemImage: "bell.badge.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.notifications")
 
-                        Button("Replay guides") {
-                            GuideProgressStore.resetAll()
-                            showingGuideReplay = true
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
+                Button("Abrir asistente de presupuesto") {
+                    viewModel.presentBudgetWizard()
+                }
+                .buttonStyle(PrimaryCTAStyle())
+                .accessibilityIdentifier("settings.action.budgetWizard")
+            }
+        }
+    }
+
+    private var accountAndHelpCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Cuenta y ayuda")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                SettingsToggleRow(
+                    title: "Recordar este dispositivo",
+                    summary: "Mantiene tu cuenta lista para volver a entrar sin repetir Apple, Google o email cada vez.",
+                    isOn: $rememberDeviceEnabled
+                )
+
+                if viewModel.biometricKind != .none {
+                    Divider()
+
+                    SettingsToggleRow(
+                        title: "Abrir con \(biometricLabel)",
+                        summary: "Usa la biometría del iPhone para abrir la cuenta guardada al volver a la app.",
+                        isOn: $biometricUnlockEnabled
+                    )
+                    .disabled(!rememberDeviceEnabled)
+                    .opacity(rememberDeviceEnabled ? 1 : 0.45)
+                }
+
+                Divider()
+
+                NavigationLink {
+                    ProfileView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Perfil",
+                        summary: "Identidad, nombre del hogar y contexto local de la cuenta.",
+                        systemImage: "person.text.rectangle"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.profile")
+
+                NavigationLink {
+                    PremiumView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Planes",
+                        summary: "Revisa la base gratis, premium y familia.",
+                        systemImage: "sparkles"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.plans")
+
+                NavigationLink {
+                    SharedSpacesView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Spaces y familia",
+                        summary: "Selecciona espacios, invita miembros y administra el plan compartido.",
+                        systemImage: "person.3.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.spaces")
+
+                NavigationLink {
+                    HelpCenterView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Centro de ayuda",
+                        summary: "Respuestas guiadas para las dudas más comunes.",
+                        systemImage: "questionmark.circle.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.help")
+
+                NavigationLink {
+                    SupportCenterView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Centro de soporte",
+                        summary: "Prepara un paquete local más limpio cuando necesites soporte.",
+                        systemImage: "lifepreserver.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.support")
+
+                NavigationLink {
+                    LegalCenterView()
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Centro legal",
+                        summary: "Privacidad, términos y enlaces públicos de confianza.",
+                        systemImage: "doc.text.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.legal")
+            }
+        }
+    }
+
+    private var moreCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Más")
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                NavigationLink {
+                    AdvancedSettingsView(viewModel: viewModel)
+                } label: {
+                    SettingsNavigationRow(
+                        title: "Exportación y soporte avanzado",
+                        summary: "Exporta datos, revisa diagnósticos y prepara soporte cuando haga falta.",
+                        systemImage: "switch.2"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("settings.link.advanced")
+
+                if debugOverlayEnabled {
+                    NavigationLink {
+                        BrandGalleryView()
+                    } label: {
+                        SettingsNavigationRow(
+                            title: "Galería de marca",
+                            summary: "Revisa la librería de personajes y temporadas solo en modo interno.",
+                            systemImage: "swatchpalette.fill"
+                        )
                     }
+                    .buttonStyle(.plain)
+                }
+
+                HStack(spacing: 12) {
+                    Button("Volver a mostrar guías") {
+                        GuideProgressStore.resetAll()
+                        showingGuideReplay = true
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+
+                    Button("Cerrar sesión") {
+                        Task { await viewModel.signOut() }
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .foregroundStyle(.red)
+                }
+            }
+        }
+    }
+}
+
+private struct SettingsPreferencesView: View {
+    @AppStorage("native.settings.language") private var language = "auto"
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
+    @AppStorage("native.settings.theme") private var theme = "finance"
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    SettingsSummaryHeader(
+                        badge: "Apariencia",
+                        title: "Apariencia y región",
+                        summary: "Mantén la configuración visual y regional en un solo lugar para que sea fácil de cambiar y fácil de revisar.",
+                        character: .tikki,
+                        expression: .happy
+                    )
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Preferences")
+                        Text("Básicos")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        settingsPickerRow(title: "Language", selection: $language) {
-                            Text("Auto").tag("auto")
-                            Text("English").tag("en")
-                            Text("Español").tag("es")
+                        SettingsChoiceRow(title: "Idioma", summary: "Por ahora se guarda solo en este dispositivo.", selection: $language) {
+                            Text("Auto".appLocalized).tag("auto")
+                            Text("English".appLocalized).tag("en")
+                            Text("Español".appLocalized).tag("es")
                         }
 
                         Divider()
 
-                        settingsPickerRow(title: "Currency", selection: $currency) {
+                        SettingsChoiceRow(title: "Moneda", summary: "Se usa en dashboard, gastos y exportaciones de este dispositivo.", selection: $currency) {
                             Text("USD").tag("USD")
                             Text("EUR").tag("EUR")
                             Text("GBP").tag("GBP")
@@ -168,358 +347,297 @@ struct SettingsView: View {
 
                         Divider()
 
-                        settingsPickerRow(title: "Theme", selection: $theme) {
-                            Text("Finance").tag("finance")
-                            Text("Midnight").tag("midnight")
-                            Text("Sunrise").tag("sunrise")
+                        SettingsChoiceRow(title: "Tema", summary: "Elige el look general sin cambiar el flujo del producto.", selection: $theme) {
+                            Text("Finance".appLocalized).tag("finance")
+                            Text("Midnight".appLocalized).tag("midnight")
+                            Text("Sunrise".appLocalized).tag("sunrise")
                         }
-
-                        Divider()
-
-                        Toggle(isOn: $remindersEnabled) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Daily reminders")
-                                    .font(.headline)
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("Keep lightweight nudges enabled while you stay on-device. Notification sound follows the device's local reminder flow.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                            }
-                        }
-                        .tint(BrandTheme.primary)
-
-                        Divider()
-
-                        Toggle(isOn: $quietHoursEnabled) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Quiet hours")
-                                    .font(.headline)
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("Pause routine reminder noise during your selected quiet window.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                            }
-                        }
-                        .tint(BrandTheme.primary)
-
-                        settingsPickerRow(title: "Quiet hours start", selection: $quietHoursStart) {
-                            Text("21:00").tag("21:00")
-                            Text("22:00").tag("22:00")
-                            Text("23:00").tag("23:00")
-                            Text("00:00").tag("00:00")
-                        }
-
-                        Divider()
-
-                        settingsPickerRow(title: "Quiet hours end", selection: $quietHoursEnd) {
-                            Text("06:00").tag("06:00")
-                            Text("07:00").tag("07:00")
-                            Text("08:00").tag("08:00")
-                            Text("09:00").tag("09:00")
-                        }
-
-                        Divider()
-
-                        Toggle(isOn: $weekendQuietMode) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Weekend quiet mode")
-                                    .font(.headline)
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("Keep weekends calmer unless you manually open the app.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(BrandTheme.muted)
-                            }
-                        }
-                        .tint(BrandTheme.primary)
-
-                        settingsPickerRow(title: "Max notifications per day", selection: $maxNotificationsPerDay) {
-                            Text("1").tag(1)
-                            Text("2").tag(2)
-                            Text("3").tag(3)
-                        }
-
-                        Divider()
-
-                        settingsPickerRow(title: "Max notifications per week", selection: $maxNotificationsPerWeek) {
-                            Text("3").tag(3)
-                            Text("4").tag(4)
-                            Text("5").tag(5)
-                            Text("6").tag(6)
-                            Text("7").tag(7)
-                        }
-
-                        Divider()
-
-                        settingsPickerRow(title: "Notification sound", selection: $soundStyle) {
-                            Text("Off").tag("off")
-                            Text("Meow").tag("miau")
-                            Text("Playful").tag("playful")
-                        }
-
-                        Button("Test notification sound") {
-                            guard soundStyle != "off" else { return }
-                            let generator = UINotificationFeedbackGenerator()
-                            generator.notificationOccurred(.success)
-                            AudioServicesPlaySystemSound(1104)
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
                     }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
+        }
+        .background(BrandTheme.canvas)
+        .background(alignment: .top) {
+            BrandBackdropView()
+        }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "settingsPreferences.screen")
+        }
+        .accessibilityIdentifier("settingsPreferences.screen")
+        .navigationTitle("Apariencia y región")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct SettingsNotificationsView: View {
+    @ObservedObject var viewModel: AppViewModel
+    @Environment(\.openURL) private var openURL
+
+    private var internalTestingEnabled: Bool {
+        BuildConfiguration.internalTestingEnabled()
+    }
+
+    private var shouldOpenSystemSettings: Bool {
+        viewModel.pushRegistrationStatus.authorization == .denied
+            || viewModel.calendarSyncStatus.authorization == .denied
+            || viewModel.calendarSyncStatus.authorization == .restricted
+            || viewModel.expenseLocationStatus == .denied
+            || viewModel.expenseLocationStatus == .restricted
+    }
+
+    private var shouldOfferPermissionRetry: Bool {
+        viewModel.pushRegistrationStatus.authorization == .notDetermined
+            || viewModel.calendarSyncStatus.authorization == .notDetermined
+            || viewModel.expenseLocationStatus == .notDetermined
+    }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 20) {
+                SurfaceCard {
+                    SettingsSummaryHeader(
+                        badge: "Permisos simples",
+                        title: "Avisos y permisos",
+                        summary: "SpendSage hereda el comportamiento del iPhone. Aquí solo revisas si el dispositivo está listo y, si hace falta, abres Ajustes del sistema.",
+                        character: .manchas,
+                        expression: .happy
+                    )
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Device and export")
+                        Text("Avisos del iPhone")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        BrandMetricTile(
-                            title: "Device",
-                            value: deviceLabel,
-                            systemImage: "iphone"
-                        )
-                        BrandMetricTile(
-                            title: "Version",
-                            value: systemVersionLabel,
-                            systemImage: "info.circle.fill"
+                        BrandFeatureRow(
+                            systemImage: viewModel.pushRegistrationStatus.authorization.systemImage,
+                            title: "Notificaciones",
+                            detail: viewModel.pushRegistrationStatus.authorization.summary
                         )
 
                         BrandFeatureRow(
-                            systemImage: "square.and.arrow.up",
-                            title: "Export center",
-                            detail: "Advanced settings keeps the readable export, JSON snapshot, diagnostics toggle, and support packet tools close at hand."
+                            systemImage: "moon.zzz.fill",
+                            title: "Silencio y concentración",
+                            detail: "SpendSage respeta el modo silencio y los modos de concentración del iPhone automáticamente. No hace falta configurar nada aquí."
                         )
 
-                        NavigationLink {
-                            AdvancedSettingsView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Open export and diagnostics",
-                                summary: "Read the ledger snapshot, copy an export, or share a support packet.",
-                                systemImage: "square.and.arrow.up"
+                        if let lastUploadedAt = viewModel.pushRegistrationStatus.lastUploadedAt, viewModel.session.isAuthenticated {
+                            BrandFeatureRow(
+                                systemImage: "checkmark.seal.fill",
+                                title: "Última verificación",
+                                detail: "Este iPhone quedó vinculado el \(lastUploadedAt.formatted(date: .abbreviated, time: .shortened))."
                             )
                         }
-                        .buttonStyle(.plain)
+
+                        if shouldOfferPermissionRetry {
+                            Button("Revisar permisos ahora") {
+                                Task { await viewModel.bootstrapEssentialPermissionsIfNeeded(force: true) }
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                        }
+
+                        if shouldOpenSystemSettings {
+                            Button("Abrir ajustes del sistema") {
+                                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                                openURL(url)
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                        }
+
+                        Text("Si el iPhone está en silencio, con un modo de concentración activo o sin conexión, Apple decide cómo se entrega el aviso. La app no necesita un ajuste extra para eso.")
+                            .font(.footnote)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Account and tools")
+                        Text("Calendario y ubicación")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        NavigationLink {
-                            ProfileView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Profile",
-                                summary: "Identity, household details, and local account snapshot.",
-                                systemImage: "person.text.rectangle"
+                        BrandFeatureRow(
+                            systemImage: viewModel.calendarSyncStatus.authorization.systemImage,
+                            title: "Calendario",
+                            detail: viewModel.calendarSyncStatus.authorization.summary
+                        )
+
+                        if let lastSyncedAt = viewModel.calendarSyncStatus.lastSyncedAt {
+                            BrandFeatureRow(
+                                systemImage: "calendar.badge.checkmark",
+                                title: "Última sincronización",
+                                detail: "Se actualizaron \(viewModel.calendarSyncStatus.syncedBillCount ?? 0) facturas el \(lastSyncedAt.formatted(date: .abbreviated, time: .shortened))."
                             )
                         }
-                        .buttonStyle(.plain)
 
-                        NavigationLink {
-                            AdvancedSettingsView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Advanced settings",
-                                summary: "Local export center, diagnostics, and support packet tools.",
-                                systemImage: "slider.horizontal.3"
-                            )
-                        }
-                        .buttonStyle(.plain)
+                        BrandFeatureRow(
+                            systemImage: viewModel.expenseLocationStatus.systemImage,
+                            title: "Ubicación",
+                            detail: viewModel.expenseLocationStatus.summary
+                        )
 
-                        Button("Sign out") {
-                            viewModel.signOut()
+                        if viewModel.calendarSyncStatus.authorization == .granted {
+                            Button("Sincronizar facturas ahora") {
+                                Task { await viewModel.syncBillsToCalendar() }
+                            }
+                            .buttonStyle(PrimaryCTAStyle())
+                            .disabled(viewModel.calendarSyncStatus.isSyncing)
+                        } else if shouldOfferPermissionRetry {
+                            Button("Volver a pedir permisos") {
+                                Task { await viewModel.bootstrapEssentialPermissionsIfNeeded(force: true) }
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
                         }
-                        .buttonStyle(SecondaryCTAStyle())
-                        .foregroundStyle(.red)
+
+                        if shouldOpenSystemSettings {
+                            Button("Abrir ajustes del sistema") {
+                                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                                openURL(url)
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                        }
+
+                        Text("SpendSage pide calendario y ubicación al iniciar si todavía no los aprobaste. El calendario se usa para facturas y la ubicación solo mientras la app está abierta para etiquetar un gasto.")
+                            .font(.footnote)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
 
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Help and trust")
-                            .font(.headline)
-                            .foregroundStyle(BrandTheme.ink)
+                if internalTestingEnabled {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Diagnóstico interno")
+                                .font(.headline)
+                                .foregroundStyle(BrandTheme.ink)
 
-                        NavigationLink {
-                            HelpCenterView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Help Center",
-                                summary: "Guided answers, setup flow, and quick paths when you get stuck.",
-                                systemImage: "questionmark.circle.fill"
+                            BrandFeatureRow(
+                                systemImage: viewModel.pushRegistrationStatus.backendEnabled ? "checkmark.icloud.fill" : "icloud.slash.fill",
+                                title: "Backend push",
+                                detail: viewModel.pushRegistrationStatus.backendEnabled
+                                    ? "El backend permite registro push para esta app."
+                                    : "El backend todavía no expone push para esta app."
+                            )
+
+                            BrandFeatureRow(
+                                systemImage: viewModel.pushRegistrationStatus.cachedTokenSuffix == nil ? "iphone.slash" : "iphone.radiowaves.left.and.right",
+                                title: "Token APNs",
+                                detail: viewModel.pushRegistrationStatus.cachedTokenSuffix.map { "Registrado localmente \($0)" }
+                                    ?? "Todavía no hay token APNs guardado en este iPhone."
+                            )
+
+                            if let lastError = viewModel.pushRegistrationStatus.lastError, !lastError.isEmpty {
+                                BrandFeatureRow(
+                                    systemImage: "exclamationmark.triangle.fill",
+                                    title: "Último error",
+                                    detail: lastError
+                                )
+                            }
+
+                            Button(viewModel.pushRegistrationStatus.cachedTokenSuffix == nil ? "Activar push en este iPhone" : "Revalidar push en este iPhone") {
+                                Task { await viewModel.registerPushNotifications() }
+                            }
+                            .buttonStyle(PrimaryCTAStyle())
+                            .disabled(
+                                !viewModel.session.isAuthenticated
+                                    || !viewModel.pushRegistrationStatus.backendEnabled
+                                    || viewModel.pushRegistrationStatus.isRegistering
+                            )
+
+                            Button("Enviar push de prueba") {
+                                Task { await viewModel.sendTestPushNotification() }
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                            .disabled(
+                                !viewModel.session.isAuthenticated
+                                    || !viewModel.pushRegistrationStatus.backendEnabled
+                                    || viewModel.pushRegistrationStatus.cachedTokenSuffix == nil
+                                    || viewModel.pushRegistrationStatus.isSendingTestPush
                             )
                         }
-                        .buttonStyle(.plain)
-
-                        NavigationLink {
-                            SupportCenterView(viewModel: viewModel)
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Support Center",
-                                summary: "Build a local support packet and share a clean troubleshooting summary.",
-                                systemImage: "lifepreserver.fill"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        NavigationLink {
-                            LegalCenterView()
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Legal Center",
-                                summary: "Privacy, terms, and public support links for this build.",
-                                systemImage: "doc.text.fill"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        NavigationLink {
-                            BrandGalleryView()
-                        } label: {
-                            settingsRouteLabel(
-                                title: "Brand Gallery",
-                                summary: "Reference the product's visual language without leaving Settings.",
-                                systemImage: "swatchpalette.fill"
-                            )
-                        }
-                        .buttonStyle(.plain)
                     }
                 }
             }
-            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
-        .sheet(isPresented: $showingGuideReplay) {
-            GuideSheet(guide: GuideLibrary.guide(.dashboard))
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "settingsNotifications.screen")
         }
-        .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.large)
-    }
-
-    private var sessionModeLabel: String {
-        switch viewModel.session {
-        case .signedOut:
-            return "Signed out".appLocalized
-        case .guest:
-            return "Guest local".appLocalized
-        case let .signedIn(email, _):
-            return email.components(separatedBy: "@").first ?? "Signed in"
+        .accessibilityIdentifier("settingsNotifications.screen")
+        .task {
+            await viewModel.refreshPushRegistrationState()
+            await viewModel.refreshCalendarSyncState()
+            await viewModel.refreshExpenseLocationState()
         }
+        .navigationTitle("Avisos y permisos")
+        .navigationBarTitleDisplayMode(.inline)
     }
+}
 
-    private var subscriptionSurface: some View {
-        SurfaceCard {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Subscription and services")
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-
-                Text("Free mode stays local, while restore and manage actions live on the premium surface.")
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                    BrandMetricTile(
-                        title: "Mode",
-                        value: viewModel.session.isAuthenticated ? "Cloud ready" : "Local free",
-                        systemImage: "lock.fill"
-                    )
-                    BrandMetricTile(
-                        title: "Restore",
-                        value: viewModel.session.isAuthenticated ? "Available" : "Sign in first",
-                        systemImage: "arrow.clockwise"
-                    )
-                    BrandMetricTile(
-                        title: "Manage",
-                        value: "Premium",
-                        systemImage: "slider.horizontal.3"
-                    )
-                    BrandMetricTile(
-                        title: "Support",
-                        value: "Connected",
-                        systemImage: "lifepreserver.fill"
-                    )
-                }
-
-                NavigationLink {
-                    PremiumView(viewModel: viewModel)
-                } label: {
-                    settingsRouteLabel(
-                        title: "Open premium surface",
-                        summary: "See restore, manage subscription, and upgrade actions in one place.",
-                        systemImage: "sparkles"
-                    )
-                }
-                .buttonStyle(.plain)
-            }
+private extension PushAuthorizationState {
+    var summary: String {
+        switch self {
+        case .authorized:
+            return "Las notificaciones están permitidas para este iPhone."
+        case .provisional:
+            return "Las notificaciones están permitidas provisionalmente."
+        case .ephemeral:
+            return "La autorización push es temporal."
+        case .denied:
+            return "Las notificaciones están bloqueadas en Ajustes del sistema."
+        case .notDetermined:
+            return "SpendSage te pedirá permiso cuando abras la app con tu cuenta."
         }
     }
 
-    private func previewAssetCard(title: String, source: BrandAssetSource, fallback: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            BrandAssetImage(source: source, fallbackSystemImage: fallback)
-                .frame(width: 72, height: 72)
-                .background(BrandTheme.surfaceTint)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
-                )
-
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(BrandTheme.muted)
-                .frame(width: 88, alignment: .leading)
-                .lineLimit(2)
+    var systemImage: String {
+        switch self {
+        case .authorized, .provisional, .ephemeral:
+            return "bell.badge.fill"
+        case .denied:
+            return "bell.slash.fill"
+        case .notDetermined:
+            return "bell"
         }
     }
+}
 
-    private func themeDisplayName(_ value: String) -> String {
-        switch value {
-        case "midnight":
-            return "Midnight".appLocalized
-        case "sunrise":
-            return "Sunrise".appLocalized
-        default:
-            return "Finance".appLocalized
+private struct SettingsSummaryHeader: View {
+    let badge: String
+    let title: String
+    let summary: String
+    let character: BrandCharacterID
+    let expression: BrandExpression
+
+    var body: some View {
+        BrandCardHeader(
+            badgeText: badge,
+            badgeSystemImage: "sparkles",
+            title: title,
+            summary: summary
+        ) {
+            MascotAvatarView(character: character, expression: expression, size: 68)
         }
     }
+}
 
-    @ViewBuilder
-    private func settingsPickerRow<SelectionValue: Hashable, Content: View>(
-        title: String,
-        selection: Binding<SelectionValue>,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title.appLocalized)
-                    .font(.headline)
-                    .foregroundStyle(BrandTheme.ink)
-                Text("Saved only on this device right now.")
-                    .font(.subheadline)
-                    .foregroundStyle(BrandTheme.muted)
-            }
+private struct SettingsNavigationRow: View {
+    let title: String
+    let summary: String
+    let systemImage: String
 
-            Spacer(minLength: 12)
-
-            Picker(title, selection: selection) {
-                content()
-            }
-            .labelsHidden()
-            .pickerStyle(.menu)
-            .tint(BrandTheme.primary)
-        }
-    }
-
-    private func settingsRouteLabel(title: String, summary: String, systemImage: String) -> some View {
+    var body: some View {
         HStack(alignment: .top, spacing: 14) {
             Image(systemName: systemImage)
                 .font(.headline.weight(.semibold))
@@ -532,13 +650,13 @@ struct SettingsView: View {
                 Text(title.appLocalized)
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
+
                 Text(summary.appLocalized)
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
             }
-
-            Spacer(minLength: 0)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Image(systemName: "chevron.right")
                 .font(.footnote.weight(.bold))
@@ -546,5 +664,107 @@ struct SettingsView: View {
                 .padding(.top, 6)
         }
         .padding(.vertical, 2)
+        .contentShape(Rectangle())
+    }
+}
+
+private struct SettingsChoiceRow<SelectionValue: Hashable, Content: View>: View {
+    let title: String
+    let summary: String
+    @Binding var selection: SelectionValue
+    let content: Content
+
+    init(
+        title: String,
+        summary: String,
+        selection: Binding<SelectionValue>,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.summary = summary
+        _selection = selection
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title.appLocalized)
+                .font(.headline)
+                .foregroundStyle(BrandTheme.ink)
+
+            Text(summary.appLocalized)
+                .font(.subheadline)
+                .foregroundStyle(BrandTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Picker(title, selection: $selection) {
+                content
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .tint(BrandTheme.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(BrandTheme.surfaceTint, in: Capsule())
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(BrandTheme.line.opacity(0.8), lineWidth: 1)
+            )
+        }
+    }
+}
+
+private struct SettingsToggleRow: View {
+    let title: String
+    let summary: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title.appLocalized)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+
+                Text(summary.appLocalized)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .tint(BrandTheme.primary)
+    }
+}
+
+private func settingsThemeDisplayName(_ value: String) -> String {
+    switch value {
+    case "midnight":
+        return "Medianoche"
+    case "sunrise":
+        return "Amanecer"
+    default:
+        return "Finanzas"
+    }
+}
+
+private func settingsSoundDisplayName(_ value: String) -> String {
+    AppNotificationSoundStyle(rawPreference: value).displayName
+}
+
+struct SettingsPreferencesDebugView: View {
+    var body: some View {
+        NavigationStack {
+            SettingsPreferencesView()
+        }
+    }
+}
+
+struct SettingsNotificationsDebugView: View {
+    @ObservedObject var viewModel: AppViewModel
+
+    var body: some View {
+        NavigationStack {
+            SettingsNotificationsView(viewModel: viewModel)
+        }
     }
 }

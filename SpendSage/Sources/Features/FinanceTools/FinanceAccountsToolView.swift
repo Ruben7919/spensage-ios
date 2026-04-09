@@ -14,6 +14,7 @@ private struct AccountDisplayMetadata: Codable {
 
 struct FinanceAccountsToolView: View {
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
 
     @State private var name = ""
     @State private var institution = ""
@@ -27,25 +28,33 @@ struct FinanceAccountsToolView: View {
     @AppStorage("native.accounts.displayMetadata") private var displayMetadataJSON = "{}"
 
     private var totalBalance: Decimal {
-        viewModel.ledger?.totalAccountBalance() ?? 0
+        netWorthAccounts.reduce(Decimal.zero) { $0 + $1.balance }
     }
 
     private var liquidBalance: Decimal {
-        viewModel.ledger?.liquidAccountBalance() ?? 0
+        netWorthAccounts
+            .filter { $0.kind != .creditCard && $0.balance > 0 }
+            .reduce(Decimal.zero) { $0 + $1.balance }
     }
 
     private var creditExposure: Decimal {
-        viewModel.ledger?.creditExposure() ?? 0
+        netWorthAccounts
+            .filter { $0.kind == .creditCard || $0.balance < 0 }
+            .reduce(Decimal.zero) { $0 + ($1.balance < 0 ? -$1.balance : $1.balance) }
     }
 
     private var assetBalance: Decimal {
-        viewModel.ledger?.accounts
+        netWorthAccounts
             .filter { $0.balance > 0 && $0.kind != .creditCard }
-            .reduce(Decimal.zero) { $0 + $1.balance } ?? 0
+            .reduce(Decimal.zero) { $0 + $1.balance }
+    }
+
+    private var storedPrimaryAccountID: UUID? {
+        viewModel.accounts.first(where: \.isPrimary)?.id
     }
 
     private var primaryAccountID: UUID? {
-        viewModel.ledger?.primaryAccount?.id
+        activeAccounts.first(where: { $0.isPrimary })?.id ?? activeAccounts.first?.id
     }
 
     private var editingAccount: AccountRecord? {
@@ -65,6 +74,10 @@ struct FinanceAccountsToolView: View {
         viewModel.accounts.filter { isArchived($0.id) }
     }
 
+    private var netWorthAccounts: [AccountRecord] {
+        activeAccounts.filter { isIncludedInNetWorth($0.id) }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -72,7 +85,10 @@ struct FinanceAccountsToolView: View {
                     eyebrow: "Local-first accounts",
                     title: "Accounts",
                     summary: "Track cash, cards, savings, and investment balances without leaving your device. The net worth line stays visible, and the primary account stays anchored at the top.",
-                    systemImage: "wallet.pass.fill"
+                    systemImage: "wallet.pass.fill",
+                    character: .mei,
+                    expression: .proud,
+                    sceneKey: "guide_15_emergency_fund_shield_mei"
                 )
 
                 if let notice = viewModel.notice {
@@ -88,27 +104,27 @@ struct FinanceAccountsToolView: View {
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                             BrandMetricTile(
                                 title: "Assets",
-                                value: assetBalance.formatted(.currency(code: "USD")),
+                                value: assetBalance.formatted(.currency(code: currencyCode)),
                                 systemImage: "arrow.up.circle.fill"
                             )
                             BrandMetricTile(
                                 title: "Liabilities",
-                                value: creditExposure.formatted(.currency(code: "USD")),
+                                value: creditExposure.formatted(.currency(code: currencyCode)),
                                 systemImage: "arrow.down.circle.fill"
                             )
                             BrandMetricTile(
                                 title: "Liquid",
-                                value: liquidBalance.formatted(.currency(code: "USD")),
+                                value: liquidBalance.formatted(.currency(code: currencyCode)),
                                 systemImage: "drop.fill"
                             )
                             BrandMetricTile(
                                 title: "Net worth",
-                                value: totalBalance.formatted(.currency(code: "USD")),
+                                value: totalBalance.formatted(.currency(code: currencyCode)),
                                 systemImage: "chart.line.uptrend.xyaxis"
                             )
                             BrandMetricTile(
                                 title: "Primary",
-                                value: viewModel.ledger?.primaryAccount?.name ?? "None",
+                                value: activeAccounts.first(where: { $0.id == primaryAccountID })?.name ?? "None".appLocalized,
                                 systemImage: "star.fill"
                             )
                         }
@@ -202,7 +218,7 @@ struct FinanceAccountsToolView: View {
 
                             Picker("Account type", selection: $kind) {
                                 ForEach(AccountKind.allCases) { item in
-                                    Label(item.rawValue, systemImage: item.symbolName)
+                                    Label(item.localizedTitle, systemImage: item.symbolName)
                                         .tag(item)
                                 }
                             }
@@ -241,7 +257,8 @@ struct FinanceAccountsToolView: View {
             }
             .padding(24)
         }
-        .background(BrandTheme.canvas)
+        .background(FinanceScreenBackground())
+        .accessibilityIdentifier("accounts.screen")
         .navigationTitle("Accounts")
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -284,7 +301,7 @@ struct FinanceAccountsToolView: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(account.balance, format: .currency(code: "USD"))
+                    Text(account.balance, format: .currency(code: currencyCode))
                         .font(.headline)
                         .foregroundStyle(balanceState == .liability ? .red : BrandTheme.ink)
 
@@ -294,7 +311,7 @@ struct FinanceAccountsToolView: View {
                 }
             }
 
-            HStack(spacing: 8) {
+            FlowStack(spacing: 8, rowSpacing: 8) {
                 accountChip(title: account.kind.localizedTitle, systemImage: account.kind.symbolName)
                 accountChip(title: balanceState.localizedTitle, systemImage: balanceState.symbolName)
                 accountChip(
@@ -310,7 +327,11 @@ struct FinanceAccountsToolView: View {
 
                 if isPrimary {
                     accountChip(title: "Primary", systemImage: "star.fill")
-                } else {
+                }
+            }
+
+            FlowStack(spacing: 8, rowSpacing: 8) {
+                if !isPrimary {
                     Button("Make primary") {
                         Task { await viewModel.setPrimaryAccount(account.id) }
                     }
@@ -325,7 +346,7 @@ struct FinanceAccountsToolView: View {
                 .controlSize(.small)
 
                 Button(isArchivedAccount ? "Restore" : "Archive") {
-                    toggleArchive(account.id)
+                    Task { await toggleArchive(account.id) }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -336,10 +357,8 @@ struct FinanceAccountsToolView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
 
-                Spacer()
-
                 Button(role: .destructive) {
-                    Task { await viewModel.deleteAccount(account.id) }
+                    Task { await deleteAccount(account.id) }
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }
@@ -373,70 +392,74 @@ struct FinanceAccountsToolView: View {
         errorMessage = nil
     }
 
-    private func accountChip(title: String, systemImage: String) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(BrandTheme.primary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(BrandTheme.primary.opacity(0.12))
-            .clipShape(Capsule())
-    }
-
     private func saveAccount() async {
         guard let balanceValue = FinanceToolFormatting.decimal(from: balance) else {
-            errorMessage = "Enter a valid balance."
+            errorMessage = "Enter a valid balance.".appLocalized
             return
         }
 
-        let wasPrimary = editingAccount?.isPrimary ?? false
+        let wasPrimary = primaryAccountID == editingAccountID
         let originalEditingID = editingAccountID
-        let previousIDs = Set(viewModel.accounts.map(\.id))
         let draftedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
         errorMessage = nil
 
         if let originalEditingID {
-            await viewModel.deleteAccount(originalEditingID)
-        }
-
-        await viewModel.addAccount(
-            AccountDraft(
-                name: name,
-                institution: institution,
-                balance: balanceValue,
-                kind: kind
+            await viewModel.updateAccount(
+                originalEditingID,
+                draft: AccountDraft(
+                    name: name,
+                    institution: institution,
+                    balance: balanceValue,
+                    kind: kind
+                )
             )
-        )
-
-        if wasPrimary, let newPrimaryID = viewModel.accounts.first?.id {
-            await viewModel.setPrimaryAccount(newPrimaryID)
+        } else {
+            await viewModel.addAccount(
+                AccountDraft(
+                    name: name,
+                    institution: institution,
+                    balance: balanceValue,
+                    kind: kind
+                )
+            )
         }
 
-        if let newAccountID = Set(viewModel.accounts.map(\.id)).subtracting(previousIDs).first {
-            updateMetadata(for: newAccountID) { metadata in
+        let targetID = originalEditingID
+            ?? viewModel.accounts.first(where: { $0.name == name && $0.balance == balanceValue && $0.kind == kind })?.id
+
+        if let targetID {
+            updateMetadata(for: targetID) { metadata in
                 metadata.note = draftedNote
                 metadata.isArchived = !active
                 metadata.includeInNetWorth = includeInNetWorth
             }
-        } else if let originalEditingID {
-            updateMetadata(for: originalEditingID) { metadata in
-                metadata.note = draftedNote
-                metadata.isArchived = !active
-                metadata.includeInNetWorth = includeInNetWorth
-            }
+        }
+
+        if let originalEditingID, let targetID, originalEditingID != targetID {
+            removeMetadata(for: originalEditingID)
+        }
+
+        if wasPrimary, active, let targetID {
+            await viewModel.setPrimaryAccount(targetID)
+        } else {
+            await ensurePrimaryAccount()
         }
 
         resetForm()
     }
 
     private func accountChip(title: String, systemImage: String, color: Color = BrandTheme.primary) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(color)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(color.opacity(0.12))
-            .clipShape(Capsule())
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.caption.weight(.semibold))
+            Text(title.appLocalized)
+                .font(.caption.weight(.semibold))
+        }
+        .foregroundStyle(color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(color.opacity(0.12))
+        .clipShape(Capsule())
     }
 
     private func note(for accountID: UUID) -> String {
@@ -459,15 +482,38 @@ struct FinanceAccountsToolView: View {
         displayMetadataJSON = encodeDisplayMetadata(metadata)
     }
 
-    private func toggleArchive(_ accountID: UUID) {
+    private func removeMetadata(for accountID: UUID) {
+        var metadata = displayMetadata
+        metadata.removeValue(forKey: accountID.uuidString)
+        displayMetadataJSON = encodeDisplayMetadata(metadata)
+    }
+
+    private func toggleArchive(_ accountID: UUID) async {
         updateMetadata(for: accountID) { metadata in
             metadata.isArchived.toggle()
         }
+        await ensurePrimaryAccount()
     }
 
     private func toggleNetWorthInclusion(_ accountID: UUID) {
         updateMetadata(for: accountID) { metadata in
             metadata.includeInNetWorth.toggle()
+        }
+    }
+
+    private func deleteAccount(_ accountID: UUID) async {
+        removeMetadata(for: accountID)
+        await viewModel.deleteAccount(accountID)
+        await ensurePrimaryAccount()
+    }
+
+    private func ensurePrimaryAccount() async {
+        if let storedPrimaryAccountID, activeAccounts.contains(where: { $0.id == storedPrimaryAccountID }) {
+            return
+        }
+
+        if let fallback = activeAccounts.first {
+            await viewModel.setPrimaryAccount(fallback.id)
         }
     }
 

@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 private enum ExportMode: String, CaseIterable, Identifiable {
-    case readable = "Readable"
+    case readable = "Legible"
     case json = "JSON"
 
     var id: String { rawValue }
@@ -22,23 +22,34 @@ struct AdvancedSettingsView: View {
     @State private var copiedState = false
     @State private var isPresentingGuide = false
 
+    private var internalTestingEnabled: Bool {
+        BuildConfiguration.internalTestingEnabled()
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 heroCard
                 guideCard
                 deviceControlsCard
+                backendCloudCard
+                internalTesterBillingCard
                 exportCenterCard
                 ledgerSummaryCard
                 supportHandoffCard
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
-        .navigationTitle("Advanced settings")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "advanced.screen")
+        }
+        .accessibilityIdentifier("advanced.screen")
+        .navigationTitle("Avanzado")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {
             GuideSheet(guide: GuideLibrary.guide(.sharing))
@@ -48,50 +59,20 @@ struct AdvancedSettingsView: View {
     private var heroCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                BrandBadge(text: "Control center", systemImage: "switch.2")
+                BrandBadge(text: "Centro de control", systemImage: "switch.2")
 
-                Text("Advanced settings")
+                Text("Avanzado")
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Inspect the ledger, generate a safe export, and keep support details close without leaving the main flow.")
+                Text("Revisa el libro local, genera una exportación segura y ten el soporte a mano sin recargar el flujo principal.")
                     .foregroundStyle(BrandTheme.muted)
 
-                LazyVGrid(
-                    columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                    spacing: 12
-                ) {
-                    BrandMetricTile(
-                        title: "Overlay",
-                        value: debugOverlayEnabled ? "On" : "Off",
-                        systemImage: "circle.grid.3x3.fill"
-                    )
-                    BrandMetricTile(
-                        title: "Diagnostics",
-                        value: includeDiagnostics ? "On" : "Off",
-                        systemImage: "doc.text.magnifyingglass"
-                    )
-                    BrandMetricTile(
-                        title: "Format",
-                        value: exportMode.localizedTitle,
-                        systemImage: "square.and.arrow.up"
-                    )
-                    BrandMetricTile(
-                        title: "Scope",
-                        value: "On device",
-                        systemImage: "lock.fill"
-                    )
-                }
-
-                BrandArtworkSurface {
-                    BrandAssetImage(
-                        source: BrandAssetCatalog.shared.guide("guide_06_sharing_family_manchas"),
-                        fallbackSystemImage: "slider.horizontal.3"
-                    )
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 200)
-                }
+                BrandFeatureRow(
+                    systemImage: "lock.fill",
+                    title: "Todo sigue en este dispositivo",
+                    detail: "Exportación, soporte y diagnóstico se mantienen como acciones conscientes, no como ruido dentro del flujo principal."
+                )
             }
         }
     }
@@ -103,17 +84,17 @@ struct AdvancedSettingsView: View {
                     MascotAvatarView(character: .manchas, expression: .happy, size: 62)
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Sharing and support guide")
+                        Text("Guía de exportación y soporte")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Open the interactive guide that explains exports, support packets, and the collaboration tone across the app.")
+                        Text("Abre la guía interactiva para entender exportaciones, paquetes de soporte y qué información sale realmente del dispositivo.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                     }
                 }
 
-                Button("Open guide") {
+                Button("Abrir guía") {
                     isPresentingGuide = true
                 }
                 .buttonStyle(PrimaryCTAStyle())
@@ -124,17 +105,17 @@ struct AdvancedSettingsView: View {
     private var deviceControlsCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Device controls")
+                Text("Controles del dispositivo")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                Toggle("Enable local debug overlay", isOn: $debugOverlayEnabled)
-                Toggle("Include diagnostics in exports", isOn: $includeDiagnostics)
+                Toggle("Activar overlay local", isOn: $debugOverlayEnabled)
+                Toggle("Incluir diagnóstico en exportaciones", isOn: $includeDiagnostics)
 
                 BrandFeatureRow(
                     systemImage: "lock.doc",
-                    title: "Private by default",
-                    detail: "Exports are built from the ledger already loaded on this device, so you decide when anything leaves the app."
+                    title: "Privado por defecto",
+                    detail: "Las exportaciones se arman con el libro ya cargado en este dispositivo, así que tú decides cuándo algo sale de la app."
                 )
             }
         }
@@ -144,18 +125,18 @@ struct AdvancedSettingsView: View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Text("Export center")
+                    Text("Centro de exportación")
                         .font(.headline)
                         .foregroundStyle(BrandTheme.ink)
                     Spacer()
                     if copiedState {
-                        Text("Copied")
+                        Text("Copiado")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(BrandTheme.primary)
                     }
                 }
 
-                Picker("Format", selection: $exportMode) {
+                Picker("Formato", selection: $exportMode) {
                     ForEach(ExportMode.allCases) { mode in
                         Text(mode.localizedTitle).tag(mode)
                     }
@@ -175,16 +156,90 @@ struct AdvancedSettingsView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
                 HStack(spacing: 12) {
-                    Button("Copy export") {
+                    Button("Copiar exportación") {
                         UIPasteboard.general.string = exportBody
                         copiedState = true
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    ShareLink(item: exportBody, preview: SharePreview("SpendSage Local Export")) {
-                        Text("Share export")
+                    ShareLink(item: exportBody, preview: SharePreview("Exportación local de SpendSage")) {
+                        Text("Compartir exportación")
                     }
                     .buttonStyle(PrimaryCTAStyle())
+                }
+            }
+        }
+    }
+
+    private var backendCloudCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Backend cloud")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        if let backendConfiguration = viewModel.backendConfiguration {
+                            Text(
+                                AppLocalization.localized(
+                                    "%@ · %@",
+                                    arguments: backendConfiguration.environmentName,
+                                    backendConfiguration.hostLabel
+                                )
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                        } else {
+                            Text("Sin configuración remota en el bundle.")
+                                .font(.subheadline)
+                                .foregroundStyle(BrandTheme.muted)
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Button("Actualizar") {
+                        Task {
+                            await viewModel.refreshBackendStatus(force: true)
+                        }
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .disabled(viewModel.backendConfiguration == nil)
+                }
+
+                if let backendStatus = viewModel.backendStatus {
+                    BrandFeatureRow(
+                        systemImage: backendStatus.securityIcon,
+                        title: AppLocalization.localized("Seguridad: %@", arguments: backendStatus.securitySummary),
+                        detail: backendStatus.featureSummary
+                    )
+
+                    if let entitlements = backendStatus.entitlements {
+                        BrandFeatureRow(
+                            systemImage: "person.2.crop.square.stack.fill",
+                            title: AppLocalization.localized("Plan cloud: %@", arguments: entitlements.planDisplayName),
+                            detail: AppLocalization.localized("Features: %@", arguments: entitlements.featuresDisplayLine)
+                        )
+                    } else {
+                        BrandFeatureRow(
+                            systemImage: "person.crop.circle.badge.questionmark",
+                            title: "Entitlements pendientes",
+                            detail: "La sesión actual todavía no devolvió plan ni features cloud."
+                        )
+                    }
+                } else if let backendStatusError = viewModel.backendStatusError {
+                    BrandFeatureRow(
+                        systemImage: "exclamationmark.triangle.fill",
+                        title: "Cloud no verificado",
+                        detail: backendStatusError
+                    )
+                } else {
+                    BrandFeatureRow(
+                        systemImage: "icloud.slash",
+                        title: "Cloud sin leer",
+                        detail: "Usa Actualizar para consultar capacidades, billing y flags del backend."
+                    )
                 }
             }
         }
@@ -193,7 +248,7 @@ struct AdvancedSettingsView: View {
     private var ledgerSummaryCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Ledger summary")
+                Text("Resumen del libro")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
@@ -203,25 +258,62 @@ struct AdvancedSettingsView: View {
                     spacing: 12
                 ) {
                     BrandMetricTile(
-                        title: "Local spend",
+                        title: "Gasto local",
                         value: LocalLedgerExportComposer.currency(state?.budgetSnapshot.monthlySpent ?? 0),
                         systemImage: "chart.bar.fill"
                     )
                     BrandMetricTile(
-                        title: "Remaining",
+                        title: "Restante",
                         value: LocalLedgerExportComposer.currency(state?.budgetSnapshot.remaining ?? 0),
                         systemImage: "shield.lefthalf.filled"
                     )
                     BrandMetricTile(
-                        title: "Last update",
-                        value: viewModel.ledger?.updatedAt.formatted(date: .abbreviated, time: .shortened) ?? "Pending",
+                        title: "Última actualización",
+                        value: viewModel.ledger?.updatedAt.formatted(date: .abbreviated, time: .shortened) ?? "Pendiente",
                         systemImage: "clock.arrow.circlepath"
                     )
                     BrandMetricTile(
-                        title: "Top category",
-                        value: state?.topCategory?.category.localizedTitle ?? "None".appLocalized,
+                        title: "Categoría líder",
+                        value: state?.topCategory?.category.localizedTitle ?? "Sin datos",
                         systemImage: "sparkles.rectangle.stack"
                     )
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var internalTesterBillingCard: some View {
+        if internalTestingEnabled, viewModel.backendConfiguration?.environmentName == "dev" {
+            SurfaceCard {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Billing interno")
+                        .font(.headline)
+                        .foregroundStyle(BrandTheme.ink)
+
+                    Text("Estos overrides existen solo para testing autenticado contra `dev`. Sirven para probar Free, Pro y Family sin cobro real en TestFlight interno.")
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    ForEach(InternalTesterPlanID.allCases, id: \.rawValue) { planID in
+                        let buttonTitle = "Activar " + planID.displayName
+                        if planID == .family {
+                            Button {
+                                Task { await viewModel.activateInternalTesterPlan(planID) }
+                            } label: {
+                                Text(buttonTitle)
+                            }
+                            .buttonStyle(PrimaryCTAStyle())
+                        } else {
+                            Button {
+                                Task { await viewModel.activateInternalTesterPlan(planID) }
+                            } label: {
+                                Text(buttonTitle)
+                            }
+                            .buttonStyle(SecondaryCTAStyle())
+                        }
+                    }
                 }
             }
         }
@@ -232,7 +324,7 @@ struct AdvancedSettingsView: View {
         case .readable:
             let summary = LocalLedgerExportComposer.readableSummary(viewModel: viewModel)
             if includeDiagnostics {
-                return summary + "\n\nDiagnostics\n- Debug overlay: \(debugOverlayEnabled ? "Enabled" : "Disabled")"
+                return summary + "\n\nDiagnóstico\n- Overlay local: \(debugOverlayEnabled ? "Activo" : "Inactivo")"
             }
             return summary
         case .json:
@@ -243,34 +335,70 @@ struct AdvancedSettingsView: View {
     private var supportHandoffCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Support packet")
+                Text("Soporte")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
                 BrandFeatureRow(
                     systemImage: "square.and.arrow.up",
-                    title: "Share exports only when you choose",
-                    detail: "Support packets stay readable before they are copied or sent, so you can review exactly what leaves the device."
+                    title: "Comparte solo cuando quieras",
+                    detail: "Los paquetes de soporte siguen siendo legibles antes de copiarse o enviarse, para que revises exactamente qué sale del dispositivo."
                 )
 
                 BrandFeatureRow(
                     systemImage: "hand.raised.fill",
-                    title: "Keep trust links nearby",
-                    detail: "Open privacy and support directly from here when you need a public reference while testing."
+                    title: "Ten los enlaces de confianza cerca",
+                    detail: "Abre privacidad y soporte desde aquí cuando necesites una referencia pública mientras pruebas la app."
                 )
 
                 HStack(spacing: 12) {
-                    Button("Open support") {
+                    Button("Abrir soporte") {
                         openURL(PublicLegalLinks.support)
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    Button("Open privacy") {
+                    Button("Abrir privacidad") {
                         openURL(PublicLegalLinks.privacy)
                     }
                     .buttonStyle(PrimaryCTAStyle())
                 }
             }
         }
+    }
+}
+
+private extension BackendRuntimeStatus {
+    var securitySummary: String {
+        let checks = [
+            capabilities.security.waf,
+            capabilities.security.kmsAtRest,
+            capabilities.security.cognitoAuth,
+            capabilities.security.webhookSignatureValidation,
+            capabilities.security.rateLimits,
+        ]
+        let readyChecks = checks.filter { $0 }.count
+        return AppLocalization.localized("%d/5 listas", arguments: readyChecks)
+    }
+
+    var featureSummary: String {
+        var flags = [
+            capabilities.features.billing ? "billing" : nil,
+            capabilities.features.pushRegistration ? "push" : nil,
+            capabilities.features.spaces ? "family" : nil,
+            capabilities.features.csvImport ? "csv" : nil,
+            capabilities.features.invoiceScan ? "scan" : nil,
+        ].compactMap(\.self)
+
+        if capabilities.features.aiInsights {
+            flags.append("ai")
+        }
+
+        return flags.isEmpty ? "Sin features cloud activas" : flags.joined(separator: ", ")
+    }
+
+    var securityIcon: String {
+        capabilities.security.waf && capabilities.security.rateLimits && capabilities.security.cognitoAuth
+            ? "checkmark.shield.fill"
+            : "exclamationmark.shield.fill"
     }
 }

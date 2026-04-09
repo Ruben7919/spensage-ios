@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FinanceCsvImportToolView: View {
     @ObservedObject var viewModel: AppViewModel
+    @AppStorage(AppCurrencyFormat.defaultsKey) private var currencyCode = AppCurrencyFormat.defaultCode
 
     @State private var csvText = ""
     @State private var importError: String?
@@ -23,20 +24,26 @@ struct FinanceCsvImportToolView: View {
 
     private var flowStage: String {
         if csvText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Choose"
+            return "Elegir"
         }
         if preview.rows.isEmpty {
-            return "Map"
+            return "Mapear"
         }
-        return "Preview"
+        return "Vista previa"
     }
 
     private var templateSummary: String {
         switch templateKind {
         case .simple:
-            return "Simple CSV template with merchant, amount, category, date, and note columns. Headers are \(hasHeaderRow ? "enabled" : "disabled"), so the first row can stay readable when you paste or preview a file."
+            return AppLocalization.localized(
+                "Simple CSV template with merchant, amount, category, date, and note columns. Headers are %@, so the first row can stay readable when you paste or preview a file.",
+                arguments: (hasHeaderRow ? "enabled" : "disabled").appLocalized
+            )
         case .debitCredit:
-            return "Debit / credit template for statements that split charges and credits into separate columns. Headers are \(hasHeaderRow ? "enabled" : "disabled"), so you can keep the first row readable while checking the mapping."
+            return AppLocalization.localized(
+                "Debit / credit template for statements that split charges and credits into separate columns. Headers are %@, so you can keep the first row readable while checking the mapping.",
+                arguments: (hasHeaderRow ? "enabled" : "disabled").appLocalized
+            )
         }
     }
 
@@ -44,10 +51,11 @@ struct FinanceCsvImportToolView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 FinanceToolsHeaderCard(
-                    eyebrow: "Paste and import",
-                    title: "CSV Import",
-                    summary: "Paste a simple CSV export, preview valid rows, and bring transactions into the local ledger in one step.",
-                    systemImage: "tablecells.fill"
+                    eyebrow: "Pegar e importar",
+                    title: "Importar CSV",
+                    summary: "Pega una exportación CSV simple, revisa las filas válidas y trae transacciones al libro local en un solo paso.",
+                    systemImage: "tablecells.fill",
+                    surface: .csvImport
                 )
 
                 if let notice = viewModel.notice {
@@ -57,56 +65,56 @@ struct FinanceCsvImportToolView: View {
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
                         HStack {
-                            Text("Import flow")
+                            Text("Flujo de importación")
                                 .font(.headline)
                                 .foregroundStyle(BrandTheme.ink)
                             Spacer()
                             BrandBadge(text: flowStage, systemImage: "arrow.right.circle.fill")
                         }
 
-                        Text("Choose a template, map the pasted file cleanly, then preview what will land in the ledger.")
+                        Text("Elige una plantilla, revisa el archivo pegado y luego mira qué aterrizará en el libro.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
 
                         HStack(spacing: 8) {
-                            flowChip(title: "Choose", isActive: flowStage == "Choose", systemImage: "square.and.pencil")
-                            flowChip(title: "Map", isActive: flowStage == "Map", systemImage: "slider.horizontal.3")
-                            flowChip(title: "Preview", isActive: flowStage == "Preview", systemImage: "doc.text.magnifyingglass")
+                            flowChip(title: "Elegir", isActive: flowStage == "Elegir", systemImage: "square.and.pencil")
+                            flowChip(title: "Mapear", isActive: flowStage == "Mapear", systemImage: "slider.horizontal.3")
+                            flowChip(title: "Vista previa", isActive: flowStage == "Vista previa", systemImage: "doc.text.magnifyingglass")
                         }
                     }
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("Templates and presets")
+                        Text("Plantillas y presets")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Pick a template, load a sample dataset, and preview the exact CSV shape before you import.")
+                        Text("Elige una plantilla, carga un ejemplo y mira la forma exacta del CSV antes de importar.")
                             .foregroundStyle(BrandTheme.muted)
 
-                        Picker("Template", selection: $templateKind) {
+                        Picker("Plantilla", selection: $templateKind) {
                             ForEach(TemplateKind.allCases) { kind in
                                 Text(kind.localizedTitle).tag(kind)
                             }
                         }
                         .pickerStyle(.segmented)
 
-                        Toggle("Headers first row", isOn: $hasHeaderRow)
+                        Toggle("Encabezados en la primera fila", isOn: $hasHeaderRow)
                             .tint(BrandTheme.primary)
 
                         HStack(spacing: 12) {
-                            Button("Load sample dataset") {
+                            Button("Cargar ejemplo") {
                                 csvText = templateKind.sampleCSV
                             }
                             .buttonStyle(SecondaryCTAStyle())
 
-                            Button("Preview template") {
+                            Button("Ver plantilla") {
                                 showingTemplatePreview = true
                             }
                             .buttonStyle(SecondaryCTAStyle())
 
-                            Button("Clear") {
+                            Button("Limpiar") {
                                 csvText = ""
                                 importError = nil
                             }
@@ -115,28 +123,28 @@ struct FinanceCsvImportToolView: View {
 
                         BrandFeatureRow(
                             systemImage: "rectangle.on.rectangle.angled",
-                            title: "Template guide",
+                            title: "Guía de plantilla",
                             detail: templateSummary
                         )
 
                         BrandFeatureRow(
                             systemImage: "slider.horizontal.3",
-                            title: "Mapping cue",
-                            detail: "Merchant, amount, category, date, and note aliases are recognized automatically so a pasted statement still previews cleanly."
+                            title: "Pista de mapeo",
+                            detail: "Alias de comercio, monto, categoría, fecha y nota se reconocen automáticamente para que un estado pegado siga previsualizándose bien."
                         )
                     }
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("Expected columns")
+                        Text("Columnas esperadas")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text("Use headers like merchant, amount, category, date, note. The parser also accepts title, payee, description, memo, posted, and transaction date aliases.")
+                        Text("Usa encabezados como merchant, amount, category, date y note. El parser también acepta alias como title, payee, description, memo, posted y transaction date.")
                             .foregroundStyle(BrandTheme.muted)
 
-                        Text("Mapping aliases such as merchant/title/payee, amount/total/price, and date/posted are already recognized to keep the import quick.")
+                        Text("Alias como merchant/title/payee, amount/total/price y date/posted ya se reconocen para mantener la importación rápida.")
                             .font(.footnote)
                             .foregroundStyle(BrandTheme.muted)
                     }
@@ -145,37 +153,41 @@ struct FinanceCsvImportToolView: View {
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 14) {
                         FinanceMultilineField(
-                            label: "Paste CSV text",
+                            label: "Pega el texto CSV",
                             placeholder: CSVExpenseImportParser.sample,
-                            text: $csvText
+                            text: $csvText,
+                            accessibilityIdentifier: "csvImport.field.rawText"
                         )
                     }
                 }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Import preview")
+                        Text("Vista previa de importación")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
-                        HStack(spacing: 12) {
+                        LazyVGrid(
+                            columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                            spacing: 12
+                        ) {
                             BrandMetricTile(
-                                title: "Ready rows",
+                                title: "Filas listas",
                                 value: "\(preview.rows.count)",
                                 systemImage: "checkmark.circle.fill"
                             )
                             BrandMetricTile(
-                                title: "Skipped",
+                                title: "Saltadas",
                                 value: "\(preview.skippedLines.count)",
                                 systemImage: "exclamationmark.triangle.fill"
                             )
                             BrandMetricTile(
                                 title: "Total",
-                                value: totalAmount.formatted(.currency(code: "USD")),
+                                value: totalAmount.formatted(.currency(code: currencyCode)),
                                 systemImage: "banknote.fill"
                             )
                             BrandMetricTile(
-                                title: "Rule match",
+                                title: "Regla aplicada",
                                 value: "\(inferredCategoryCount)",
                                 systemImage: "slider.horizontal.3"
                             )
@@ -183,21 +195,19 @@ struct FinanceCsvImportToolView: View {
 
                         if !preview.headers.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Detected columns")
+                                Text("Columnas detectadas")
                                     .font(.footnote.weight(.semibold))
                                     .foregroundStyle(BrandTheme.muted)
 
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 8) {
-                                        ForEach(preview.headers, id: \.self) { header in
-                                            Text(header)
-                                                .font(.caption.weight(.semibold))
-                                                .foregroundStyle(BrandTheme.primary)
-                                                .padding(.horizontal, 10)
-                                                .padding(.vertical, 6)
-                                                .background(BrandTheme.primary.opacity(0.12))
-                                                .clipShape(Capsule())
-                                        }
+                                FlowStack(spacing: 8, rowSpacing: 8) {
+                                    ForEach(preview.headers, id: \.self) { header in
+                                        Text(header)
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(BrandTheme.primary)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(BrandTheme.primary.opacity(0.12))
+                                            .clipShape(Capsule())
                                     }
                                 }
                             }
@@ -205,8 +215,8 @@ struct FinanceCsvImportToolView: View {
 
                         if preview.rows.isEmpty {
                             FinanceEmptyStateCard(
-                                title: "Nothing ready yet",
-                                summary: "Paste CSV text or load the sample dataset to preview importable rows.",
+                                title: "Todavía no hay nada listo",
+                                summary: "Pega texto CSV o carga el ejemplo para revisar filas importables.",
                                 systemImage: "doc.text.magnifyingglass"
                             )
                         } else {
@@ -225,7 +235,13 @@ struct FinanceCsvImportToolView: View {
                                     HStack(alignment: .top, spacing: 10) {
                                         Image(systemName: "exclamationmark.triangle.fill")
                                             .foregroundStyle(.orange)
-                                        Text("Line \(item.lineNumber): \(item.reason)")
+                                        Text(
+                                            AppLocalization.localized(
+                                                "Line %d: %@",
+                                                arguments: item.lineNumber,
+                                                item.reason.appLocalized
+                                            )
+                                        )
                                             .font(.footnote)
                                             .foregroundStyle(BrandTheme.muted)
                                         Spacer()
@@ -244,6 +260,7 @@ struct FinanceCsvImportToolView: View {
                             Task { await importDrafts() }
                         }
                         .buttonStyle(PrimaryCTAStyle())
+                        .accessibilityIdentifier("csvImport.action.import")
                         .disabled(preview.rows.isEmpty)
                         .opacity(preview.rows.isEmpty ? 0.6 : 1)
                     }
@@ -251,7 +268,8 @@ struct FinanceCsvImportToolView: View {
             }
             .padding(24)
         }
-        .background(BrandTheme.canvas)
+        .background(FinanceScreenBackground())
+        .accessibilityIdentifier("csvImport.screen")
         .navigationTitle("CSV Import")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingTemplatePreview) {
@@ -324,7 +342,7 @@ struct FinanceCsvImportToolView: View {
                         .foregroundStyle(BrandTheme.muted)
                 }
 
-                Label("Line \(row.lineNumber)", systemImage: row.source.symbolName)
+                Label(AppLocalization.localized("Line %d", arguments: row.lineNumber), systemImage: row.source.symbolName)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(row.source.color)
             }
@@ -332,7 +350,7 @@ struct FinanceCsvImportToolView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text(row.draft.amount, format: .currency(code: "USD"))
+                Text(row.draft.amount, format: .currency(code: currencyCode))
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
@@ -344,18 +362,22 @@ struct FinanceCsvImportToolView: View {
     }
 
     private func flowChip(title: String, isActive: Bool, systemImage: String) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(isActive ? BrandTheme.primary : BrandTheme.muted)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background((isActive ? BrandTheme.primary : BrandTheme.muted).opacity(0.12))
-            .clipShape(Capsule())
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.caption.weight(.semibold))
+            Text(title.appLocalized)
+                .font(.caption.weight(.semibold))
+        }
+        .foregroundStyle(isActive ? BrandTheme.primary : BrandTheme.muted)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background((isActive ? BrandTheme.primary : BrandTheme.muted).opacity(0.12))
+        .clipShape(Capsule())
     }
 
     private func importDrafts() async {
         guard !preview.rows.isEmpty else {
-            importError = "Paste a valid CSV dataset first."
+            importError = "Paste a valid CSV dataset first.".appLocalized
             return
         }
 

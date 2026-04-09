@@ -39,20 +39,36 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Scan receipts and capture supporting images.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Create optional due-date reminders for your recurring bills.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Unlock your saved SpendSage account quickly and securely.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Tag an expense with your current place only when you ask SpendSage to do it.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Save exported images and documents.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Import receipts and supporting images.</string>
 	<key>SpendSageCognitoHostedUIDomain</key>
-	<string></string>
+	<string>spendsage-dev-177600645043.auth.us-east-1.amazoncognito.com</string>
 	<key>SpendSageCognitoRedirectSignIn</key>
 	<string>spendsage://auth-callback</string>
 	<key>SpendSageCognitoRedirectSignOut</key>
 	<string>spendsage://auth-logout</string>
 	<key>SpendSageCognitoUserPoolClientId</key>
-	<string></string>
+	<string>7t375oqkn6ihh1rnk3lt0qffv3</string>
+	<key>SpendSageAPIBaseURL</key>
+	<string>https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/</string>
+	<key>SpendSageEnvironmentName</key>
+	<string>dev</string>
+	<key>SpendSageInternalTestingEnabled</key>
+	<string>$(SPENDSAGE_INTERNAL_TESTING_ENABLED)</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UIRequiresFullScreen</key>

@@ -1,0 +1,194 @@
+{
+  "appId": "6761512773",
+  "bundleId": "com.spendsage.ai",
+  "appInfoId": "c9d99a3f-54d4-4d1c-aef4-2443bc5050c6",
+  "appInfo": {
+    "localizations": {
+      "en-US": {
+        "name": "SpendSage AI",
+        "subtitle": "Budget, receipts, and spending",
+        "privacyPolicyUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/privacy-policy"
+      },
+      "es-ES": {
+        "name": "SpendSage AI",
+        "subtitle": "Gastos y presupuesto fácil",
+        "privacyPolicyUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/privacy-policy"
+      }
+    },
+    "primaryCategory": "FINANCE",
+    "secondaryCategory": "PRODUCTIVITY"
+  },
+  "version": {
+    "id": "154498b6-0879-4f5d-88c2-5d439e54ebd2",
+    "reviewDetailId": "71d9b887-6789-44a5-aa80-48b102c4ac7b",
+    "versionString": "1.0",
+    "copyright": "2026 SpendSage AI",
+    "usesIdfa": false,
+    "localizations": {
+      "en-US": {
+        "promotionalText": "Track expenses, scan receipts, and understand your month in a clear, cute, powerful iPhone app.",
+        "description": "SpendSage helps you log expenses, scan receipts, and protect your budget without feeling like you are managing a spreadsheet.\n\nAdd purchases quickly, review the month with clarity, and use receipt scanning to create an editable draft before saving. The experience is designed to feel simple from the first minute, while still being useful enough to give you real context about how your month is going.\n\nWith SpendSage you can:\n\n- log expenses in seconds;\n- scan receipts with on-device assistance;\n- review and correct the draft before saving;\n- see simple insights and tap charts to inspect exact values;\n- configure a guided budget step by step;\n- sync an authenticated personal space across devices;\n- invite household members into a shared family space;\n- optionally tag an expense with your current place;\n- optionally create calendar reminders for recurring bills;\n- follow your progress with levels, streaks, badges, and shareable celebrations.\n\nSpendSage is designed for iPhone with a mobile-first experience, a clear interface, and characters that support progress without making the app feel heavy or confusing.\n\nPrivacy first:\n\n- sign in is required for the native app experience;\n- finance tracking remains local-first by default and only syncs when you are authenticated;\n- there is no active advertising tracking;\n- there is no background geolocation;\n- calendar, notifications, and location access are optional and only used for the features you trigger;\n- receipt scanning uses local device-assisted processing and still requires user review;\n- reliability diagnostics and product events are first-party and collected without third-party analytics SDKs.\n\nSpendSage is a personal-finance support app. It is not a bank and it does not replace professional financial, legal, or tax advice.",
+        "keywords": "expense,budget,receipts,finance,savings,money,spending,tracker,household,scanner",
+        "supportUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/support-and-contact",
+        "marketingUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/disclaimer",
+        "whatsNew": "We refined the first iPhone experience with authenticated cloud sync, shared family spaces and invites, optional notifications, native StoreKit subscriptions, clearer charts, and a friendlier budget setup flow."
+      },
+      "es-ES": {
+        "promotionalText": "Controla gastos, escanea recibos y entiende tu mes con una app clara, cute y poderosa desde tu iPhone.",
+        "description": "SpendSage te ayuda a registrar gastos, escanear recibos y cuidar tu presupuesto sin sentir que estás administrando una hoja de cálculo.\n\nRegistra compras rápido, revisa el mes con claridad y usa el escaneo de recibos para crear un borrador editable antes de guardar. La experiencia está pensada para sentirse simple desde el primer minuto, pero lo bastante útil para darte contexto real sobre cómo vas este mes.\n\nCon SpendSage puedes:\n\n- registrar gastos manualmente en segundos;\n- escanear recibos con ayuda local en el dispositivo;\n- revisar y corregir el borrador antes de guardar;\n- ver análisis simples y tocar gráficas para leer el valor exacto;\n- configurar un presupuesto guiado paso a paso;\n- sincronizar un espacio personal autenticado entre dispositivos;\n- invitar miembros del hogar a un espacio familiar compartido;\n- etiquetar un gasto con tu lugar actual de forma opcional;\n- crear recordatorios de facturas en Calendario de forma opcional;\n- seguir tu progreso con niveles, rachas, badges y celebraciones compartibles.\n\nSpendSage está diseñado para iPhone con una experiencia mobile-first, una UI clara y personajes que acompañan el progreso sin volver la app pesada o confusa.\n\nPrivacidad primero:\n\n- el inicio de sesión es obligatorio para la experiencia nativa;\n- el registro financiero sigue siendo local-first por defecto y solo sincroniza cuando estás autenticado;\n- no hay tracking publicitario activo;\n- no hay geolocalización en background;\n- calendario, notificaciones y ubicación son opcionales y solo se usan cuando tú disparas esa función;\n- el escaneo de recibos usa procesamiento local asistido y requiere revisión del usuario;\n- los diagnósticos de estabilidad y eventos de producto son first-party, sin SDKs analíticos de terceros.\n\nSpendSage es una app de apoyo para finanzas personales. No es un banco ni reemplaza asesoría financiera, legal o tributaria profesional.",
+        "keywords": "gastos,ahorro,presupuesto,recibos,finanzas,scanner,control,metas,budget,expense",
+        "supportUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/support-and-contact",
+        "marketingUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/disclaimer",
+        "whatsNew": "Pulimos la experiencia de iPhone con sync autenticado, espacios familiares compartidos con invites, notificaciones opcionales, suscripciones nativas con StoreKit, mejores gráficas y un presupuesto paso a paso más amable."
+      }
+    },
+    "review": {
+      "contactFirstName": "Ruben",
+      "contactLastName": "Lazaro",
+      "contactPhone": "+593969686491",
+      "contactEmail": "support@spendsage.ai",
+      "demoAccountRequired": false,
+      "notes": "SpendSage is a local-first personal-finance app for iPhone.\n\nReview notes:\n1. Sign in is required. Reviewers can create a fresh account with email or use Sign in with Apple / Google from the first screen.\n2. This TestFlight/external-beta line is intentionally pointed to the authenticated dev backend. That is expected for this beta review.\n3. Free accounts remain local-first after authentication; the core flow is onboarding, dashboard, expense capture, receipt scan, insights, sync, and settings.\n4. Shared family spaces and invite flows are available after sign in, but review can focus on the personal authenticated flow if desired.\n5. Receipt scan uses on-device Vision or VisionKit assistance; the user always reviews and edits the draft before saving.\n6. Calendar, notifications, and location access are optional and only used when the user triggers those features explicitly.\n7. This build does not use cross-app tracking or background geolocation. Reliability diagnostics and product telemetry are first-party only.\n8. StoreKit purchase surfaces are visible in Premium, with products configured in App Store Connect."
+    }
+  },
+  "beta": {
+    "localizations": {
+      "en-US": {
+        "feedbackEmail": "support@spendsage.ai",
+        "marketingUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/support-and-contact",
+        "privacyPolicyUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/privacy-policy",
+        "description": "SpendSage is a local-first personal finance beta for iPhone. Sign in is required before using the app. Testers can create an account with email or continue with Sign in with Apple or Google, then track expenses, sync a personal space, invite a household into a shared family space, validate optional notifications, scan receipts, review insights, configure budgets, and explore native StoreKit purchase surfaces."
+      },
+      "es-MX": {
+        "feedbackEmail": "support@spendsage.ai",
+        "marketingUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/support-and-contact",
+        "privacyPolicyUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/privacy-policy",
+        "description": "SpendSage es una beta local-first de finanzas personales para iPhone. El inicio de sesión es obligatorio antes de usar la app. Los testers pueden crear una cuenta con email o continuar con Sign in with Apple o Google, luego registrar gastos, sincronizar un espacio personal, invitar a su hogar a un espacio familiar compartido, validar notificaciones opcionales, escanear recibos, revisar insights, configurar presupuestos y explorar las pantallas de compra nativas con StoreKit."
+      }
+    }
+  },
+  "build": {
+    "id": "da3f142f-348b-4ebc-a282-0371c7cbf419",
+    "betaLocalizations": {
+      "en-US": {
+        "whatsNew": "Build 27 refines the beta UX with the restored bottom tab bar, cleaner mission and plan language, SES-backed family invite emails, simpler receipt scanning, smoother family-sharing surfaces, and the latest authenticated cloud readiness fixes."
+      },
+      "es-MX": {
+        "whatsNew": "La build 27 pule la UX de beta con el tab bar inferior restaurado, lenguaje más claro de misiones y planes, invitaciones family por SES, escaneo de recibos más simple y los últimos ajustes de sync autenticado."
+      }
+    }
+  },
+  "ageRating": {
+    "declarationId": "c9d99a3f-54d4-4d1c-aef4-2443bc5050c6",
+    "developerAgeRatingInfoUrl": "https://cz2vxbcze4.execute-api.us-east-1.amazonaws.com/dev/public/legal/disclaimer"
+  },
+  "testflight": {
+    "internalGroupId": "2c78be6d-4e47-416d-9ce0-ebe17d85ff1a",
+    "externalGroupId": "af7d1ea2-45ea-4762-9d57-850def545006"
+  },
+  "pricing": {
+    "reviewScreenshotPath": "AppStoreAssets/external-release/iphone-6.9/es/01_inicio_control.png",
+    "subscriptionImagePath": "SpendSage/Resources/Assets.xcassets/AppIcon.appiconset/icon-any-1024.png",
+    "taxCategoryId": "C003",
+    "app": {
+      "basePriceUsd": "0.00",
+      "availableEverywhere": true
+    },
+    "iaps": {
+      "spendsage.remove_ads": {
+        "resourceId": "6761744084",
+        "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/iaps/6761744084",
+        "priceUsd": "7.99",
+        "reviewNote": "Remove Ads non-consumable for authenticated users. Review can verify product visibility and purchase presentation from the Premium screen after sign in.",
+        "localizations": {
+          "en-US": {
+            "name": "SpendSage Remove Ads",
+            "description": "Remove sponsor cards and keep SpendSage focused."
+          },
+          "es-ES": {
+            "name": "SpendSage Quitar anuncios",
+            "description": "Quita anuncios y deja SpendSage más limpio."
+          }
+        }
+      }
+    },
+    "subscriptions": {
+      "groupId": "22018554",
+      "groupUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscription-groups/22018554",
+      "groupLocalizations": {
+        "en-US": {
+          "name": "SpendSage Premium"
+        },
+        "es-ES": {
+          "name": "SpendSage Premium"
+        }
+      },
+      "products": {
+        "spendsage.pro.monthly": {
+          "resourceId": "6761743645",
+          "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscriptions/6761743645",
+          "priceUsd": "4.99",
+          "reviewNote": "Monthly Pro unlock for authenticated users. Premium purchase surfaces live in the iPhone app. Review can validate product display and purchase flow from the Premium screen after sign in.",
+          "localizations": {
+            "en-US": {
+              "name": "SpendSage Pro Monthly",
+              "description": "Cloud sync, scans, insights, and exports"
+            },
+            "es-ES": {
+              "name": "SpendSage Pro mensual",
+              "description": "Sync cloud, recibos con IA y sin anuncios"
+            }
+          }
+        },
+        "spendsage.pro.annual": {
+          "resourceId": "6761744051",
+          "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscriptions/6761744051",
+          "priceUsd": "29.99",
+          "reviewNote": "Annual Pro unlock for authenticated users. Premium purchase surfaces live in the iPhone app. Review can validate product display and purchase flow from the Premium screen after sign in.",
+          "localizations": {
+            "en-US": {
+              "name": "SpendSage Pro Annual",
+              "description": "Full Pro plan billed yearly with cloud sync"
+            },
+            "es-ES": {
+              "name": "SpendSage Pro anual",
+              "description": "Plan Pro anual con sync cloud y recibos IA"
+            }
+          }
+        },
+        "spendsage.family.monthly": {
+          "resourceId": "6761744151",
+          "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscriptions/6761744151",
+          "priceUsd": "7.99",
+          "reviewNote": "Monthly Family unlock for authenticated users. Shared spaces and invite flows are now available in the beta after sign in, and review can validate product availability and purchase presentation from the Premium screen.",
+          "localizations": {
+            "en-US": {
+              "name": "SpendSage Family Monthly",
+              "description": "Shared spaces, invites, cloud sync, and no ads"
+            },
+            "es-ES": {
+              "name": "SpendSage Family mensual",
+              "description": "Espacios compartidos, invites y sync cloud"
+            }
+          }
+        },
+        "spendsage.family.annual": {
+          "resourceId": "6761744152",
+          "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscriptions/6761744152",
+          "priceUsd": "49.99",
+          "reviewNote": "Annual Family unlock for authenticated users. Shared spaces and invite flows are now available in the beta after sign in, and review can validate product availability and purchase presentation from the Premium screen.",
+          "localizations": {
+            "en-US": {
+              "name": "SpendSage Family Annual",
+              "description": "Full Family plan billed yearly with shared spaces"
+            },
+            "es-ES": {
+              "name": "SpendSage Family anual",
+              "description": "Plan Family anual con espacios compartidos"
+            }
+          }
+        }
+      }
+    }
+  }
+}

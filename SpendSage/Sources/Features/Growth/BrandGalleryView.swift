@@ -10,53 +10,149 @@ struct BrandGalleryView: View {
     @State private var selectedGuide: GuideDefinition?
 
     private let swatches: [GallerySwatch] = [
-        GallerySwatch(name: "Background", color: BrandTheme.background),
+        GallerySwatch(name: "Fondo", color: BrandTheme.background),
         GallerySwatch(name: "Canvas", color: BrandTheme.canvas),
-        GallerySwatch(name: "Primary", color: BrandTheme.primary),
-        GallerySwatch(name: "Accent", color: BrandTheme.accent),
+        GallerySwatch(name: "Primario", color: BrandTheme.primary),
+        GallerySwatch(name: "Acento", color: BrandTheme.accent),
         GallerySwatch(name: "Ink", color: BrandTheme.ink),
         GallerySwatch(name: "Glow", color: BrandTheme.glow)
     ]
 
     private let catalog = BrandAssetCatalog.shared
     private var manifest: BrandAssetManifest { catalog.activeManifest }
+    private var activeSeason: BrandSeasonDefinition? { BrandSeasonCatalog.activeSeason() }
+    private var nextSeason: (season: BrandSeasonDefinition, startDate: Date)? { BrandSeasonCatalog.nextSeason() }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 FinanceToolsHeaderCard(
-                    eyebrow: "Brand system",
-                    title: "Brand Gallery",
-                    summary: "A live gallery of the visual building blocks used across SpendSage: palette, mascots, guides, badges, and product storytelling surfaces. The manifest framing keeps the icon, expression, badge, and guide system easy to audit.",
-                    systemImage: "swatchpalette.fill"
+                    eyebrow: "Sistema de marca",
+                    title: "Galería de marca",
+                    summary: "Una vista interna de paleta, mascotas, guías, badges e iconos para auditar que el lenguaje visual de SpendSage siga consistente.",
+                    systemImage: "swatchpalette.fill",
+                    character: .tikki,
+                    expression: .proud,
+                    sceneKey: "guide_17_landing_hero_team"
                 )
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Manifest framing")
+                        Text("Manifiesto visual")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
                         BrandBadge(text: "Manifest \(manifest.version.rawValue.uppercased())", systemImage: "bookmark.fill")
 
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                            BrandMetricTile(title: "Version", value: manifest.version.rawValue.uppercased(), systemImage: "bookmark.fill")
-                            BrandMetricTile(title: "Characters", value: "\(manifest.characters.count)", systemImage: "person.3.fill")
-                            BrandMetricTile(title: "Guides", value: "\(manifest.guides.count)", systemImage: "book.pages.fill")
+                            BrandMetricTile(title: "Versión", value: manifest.version.rawValue.uppercased(), systemImage: "bookmark.fill")
+                            BrandMetricTile(title: "Personajes", value: "\(manifest.characters.count)", systemImage: "person.3.fill")
+                            BrandMetricTile(title: "Guías", value: "\(manifest.guides.count)", systemImage: "book.pages.fill")
                             BrandMetricTile(title: "Badges", value: "\(manifest.badges.count)", systemImage: "seal.fill")
                         }
 
                         BrandFeatureRow(
                             systemImage: "sparkles.rectangle.stack.fill",
-                            title: "Guide-ready system",
-                            detail: "Mascot expressions, badge art, and guide scenes all come from the same manifest, so the product language stays consistent."
+                            title: "Sistema auditable",
+                            detail: "Expresiones, badges y escenas salen del mismo manifiesto para que el icono y los personajes se mantengan coherentes."
                         )
                     }
                 }
 
                 SurfaceCard {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Temporadas")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text("Los cambios visuales por temporada salen de un catálogo pequeño y mantenible, no de condiciones sueltas.")
+                            .foregroundStyle(BrandTheme.muted)
+
+                        ForEach(BrandSeasonCatalog.seasons, id: \.id) { season in
+                            HStack(alignment: .top, spacing: 14) {
+                                BrandAssetImage(
+                                    source: seasonalPreviewSource(for: season),
+                                    fallbackSystemImage: "sparkles"
+                                )
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 92, height: 72)
+                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack(spacing: 8) {
+                                        Text(season.title.appLocalized)
+                                            .font(.headline)
+                                            .foregroundStyle(BrandTheme.ink)
+
+                                        if activeSeason?.id == season.id {
+                                            BrandBadge(text: "Activa".appLocalized, systemImage: "sparkles")
+                                        } else if nextSeason?.season.id == season.id {
+                                            BrandBadge(text: "Siguiente".appLocalized, systemImage: "calendar")
+                                        }
+                                    }
+
+                                    Text(season.summary.appLocalized)
+                                        .font(.subheadline)
+                                        .foregroundStyle(BrandTheme.muted)
+                                        .fixedSize(horizontal: false, vertical: true)
+
+                                    HStack(spacing: 8) {
+                                        BrandAssetImage(
+                                            source: catalog.badge(named: season.badgeAsset),
+                                            fallbackSystemImage: "seal.fill"
+                                        )
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 28, height: 28)
+
+                                        Text(seasonDateLabel(for: season))
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(BrandTheme.primary)
+                                    }
+
+                                    let characterPreviews = seasonCharacterPreviewSources(for: season)
+                                    if !characterPreviews.isEmpty {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            Text("Mascotas del evento")
+                                                .font(.caption.weight(.semibold))
+                                                .foregroundStyle(BrandTheme.muted)
+
+                                            HStack(spacing: 8) {
+                                                ForEach(Array(characterPreviews.enumerated()), id: \.offset) { _, source in
+                                                    BrandAssetImage(
+                                                        source: source,
+                                                        fallbackSystemImage: "sparkles"
+                                                    )
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 64, height: 50)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                                            .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Spacer()
+                            }
+                            .padding(14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                    .fill(BrandTheme.surfaceTint)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                    .stroke(BrandTheme.line.opacity(0.82), lineWidth: 1)
+                            )
+                        }
+                    }
+                }
+
+                SurfaceCard {
                     VStack(alignment: .leading, spacing: 18) {
-                        Text("Brand pack")
+                        Text("Pack principal")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -77,7 +173,7 @@ struct BrandGalleryView: View {
                                             .aspectRatio(contentMode: .fit)
                                             .frame(height: 28)
 
-                                        Text("The same bundled brand assets used across guides, badges, mascots, and product storytelling.")
+                                        Text("Los mismos assets de marca que usa la app para guías, badges, personajes y escenas.")
                                             .font(.subheadline)
                                             .foregroundStyle(BrandTheme.muted)
                                     }
@@ -95,7 +191,7 @@ struct BrandGalleryView: View {
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Color system")
+                        Text("Sistema de color")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
 
@@ -125,7 +221,7 @@ struct BrandGalleryView: View {
                             .foregroundStyle(BrandTheme.ink)
 
                         HStack {
-                            BrandBadge(text: "Guest local mode", systemImage: "iphone.gen3")
+                            BrandBadge(text: "Account-first", systemImage: "person.crop.circle")
                             Spacer()
                             BrandBadge(text: "Premium growth", systemImage: "sparkles")
                         }
@@ -143,7 +239,7 @@ struct BrandGalleryView: View {
                         BrandFeatureRow(
                             systemImage: "sparkles.rectangle.stack.fill",
                             title: "Growth energy",
-                            detail: "Badges, trophies, mascots, and guide surfaces keep the experience lively without breaking the local-first tone."
+                            detail: "Badges, trophies, mascots, and guide surfaces keep the experience lively without breaking the clear account-first product tone."
                         )
                     }
                 }
@@ -245,7 +341,7 @@ struct BrandGalleryView: View {
             .padding(24)
         }
         .background(BrandTheme.canvas)
-        .overlay(alignment: .top) {
+        .background(alignment: .top) {
             BrandBackdropView()
         }
         .navigationTitle("Brand Gallery")
@@ -253,5 +349,39 @@ struct BrandGalleryView: View {
         .sheet(item: $selectedGuide) { guide in
             GuideSheet(guide: guide)
         }
+    }
+
+    private func seasonalPreviewSource(for season: BrandSeasonDefinition) -> BrandAssetSource? {
+        let key = season.guideOverrides[season.spotlightGuideKey] ?? season.spotlightGuideKey
+        return catalog.guideIfAvailable(key) ?? catalog.guideIfAvailable(season.spotlightGuideKey)
+    }
+
+    private func seasonCharacterPreviewSources(for season: BrandSeasonDefinition) -> [BrandAssetSource] {
+        let keys: [String]
+        switch season.id {
+        case .halloween:
+            keys = ["guide_27_tikki_halloween", "guide_28_mei_halloween", "guide_29_manchas_halloween"]
+        case .winterHolidays:
+            keys = ["guide_30_tikki_holiday", "guide_31_mei_holiday", "guide_32_manchas_holiday"]
+        case .newYear:
+            keys = ["guide_33_tikki_new_year", "guide_34_mei_new_year", "guide_35_manchas_new_year"]
+        }
+
+        return keys.compactMap { catalog.guideIfAvailable($0) }
+    }
+
+    private func seasonDateLabel(for season: BrandSeasonDefinition) -> String {
+        if activeSeason?.id == season.id {
+            return "Active on today's date".appLocalized
+        }
+
+        if let nextSeason, nextSeason.season.id == season.id {
+            return AppLocalization.localized(
+                "Starts %@",
+                arguments: nextSeason.startDate.formatted(date: .abbreviated, time: .omitted)
+            )
+        }
+
+        return "Catalog ready".appLocalized
     }
 }
