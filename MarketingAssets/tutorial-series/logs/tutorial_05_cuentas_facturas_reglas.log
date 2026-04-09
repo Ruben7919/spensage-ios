@@ -1,0 +1,83 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/rubenlazaro/Projects/spensage-ios/SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=5C6156AE-37BA-45CD-81AE-0A16A530E5A8" -parallel-testing-enabled NO "-only-testing:SpendSageUITests/SpendSageTutorialUITests/testTutorial05AccountsBillsAndRules" ONLY_ACTIVE_ARCH=YES ARCHS=arm64
+
+Build settings from command line:
+    ARCHS = arm64
+    ONLY_ACTIVE_ARCH = YES
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+2026-04-08 14:04:21.103729-0500 SpendSageUITests-Runner[1720:2275717] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-04-08 14:04:22.283.
+Test Suite 'SpendSageUITests.xctest' started at 2026-04-08 14:04:22.285.
+Test Suite 'SpendSageTutorialUITests' started at 2026-04-08 14:04:22.286.
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial05AccountsBillsAndRules]' started.
+    t =     0.00s Start Test at 2026-04-08 14:04:22.287
+    t =     0.03s Set Up
+    t =     0.04s Open com.spendsage.ai
+    t =     0.04s     Launch com.spendsage.ai
+2026-04-08 14:04:22.687 xcodebuild[1707:2275347] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:04:22.688 xcodebuild[1707:2275347] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     3.24s         Setting up automation session
+    t =     7.10s         Wait for com.spendsage.ai to idle
+    t =    11.71s Waiting 10.0s for "Cuentas" NavigationBar to exist
+    t =    12.79s     Checking `Expect predicate `existsNoRetry == 1` for object "Cuentas" NavigationBar`
+    t =    12.79s         Checking existence of `"Cuentas" NavigationBar`
+    t =    13.69s Swipe up Target Application 'com.spendsage.ai'
+    t =    13.69s     Wait for com.spendsage.ai to idle
+    t =    13.70s     Find the Target Application 'com.spendsage.ai'
+    t =    13.79s     Check for interrupting elements affecting "SpendSage AI" Application
+    t =    13.84s     Synthesize event
+    t =    14.28s     Wait for com.spendsage.ai to idle
+    t =    17.38s Terminate com.spendsage.ai:1758
+    t =    19.02s Open com.spendsage.ai
+    t =    19.02s     Launch com.spendsage.ai
+2026-04-08 14:04:41.333 xcodebuild[1707:2275347] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:04:41.337 xcodebuild[1707:2275347] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    19.72s         Setting up automation session
+    t =    22.94s         Wait for com.spendsage.ai to idle
+    t =    26.43s Waiting 10.0s for "Facturas" NavigationBar to exist
+    t =    27.50s     Checking `Expect predicate `existsNoRetry == 1` for object "Facturas" NavigationBar`
+    t =    27.50s         Checking existence of `"Facturas" NavigationBar`
+    t =    28.38s Swipe up Target Application 'com.spendsage.ai'
+    t =    28.38s     Wait for com.spendsage.ai to idle
+    t =    28.39s     Find the Target Application 'com.spendsage.ai'
+    t =    28.46s     Check for interrupting elements affecting "SpendSage AI" Application
+    t =    28.49s     Synthesize event
+    t =    28.92s     Wait for com.spendsage.ai to idle
+    t =    32.04s Terminate com.spendsage.ai:2043
+    t =    33.74s Open com.spendsage.ai
+    t =    33.74s     Launch com.spendsage.ai
+2026-04-08 14:04:56.031 xcodebuild[1707:2275347] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:04:56.031 xcodebuild[1707:2275347] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    34.40s         Setting up automation session
+    t =    37.43s         Wait for com.spendsage.ai to idle
+    t =    40.52s Waiting 10.0s for "Reglas" NavigationBar to exist
+    t =    41.60s     Checking `Expect predicate `existsNoRetry == 1` for object "Reglas" NavigationBar`
+    t =    41.60s         Checking existence of `"Reglas" NavigationBar`
+    t =    42.64s Swipe up Target Application 'com.spendsage.ai'
+    t =    42.64s     Wait for com.spendsage.ai to idle
+    t =    42.65s     Find the Target Application 'com.spendsage.ai'
+    t =    42.72s     Check for interrupting elements affecting "SpendSage AI" Application
+    t =    42.76s     Synthesize event
+    t =    43.20s     Wait for com.spendsage.ai to idle
+    t =    46.74s Tear Down
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial05AccountsBillsAndRules]' passed (47.032 seconds).
+Test Suite 'SpendSageTutorialUITests' passed at 2026-04-08 14:05:09.323.
+	 Executed 1 test, with 0 failures (0 unexpected) in 47.032 (47.037) seconds
+Test Suite 'SpendSageUITests.xctest' passed at 2026-04-08 14:05:09.325.
+	 Executed 1 test, with 0 failures (0 unexpected) in 47.032 (47.040) seconds
+Test Suite 'Selected tests' passed at 2026-04-08 14:05:09.327.
+	 Executed 1 test, with 0 failures (0 unexpected) in 47.032 (47.044) seconds
+2026-04-08 14:05:10.293 xcodebuild[1707:2275347] [MT] IDETestOperationsObserverDebug: 54.948 elapsed -- Testing started completed.
+2026-04-08 14:05:10.293 xcodebuild[1707:2275347] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-04-08 14:05:10.293 xcodebuild[1707:2275347] [MT] IDETestOperationsObserverDebug: 54.948 sec, +54.948 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/rubenlazaro/Library/Developer/Xcode/DerivedData/SpendSage-cgwioapamhwzhmfhyiwoniotpclb/Logs/Test/Test-SpendSage-2026.04.08_14-04-13--0500.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

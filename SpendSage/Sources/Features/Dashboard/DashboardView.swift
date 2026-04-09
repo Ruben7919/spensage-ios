@@ -127,7 +127,7 @@ struct DashboardView: View {
         JourneyHeroCard(
             eyebrow: "Ciclo diario del dinero",
             title: "Cargando inicio",
-            summary: "Estamos reuniendo tu libro local, la guía del coach y las señales que alimentan el dashboard.",
+            summary: "Estamos reuniendo tus gastos, la guía del coach y las señales que alimentan el dashboard.",
             character: .manchas,
             expression: .thinking,
             sceneKey: "guide_01_dashboard_game_manchas",
@@ -187,7 +187,7 @@ struct DashboardView: View {
     private func strategyCard(growth: DashboardGrowthSnapshot) -> some View {
         GuidedSectionCard(
             title: "Plan de ahorro",
-            summary: "Una lista corta de movimientos locales que protegen tu dinero sin convertir inicio en un reporte denso.",
+            summary: "Una lista corta de movimientos que protegen tu dinero sin convertir inicio en un reporte denso.",
             character: .mei,
             expression: growth.riskState == .urgent ? .warning : .thinking,
             systemImage: "brain.head.profile"
@@ -242,7 +242,7 @@ struct DashboardView: View {
     private func missionSummaryCard(growth: DashboardGrowthSnapshot) -> some View {
         GuidedSectionCard(
             title: "Tablero de misiones",
-            summary: "Una mezcla corta de misiones locales, cloud y especiales para ayudarte a ahorrar sin volver compleja la pantalla principal.",
+            summary: "Una mezcla corta de retos para ayudarte a registrar mejor, ordenar gastos y ahorrar sin volver compleja la pantalla principal.",
             character: .manchas,
             expression: .excited,
             systemImage: "checklist"
@@ -251,9 +251,9 @@ struct DashboardView: View {
                 columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                 spacing: 12
             ) {
-                BrandMetricTile(title: "Locales", value: "\(growth.localMissions.filter { $0.status == .completed }.count)/\(growth.localMissions.count)", systemImage: "house.fill")
-                BrandMetricTile(title: "Cloud", value: "\(growth.cloudMissions.filter { $0.status == .completed }.count)/\(growth.cloudMissions.count)", systemImage: "icloud.fill")
-                BrandMetricTile(title: "Especiales", value: "\(growth.specialMissions.filter { $0.status == .completed }.count)/\(growth.specialMissions.count)", systemImage: "sparkles")
+                BrandMetricTile(title: "Misiones", value: "\(growth.allMissions.filter { $0.status == .completed }.count)/\(growth.allMissions.count)", systemImage: "checklist")
+                BrandMetricTile(title: "En curso", value: "\(growth.allMissions.filter { $0.status != .completed }.count)", systemImage: "figure.walk")
+                BrandMetricTile(title: "Eventos", value: "\(growth.eventCalendar.count)", systemImage: "calendar")
                 BrandMetricTile(title: "Logros", value: "\(growth.trophies.filter { $0.unlocked }.count)", systemImage: "trophy.fill")
             }
 
@@ -267,7 +267,7 @@ struct DashboardView: View {
             if growth.missions.isEmpty {
                 FinanceEmptyStateCard(
                     title: "Todavía no hay misiones",
-                    summary: "Agrega tu primera actividad y el loop del juego se activará aquí.",
+                    summary: "Agrega tu primera actividad y tus retos aparecerán aquí.",
                     systemImage: "sparkles"
                 )
             } else {
@@ -294,7 +294,6 @@ struct DashboardView: View {
                         }
 
                         FlowStack(spacing: 8, rowSpacing: 8) {
-                            BrandBadge(text: mission.track.badgeText, systemImage: mission.track.systemImage)
                             BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
                             BrandBadge(text: mission.cadenceLabel, systemImage: "calendar")
                             if mission.isSeasonal {
@@ -333,7 +332,7 @@ struct DashboardView: View {
                     BrandFeatureRow(
                         systemImage: "checklist.checked",
                         title: AppLocalization.localized("%d misiones más disponibles", arguments: growth.allMissions.count - min(growth.missions.count, 2)),
-                        detail: "Abre el historial para ver el tablero completo de misiones locales, cloud, especiales y el calendario de eventos."
+                        detail: "Abre el historial para ver el tablero completo de misiones y el calendario de eventos."
                     )
                 }
             }
@@ -405,7 +404,7 @@ struct DashboardView: View {
         MascotLoadingCard(
             badgeText: "Cargando inicio",
             title: "Cargando inicio",
-            summary: "Estamos reuniendo el libro local, la guía del coach y las señales por categoría.",
+            summary: "Estamos reuniendo tus gastos, la guía del coach y las señales por categoría.",
             character: .manchas,
             expression: .excited
         )

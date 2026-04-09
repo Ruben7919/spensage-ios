@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,000
+Si tu app financiera tarda en arrancar,
+ya perdio al usuario.
+
+2
+00:00:02,000 --> 00:00:05,000
+En SpendSage empiezas con ingreso,
+gastos fijos y una meta simple.
+
+3
+00:00:05,000 --> 00:00:08,000
+El setup inicial no se siente tecnico.
+Se siente guiado.

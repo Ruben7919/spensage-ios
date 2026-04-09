@@ -120,10 +120,23 @@ struct CreateInviteInput: Encodable, Equatable {
     let expiresInDays: Int?
 }
 
+struct InviteEmailDelivery: Decodable, Equatable {
+    enum Status: String, Decodable, Equatable {
+        case disabled
+        case sent
+        case failed
+    }
+
+    let status: Status
+    let messageId: String?
+    let reason: String?
+}
+
 struct CreateInviteResult: Decodable, Equatable {
     let invite: SpaceInvite
     let deepLink: String
     let webLink: String?
+    let emailDelivery: InviteEmailDelivery?
 }
 
 struct AcceptInviteResult: Decodable, Equatable {

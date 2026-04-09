@@ -7,25 +7,17 @@ struct NativeAppShellView: View {
     private let trailingTabs: [AppViewModel.AppTab] = [.insights, .settings]
 
     var body: some View {
-        GeometryReader { proxy in
-            let deviceBottomInset = proxy.safeAreaInsets.bottom
-            let bottomNavigationContentPadding = max(deviceBottomInset - 14, 2)
-            let bottomNavigationInset = ShellBarMetrics.backgroundHeight + bottomNavigationContentPadding + 12
-
+        VStack(spacing: 0) {
             currentTabContent
                 .tint(BrandTheme.primary)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .environment(\.shellBottomInset, bottomNavigationInset)
-                .safeAreaInset(edge: .bottom, spacing: 0) {
-                    bottomNavigation(
-                        deviceBottomInset: deviceBottomInset,
-                        bottomNavigationContentPadding: bottomNavigationContentPadding
-                    )
-                }
-            .background(BrandTheme.background.ignoresSafeArea())
-            .overlay(alignment: .topLeading) {
-                AccessibilityProbe(identifier: "shell.current.\(viewModel.selectedTab.rawValue)")
-            }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .environment(\.shellBottomInset, 0)
+
+            bottomNavigation
+        }
+        .background(BrandTheme.background.ignoresSafeArea())
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "shell.current.\(viewModel.selectedTab.rawValue)")
         }
         .sheet(item: $viewModel.activeSheet) { sheet in
             switch sheet {
@@ -73,11 +65,16 @@ struct NativeAppShellView: View {
         }
     }
 
-    private func bottomNavigation(deviceBottomInset: CGFloat, bottomNavigationContentPadding: CGFloat) -> some View {
-        ZStack(alignment: .bottom) {
-            ShellNavigationBackground(bottomInset: deviceBottomInset)
+    private var bottomNavigation: some View {
+        VStack(spacing: 0) {
+            LinearGradient(
+                colors: [BrandTheme.shadow.opacity(0.08), .clear],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 12)
 
-            HStack(alignment: .center, spacing: 10) {
+            HStack(alignment: .bottom, spacing: 14) {
                 ForEach(leadingTabs) { tab in
                     ShellNavigationButton(
                         tab: tab,
@@ -100,11 +97,35 @@ struct NativeAppShellView: View {
                     }
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.top, 6)
-            .padding(.bottom, bottomNavigationContentPadding)
+            .padding(.horizontal, 18)
+            .padding(.top, 8)
+            .padding(.bottom, 10)
         }
-        .frame(maxWidth: .infinity)
+        .background(
+            TopRoundedRectangle(cornerRadius: 30)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    TopRoundedRectangle(cornerRadius: 30)
+                        .fill(BrandTheme.surface.opacity(0.26))
+                )
+                .overlay(alignment: .top) {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.white.opacity(0.22), Color.white.opacity(0.04)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(height: 1)
+                }
+                .overlay(
+                    TopRoundedRectangle(cornerRadius: 30)
+                        .stroke(BrandTheme.line.opacity(0.22), lineWidth: 0.8)
+                )
+                .shadow(color: BrandTheme.shadow.opacity(0.04), radius: 10, x: 0, y: -1)
+                .ignoresSafeArea(edges: .bottom)
+        )
     }
 
     private func select(_ tab: AppViewModel.AppTab) {
@@ -118,10 +139,6 @@ struct NativeAppShellView: View {
                 .toolbarBackground(BrandTheme.background.opacity(0.92), for: .navigationBar)
         }
     }
-}
-
-private enum ShellBarMetrics {
-    static let backgroundHeight: CGFloat = 66
 }
 
 private struct ShellBottomInsetKey: EnvironmentKey {
@@ -144,37 +161,22 @@ private struct ShellNavigationButton: View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Image(systemName: tab.systemImage)
-                    .font(.system(size: 17, weight: isSelected ? .bold : .semibold))
-                    .frame(width: 36, height: 32)
-                    .symbolRenderingMode(.hierarchical)
+                    .font(.system(size: 18, weight: .semibold))
+                    .frame(width: 38, height: 38)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(isSelected ? BrandTheme.accent.opacity(0.26) : Color.clear)
+                    )
 
                 Text(tab.title)
-                    .font(.caption2.weight(isSelected ? .bold : .semibold))
+                    .font(.caption2.weight(.semibold))
                     .lineLimit(1)
             }
             .foregroundStyle(isSelected ? BrandTheme.primary : BrandTheme.muted)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
+            .padding(.top, 8)
+            .padding(.bottom, 2)
             .contentShape(Rectangle())
-            .background {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    BrandTheme.surface.opacity(0.98),
-                                    BrandTheme.accent.opacity(0.16)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .stroke(BrandTheme.line.opacity(0.85), lineWidth: 1)
-                        )
-                }
-            }
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("shell.tab.\(tab.rawValue)")
@@ -190,86 +192,27 @@ private struct ReceiptScanDockButton: View {
             VStack(spacing: 8) {
                 ZStack {
                     Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    BrandTheme.primary,
-                                    BrandTheme.glow,
-                                    BrandTheme.accent
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                    Circle()
-                        .fill(Color.white.opacity(0.12))
-                        .padding(3)
+                        .fill(BrandTheme.heroGlowGradient)
                     Image(systemName: "camera.viewfinder")
-                        .font(.system(size: 20, weight: .black))
+                        .font(.system(size: 21, weight: .bold))
                         .foregroundStyle(Color.white)
                 }
-                .frame(width: 56, height: 56)
+                .frame(width: 58, height: 58)
                 .overlay(
                     Circle()
-                        .stroke(Color.white.opacity(isSelected ? 0.72 : 0.34), lineWidth: isSelected ? 2 : 1)
+                        .stroke(Color.white.opacity(0.75), lineWidth: isSelected ? 2 : 0)
                 )
-                .shadow(color: BrandTheme.primary.opacity(0.18), radius: 14, x: 0, y: 8)
-                .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 10, x: 0, y: 5)
+                .shadow(color: BrandTheme.shadow.opacity(0.2), radius: 16, x: 0, y: 10)
 
                 Text("Escanear")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(isSelected ? BrandTheme.primary : BrandTheme.ink)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(BrandTheme.primary)
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
         .accessibilityIdentifier("shell.tab.scan")
-    }
-}
-
-private struct ShellNavigationBackground: View {
-    let bottomInset: CGFloat
-
-    var body: some View {
-        TopRoundedRectangle(cornerRadius: 30)
-            .fill(
-                LinearGradient(
-                    colors: [
-                        BrandTheme.surface.opacity(1),
-                        BrandTheme.surfaceTint.opacity(0.98),
-                        BrandTheme.surfaceTint.opacity(0.95)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .overlay(alignment: .top) {
-                Capsule(style: .continuous)
-                    .fill(Color.white.opacity(0.56))
-                    .frame(height: 1)
-                    .padding(.horizontal, 32)
-                    .padding(.top, 1.5)
-            }
-            .overlay {
-                TopRoundedRectangle(cornerRadius: 30)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                BrandTheme.glow.opacity(0.08),
-                                Color.clear
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-            }
-            .overlay {
-                TopRoundedRectangle(cornerRadius: 30)
-                    .stroke(BrandTheme.line.opacity(0.74), lineWidth: 1)
-            }
-            .shadow(color: BrandTheme.shadow.opacity(0.12), radius: 18, x: 0, y: -2)
-            .frame(height: ShellBarMetrics.backgroundHeight + bottomInset, alignment: .top)
     }
 }
 

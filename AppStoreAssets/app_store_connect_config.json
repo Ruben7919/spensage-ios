@@ -71,10 +71,10 @@
     "id": "da3f142f-348b-4ebc-a282-0371c7cbf419",
     "betaLocalizations": {
       "en-US": {
-        "whatsNew": "Build 26 refines the beta UX with cleaner mission boards, seasonal event visibility, simpler receipt scanning, safer spacing above the tab bar, smoother family-sharing surfaces, and the latest authenticated cloud and TestFlight readiness fixes."
+        "whatsNew": "Build 27 refines the beta UX with the restored bottom tab bar, cleaner mission and plan language, SES-backed family invite emails, simpler receipt scanning, smoother family-sharing surfaces, and the latest authenticated cloud readiness fixes."
       },
       "es-MX": {
-        "whatsNew": "La build 26 pule la UX de beta con misiones más claras, calendario de eventos de temporada, escaneo de recibos más simple, mejor espacio sobre el tab bar, superficies family más fluidas y los últimos ajustes para sync autenticado y salida por TestFlight."
+        "whatsNew": "La build 27 pule la UX de beta con el tab bar inferior restaurado, lenguaje más claro de misiones y planes, invitaciones family por SES, escaneo de recibos más simple y los últimos ajustes de sync autenticado."
       }
     }
   },

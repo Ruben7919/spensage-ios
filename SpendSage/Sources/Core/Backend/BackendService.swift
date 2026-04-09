@@ -234,6 +234,7 @@ private struct BackendInviteCreateEnvelope: Decodable {
     let invite: SpaceInvite
     let deepLink: String
     let webLink: String?
+    let emailDelivery: InviteEmailDelivery?
 }
 
 private struct BackendInviteAcceptEnvelope: Decodable {
@@ -350,7 +351,12 @@ final class LiveBackendService: BackendServicing {
             body: body
         )
         let response = try await perform(request, as: BackendInviteCreateEnvelope.self)
-        return CreateInviteResult(invite: response.invite, deepLink: response.deepLink, webLink: response.webLink)
+        return CreateInviteResult(
+            invite: response.invite,
+            deepLink: response.deepLink,
+            webLink: response.webLink,
+            emailDelivery: response.emailDelivery
+        )
     }
 
     func acceptInvite(idToken: String, code: String) async throws -> AcceptInviteResult {

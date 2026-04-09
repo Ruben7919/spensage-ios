@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,000
+Si registrar un gasto te toma más de 10 segundos,
+esa app ya va tarde.
+
+2
+00:00:02,000 --> 00:00:05,000
+En SpendSage abres la captura
+y llenas solo lo esencial.
+
+3
+00:00:05,000 --> 00:00:08,000
+Abre, registra y sigue.
+Así debería sentirse.

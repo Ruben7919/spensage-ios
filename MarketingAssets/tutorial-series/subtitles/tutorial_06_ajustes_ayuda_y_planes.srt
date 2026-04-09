@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,400
+Todo lo importante
+está aquí.
+
+2
+00:00:02,400 --> 00:00:05,400
+Resuelves dudas
+y revisas tu plan.
+
+3
+00:00:05,400 --> 00:00:10,800
+Rápido,
+y directo.

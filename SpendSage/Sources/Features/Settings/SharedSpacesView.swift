@@ -5,7 +5,7 @@ struct SharedSpacesView: View {
     @Environment(\.shellBottomInset) private var shellBottomInset
 
     @State private var inviteEmail = ""
-    @State private var inviteRole: SpaceRole = .viewer
+    @State private var inviteRole: SpaceRole = .editor
     @State private var inviteExpiryDays = 14
     @State private var acceptCode = ""
 
@@ -37,13 +37,13 @@ struct SharedSpacesView: View {
     private var headerCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                BrandBadge(text: "Cloud sharing", systemImage: "person.3.fill")
+                BrandBadge(text: "Plan familiar", systemImage: "person.3.fill")
 
                 Text("Spaces y familia")
                     .font(.system(size: 30, weight: .black, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Selecciona el espacio activo, invita miembros y controla quién puede editar o solo mirar.")
+                Text("Invita a tu hogar y comparte el presupuesto sin códigos raros ni pasos extra.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -51,9 +51,9 @@ struct SharedSpacesView: View {
                 if let space = viewModel.currentSpace {
                     FlowStack(spacing: 8, rowSpacing: 8) {
                         BrandBadge(text: space.displayTitle, systemImage: space.isPersonalSpace ? "person.fill" : "person.3.fill")
-                        BrandBadge(text: viewModel.currentSpaceRole?.displayName ?? space.role.displayName, systemImage: "person.crop.circle.badge.checkmark")
+                        BrandBadge(text: roleLabel(viewModel.currentSpaceRole ?? space.role), systemImage: "person.crop.circle.badge.checkmark")
                         if let familyModel = viewModel.familySharingModel {
-                            BrandBadge(text: "\(familyModel.memberCount)/\(familyModel.maxMembers) miembros", systemImage: "person.2.fill")
+                            BrandBadge(text: familySeatProgressText(familyModel), systemImage: "person.2.fill")
                         }
                     }
                 }
@@ -93,19 +93,18 @@ struct SharedSpacesView: View {
     private var familyStatusCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Estado family")
+                Text("Tu familia")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
                 if let familyModel = viewModel.familySharingModel {
                     VStack(alignment: .leading, spacing: 10) {
-                        metricRow(title: "Modo", value: familyModel.mode.capitalized)
-                        metricRow(title: "Slots libres", value: "\(familyModel.remainingSlots)")
-                        metricRow(title: "Owner plan", value: familyModel.entitlements.ownerPlanId.capitalized)
-                        metricRow(title: "Invites pendientes", value: "\(familyModel.pendingInviteCount)")
+                        metricRow(title: "Plan", value: planLabel(familyModel.entitlements.ownerPlanId))
+                        metricRow(title: "Miembros", value: familySeatProgressText(familyModel))
+                        metricRow(title: "Invitaciones pendientes", value: "\(familyModel.pendingInviteCount)")
                     }
                 } else {
-                    Text("Todavía no hay estado family cargado para este espacio.")
+                    Text("Todavía estamos cargando el estado de tu familia.")
                         .font(.subheadline)
                         .foregroundStyle(BrandTheme.muted)
                 }
@@ -116,7 +115,7 @@ struct SharedSpacesView: View {
     private var inviteComposerCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Invitar miembro")
+                Text("Invitar a alguien")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
@@ -128,15 +127,11 @@ struct SharedSpacesView: View {
                     .background(BrandTheme.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
-                Picker("Rol", selection: $inviteRole) {
-                    Text("Viewer").tag(SpaceRole.viewer)
-                    Text("Editor").tag(SpaceRole.editor)
-                }
-                .pickerStyle(.segmented)
+                Text("La persona recibirá un enlace para unirse. Si ya tiene cuenta, la invitación aparecerá al iniciar sesión con ese correo.")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(BrandTheme.muted)
 
-                Stepper("Expira en \(inviteExpiryDays) días", value: $inviteExpiryDays, in: 1...60)
-
-                Button("Crear invitación") {
+                Button("Enviar invitación") {
                     Task {
                         await viewModel.createFamilyInvite(
                             recipientEmail: inviteEmail,
@@ -150,18 +145,18 @@ struct SharedSpacesView: View {
 
                 if let invite = viewModel.lastCreatedInvite {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Última invitación")
+                        Text(invite.emailDelivery?.status == .sent ? "Invitación enviada" : "Invitación lista")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(BrandTheme.ink)
 
-                        Text(invite.deepLink)
+                        Text(inviteDeliveryMessage(invite))
                             .font(.footnote)
                             .foregroundStyle(BrandTheme.muted)
-                            .textSelection(.enabled)
+                            .fixedSize(horizontal: false, vertical: true)
 
                         if let url = URL(string: invite.deepLink) {
                             ShareLink(item: url) {
-                                Label("Compartir deep link", systemImage: "square.and.arrow.up")
+                                Label("Compartir invitación", systemImage: "square.and.arrow.up")
                             }
                             .buttonStyle(SecondaryCTAStyle())
                         }
@@ -174,32 +169,26 @@ struct SharedSpacesView: View {
     private var inviteInboxCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Aceptar invitación")
+                Text("Invitaciones para ti")
                     .font(.headline)
                     .foregroundStyle(BrandTheme.ink)
 
-                TextField("Código de invitación", text: $acceptCode)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .padding(12)
-                    .background(BrandTheme.surface)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-
-                Button("Aceptar") {
-                    Task { await viewModel.acceptInvite(code: acceptCode) }
+                if !acceptCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Button("Unirme a la familia") {
+                        Task { await viewModel.acceptInvite(code: acceptCode) }
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
                 }
-                .buttonStyle(PrimaryCTAStyle())
-                .disabled(acceptCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
                 if !viewModel.myInvites.isEmpty {
-                    Divider()
-                    Text("Mis invitaciones")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(BrandTheme.ink)
-
                     ForEach(viewModel.myInvites) { invite in
                         inviteRow(invite)
                     }
+                } else if acceptCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text("Cuando alguien te invite, aparecerá aquí automáticamente al iniciar sesión con el correo correcto.")
+                        .font(.subheadline)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
@@ -224,13 +213,13 @@ struct SharedSpacesView: View {
                                     Text(member.userEmailLower ?? member.userId)
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundStyle(BrandTheme.ink)
-                                    Text(member.role.displayName)
+                                    Text(roleLabel(member.role))
                                         .font(.footnote)
                                         .foregroundStyle(BrandTheme.muted)
                                 }
                                 Spacer()
                                 if member.role != .owner, viewModel.canManageCurrentSpaceMembers {
-                                    Button(member.role == .viewer ? "Promover" : "Pasar a viewer") {
+                                    Button(member.role == .viewer ? "Permitir edición" : "Solo mirar") {
                                         Task {
                                             await viewModel.updateSpaceMember(
                                                 member.userId,
@@ -265,10 +254,10 @@ struct SharedSpacesView: View {
                     ForEach(viewModel.spaceInvites) { invite in
                         HStack(alignment: .top) {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(invite.recipientEmailLower)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(BrandTheme.ink)
-                                Text("\(invite.role.displayName) · \(invite.status.rawValue)")
+                            Text(invite.recipientEmailLower)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(BrandTheme.ink)
+                                Text("\(roleLabel(invite.role)) · \(inviteStatusLabel(invite.status))")
                                     .font(.footnote)
                                     .foregroundStyle(BrandTheme.muted)
                             }
@@ -299,13 +288,89 @@ struct SharedSpacesView: View {
     }
 
     private func inviteRow(_ invite: SpaceInvite) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(invite.recipientEmailLower)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(BrandTheme.ink)
-            Text("\(invite.status.rawValue) · \(invite.role.displayName)")
-                .font(.footnote)
-                .foregroundStyle(BrandTheme.muted)
+        VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(invite.inviterEmailLower ?? "Tu familia")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(BrandTheme.ink)
+                Text("Te invitó como \(roleLabel(invite.role).lowercased()).")
+                    .font(.footnote)
+                    .foregroundStyle(BrandTheme.muted)
+            }
+
+            if invite.status == .pending {
+                Button("Unirme a la familia") {
+                    Task { await viewModel.acceptInvite(code: invite.code) }
+                }
+                .buttonStyle(PrimaryCTAStyle())
+            } else {
+                Text(inviteStatusLabel(invite.status))
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(BrandTheme.primary)
+            }
+        }
+    }
+
+    private func displayMaxMembers(_ model: FamilySharingModel) -> Int {
+        switch model.entitlements.ownerPlanId.lowercased() {
+        case "family":
+            return min(max(model.maxMembers, 1), 5)
+        case "enterprise":
+            return min(max(model.maxMembers, 1), 20)
+        default:
+            return min(max(model.maxMembers, 1), 2)
+        }
+    }
+
+    private func familySeatProgressText(_ model: FamilySharingModel) -> String {
+        "\(model.memberCount)/\(displayMaxMembers(model)) miembros"
+    }
+
+    private func planLabel(_ raw: String) -> String {
+        switch raw.lowercased() {
+        case "family":
+            return "Family"
+        case "personal", "pro":
+            return "Pro"
+        case "enterprise":
+            return "Enterprise"
+        default:
+            return "Gratis"
+        }
+    }
+
+    private func roleLabel(_ role: SpaceRole) -> String {
+        switch role {
+        case .owner:
+            return "Administrador"
+        case .editor:
+            return "Puede editar"
+        case .viewer:
+            return "Solo mirar"
+        }
+    }
+
+    private func inviteStatusLabel(_ status: SpaceInvite.Status) -> String {
+        switch status {
+        case .pending:
+            return "Pendiente"
+        case .accepted:
+            return "Aceptada"
+        case .revoked:
+            return "Revocada"
+        case .expired:
+            return "Expirada"
+        }
+    }
+
+    private func inviteDeliveryMessage(_ invite: CreateInviteResult) -> String {
+        switch invite.emailDelivery?.status {
+        case .sent:
+            return "Le enviamos un correo. Si ya tiene cuenta, solo debe entrar con ese email; si no, puede crear una cuenta y quedará unido a tu familia."
+        case .failed:
+            return "No pudimos enviar el correo automáticamente. Comparte este enlace de respaldo por Mensajes, WhatsApp o Mail."
+        case .disabled, .none:
+            return "Comparte este enlace por Mensajes, WhatsApp o Mail. La app unirá a la persona correcta cuando entre con ese correo."
         }
     }
 

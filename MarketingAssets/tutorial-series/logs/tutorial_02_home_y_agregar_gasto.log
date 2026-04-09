@@ -1,0 +1,129 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/rubenlazaro/Projects/spensage-ios/SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=5C6156AE-37BA-45CD-81AE-0A16A530E5A8" -parallel-testing-enabled NO "-only-testing:SpendSageUITests/SpendSageTutorialUITests/testTutorial02DashboardAndAddExpense" ONLY_ACTIVE_ARCH=YES ARCHS=arm64
+
+Build settings from command line:
+    ARCHS = arm64
+    ONLY_ACTIVE_ARCH = YES
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+2026-04-08 14:02:05.185789-0500 SpendSageUITests-Runner[99861:2270016] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-04-08 14:02:05.997.
+Test Suite 'SpendSageUITests.xctest' started at 2026-04-08 14:02:06.000.
+Test Suite 'SpendSageTutorialUITests' started at 2026-04-08 14:02:06.000.
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial02DashboardAndAddExpense]' started.
+    t =     0.00s Start Test at 2026-04-08 14:02:06.002
+    t =     0.03s Set Up
+    t =     0.04s Open com.spendsage.ai
+    t =     0.04s     Launch com.spendsage.ai
+2026-04-08 14:02:06.279 xcodebuild[99846:2269737] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:02:06.279 xcodebuild[99846:2269737] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.90s         Setting up automation session
+    t =     2.96s         Wait for com.spendsage.ai to idle
+    t =     5.83s Waiting 10.0s for "dashboard.screen" Any to exist
+    t =     6.91s     Checking `Expect predicate `existsNoRetry == 1` for object "dashboard.screen" Any`
+    t =     6.91s         Checking existence of `"dashboard.screen" Any`
+    t =     8.31s Waiting 8.0s for "shell.tab.expenses" Button to exist
+    t =     9.39s     Checking `Expect predicate `existsNoRetry == 1` for object "shell.tab.expenses" Button`
+    t =     9.39s         Checking existence of `"shell.tab.expenses" Button`
+    t =     9.41s Tap "shell.tab.expenses" Button
+    t =     9.41s     Wait for com.spendsage.ai to idle
+    t =     9.41s     Find the "shell.tab.expenses" Button
+    t =     9.42s     Check for interrupting elements affecting "shell.tab.expenses" Button
+    t =     9.52s     Synthesize event
+    t =     9.83s     Wait for com.spendsage.ai to idle
+    t =    10.82s Waiting 8.0s for "expenses.screen" Any to exist
+    t =    11.90s     Checking `Expect predicate `existsNoRetry == 1` for object "expenses.screen" Any`
+    t =    11.90s         Checking existence of `"expenses.screen" Any`
+    t =    12.83s Waiting 8.0s for "expenses.action.add" Button to exist
+    t =    13.91s     Checking `Expect predicate `existsNoRetry == 1` for object "expenses.action.add" Button`
+    t =    13.91s         Checking existence of `"expenses.action.add" Button`
+    t =    13.96s Tap "expenses.action.add" Button
+    t =    13.96s     Wait for com.spendsage.ai to idle
+    t =    13.97s     Find the "expenses.action.add" Button
+    t =    14.02s     Check for interrupting elements affecting "expenses.action.add" Button
+    t =    14.10s     Synthesize event
+    t =    14.14s         Scroll element to visible
+    t =    14.14s         Find the "expenses.action.add" Button
+    t =    14.30s         Computed hit point {117.5, 744} after scrolling to visible
+    t =    14.59s     Wait for com.spendsage.ai to idle
+    t =    15.71s Waiting 8.0s for "addExpense.screen" Any to exist
+    t =    16.78s     Checking `Expect predicate `existsNoRetry == 1` for object "addExpense.screen" Any`
+    t =    16.78s         Checking existence of `"addExpense.screen" Any`
+    t =    17.77s Waiting 8.0s for "addExpense.field.merchant" TextField to exist
+    t =    18.86s     Checking `Expect predicate `existsNoRetry == 1` for object "addExpense.field.merchant" TextField`
+    t =    18.86s         Checking existence of `"addExpense.field.merchant" TextField`
+    t =    18.99s Tap "addExpense.field.merchant" TextField
+    t =    18.99s     Wait for com.spendsage.ai to idle
+    t =    18.99s     Find the "addExpense.field.merchant" TextField
+    t =    19.08s     Check for interrupting elements affecting "addExpense.field.merchant" TextField
+    t =    19.14s     Synthesize event
+    t =    19.44s     Wait for com.spendsage.ai to idle
+    t =    19.72s Find the "addExpense.field.merchant" TextField
+    t =    19.87s Type 'Supermaxi' into "addExpense.field.merchant" TextField
+    t =    19.87s     Wait for com.spendsage.ai to idle
+    t =    19.87s     Find the "addExpense.field.merchant" TextField
+    t =    19.99s     Check for interrupting elements affecting "addExpense.field.merchant" TextField
+    t =    20.06s     Synthesize event
+    t =    20.41s     Wait for com.spendsage.ai to idle
+    t =    21.26s Waiting 8.0s for "addExpense.field.amount" TextField to exist
+    t =    22.34s     Checking `Expect predicate `existsNoRetry == 1` for object "addExpense.field.amount" TextField`
+    t =    22.34s         Checking existence of `"addExpense.field.amount" TextField`
+    t =    22.52s Tap "addExpense.field.amount" TextField
+    t =    22.52s     Wait for com.spendsage.ai to idle
+    t =    22.52s     Find the "addExpense.field.amount" TextField
+    t =    22.65s     Check for interrupting elements affecting "addExpense.field.amount" TextField
+    t =    22.71s     Synthesize event
+    t =    22.72s         Scroll element to visible
+    t =    22.72s         Find the "addExpense.field.amount" TextField
+    t =    22.86s         Computed hit point {201, 527} after scrolling to visible
+    t =    23.15s     Wait for com.spendsage.ai to idle
+    t =    23.59s Find the "addExpense.field.amount" TextField
+    t =    23.72s Find the "addExpense.field.amount" TextField
+    t =    23.83s Type '' into "addExpense.field.amount" TextField
+    t =    23.83s     Wait for com.spendsage.ai to idle
+    t =    23.83s     Find the "addExpense.field.amount" TextField
+    t =    23.95s     Check for interrupting elements affecting "addExpense.field.amount" TextField
+    t =    24.02s     Synthesize event
+    t =    24.31s     Wait for com.spendsage.ai to idle
+    t =    24.58s Type '42.80' into "addExpense.field.amount" TextField
+    t =    24.58s     Wait for com.spendsage.ai to idle
+    t =    24.59s     Find the "addExpense.field.amount" TextField
+    t =    24.74s     Check for interrupting elements affecting "addExpense.field.amount" TextField
+    t =    24.83s     Synthesize event
+    t =    25.12s     Wait for com.spendsage.ai to idle
+    t =    26.34s Waiting 8.0s for "addExpense.action.save" Button to exist
+    t =    27.41s     Checking `Expect predicate `existsNoRetry == 1` for object "addExpense.action.save" Button`
+    t =    27.41s         Checking existence of `"addExpense.action.save" Button`
+    t =    27.59s Tap "addExpense.action.save" Button
+    t =    27.59s     Wait for com.spendsage.ai to idle
+    t =    27.60s     Find the "addExpense.action.save" Button
+    t =    27.73s     Check for interrupting elements affecting "addExpense.action.save" Button
+    t =    27.79s     Synthesize event
+    t =    27.80s         Scroll element to visible
+    t =    27.80s         Find the "addExpense.action.save" Button
+    t =    27.96s         Computed hit point {201, 556.3333740234375} after scrolling to visible
+    t =    28.25s     Wait for com.spendsage.ai to idle
+    t =    29.08s Waiting 8.0s for "expenses.screen" Any to exist
+    t =    30.14s     Checking `Expect predicate `existsNoRetry == 1` for object "expenses.screen" Any`
+    t =    30.14s         Checking existence of `"expenses.screen" Any`
+    t =    31.67s Tear Down
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial02DashboardAndAddExpense]' passed (31.948 seconds).
+Test Suite 'SpendSageTutorialUITests' passed at 2026-04-08 14:02:37.951.
+	 Executed 1 test, with 0 failures (0 unexpected) in 31.948 (31.951) seconds
+Test Suite 'SpendSageUITests.xctest' passed at 2026-04-08 14:02:37.952.
+	 Executed 1 test, with 0 failures (0 unexpected) in 31.948 (31.952) seconds
+Test Suite 'Selected tests' passed at 2026-04-08 14:02:37.953.
+	 Executed 1 test, with 0 failures (0 unexpected) in 31.948 (31.955) seconds
+2026-04-08 14:02:38.494 xcodebuild[99846:2269737] [MT] IDETestOperationsObserverDebug: 35.319 elapsed -- Testing started completed.
+2026-04-08 14:02:38.494 xcodebuild[99846:2269737] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-04-08 14:02:38.494 xcodebuild[99846:2269737] [MT] IDETestOperationsObserverDebug: 35.319 sec, +35.319 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/rubenlazaro/Library/Developer/Xcode/DerivedData/SpendSage-cgwioapamhwzhmfhyiwoniotpclb/Logs/Test/Test-SpendSage-2026.04.08_14-02-01--0500.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

@@ -1,0 +1,151 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/rubenlazaro/Projects/spensage-ios/SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=5C6156AE-37BA-45CD-81AE-0A16A530E5A8" -parallel-testing-enabled NO "-only-testing:SpendSageUITests/SpendSageTutorialUITests/testTutorial01OnboardingFirstWin" ONLY_ACTIVE_ARCH=YES ARCHS=arm64
+
+Build settings from command line:
+    ARCHS = arm64
+    ONLY_ACTIVE_ARCH = YES
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+2026-04-08 14:01:26.736718-0500 SpendSageUITests-Runner[99398:2268331] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-04-08 14:01:27.466.
+Test Suite 'SpendSageUITests.xctest' started at 2026-04-08 14:01:27.466.
+Test Suite 'SpendSageTutorialUITests' started at 2026-04-08 14:01:27.466.
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial01OnboardingFirstWin]' started.
+    t =     0.00s Start Test at 2026-04-08 14:01:27.467
+    t =     0.02s Set Up
+    t =     0.02s Open com.spendsage.ai
+    t =     0.02s     Launch com.spendsage.ai
+2026-04-08 14:01:27.728 xcodebuild[99382:2268098] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:01:27.728 xcodebuild[99382:2268098] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.28s         Setting up automation session
+    t =     2.22s         Wait for com.spendsage.ai to idle
+    t =     4.12s Waiting 10.0s for "onboarding.screen" Any to exist
+    t =     5.18s     Checking `Expect predicate `existsNoRetry == 1` for object "onboarding.screen" Any`
+    t =     5.19s         Checking existence of `"onboarding.screen" Any`
+    t =     6.36s Waiting 8.0s for "onboarding.field.monthlyIncome" TextField to exist
+    t =     7.46s     Checking `Expect predicate `existsNoRetry == 1` for object "onboarding.field.monthlyIncome" TextField`
+    t =     7.46s         Checking existence of `"onboarding.field.monthlyIncome" TextField`
+    t =     7.50s Tap "onboarding.field.monthlyIncome" TextField
+    t =     7.50s     Wait for com.spendsage.ai to idle
+    t =     7.51s     Find the "onboarding.field.monthlyIncome" TextField
+    t =     7.53s     Check for interrupting elements affecting "onboarding.field.monthlyIncome" TextField
+    t =     7.56s     Synthesize event
+    t =     7.57s         Scroll element to visible
+    t =     7.57s         Find the "onboarding.field.monthlyIncome" TextField
+    t =     7.60s         Computed hit point {201, 829} after scrolling to visible
+    t =     7.90s     Wait for com.spendsage.ai to idle
+    t =     8.61s Find the "onboarding.field.monthlyIncome" TextField
+    t =     8.68s Type '3200' into "onboarding.field.monthlyIncome" TextField
+    t =     8.68s     Wait for com.spendsage.ai to idle
+    t =     8.68s     Find the "onboarding.field.monthlyIncome" TextField
+    t =     8.70s     Check for interrupting elements affecting "onboarding.field.monthlyIncome" TextField
+    t =     8.73s     Synthesize event
+    t =     9.00s     Wait for com.spendsage.ai to idle
+    t =     9.94s Waiting 8.0s for "onboarding.field.fixedBills" TextField to exist
+    t =    11.01s     Checking `Expect predicate `existsNoRetry == 1` for object "onboarding.field.fixedBills" TextField`
+    t =    11.01s         Checking existence of `"onboarding.field.fixedBills" TextField`
+    t =    11.05s Tap "onboarding.field.fixedBills" TextField
+    t =    11.05s     Wait for com.spendsage.ai to idle
+    t =    11.05s     Find the "onboarding.field.fixedBills" TextField
+    t =    11.08s     Check for interrupting elements affecting "onboarding.field.fixedBills" TextField
+    t =    11.10s     Synthesize event
+    t =    11.11s         Scroll element to visible
+    t =    11.11s         Find the "onboarding.field.fixedBills" TextField
+    t =    11.15s         Computed hit point {201, 572} after scrolling to visible
+    t =    11.43s     Wait for com.spendsage.ai to idle
+    t =    11.87s Find the "onboarding.field.fixedBills" TextField
+    t =    11.91s Type '1250' into "onboarding.field.fixedBills" TextField
+    t =    11.91s     Wait for com.spendsage.ai to idle
+    t =    11.91s     Find the "onboarding.field.fixedBills" TextField
+    t =    11.95s     Check for interrupting elements affecting "onboarding.field.fixedBills" TextField
+    t =    11.97s     Synthesize event
+    t =    12.24s     Wait for com.spendsage.ai to idle
+    t =    13.15s Waiting 8.0s for "onboarding.field.currentBalance" TextField to exist
+    t =    14.23s     Checking `Expect predicate `existsNoRetry == 1` for object "onboarding.field.currentBalance" TextField`
+    t =    14.23s         Checking existence of `"onboarding.field.currentBalance" TextField`
+    t =    14.28s Tap "onboarding.field.currentBalance" TextField
+    t =    14.28s     Wait for com.spendsage.ai to idle
+    t =    14.28s     Find the "onboarding.field.currentBalance" TextField
+    t =    14.30s     Check for interrupting elements affecting "onboarding.field.currentBalance" TextField
+    t =    14.33s     Synthesize event
+    t =    14.34s         Scroll element to visible
+    t =    14.34s         Find the "onboarding.field.currentBalance" TextField
+    t =    14.38s         Computed hit point {201, 572} after scrolling to visible
+    t =    14.67s     Wait for com.spendsage.ai to idle
+    t =    15.09s Find the "onboarding.field.currentBalance" TextField
+    t =    15.13s Type '840' into "onboarding.field.currentBalance" TextField
+    t =    15.13s     Wait for com.spendsage.ai to idle
+    t =    15.13s     Find the "onboarding.field.currentBalance" TextField
+    t =    15.16s     Check for interrupting elements affecting "onboarding.field.currentBalance" TextField
+    t =    15.18s     Synthesize event
+    t =    15.44s     Wait for com.spendsage.ai to idle
+    t =    16.38s Waiting 8.0s for "onboarding.action.continueToGoal" Button to exist
+    t =    17.45s     Checking `Expect predicate `existsNoRetry == 1` for object "onboarding.action.continueToGoal" Button`
+    t =    17.45s         Checking existence of `"onboarding.action.continueToGoal" Button`
+    t =    17.52s Tap "onboarding.action.continueToGoal" Button
+    t =    17.52s     Wait for com.spendsage.ai to idle
+    t =    17.52s     Find the "onboarding.action.continueToGoal" Button
+    t =    17.55s     Check for interrupting elements affecting "onboarding.action.continueToGoal" Button
+    t =    17.57s     Synthesize event
+    t =    17.58s         Scroll element to visible
+    t =    17.58s         Find the "onboarding.action.continueToGoal" Button
+    t =    17.62s         Computed hit point {201, 556.33334350585938} after scrolling to visible
+    t =    17.91s     Wait for com.spendsage.ai to idle
+    t =    18.65s Waiting 8.0s for "onboarding.field.goalTarget" TextField to exist
+    t =    19.73s     Checking `Expect predicate `existsNoRetry == 1` for object "onboarding.field.goalTarget" TextField`
+    t =    19.73s         Checking existence of `"onboarding.field.goalTarget" TextField`
+    t =    19.76s Tap "onboarding.field.goalTarget" TextField
+    t =    19.76s     Wait for com.spendsage.ai to idle
+    t =    19.76s     Find the "onboarding.field.goalTarget" TextField
+    t =    19.79s     Check for interrupting elements affecting "onboarding.field.goalTarget" TextField
+    t =    19.82s     Synthesize event
+    t =    20.11s     Wait for com.spendsage.ai to idle
+    t =    20.12s Find the "onboarding.field.goalTarget" TextField
+    t =    20.15s Type '1500' into "onboarding.field.goalTarget" TextField
+    t =    20.15s     Wait for com.spendsage.ai to idle
+    t =    20.15s     Find the "onboarding.field.goalTarget" TextField
+    t =    20.17s     Check for interrupting elements affecting "onboarding.field.goalTarget" TextField
+    t =    20.20s     Synthesize event
+    t =    20.46s     Wait for com.spendsage.ai to idle
+    t =    21.38s Waiting 8.0s for "onboarding.action.showPreview" Button to exist
+    t =    22.45s     Checking `Expect predicate `existsNoRetry == 1` for object "onboarding.action.showPreview" Button`
+    t =    22.45s         Checking existence of `"onboarding.action.showPreview" Button`
+    t =    22.53s Tap "onboarding.action.showPreview" Button
+    t =    22.53s     Wait for com.spendsage.ai to idle
+    t =    22.53s     Find the "onboarding.action.showPreview" Button
+    t =    22.57s     Check for interrupting elements affecting "onboarding.action.showPreview" Button
+    t =    22.59s     Synthesize event
+    t =    22.60s         Scroll element to visible
+    t =    22.60s         Find the "onboarding.action.showPreview" Button
+    t =    22.64s         Computed hit point {282.5, 545.33332824707031} after scrolling to visible
+    t =    22.93s     Wait for com.spendsage.ai to idle
+    t =    25.45s Waiting 8.0s for "onboarding.action.getStarted" Button to exist
+    t =    26.52s     Checking `Expect predicate `existsNoRetry == 1` for object "onboarding.action.getStarted" Button`
+    t =    26.53s         Checking existence of `"onboarding.action.getStarted" Button`
+    t =    26.59s Tap "onboarding.action.getStarted" Button
+    t =    26.59s     Wait for com.spendsage.ai to idle
+    t =    26.59s     Find the "onboarding.action.getStarted" Button
+    t =    26.62s     Check for interrupting elements affecting "onboarding.action.getStarted" Button
+    t =    26.64s     Synthesize event
+    t =    26.93s     Wait for com.spendsage.ai to idle
+    t =    29.13s Tear Down
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial01OnboardingFirstWin]' passed (29.428 seconds).
+Test Suite 'SpendSageTutorialUITests' passed at 2026-04-08 14:01:56.897.
+	 Executed 1 test, with 0 failures (0 unexpected) in 29.428 (29.431) seconds
+Test Suite 'SpendSageUITests.xctest' passed at 2026-04-08 14:01:56.898.
+	 Executed 1 test, with 0 failures (0 unexpected) in 29.428 (29.432) seconds
+Test Suite 'Selected tests' passed at 2026-04-08 14:01:56.899.
+	 Executed 1 test, with 0 failures (0 unexpected) in 29.428 (29.433) seconds
+2026-04-08 14:01:57.391 xcodebuild[99382:2268098] [MT] IDETestOperationsObserverDebug: 32.631 elapsed -- Testing started completed.
+2026-04-08 14:01:57.391 xcodebuild[99382:2268098] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-04-08 14:01:57.391 xcodebuild[99382:2268098] [MT] IDETestOperationsObserverDebug: 32.631 sec, +32.631 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/rubenlazaro/Library/Developer/Xcode/DerivedData/SpendSage-cgwioapamhwzhmfhyiwoniotpclb/Logs/Test/Test-SpendSage-2026.04.08_14-01-23--0500.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

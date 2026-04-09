@@ -1,0 +1,78 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/rubenlazaro/Projects/spensage-ios/SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=5C6156AE-37BA-45CD-81AE-0A16A530E5A8" -parallel-testing-enabled NO "-only-testing:SpendSageUITests/SpendSageTutorialUITests/testTutorial03ScanReceiptReviewAndSave" ONLY_ACTIVE_ARCH=YES ARCHS=arm64
+
+Build settings from command line:
+    ARCHS = arm64
+    ONLY_ACTIVE_ARCH = YES
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+2026-04-08 14:02:46.591718-0500 SpendSageUITests-Runner[804:2272234] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-04-08 14:02:47.422.
+Test Suite 'SpendSageUITests.xctest' started at 2026-04-08 14:02:47.422.
+Test Suite 'SpendSageTutorialUITests' started at 2026-04-08 14:02:47.422.
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial03ScanReceiptReviewAndSave]' started.
+    t =     0.00s Start Test at 2026-04-08 14:02:47.423
+    t =     0.02s Set Up
+    t =     0.03s Open com.spendsage.ai
+    t =     0.03s     Launch com.spendsage.ai
+2026-04-08 14:02:47.727 xcodebuild[374:2271680] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:02:47.727 xcodebuild[374:2271680] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.55s         Setting up automation session
+    t =     2.72s         Wait for com.spendsage.ai to idle
+    t =     5.11s Waiting 10.0s for "scan.screen" Any to exist
+    t =     6.18s     Checking `Expect predicate `existsNoRetry == 1` for object "scan.screen" Any`
+    t =     6.19s         Checking existence of `"scan.screen" Any`
+    t =     7.51s Waiting 8.0s for "scan.action.backToAutofill" Button to exist
+    t =     8.59s     Checking `Expect predicate `existsNoRetry == 1` for object "scan.action.backToAutofill" Button`
+    t =     8.59s         Checking existence of `"scan.action.backToAutofill" Button`
+    t =     8.66s Tap "scan.action.backToAutofill" Button
+    t =     8.66s     Wait for com.spendsage.ai to idle
+    t =     8.66s     Find the "scan.action.backToAutofill" Button
+    t =     8.69s     Check for interrupting elements affecting "scan.action.backToAutofill" Button
+    t =     8.72s     Synthesize event
+    t =     8.73s         Scroll element to visible
+    t =     8.73s         Find the "scan.action.backToAutofill" Button
+    t =     8.78s         Computed hit point {119.50000762939453, 813.23333740234375} after scrolling to visible
+    t =     9.07s     Wait for com.spendsage.ai to idle
+    t =    10.59s Waiting 8.0s for "scan.action.review" Button to exist
+    t =    11.67s     Checking `Expect predicate `existsNoRetry == 1` for object "scan.action.review" Button`
+    t =    11.67s         Checking existence of `"scan.action.review" Button`
+    t =    11.74s Tap "scan.action.review" Button
+    t =    11.74s     Wait for com.spendsage.ai to idle
+    t =    11.74s     Find the "scan.action.review" Button
+    t =    11.77s     Check for interrupting elements affecting "scan.action.review" Button
+    t =    11.80s     Synthesize event
+    t =    12.09s     Wait for com.spendsage.ai to idle
+    t =    13.61s Waiting 8.0s for "scan.action.save" Button to exist
+    t =    14.68s     Checking `Expect predicate `existsNoRetry == 1` for object "scan.action.save" Button`
+    t =    14.68s         Checking existence of `"scan.action.save" Button`
+    t =    14.76s Tap "scan.action.save" Button
+    t =    14.76s     Wait for com.spendsage.ai to idle
+    t =    14.76s     Find the "scan.action.save" Button
+    t =    14.79s     Check for interrupting elements affecting "scan.action.save" Button
+    t =    14.82s     Synthesize event
+    t =    15.11s     Wait for com.spendsage.ai to idle
+    t =    15.84s Waiting 8.0s for "scan.action.openCamera" Button to exist
+    t =    16.92s     Checking `Expect predicate `existsNoRetry == 1` for object "scan.action.openCamera" Button`
+    t =    16.92s         Checking existence of `"scan.action.openCamera" Button`
+    t =    18.37s Tear Down
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial03ScanReceiptReviewAndSave]' passed (18.648 seconds).
+Test Suite 'SpendSageTutorialUITests' passed at 2026-04-08 14:03:06.072.
+	 Executed 1 test, with 0 failures (0 unexpected) in 18.648 (18.650) seconds
+Test Suite 'SpendSageUITests.xctest' passed at 2026-04-08 14:03:06.074.
+	 Executed 1 test, with 0 failures (0 unexpected) in 18.648 (18.652) seconds
+Test Suite 'Selected tests' passed at 2026-04-08 14:03:06.076.
+	 Executed 1 test, with 0 failures (0 unexpected) in 18.648 (18.654) seconds
+2026-04-08 14:03:06.445 xcodebuild[374:2271680] [MT] IDETestOperationsObserverDebug: 21.845 elapsed -- Testing started completed.
+2026-04-08 14:03:06.445 xcodebuild[374:2271680] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-04-08 14:03:06.445 xcodebuild[374:2271680] [MT] IDETestOperationsObserverDebug: 21.845 sec, +21.845 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/rubenlazaro/Library/Developer/Xcode/DerivedData/SpendSage-cgwioapamhwzhmfhyiwoniotpclb/Logs/Test/Test-SpendSage-2026.04.08_14-02-42--0500.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

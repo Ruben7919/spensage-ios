@@ -1,0 +1,11 @@
+experiment_id,area,hypothesis,control,variant,primary_metric,secondary_metric,status
+aso_subtitle_v1,subtitle,Clarity-first subtitle will improve product-page conversion,"Gastos, recibos y presupuesto fácil","Gastos claros desde el iPhone",app_store_conversion,activation_rate,ready_to_test
+aso_subtitle_v2,subtitle,Scan-and-month language will attract users with receipt pain,"Gastos, recibos y presupuesto fácil","Escanea recibos y entiende tu mes",app_store_conversion,first_scan_rate,ready_to_test
+aso_subtitle_v3,subtitle,Progress language will attract habit-oriented users,"Gastos, recibos y presupuesto fácil","Presupuesto simple y progreso real",app_store_conversion,budget_created_rate,ready_to_test
+aso_promo_v1,promotional_text,First-action copy will reduce friction,"Controla gastos, escanea recibos y entiende tu mes con una app clara, cute y poderosa desde tu iPhone.","Empieza con una compra real: registra gastos, escanea recibos y mira tu mes con más claridad.",app_store_conversion,first_expense_rate,ready_to_test
+aso_promo_v2,promotional_text,Friendly utility copy will feel more premium and less hype,"Controla gastos, escanea recibos y entiende tu mes con una app clara, cute y poderosa desde tu iPhone.","Una forma más amable de registrar gastos, revisar recibos y convertir tus datos en próximos pasos.",app_store_conversion,d7_value_signal,ready_to_test
+aso_screenshot_1_v1,screenshot_1,Scan visual will convert high-intent users,Home/dashboard screenshot,Scan flow with "Foto, revisa y guarda",app_store_conversion,first_scan_rate,ready_to_test
+aso_screenshot_1_v2,screenshot_1,Insight visual will explain value faster,Home/dashboard screenshot,Analysis tooltip with "Toca el dato y decide",app_store_conversion,insight_view_rate,ready_to_test
+aso_screenshot_1_v3,screenshot_1,Achievement visual will support emotional social positioning,Home/dashboard screenshot,Achievement share with "Celebra el avance",app_store_conversion,share_started_rate,ready_to_test
+aso_icon_v1,icon,More visible teal + receipt mark may improve recognition at small size,Current icon,Teal-forward receipt symbol,product_page_tap_rate,app_store_conversion,concept_only
+aso_icon_v2,icon,Mascot icon may improve memorability if legible,Current icon,Simplified mascot mark,product_page_tap_rate,app_store_conversion,concept_only

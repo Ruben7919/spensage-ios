@@ -121,6 +121,7 @@
 		5857534E7E423891F0D2B0EE /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBCBCE8B2F2F891F368C7DFB /* AdvancedSettingsView.swift */; };
 		58ABE2D44C7E252FD2D98124 /* manchas_proud_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3744CD5090B0DE475889F8A6 /* manchas_proud_new_year_v2.png */; };
 		595315DF5DA18CECF73DDD87 /* guide_03_budgets_tikki_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D99D734B1727A89137ADB2A2 /* guide_03_budgets_tikki_v2.png */; };
+		5984EF6824CB6ACE37CC94C7 /* AppCampaignDeepLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C08F9EE98E0A8EEA9783D9 /* AppCampaignDeepLinkTests.swift */; };
 		5990879729FF8B63FB7F8BA4 /* tikki_happy_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5456D851E00E542F1EA16 /* tikki_happy_v2.png */; };
 		59DD44AF2E83C6059C98A1D6 /* guide_19_pricing_cards_tikki_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C943812C888E3649FB12721 /* guide_19_pricing_cards_tikki_v2.png */; };
 		5BB52A0F143440689412542C /* guide_05_scan_receipt_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2B87008CE2372CB69639994B /* guide_05_scan_receipt_mei_v2.png */; };
@@ -624,6 +625,7 @@
 		C7EE7F5280A10507BD9E9A82 /* mei_warning_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_warning_new_year_v2.png; sourceTree = "<group>"; };
 		C835E2C1589A57B5B0A4CBBE /* PushRegistrationFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushRegistrationFlowTests.swift; sourceTree = "<group>"; };
 		C9AE2E4062B2ED34A969EF0D /* ProfileCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCompletionView.swift; sourceTree = "<group>"; };
+		C9C08F9EE98E0A8EEA9783D9 /* AppCampaignDeepLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCampaignDeepLinkTests.swift; sourceTree = "<group>"; };
 		CA56DF4650B5021F47704B05 /* tikki_angry_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_angry_v2.png; sourceTree = "<group>"; };
 		CC05C996D8DF40D500F2777C /* BrandStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandStory.swift; sourceTree = "<group>"; };
 		CD3C5E5018EA0970DE99F25F /* SessionUnlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionUnlockView.swift; sourceTree = "<group>"; };
@@ -1308,6 +1310,7 @@
 		D63995B83E0ABA1D6AF79F35 /* SpendSageTests */ = {
 			isa = PBXGroup;
 			children = (
+				C9C08F9EE98E0A8EEA9783D9 /* AppCampaignDeepLinkTests.swift */,
 				53830B084DED666D8252FD51 /* BackendAlignmentTests.swift */,
 				6902A39AC1EB9CDDD5E6F785 /* BrandSeasonalAssetTests.swift */,
 				F33ED27E7545FFE71B7BB40F /* CrashGuardTests.swift */,
@@ -1856,6 +1859,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5984EF6824CB6ACE37CC94C7 /* AppCampaignDeepLinkTests.swift in Sources */,
 				4EA878B15CA6E3252D3B6EA3 /* BackendAlignmentTests.swift in Sources */,
 				E69CE8E8F10B302A01F33D25 /* BrandSeasonalAssetTests.swift in Sources */,
 				D5C90E37142F70A5E45F3523 /* CrashGuardTests.swift in Sources */,
@@ -1963,7 +1967,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -2090,7 +2094,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = YU855NB22W;
 				ENABLE_NS_ASSERTIONS = NO;

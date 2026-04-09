@@ -1,0 +1,57 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/rubenlazaro/Projects/spensage-ios/SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=5C6156AE-37BA-45CD-81AE-0A16A530E5A8" -parallel-testing-enabled NO "-only-testing:SpendSageUITests/SpendSageTutorialUITests/testTutorial07CelebrationShare" ONLY_ACTIVE_ARCH=YES ARCHS=arm64
+
+Build settings from command line:
+    ARCHS = arm64
+    ONLY_ACTIVE_ARCH = YES
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+2026-04-08 14:06:19.916839-0500 SpendSageUITests-Runner[3106:2280587] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-04-08 14:06:21.177.
+Test Suite 'SpendSageUITests.xctest' started at 2026-04-08 14:06:21.178.
+Test Suite 'SpendSageTutorialUITests' started at 2026-04-08 14:06:21.178.
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial07CelebrationShare]' started.
+    t =     0.00s Start Test at 2026-04-08 14:06:21.180
+    t =     0.04s Set Up
+    t =     0.05s Open com.spendsage.ai
+    t =     0.05s     Launch com.spendsage.ai
+2026-04-08 14:06:21.680 xcodebuild[2897:2280035] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:06:21.680 xcodebuild[2897:2280035] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     3.00s         Setting up automation session
+    t =     5.25s         Wait for com.spendsage.ai to idle
+    t =     8.99s Waiting 8.0s for "celebration.action.share" Button to exist
+    t =    10.07s     Checking `Expect predicate `existsNoRetry == 1` for object "celebration.action.share" Button`
+    t =    10.07s         Checking existence of `"celebration.action.share" Button`
+    t =    11.18s Waiting 8.0s for "celebration.action.share" Button to exist
+    t =    12.25s     Checking `Expect predicate `existsNoRetry == 1` for object "celebration.action.share" Button`
+    t =    12.25s         Checking existence of `"celebration.action.share" Button`
+    t =    12.30s Tap "celebration.action.share" Button
+    t =    12.30s     Wait for com.spendsage.ai to idle
+    t =    12.30s     Find the "celebration.action.share" Button
+    t =    12.33s     Check for interrupting elements affecting "celebration.action.share" Button
+    t =    12.43s     Synthesize event
+    t =    12.74s     Wait for com.spendsage.ai to idle
+    t =    13.82s Waiting 5.0s for "celebration.share.presented" Any to exist
+    t =    14.89s     Checking `Expect predicate `existsNoRetry == 1` for object "celebration.share.presented" Any`
+    t =    14.89s         Checking existence of `"celebration.share.presented" Any`
+    t =    16.71s Tear Down
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial07CelebrationShare]' passed (17.054 seconds).
+Test Suite 'SpendSageTutorialUITests' passed at 2026-04-08 14:06:38.235.
+	 Executed 1 test, with 0 failures (0 unexpected) in 17.054 (17.057) seconds
+Test Suite 'SpendSageUITests.xctest' passed at 2026-04-08 14:06:38.236.
+	 Executed 1 test, with 0 failures (0 unexpected) in 17.054 (17.058) seconds
+Test Suite 'Selected tests' passed at 2026-04-08 14:06:38.237.
+	 Executed 1 test, with 0 failures (0 unexpected) in 17.054 (17.060) seconds
+2026-04-08 14:06:38.613 xcodebuild[2897:2280035] [MT] IDETestOperationsObserverDebug: 22.877 elapsed -- Testing started completed.
+2026-04-08 14:06:38.613 xcodebuild[2897:2280035] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-04-08 14:06:38.613 xcodebuild[2897:2280035] [MT] IDETestOperationsObserverDebug: 22.877 sec, +22.877 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/rubenlazaro/Library/Developer/Xcode/DerivedData/SpendSage-cgwioapamhwzhmfhyiwoniotpclb/Logs/Test/Test-SpendSage-2026.04.08_14-06-14--0500.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

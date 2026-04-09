@@ -60,16 +60,16 @@ struct TrophyHistoryView: View {
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Aquí ves tus misiones locales, tus pasos cloud, los retos especiales y los logros que van haciendo más liviano tu presupuesto.")
+                Text("Aquí ves tus misiones, eventos y logros para hacer más liviano tu presupuesto.")
                     .foregroundStyle(BrandTheme.muted)
 
                 LazyVGrid(
                     columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                     spacing: 12
                 ) {
-                    BrandMetricTile(title: "Locales", value: "\(growthSnapshot.localMissions.filter { $0.status == .completed }.count)/\(growthSnapshot.localMissions.count)", systemImage: "house.fill")
-                    BrandMetricTile(title: "Cloud", value: "\(growthSnapshot.cloudMissions.filter { $0.status == .completed }.count)/\(growthSnapshot.cloudMissions.count)", systemImage: "icloud.fill")
-                    BrandMetricTile(title: "Especiales", value: "\(growthSnapshot.specialMissions.filter { $0.status == .completed }.count)/\(growthSnapshot.specialMissions.count)", systemImage: "sparkles")
+                    BrandMetricTile(title: "Misiones", value: "\(growthSnapshot.allMissions.filter { $0.status == .completed }.count)/\(growthSnapshot.allMissions.count)", systemImage: "checklist")
+                    BrandMetricTile(title: "En curso", value: "\(growthSnapshot.allMissions.filter { $0.status != .completed }.count)", systemImage: "figure.walk")
+                    BrandMetricTile(title: "Eventos", value: "\(growthSnapshot.eventCalendar.count)", systemImage: "calendar")
                     BrandMetricTile(title: "Logros", value: "\(growthSnapshot.trophies.filter(\.unlocked).count)", systemImage: "rosette")
                 }
 
@@ -150,23 +150,15 @@ struct TrophyHistoryView: View {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeading(
                     title: "Misiones",
-                    detail: "El tablero se divide por tipo para que sepas rápido qué depende de tus hábitos, qué depende del respaldo cloud y qué misiones especiales están activas."
+                    detail: "El tablero reúne retos de ahorro, orden y familia sin mostrar detalles técnicos."
                 )
 
                 missionTrackSection(
-                    title: "Local",
-                    detail: growthSnapshot.localMissions.isEmpty
-                        ? "Aún no hay hábitos locales visibles."
-                        : GrowthMissionTrack.local.summary,
-                    missions: growthSnapshot.localMissions
-                )
-
-                missionTrackSection(
-                    title: "Cloud",
-                    detail: growthSnapshot.cloudMissions.isEmpty
-                        ? "Las misiones cloud aparecen cuando el respaldo y los espacios compartidos ya están disponibles."
-                        : GrowthMissionTrack.cloud.summary,
-                    missions: growthSnapshot.cloudMissions
+                    title: "Disponibles",
+                    detail: growthSnapshot.allMissions.isEmpty
+                        ? "Aún no hay misiones visibles."
+                        : "Completa acciones pequeñas que ayudan a cuidar el presupuesto y compartirlo cuando haga falta.",
+                    missions: growthSnapshot.allMissions
                 )
 
                 missionTrackSection(
@@ -266,8 +258,8 @@ struct TrophyHistoryView: View {
                     detail: "Las misiones y logros están pensados para que ahorrar se sienta claro: registrar, ordenar, anticipar y compartir cuando haga falta."
                 )
 
-                Label("Las misiones locales te ayudan a construir el hábito diario de registrar y revisar.", systemImage: "house.fill")
-                Label("Las misiones cloud protegen tu respaldo y facilitan compartir el presupuesto con familia.", systemImage: "icloud.fill")
+                Label("Las misiones te ayudan a construir el hábito diario de registrar y revisar.", systemImage: "checklist")
+                Label("Algunas misiones aparecen cuando compartes presupuesto con tu familia.", systemImage: "person.3.fill")
                 Label("Las especiales aparecen para empujarte a ahorrar mejor en momentos importantes del año.", systemImage: "sparkles")
             }
             .foregroundStyle(BrandTheme.ink)
@@ -302,7 +294,6 @@ struct TrophyHistoryView: View {
                 Spacer(minLength: 0)
 
                 VStack(alignment: .trailing, spacing: 6) {
-                    BrandBadge(text: mission.track.badgeText, systemImage: mission.track.systemImage)
                     BrandBadge(text: mission.status.localizedTitle, systemImage: mission.systemImage)
                 }
             }

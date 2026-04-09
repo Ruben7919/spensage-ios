@@ -18,4 +18,9 @@ Dominio público previsto: `https://spendsage.ai`
 
 ## Nota
 
-Este archivo es una base mínima de despliegue para que el dominio público y sus enlaces críticos existan antes de la submission externa.
+Este archivo sigue siendo la nota minima de despliegue.
+
+Implementacion Sprint 1 ya creada:
+
+- landing visual: [index.html](/Users/rubenlazaro/Projects/spensage-ios/PublicSite/spendsage.ai/index.html)
+- estilos: [styles.css](/Users/rubenlazaro/Projects/spensage-ios/PublicSite/spendsage.ai/styles.css)

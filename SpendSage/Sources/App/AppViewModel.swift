@@ -76,6 +76,13 @@ final class AppViewModel: ObservableObject {
         var id: String { rawValue }
     }
 
+    struct IncomingURLAction: Equatable {
+        var inviteCode: String?
+        var selectedTab: AppTab?
+        var presentedSheet: PresentedSheet?
+        var notice: String?
+    }
+
     @Published var session: SessionState
     @Published var hasCompletedOnboarding: Bool
     @Published var selectedTab: AppTab
@@ -748,7 +755,7 @@ final class AppViewModel: ObservableObject {
 
     func chooseFreeLocalPlan() {
         syncPersistedPremiumState(with: .empty)
-        notice = "Local gratis sigue activo en este dispositivo."
+        notice = "El plan gratis sigue activo."
     }
 
     private func applyStoreEntitlements(_ entitlements: StoreEntitlementSnapshot) {
@@ -1090,10 +1097,18 @@ final class AppViewModel: ObservableObject {
                 )
             )
             lastCreatedInvite = result
-            notice = "Invitación creada. Comparte el deep link o el correo del invitado."
+            notice = switch result.emailDelivery?.status {
+            case .sent:
+                "Invitación enviada por correo. Cuando esa persona entre con ese email, se unirá a tu familia."
+            case .failed:
+                "Invitación creada. El correo no salió, pero puedes compartir el enlace de respaldo."
+            case .disabled, .none:
+                "Invitación creada. Comparte el enlace de respaldo para que esa persona se una a tu familia."
+            }
             await telemetryService.track("sharing_invite_created", properties: [
                 "spaceId": spaceID,
-                "role": role.rawValue
+                "role": role.rawValue,
+                "emailDelivery": result.emailDelivery?.status.rawValue ?? "none"
             ])
             await refreshSharingState(force: true)
         } catch {
@@ -1121,7 +1136,7 @@ final class AppViewModel: ObservableObject {
             pendingInviteStore.store(code: nil)
             currentSpaceID = result.spaceId
             selectedSpaceStore.setCurrentSpaceID(result.spaceId, for: session)
-            notice = "Invitación aceptada. Tu espacio compartido ya está activo."
+            notice = "¡Listo! Ya eres parte de la familia. Tikki, Mei y Manchas están celebrando contigo."
             await telemetryService.track("sharing_invite_accepted", properties: [
                 "spaceId": result.spaceId,
                 "role": result.role.rawValue
@@ -1175,14 +1190,63 @@ final class AppViewModel: ObservableObject {
         }
     }
 
-    func handleIncomingURL(_ url: URL) {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
+    nonisolated static func resolveIncomingURL(_ url: URL) -> IncomingURLAction? {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
         let host = components.host?.lowercased()
         let path = components.path.lowercased()
-        guard host == "invite" || path == "/invite" else { return }
-        let code = components.queryItems?.first(where: { $0.name == "code" })?.value
-        pendingInviteStore.store(code: code)
-        notice = "Invitación detectada. Inicia sesión o entra a Spaces para aceptarla."
+
+        if host == "invite" || path == "/invite" {
+            let code = components.queryItems?.first(where: { $0.name.lowercased() == "code" })?.value
+            return IncomingURLAction(
+                inviteCode: code,
+                notice: "Invitación detectada. Inicia sesión o entra a Spaces para aceptarla."
+            )
+        }
+
+        guard host == "open" || path == "/open" else { return nil }
+
+        let selectedTab = normalizedAppTab(
+            for: components.queryItems?.first(where: { $0.name.lowercased() == "tab" })?.value
+        )
+        let presentedSheet = normalizedPresentedSheet(
+            for: components.queryItems?.first(where: { $0.name.lowercased() == "sheet" })?.value
+        )
+
+        guard selectedTab != nil || presentedSheet != nil else { return nil }
+
+        return IncomingURLAction(
+            selectedTab: selectedTab ?? defaultTab(for: presentedSheet),
+            presentedSheet: presentedSheet
+        )
+    }
+
+    func handleIncomingURL(_ url: URL) {
+        guard let action = Self.resolveIncomingURL(url) else { return }
+
+        if action.inviteCode != nil {
+            pendingInviteStore.store(code: action.inviteCode)
+            notice = action.notice
+            return
+        }
+
+        guard session.isAuthenticated else {
+            notice = "Inicia sesión para abrir este atajo de SpendSage."
+            return
+        }
+
+        debugRoute = nil
+
+        if let selectedTab = action.selectedTab {
+            self.selectedTab = selectedTab
+        }
+
+        if let presentedSheet = action.presentedSheet {
+            activeSheet = presentedSheet
+        }
+
+        if let actionNotice = action.notice {
+            notice = actionNotice
+        }
     }
 
     func presentAddExpense() {
@@ -1212,12 +1276,30 @@ final class AppViewModel: ObservableObject {
         }
 
         await financeStore.saveExpense(draft, for: session, spaceID: currentSpaceID)
+        await telemetryService.track(
+            "expense_saved",
+            properties: [
+                "source": draft.source.rawValue,
+                "category": draft.category.rawValue,
+                "has_recurring_plan": draft.recurringPlan == nil ? "false" : "true",
+                "space_scope": currentSpace?.isPersonalSpace == false ? "shared" : "personal"
+            ]
+        )
+        if draft.source == .receiptScan {
+            await telemetryService.track(
+                "receipt_scan_expense_saved",
+                properties: [
+                    "category": draft.category.rawValue,
+                    "space_scope": currentSpace?.isPersonalSpace == false ? "shared" : "personal"
+                ]
+            )
+        }
         if draft.category == .subscriptions, draft.recurringPlan != nil {
             notice = draft.recurringPlan?.autoRecord == true
                 ? "Suscripción guardada y lista para registrarse sola en cada renovación.".appLocalized
                 : "Suscripción guardada con seguimiento recurrente.".appLocalized
         } else if draft.source == .email {
-            notice = "Compra importada desde correo y guardada localmente.".appLocalized
+            notice = "Compra importada desde correo y guardada.".appLocalized
         } else {
             notice = "Expense saved locally on this device.".appLocalized
         }
@@ -1234,6 +1316,12 @@ final class AppViewModel: ObservableObject {
         }
 
         await financeStore.saveBudget(monthlyIncome: monthlyIncome, monthlyBudget: monthlyBudget, for: session, spaceID: currentSpaceID)
+        await telemetryService.track(
+            "budget_saved",
+            properties: [
+                "space_scope": currentSpace?.isPersonalSpace == false ? "shared" : "personal"
+            ]
+        )
         notice = "Budget updated locally on this device.".appLocalized
         if activeSheet == .budgetWizard {
             activeSheet = nil
@@ -1715,7 +1803,7 @@ final class AppViewModel: ObservableObject {
                 kind: .missionCompleted,
                 title: "Cinco gastos registrados",
                 message: "Misión completada. 80 XP listos para tu progreso.",
-                detail: "Tu libro local ya tiene suficiente movimiento para que el coach lea mejor tus hábitos.",
+                detail: "Tus gastos ya tienen suficiente movimiento para que el coach lea mejor tus hábitos.",
                 badgeAsset: "badge_quest_daily_v2.png",
                 systemImage: "checkmark.circle.fill",
                 rewardXP: 80,
@@ -1736,6 +1824,57 @@ final class AppViewModel: ObservableObject {
                 shareText: "Desbloqueé un badge en SpendSage."
             )
         default:
+            return nil
+        }
+    }
+
+    private nonisolated static func normalizedAppTab(for rawValue: String?) -> AppTab? {
+        guard let rawValue else { return nil }
+
+        switch rawValue
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+            .replacingOccurrences(of: "_", with: "-")
+        {
+        case "dashboard", "home", "inicio":
+            return .dashboard
+        case "expenses", "expense", "gastos", "gasto":
+            return .expenses
+        case "scan", "scanner", "escanear", "escanear-recibo":
+            return .scan
+        case "insights", "insight", "analysis", "analytics", "analisis", "análisis":
+            return .insights
+        case "settings", "setting", "ajustes", "configuracion", "configuración":
+            return .settings
+        default:
+            return nil
+        }
+    }
+
+    private nonisolated static func normalizedPresentedSheet(for rawValue: String?) -> PresentedSheet? {
+        guard let rawValue else { return nil }
+
+        switch rawValue
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+            .replacingOccurrences(of: "_", with: "-")
+        {
+        case "add-expense", "expense", "gasto", "nuevo-gasto":
+            return .addExpense
+        case "budget", "budget-wizard", "presupuesto", "presupuesto-guiado":
+            return .budgetWizard
+        default:
+            return nil
+        }
+    }
+
+    private nonisolated static func defaultTab(for presentedSheet: PresentedSheet?) -> AppTab? {
+        switch presentedSheet {
+        case .addExpense:
+            return .expenses
+        case .budgetWizard:
+            return .settings
+        case nil:
             return nil
         }
     }

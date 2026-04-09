@@ -27,9 +27,9 @@ enum GrowthMissionTrack: String, Hashable {
     var localizedTitle: String {
         switch self {
         case .local:
-            return "Local".appLocalized
+            return "Rutina".appLocalized
         case .cloud:
-            return "Cloud".appLocalized
+            return "Familia".appLocalized
         case .special:
             return "Especial".appLocalized
         }
@@ -40,7 +40,7 @@ enum GrowthMissionTrack: String, Hashable {
         case .local:
             return "Pequeños hábitos del día a día que ordenan el gasto y ayudan a cuidar el presupuesto.".appLocalized
         case .cloud:
-            return "Pasos compartidos y de respaldo para que tu dinero quede sincronizado y listo para familia.".appLocalized
+            return "Pasos compartidos para cuidar el presupuesto con tu familia.".appLocalized
         case .special:
             return "Retos grandes y eventos de temporada para ganar impulso extra cuando más importa ahorrar.".appLocalized
         }
@@ -51,7 +51,7 @@ enum GrowthMissionTrack: String, Hashable {
         case .local:
             return "Rutina".appLocalized
         case .cloud:
-            return "Respaldo".appLocalized
+            return "Familia".appLocalized
         case .special:
             return "Meta grande".appLocalized
         }
@@ -62,7 +62,7 @@ enum GrowthMissionTrack: String, Hashable {
         case .local:
             return "house.fill"
         case .cloud:
-            return "icloud.fill"
+            return "person.3.fill"
         case .special:
             return "sparkles"
         }
@@ -303,7 +303,7 @@ enum GrowthMissionCatalog {
             title: "Respaldo al día".appLocalized,
             detail: "Sincroniza tu espacio actual para que tu progreso siga vivo aunque cambies de dispositivo.".appLocalized,
             coachNote: "Un ahorro bien cuidado también necesita respaldo, no solo disciplina.".appLocalized,
-            cadenceLabel: "Cloud".appLocalized,
+            cadenceLabel: "Respaldo".appLocalized,
             rewardXP: 95,
             systemImage: "icloud.fill",
             badgeAsset: "badge_security_v2.png",
@@ -319,7 +319,7 @@ enum GrowthMissionCatalog {
             title: "Casa compartida".appLocalized,
             detail: "Únete o crea un espacio compartido para que el presupuesto familiar no se pierda entre chats y capturas.".appLocalized,
             coachNote: "Compartir el espacio correcto evita que cada persona lleve una versión distinta del mismo dinero.".appLocalized,
-            cadenceLabel: "Cloud".appLocalized,
+            cadenceLabel: "Familia".appLocalized,
             rewardXP: 140,
             systemImage: "person.2.fill",
             badgeAsset: "badge_sharing_v2.png",
@@ -335,7 +335,7 @@ enum GrowthMissionCatalog {
             title: "Primer asiento ocupado".appLocalized,
             detail: "Consigue que al menos otra persona entre a tu espacio compartido para manejar el presupuesto juntos.".appLocalized,
             coachNote: "La parte difícil no es invitar, sino volver el dinero visible para todos los que sí deciden.".appLocalized,
-            cadenceLabel: "Cloud".appLocalized,
+            cadenceLabel: "Familia".appLocalized,
             rewardXP: 170,
             systemImage: "person.crop.circle.badge.plus",
             badgeAsset: "badge_sharing_v2.png",
@@ -351,7 +351,7 @@ enum GrowthMissionCatalog {
             title: "Invitación enviada".appLocalized,
             detail: "Envía una invitación para arrancar el espacio familiar antes de que el mes se llene de pendientes.".appLocalized,
             coachNote: "Las finanzas compartidas fluyen mejor cuando la invitación sale temprano y no en medio del caos.".appLocalized,
-            cadenceLabel: "Cloud".appLocalized,
+            cadenceLabel: "Familia".appLocalized,
             rewardXP: 105,
             systemImage: "paperplane.fill",
             badgeAsset: "badge_promo_v2.png",
@@ -764,7 +764,7 @@ enum GrowthSnapshotBuilder {
         let greetingTitle: String
         switch session {
         case .guest:
-            greetingTitle = "Tu loop local de progreso".appLocalized
+            greetingTitle = "Tu progreso de ahorro".appLocalized
         case let .signedIn(email, provider):
             let handle = email
                 .components(separatedBy: "@")
@@ -795,7 +795,7 @@ enum GrowthSnapshotBuilder {
             heroBody = "El mes se está calentando, pero una regla, una revisión de facturas o un recorte en una categoría mantiene el dashboard en control.".appLocalized
         } else {
             heroTitle = "El impulso se está acumulando".appLocalized
-            heroBody = "Tu libro local ya está lo bastante limpio para que el coaching, las misiones y el progreso de logros se sientan intencionales.".appLocalized
+            heroBody = "Tus gastos ya están lo bastante claros para que el coaching, las misiones y los logros se sientan intencionales.".appLocalized
         }
 
         let topCategoryName = state?.topCategory?.category.localizedTitle ?? "tu categoría principal".appLocalized
@@ -827,7 +827,7 @@ enum GrowthSnapshotBuilder {
             coachAction = "Configura tu primera factura recurrente.".appLocalized
         } else {
             coachTitle = "Coach: mantén el ritmo predecible".appLocalized
-            coachBody = "Ya tienes las piezas de un loop local fuerte. Ahora la victoria es consistencia: chequeos cortos, categorías limpias y menos sorpresas.".appLocalized
+            coachBody = "Ya tienes una base fuerte. Ahora la victoria es consistencia: chequeos cortos, categorías limpias y menos sorpresas.".appLocalized
             coachAction = "Protege la racha con una revisión rápida esta noche.".appLocalized
         }
 
@@ -1026,7 +1026,7 @@ enum GrowthSnapshotBuilder {
                         id: "seed-ledger",
                         title: "Arranca con 3".appLocalized,
                         detail: "Registra supermercado, transporte y una compra flexible para que la app empiece a detectar patrones en vez de adivinar.".appLocalized,
-                        footnote: "Las primeras sugerencias de ahorro se vuelven más confiables apenas el libro local tiene algunas categorías para comparar.".appLocalized,
+                        footnote: "Las primeras sugerencias de ahorro se vuelven más confiables apenas tienes algunas categorías para comparar.".appLocalized,
                         badgeText: "3 registros".appLocalized,
                         badgeSystemImage: "sparkles",
                         systemImage: "square.and.pencil.circle.fill"
@@ -1208,7 +1208,7 @@ enum GrowthSnapshotBuilder {
                 id: "rookie-ledger",
                 title: "Libro novato".appLocalized,
                 detail: "Ya entró el primer gasto. El dashboard por fin puede acompañarte con datos reales.".appLocalized,
-                celebration: "Primer gasto guardado localmente.".appLocalized,
+                celebration: "Primer gasto guardado.".appLocalized,
                 systemImage: "sparkles.rectangle.stack.fill",
                 hybridBadgeAsset: "badge_savings_v2.png",
                 progressValue: expenses.count,
@@ -1243,7 +1243,7 @@ enum GrowthSnapshotBuilder {
             GrowthTrophy(
                 id: "rule-architect",
                 title: "Arquitecto de reglas".appLocalized,
-                detail: "Una regla por comercio significa que el libro local ya empieza a organizarse solo.".appLocalized,
+                detail: "Una regla por comercio significa que tus gastos ya empiezan a organizarse solos.".appLocalized,
                 celebration: "Primera regla agregada.".appLocalized,
                 systemImage: "point.3.connected.trianglepath.dotted",
                 hybridBadgeAsset: "badge_smart_spend_v2.png",
@@ -1267,7 +1267,7 @@ enum GrowthSnapshotBuilder {
             GrowthTrophy(
                 id: "level-five",
                 title: "Nivel cinco".appLocalized,
-                detail: "Tu sistema local ya tiene suficiente profundidad para sentirse como un loop de producto, no solo un libro.".appLocalized,
+                detail: "Tu sistema ya tiene suficiente profundidad para sentirse útil de verdad, no solo como una lista.".appLocalized,
                 celebration: "Llegaste al nivel cinco.".appLocalized,
                 systemImage: "bolt.circle.fill",
                 hybridBadgeAsset: "badge_level_up_v2.png",
@@ -1315,12 +1315,11 @@ enum GrowthSnapshotBuilder {
             items.append(
                 GrowthEvent(
                     id: "category-\(topCategory.id)",
-                    title: AppLocalization.localized("%@ is leading this month", arguments: topCategory.category.localizedTitle),
+                    title: AppLocalization.localized("%@ lidera este mes", arguments: topCategory.category.localizedTitle),
                     detail: AppLocalization.localized(
-                        "%d gasto%@ local%@ están dando forma al plan actual.",
+                        "%d gasto%@ están dando forma al plan actual.",
                         arguments: topCategory.count,
-                        topCategory.count == 1 ? "" : "s",
-                        topCategory.count == 1 ? "" : "es"
+                        topCategory.count == 1 ? "" : "s"
                     ),
                     occurredAt: lastUpdated,
                     systemImage: topCategory.category.symbolName

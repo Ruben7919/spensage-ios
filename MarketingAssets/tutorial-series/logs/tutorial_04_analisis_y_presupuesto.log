@@ -1,0 +1,193 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/rubenlazaro/Projects/spensage-ios/SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=5C6156AE-37BA-45CD-81AE-0A16A530E5A8" -parallel-testing-enabled NO "-only-testing:SpendSageUITests/SpendSageTutorialUITests/testTutorial04InsightsAndBudgetWizard" ONLY_ACTIVE_ARCH=YES ARCHS=arm64
+
+Build settings from command line:
+    ARCHS = arm64
+    ONLY_ACTIVE_ARCH = YES
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:5C6156AE-37BA-45CD-81AE-0A16A530E5A8, OS:18.6, name:iPhone 16 Pro }
+2026-04-08 14:03:14.427963-0500 SpendSageUITests-Runner[902:2273178] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-04-08 14:03:15.138.
+Test Suite 'SpendSageUITests.xctest' started at 2026-04-08 14:03:15.138.
+Test Suite 'SpendSageTutorialUITests' started at 2026-04-08 14:03:15.138.
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial04InsightsAndBudgetWizard]' started.
+    t =     0.00s Start Test at 2026-04-08 14:03:15.139
+    t =     0.03s Set Up
+    t =     0.03s Open com.spendsage.ai
+    t =     0.03s     Launch com.spendsage.ai
+2026-04-08 14:03:15.439 xcodebuild[895:2272885] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-04-08 14:03:15.439 xcodebuild[895:2272885] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.53s         Setting up automation session
+    t =     2.78s         Wait for com.spendsage.ai to idle
+    t =     5.98s Waiting 10.0s for "insights.screen" Any to exist
+    t =     7.06s     Checking `Expect predicate `existsNoRetry == 1` for object "insights.screen" Any`
+    t =     7.06s         Checking existence of `"insights.screen" Any`
+    t =     8.28s Waiting 8.0s for "insights.chart.bar.3" Button to exist
+    t =     9.35s     Checking `Expect predicate `existsNoRetry == 1` for object "insights.chart.bar.3" Button`
+    t =     9.35s         Checking existence of `"insights.chart.bar.3" Button`
+    t =     9.44s Tap "insights.chart.bar.3" Button
+    t =     9.44s     Wait for com.spendsage.ai to idle
+    t =     9.44s     Find the "insights.chart.bar.3" Button
+    t =     9.49s     Check for interrupting elements affecting "insights.chart.bar.3" Button
+    t =     9.54s     Synthesize event
+    t =     9.55s         Scroll element to visible
+    t =     9.56s         Find the "insights.chart.bar.3" Button
+    t =     9.63s         Computed hit point {213.49999999999997, 669.66666666666663} after scrolling to visible
+    t =     9.93s     Wait for com.spendsage.ai to idle
+    t =    10.65s Waiting 4.0s for "insights.chart.selection" Any to exist
+    t =    11.72s     Checking `Expect predicate `existsNoRetry == 1` for object "insights.chart.selection" Any`
+    t =    11.72s         Checking existence of `"insights.chart.selection" Any`
+    t =    12.83s Waiting 8.0s for "insights.link.trend" Button to exist
+    t =    13.91s     Checking `Expect predicate `existsNoRetry == 1` for object "insights.link.trend" Button`
+    t =    13.91s         Checking existence of `"insights.link.trend" Button`
+    t =    14.00s Tap "insights.link.trend" Button
+    t =    14.00s     Wait for com.spendsage.ai to idle
+    t =    14.00s     Find the "insights.link.trend" Button
+    t =    14.05s     Check for interrupting elements affecting "insights.link.trend" Button
+    t =    14.08s     Synthesize event
+    t =    14.09s         Scroll element to visible
+    t =    14.09s         Find the "insights.link.trend" Button
+    t =    14.17s         Computed hit point {201, 703.50000000000034} after scrolling to visible
+    t =    14.45s     Wait for com.spendsage.ai to idle
+    t =    15.62s Waiting 8.0s for "Tendencia" NavigationBar to exist
+    t =    16.68s     Checking `Expect predicate `existsNoRetry == 1` for object "Tendencia" NavigationBar`
+    t =    16.68s         Checking existence of `"Tendencia" NavigationBar`
+    t =    17.72s Waiting 8.0s for Button (First Match) to exist
+    t =    18.79s     Checking `Expect predicate `existsNoRetry == 1` for object Button (First Match)`
+    t =    18.79s         Checking existence of `Button (First Match)`
+    t =    18.82s Tap Button (First Match)
+    t =    18.82s     Wait for com.spendsage.ai to idle
+    t =    18.82s     Find the Button (First Match)
+    t =    18.85s     Check for interrupting elements affecting "Análisis" Button
+    t =    18.88s     Synthesize event
+    t =    19.17s     Wait for com.spendsage.ai to idle
+    t =    20.23s Waiting 8.0s for "shell.tab.dashboard" Button to exist
+    t =    21.30s     Checking `Expect predicate `existsNoRetry == 1` for object "shell.tab.dashboard" Button`
+    t =    21.30s         Checking existence of `"shell.tab.dashboard" Button`
+    t =    21.32s Tap "shell.tab.dashboard" Button
+    t =    21.32s     Wait for com.spendsage.ai to idle
+    t =    21.33s     Find the "shell.tab.dashboard" Button
+    t =    21.34s     Check for interrupting elements affecting "shell.tab.dashboard" Button
+    t =    21.39s     Synthesize event
+    t =    21.68s     Wait for com.spendsage.ai to idle
+    t =    22.64s Waiting 8.0s for "dashboard.screen" Any to exist
+    t =    23.71s     Checking `Expect predicate `existsNoRetry == 1` for object "dashboard.screen" Any`
+    t =    23.71s         Checking existence of `"dashboard.screen" Any`
+    t =    24.67s Waiting 8.0s for "dashboard.action.budgetWizard" Button to exist
+    t =    25.74s     Checking `Expect predicate `existsNoRetry == 1` for object "dashboard.action.budgetWizard" Button`
+    t =    25.74s         Checking existence of `"dashboard.action.budgetWizard" Button`
+    t =    25.85s Tap "dashboard.action.budgetWizard" Button
+    t =    25.85s     Wait for com.spendsage.ai to idle
+    t =    25.85s     Find the "dashboard.action.budgetWizard" Button
+    t =    25.93s     Check for interrupting elements affecting "dashboard.action.budgetWizard" Button
+    t =    25.99s     Synthesize event
+    t =    26.00s         Scroll element to visible
+    t =    26.01s         Find the "dashboard.action.budgetWizard" Button
+    t =    26.13s         Computed hit point {201.33334350585938, 743.89996337890625} after scrolling to visible
+    t =    26.41s     Wait for com.spendsage.ai to idle
+    t =    27.32s Waiting 8.0s for "budget.screen" Any to exist
+    t =    28.39s     Checking `Expect predicate `existsNoRetry == 1` for object "budget.screen" Any`
+    t =    28.39s         Checking existence of `"budget.screen" Any`
+    t =    29.38s Waiting 8.0s for "budget.field.income" TextField to exist
+    t =    30.44s     Checking `Expect predicate `existsNoRetry == 1` for object "budget.field.income" TextField`
+    t =    30.44s         Checking existence of `"budget.field.income" TextField`
+    t =    30.58s Tap "budget.field.income" TextField
+    t =    30.58s     Wait for com.spendsage.ai to idle
+    t =    30.58s     Find the "budget.field.income" TextField
+    t =    30.70s     Check for interrupting elements affecting "budget.field.income" TextField
+    t =    30.78s     Synthesize event
+    t =    30.79s         Scroll element to visible
+    t =    30.79s         Find the "budget.field.income" TextField
+    t =    30.94s         Computed hit point {201, 829} after scrolling to visible
+    t =    31.22s     Wait for com.spendsage.ai to idle
+    t =    31.64s Find the "budget.field.income" TextField
+    t =    31.82s Find the "budget.field.income" TextField
+    t =    32.02s Type '' into "budget.field.income" TextField
+    t =    32.02s     Wait for com.spendsage.ai to idle
+    t =    32.02s     Find the "budget.field.income" TextField
+    t =    32.23s     Check for interrupting elements affecting "budget.field.income" TextField
+    t =    32.37s     Synthesize event
+    t =    32.64s     Wait for com.spendsage.ai to idle
+    t =    32.95s Type '4200' into "budget.field.income" TextField
+    t =    32.95s     Wait for com.spendsage.ai to idle
+    t =    32.96s     Find the "budget.field.income" TextField
+    t =    33.18s     Check for interrupting elements affecting "budget.field.income" TextField
+    t =    33.35s     Synthesize event
+    t =    33.63s     Wait for com.spendsage.ai to idle
+    t =    34.24s Waiting 8.0s for "budget.action.next" Button to exist
+    t =    35.31s     Checking `Expect predicate `existsNoRetry == 1` for object "budget.action.next" Button`
+    t =    35.31s         Checking existence of `"budget.action.next" Button`
+    t =    35.51s Tap "budget.action.next" Button
+    t =    35.51s     Wait for com.spendsage.ai to idle
+    t =    35.51s     Find the "budget.action.next" Button
+    t =    35.67s     Check for interrupting elements affecting "budget.action.next" Button
+    t =    35.77s     Synthesize event
+    t =    35.78s         Scroll element to visible
+    t =    35.78s         Find the "budget.action.next" Button
+    t =    36.04s         Computed hit point {201, 556.33334350585938} after scrolling to visible
+    t =    36.34s     Wait for com.spendsage.ai to idle
+    t =    37.06s Waiting 8.0s for "budget.field.target" TextField to exist
+    t =    38.11s     Checking `Expect predicate `existsNoRetry == 1` for object "budget.field.target" TextField`
+    t =    38.11s         Checking existence of `"budget.field.target" TextField`
+    t =    38.39s Tap "budget.field.target" TextField
+    t =    38.39s     Wait for com.spendsage.ai to idle
+    t =    38.39s     Find the "budget.field.target" TextField
+    t =    38.74s     Check for interrupting elements affecting "budget.field.target" TextField
+    t =    39.02s     Synthesize event
+    t =    39.36s     Wait for com.spendsage.ai to idle
+    t =    39.41s Find the "budget.field.target" TextField
+    t =    39.99s Find the "budget.field.target" TextField
+    t =    40.45s Type '' into "budget.field.target" TextField
+    t =    40.45s     Wait for com.spendsage.ai to idle
+    t =    40.46s     Find the "budget.field.target" TextField
+    t =    40.87s     Check for interrupting elements affecting "budget.field.target" TextField
+    t =    41.11s     Synthesize event
+    t =    41.39s     Wait for com.spendsage.ai to idle
+    t =    41.73s Type '2800' into "budget.field.target" TextField
+    t =    41.73s     Wait for com.spendsage.ai to idle
+    t =    41.76s     Find the "budget.field.target" TextField
+    t =    42.35s     Check for interrupting elements affecting "budget.field.target" TextField
+    t =    42.66s     Synthesize event
+    t =    42.94s     Wait for com.spendsage.ai to idle
+    t =    43.55s Waiting 8.0s for "budget.action.next" Button to exist
+    t =    44.59s     Checking `Expect predicate `existsNoRetry == 1` for object "budget.action.next" Button`
+    t =    44.59s         Checking existence of `"budget.action.next" Button`
+    t =    44.80s Tap "budget.action.next" Button
+    t =    44.80s     Wait for com.spendsage.ai to idle
+    t =    44.80s     Find the "budget.action.next" Button
+    t =    45.05s     Check for interrupting elements affecting "budget.action.next" Button
+    t =    45.20s     Synthesize event
+    t =    45.51s     Wait for com.spendsage.ai to idle
+    t =    47.22s Waiting 8.0s for "budget.action.save" Button to exist
+    t =    48.30s     Checking `Expect predicate `existsNoRetry == 1` for object "budget.action.save" Button`
+    t =    48.30s         Checking existence of `"budget.action.save" Button`
+    t =    48.51s Tap "budget.action.save" Button
+    t =    48.51s     Wait for com.spendsage.ai to idle
+    t =    48.51s     Find the "budget.action.save" Button
+    t =    48.75s     Check for interrupting elements affecting "budget.action.save" Button
+    t =    48.90s     Synthesize event
+    t =    49.20s     Wait for com.spendsage.ai to idle
+    t =    50.17s Waiting 8.0s for "dashboard.screen" Any to exist
+    t =    51.25s     Checking `Expect predicate `existsNoRetry == 1` for object "dashboard.screen" Any`
+    t =    51.25s         Checking existence of `"dashboard.screen" Any`
+    t =    52.81s Tear Down
+Test Case '-[SpendSageUITests.SpendSageTutorialUITests testTutorial04InsightsAndBudgetWizard]' passed (53.130 seconds).
+Test Suite 'SpendSageTutorialUITests' passed at 2026-04-08 14:04:08.272.
+	 Executed 1 test, with 0 failures (0 unexpected) in 53.130 (53.133) seconds
+Test Suite 'SpendSageUITests.xctest' passed at 2026-04-08 14:04:08.273.
+	 Executed 1 test, with 0 failures (0 unexpected) in 53.130 (53.135) seconds
+Test Suite 'Selected tests' passed at 2026-04-08 14:04:08.274.
+	 Executed 1 test, with 0 failures (0 unexpected) in 53.130 (53.136) seconds
+2026-04-08 14:04:08.901 xcodebuild[895:2272885] [MT] IDETestOperationsObserverDebug: 56.833 elapsed -- Testing started completed.
+2026-04-08 14:04:08.901 xcodebuild[895:2272885] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-04-08 14:04:08.901 xcodebuild[895:2272885] [MT] IDETestOperationsObserverDebug: 56.833 sec, +56.833 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/rubenlazaro/Library/Developer/Xcode/DerivedData/SpendSage-cgwioapamhwzhmfhyiwoniotpclb/Logs/Test/Test-SpendSage-2026.04.08_14-03-10--0500.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

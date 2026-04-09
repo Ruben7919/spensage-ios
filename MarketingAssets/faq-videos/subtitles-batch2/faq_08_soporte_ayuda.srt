@@ -1,0 +1,14 @@
+1
+00:00:00,000 --> 00:00:02,000
+Cuando algo falla, lo util
+es salir rapido del caos.
+
+2
+00:00:02,000 --> 00:00:05,000
+Abres ayuda, preparas tu paquete local
+y compartes solo lo que decides.
+
+3
+00:00:05,000 --> 00:00:09,000
+Ayuda clara, soporte rapido
+y contexto bajo control.
