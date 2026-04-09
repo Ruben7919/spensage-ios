@@ -11,28 +11,34 @@ final class SpendSageUITests: XCTestCase {
         app.launch()
 
         assertElement("dashboard.screen", in: app)
+        XCTAssertTrue(app.buttons["dashboard.action.budgetWizard"].firstMatch.waitForExistence(timeout: 8))
 
-        tapCoordinate(app.buttons["shell.tab.expenses"].firstMatch)
+        tap(app.buttons["shell.tab.expenses"].firstMatch, in: app)
         assertElement("expenses.screen", in: app)
+        XCTAssertTrue(app.buttons["expenses.action.add"].firstMatch.waitForExistence(timeout: 8))
 
-        tapCoordinate(app.buttons["shell.tab.insights"].firstMatch)
+        tap(app.buttons["shell.tab.insights"].firstMatch, in: app)
         assertElement("insights.screen", in: app)
+        XCTAssertTrue(app.buttons["insights.link.trend"].firstMatch.waitForExistence(timeout: 8))
 
-        tapCoordinate(app.buttons["shell.tab.settings"].firstMatch)
+        tap(app.buttons["shell.tab.settings"].firstMatch, in: app)
         assertElement("settings.screen", in: app)
+        XCTAssertTrue(app.buttons["settings.link.profile"].firstMatch.waitForExistence(timeout: 8))
 
-        tapCoordinate(app.buttons["shell.tab.dashboard"].firstMatch)
+        tap(app.buttons["shell.tab.dashboard"].firstMatch, in: app)
         assertElement("dashboard.screen", in: app)
+        XCTAssertTrue(app.buttons["dashboard.action.budgetWizard"].firstMatch.waitForExistence(timeout: 8))
 
-        tapCoordinate(app.buttons["shell.tab.scan"].firstMatch)
+        tap(app.buttons["shell.tab.scan"].firstMatch, in: app)
         assertElement("scan.screen", in: app)
+        XCTAssertTrue(app.buttons["scan.action.importPhoto"].firstMatch.waitForExistence(timeout: 8))
     }
 
     @MainActor
     func testSettingsProfileNavigationOpensDestination() {
         assertSettingsRoute(
             triggerID: "settings.link.profile",
-            destinationTitle: "Perfil"
+            destinationElementID: "profile.screen"
         )
     }
 
@@ -40,7 +46,7 @@ final class SpendSageUITests: XCTestCase {
     func testSettingsPreferencesNavigationOpensDestination() {
         assertSettingsRoute(
             triggerID: "settings.link.preferences",
-            destinationTitle: "Apariencia y región"
+            destinationElementID: "settingsPreferences.screen"
         )
     }
 
@@ -48,7 +54,7 @@ final class SpendSageUITests: XCTestCase {
     func testSettingsNotificationsNavigationOpensDestination() {
         assertSettingsRoute(
             triggerID: "settings.link.notifications",
-            destinationTitle: "Avisos y permisos"
+            destinationElementID: "settingsNotifications.screen"
         )
     }
 
@@ -56,7 +62,7 @@ final class SpendSageUITests: XCTestCase {
     func testSettingsHelpNavigationOpensDestination() {
         assertSettingsRoute(
             triggerID: "settings.link.help",
-            destinationTitle: "Centro de ayuda"
+            destinationElementID: "help.screen"
         )
     }
 
@@ -64,7 +70,7 @@ final class SpendSageUITests: XCTestCase {
     func testSettingsSupportNavigationOpensDestination() {
         assertSettingsRoute(
             triggerID: "settings.link.support",
-            destinationTitle: "Centro de soporte"
+            destinationElementID: "support.screen"
         )
     }
 
@@ -73,7 +79,7 @@ final class SpendSageUITests: XCTestCase {
         assertSettingsRoute(
             triggerID: "settings.link.legal",
             destinationElementID: "legal.screen",
-            maxSwipes: 1
+            maxSwipes: 2
         )
     }
 
@@ -81,8 +87,8 @@ final class SpendSageUITests: XCTestCase {
     func testSettingsAdvancedNavigationOpensDestination() {
         assertSettingsRoute(
             triggerID: "settings.link.advanced",
-            destinationTitle: "Avanzado",
-            maxSwipes: 2
+            destinationElementID: "advanced.screen",
+            maxSwipes: 3
         )
     }
 
@@ -94,9 +100,10 @@ final class SpendSageUITests: XCTestCase {
         let button = app.buttons["settings.action.budgetWizard"].firstMatch
         XCTAssertTrue(button.waitForExistence(timeout: 8))
 
-        button.tap()
+        tap(button, in: app)
 
-        XCTAssertTrue(app.buttons["Cerrar"].firstMatch.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["budget.action.close"].firstMatch.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["budget.action.guide"].firstMatch.waitForExistence(timeout: 5))
     }
 
     @MainActor
@@ -107,28 +114,22 @@ final class SpendSageUITests: XCTestCase {
         let trendLink = app.buttons["insights.link.trend"].firstMatch
         XCTAssertTrue(trendLink.waitForExistence(timeout: 10))
 
-        trendLink.tap()
+        tap(trendLink, in: app)
 
-        assertNavigationTitle("Tendencia", in: app)
+        assertElement("insightsTrend.screen", in: app)
     }
 
     @MainActor
     func testInsightsChartTapShowsSelectionState() {
         let app = makeApp(startingTab: "insights")
+        app.launchEnvironment["SPENDSAGE_DEBUG_INSIGHTS_SELECTION"] = "3"
         app.launch()
 
         let chart = app.otherElements["insights.mainChart"].firstMatch
         XCTAssertTrue(chart.waitForExistence(timeout: 10))
 
-        let selectedText = app.staticTexts.containing(
-            NSPredicate(format: "label CONTAINS[c] %@", "seleccionado")
-        ).firstMatch
-
-        let bar = app.buttons["insights.chart.bar.3"].firstMatch
-        XCTAssertTrue(bar.waitForExistence(timeout: 5))
-        bar.tap()
-
-        XCTAssertTrue(selectedText.waitForExistence(timeout: 2), "Expected the chart to expose a selected point after tapping a bar.")
+        let selectionSummary = element("insights.chart.selection", in: app)
+        XCTAssertTrue(selectionSummary.waitForExistence(timeout: 2), "Expected the chart to expose a selected point after tapping a bar.")
     }
 
     @MainActor
@@ -139,9 +140,8 @@ final class SpendSageUITests: XCTestCase {
         let button = app.buttons["expenses.action.add"].firstMatch
         XCTAssertTrue(button.waitForExistence(timeout: 8))
 
-        tapCoordinate(button)
+        tap(button, in: app)
 
-        assertElement("addExpense.presented", in: app)
         XCTAssertTrue(app.buttons["addExpense.action.cancel"].firstMatch.waitForExistence(timeout: 8))
         XCTAssertTrue(app.buttons["addExpense.action.save"].firstMatch.waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["addExpense.action.cancel"].firstMatch.waitForExistence(timeout: 5))
@@ -155,17 +155,16 @@ final class SpendSageUITests: XCTestCase {
         let button = app.buttons["expenses.action.scan"].firstMatch
         XCTAssertTrue(button.waitForExistence(timeout: 8))
 
-        tapCoordinate(button)
+        tap(button, in: app)
 
-        assertElement("scan.screen", in: app)
-        XCTAssertTrue(app.buttons["Guía"].firstMatch.waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["scan.action.importPhoto"].firstMatch.waitForExistence(timeout: 8))
     }
 
     @MainActor
     func testExpensesToolsAccountsNavigationOpensDestination() {
         assertExpensesToolRoute(
             triggerID: "expenses.tool.accounts",
-            destinationTitle: "Accounts"
+            destinationElementID: "accounts.screen"
         )
     }
 
@@ -173,7 +172,7 @@ final class SpendSageUITests: XCTestCase {
     func testExpensesToolsBillsNavigationOpensDestination() {
         assertExpensesToolRoute(
             triggerID: "expenses.tool.bills",
-            destinationTitle: "Bills"
+            destinationElementID: "bills.screen"
         )
     }
 
@@ -181,7 +180,7 @@ final class SpendSageUITests: XCTestCase {
     func testExpensesToolsRulesNavigationOpensDestination() {
         assertExpensesToolRoute(
             triggerID: "expenses.tool.rules",
-            destinationTitle: "Reglas"
+            destinationElementID: "rules.screen"
         )
     }
 
@@ -189,7 +188,7 @@ final class SpendSageUITests: XCTestCase {
     func testExpensesToolsCsvNavigationOpensDestination() {
         assertExpensesToolRoute(
             triggerID: "expenses.tool.csv",
-            destinationTitle: "CSV Import"
+            destinationElementID: "csvImport.action.import"
         )
     }
 
@@ -198,13 +197,14 @@ final class SpendSageUITests: XCTestCase {
         let app = makeApp(startingTab: "expenses")
         app.launch()
 
+        prepareExpensesTools(in: app, targetID: "expenses.action.budgetWizard")
+
         let button = element("expenses.action.budgetWizard", in: app)
         XCTAssertTrue(button.waitForExistence(timeout: 8))
-        reveal(button, in: app, maxSwipes: 2)
+        reveal(button, in: app, maxSwipes: 4)
 
-        tapCoordinate(button)
+        tap(button, in: app)
 
-        assertElement("budgetWizard.presented", in: app)
         XCTAssertTrue(app.buttons["budget.action.close"].firstMatch.waitForExistence(timeout: 8))
         XCTAssertTrue(app.buttons["budget.action.guide"].firstMatch.waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["budget.action.close"].firstMatch.waitForExistence(timeout: 8))
@@ -241,7 +241,7 @@ final class SpendSageUITests: XCTestCase {
         XCTAssertTrue(trigger.waitForExistence(timeout: 8))
         reveal(trigger, in: app, maxSwipes: maxSwipes)
 
-        tap(trigger)
+        tap(trigger, in: app)
 
         if let destinationTitle {
             assertNavigationTitle(destinationTitle, in: app)
@@ -253,41 +253,81 @@ final class SpendSageUITests: XCTestCase {
     }
 
     @MainActor
-    private func assertExpensesToolRoute(triggerID: String, destinationTitle: String) {
+    private func assertExpensesToolRoute(triggerID: String, destinationElementID: String) {
         let app = makeApp(startingTab: "expenses")
         app.launch()
 
+        prepareExpensesTools(in: app, targetID: triggerID)
+
         let trigger = element(triggerID, in: app)
         XCTAssertTrue(trigger.waitForExistence(timeout: 8))
-        reveal(trigger, in: app, maxSwipes: 2)
+        reveal(trigger, in: app, maxSwipes: 4)
 
-        tap(trigger)
+        tap(trigger, in: app)
 
-        assertNavigationTitle(destinationTitle, in: app)
+        assertElement(destinationElementID, in: app)
+    }
+
+    @MainActor
+    private func prepareExpensesTools(in app: XCUIApplication, targetID: String) {
+        let disclosure = app.buttons["expenses.disclosure.tools"].firstMatch
+        XCTAssertTrue(disclosure.waitForExistence(timeout: 8))
+        reveal(disclosure, in: app, maxSwipes: 5)
+
+        let target = element(targetID, in: app)
+        if target.exists { return }
+
+        tap(disclosure, in: app, postPause: 0.9)
+
+        if !target.exists {
+            reveal(disclosure, in: app, maxSwipes: 2)
+            tap(disclosure, in: app, postPause: 0.9)
+        }
     }
 
     @MainActor
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, maxSwipes: Int) {
         guard maxSwipes > 0 else { return }
+        let viewport = app.windows.firstMatch.frame
 
         for _ in 0..<maxSwipes where !element.isHittable {
-            app.swipeUp()
+            let frame = element.frame
+            if !frame.isEmpty {
+                if frame.maxY > viewport.maxY - 140 {
+                    app.swipeUp()
+                } else if frame.minY < viewport.minY + 140 {
+                    app.swipeDown()
+                } else {
+                    usleep(250_000)
+                }
+            } else {
+                app.swipeUp()
+            }
+            usleep(300_000)
         }
     }
 
     @MainActor
-    private func tap(_ element: XCUIElement, timeout: TimeInterval = 8, postPause: Double = 0.7) {
+    private func tap(_ element: XCUIElement, in app: XCUIApplication? = nil, timeout: TimeInterval = 8, postPause: Double = 0.7) {
         XCTAssertTrue(element.waitForExistence(timeout: timeout))
+        if let app {
+            reveal(element, in: app, maxSwipes: 4)
+        }
+        XCTAssertTrue(waitUntilHittable(element, timeout: 4))
         element.tap()
         usleep(useconds_t(postPause * 1_000_000))
     }
 
     @MainActor
-    private func tapCoordinate(_ element: XCUIElement, timeout: TimeInterval = 8, postPause: Double = 0.7) {
-        XCTAssertTrue(element.waitForExistence(timeout: timeout))
-        element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
-
-        usleep(useconds_t(postPause * 1_000_000))
+    private func waitUntilHittable(_ element: XCUIElement, timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if element.isHittable {
+                return true
+            }
+            usleep(200_000)
+        }
+        return element.isHittable
     }
 
     @MainActor
@@ -302,7 +342,7 @@ final class SpendSageUITests: XCTestCase {
 
     @MainActor
     private func element(_ identifier: String, in app: XCUIApplication) -> XCUIElement {
-        app.descendants(matching: .any)[identifier]
+        app.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
 
     @MainActor

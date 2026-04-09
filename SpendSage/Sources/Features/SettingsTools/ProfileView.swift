@@ -34,6 +34,10 @@ struct ProfileView: View {
         .background(alignment: .top) {
             BrandBackdropView()
         }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "profile.screen")
+        }
+        .accessibilityIdentifier("profile.screen")
         .navigationTitle("Perfil")
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: viewModel.profile) { _, profile in
@@ -336,6 +340,10 @@ private struct ProfilePreferencesDetailView: View {
         .background(alignment: .top) {
             BrandBackdropView()
         }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "profilePreferences.screen")
+        }
+        .accessibilityIdentifier("profilePreferences.screen")
         .navigationTitle("Preferencias")
         .navigationBarTitleDisplayMode(.inline)
     }

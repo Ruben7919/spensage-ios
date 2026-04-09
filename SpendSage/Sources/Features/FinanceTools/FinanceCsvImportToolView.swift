@@ -155,7 +155,8 @@ struct FinanceCsvImportToolView: View {
                         FinanceMultilineField(
                             label: "Pega el texto CSV",
                             placeholder: CSVExpenseImportParser.sample,
-                            text: $csvText
+                            text: $csvText,
+                            accessibilityIdentifier: "csvImport.field.rawText"
                         )
                     }
                 }
@@ -259,6 +260,7 @@ struct FinanceCsvImportToolView: View {
                             Task { await importDrafts() }
                         }
                         .buttonStyle(PrimaryCTAStyle())
+                        .accessibilityIdentifier("csvImport.action.import")
                         .disabled(preview.rows.isEmpty)
                         .opacity(preview.rows.isEmpty ? 0.6 : 1)
                     }
@@ -267,6 +269,7 @@ struct FinanceCsvImportToolView: View {
             .padding(24)
         }
         .background(FinanceScreenBackground())
+        .accessibilityIdentifier("csvImport.screen")
         .navigationTitle("CSV Import")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingTemplatePreview) {

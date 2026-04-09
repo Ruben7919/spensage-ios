@@ -226,12 +226,7 @@ struct ExperienceDisclosureCard<Content: View>: View {
 
     var body: some View {
         SurfaceCard {
-            if let accessibilityIdentifier {
-                disclosureGroup
-                    .accessibilityIdentifier(accessibilityIdentifier)
-            } else {
-                disclosureGroup
-            }
+            disclosureGroup
         }
     }
 
@@ -243,21 +238,34 @@ struct ExperienceDisclosureCard<Content: View>: View {
             }
             .padding(.top, 8)
         } label: {
-            HStack(alignment: .top, spacing: 14) {
-                MascotAvatarView(character: character, expression: expression, size: 54)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title.appLocalized)
-                        .font(.headline)
-                        .foregroundStyle(BrandTheme.ink)
-                    Text(summary.appLocalized)
-                        .font(.subheadline)
-                        .foregroundStyle(BrandTheme.muted)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .contentShape(Rectangle())
+            disclosureLabel
         }
         .tint(BrandTheme.primary)
+    }
+
+    @ViewBuilder
+    private var disclosureLabel: some View {
+        let label = HStack(alignment: .top, spacing: 14) {
+            MascotAvatarView(character: character, expression: expression, size: 54)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title.appLocalized)
+                    .font(.headline)
+                    .foregroundStyle(BrandTheme.ink)
+                Text(summary.appLocalized)
+                    .font(.subheadline)
+                    .foregroundStyle(BrandTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(title.appLocalized). \(summary.appLocalized)")
+
+        if let accessibilityIdentifier {
+            label.accessibilityIdentifier(accessibilityIdentifier)
+        } else {
+            label
+        }
     }
 }

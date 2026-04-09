@@ -266,6 +266,7 @@ struct PrimaryCTAStyle: ButtonStyle {
             .font(.headline)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
+            .contentShape(Rectangle())
             .background(
                 LinearGradient(
                     colors: [
@@ -294,6 +295,7 @@ struct SecondaryCTAStyle: ButtonStyle {
             .font(.headline)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
+            .contentShape(Rectangle())
             .background(
                 LinearGradient(
                     colors: [
@@ -311,6 +313,24 @@ struct SecondaryCTAStyle: ButtonStyle {
             )
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .shadow(color: BrandTheme.shadow.opacity(0.06), radius: 12, x: 0, y: 6)
+    }
+}
+
+struct AccessibilityProbe: View {
+    let identifier: String
+
+    var body: some View {
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            Text(identifier)
+                .font(.system(size: 1))
+                .foregroundStyle(Color.white.opacity(0.01))
+                .frame(width: 2, height: 2, alignment: .topLeading)
+                .padding(.leading, 2)
+                .padding(.top, 2)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+                .accessibilityIdentifier(identifier)
+        }
     }
 }
 

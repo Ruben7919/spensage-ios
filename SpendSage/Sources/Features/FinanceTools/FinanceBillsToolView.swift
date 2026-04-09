@@ -326,6 +326,7 @@ struct FinanceBillsToolView: View {
             .padding(24)
         }
         .background(FinanceScreenBackground())
+        .accessibilityIdentifier("bills.screen")
         .navigationTitle("Bills")
         .navigationBarTitleDisplayMode(.inline)
         .task {

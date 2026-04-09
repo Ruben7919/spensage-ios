@@ -27,6 +27,9 @@ struct LegalCenterView: View {
                 LegalDocumentLibraryView()
             }
         }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: initialDocument == nil ? "legal.screen" : "legal.document.screen")
+        }
         .background(BrandTheme.canvas)
         .background(alignment: .top) {
             BrandBackdropView()

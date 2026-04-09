@@ -177,6 +177,10 @@ struct HelpCenterView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
+        .accessibilityIdentifier("help.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "help.screen")
+        }
         .background(BrandTheme.canvas)
         .background(alignment: .top) {
             BrandBackdropView()

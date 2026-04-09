@@ -212,6 +212,7 @@ struct FinanceRulesToolView: View {
             .padding(24)
         }
         .background(FinanceScreenBackground())
+        .accessibilityIdentifier("rules.screen")
         .navigationTitle("Reglas")
         .navigationBarTitleDisplayMode(.inline)
         .task {

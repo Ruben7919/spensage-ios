@@ -34,6 +34,10 @@ struct PremiumView: View {
             }
             .ignoresSafeArea()
         )
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "premium.screen")
+        }
+        .accessibilityIdentifier("premium.screen")
         .navigationTitle("Planes")
         .navigationBarTitleDisplayMode(.inline)
         .task {

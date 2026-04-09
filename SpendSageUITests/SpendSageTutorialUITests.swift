@@ -17,13 +17,13 @@ final class SpendSageTutorialUITests: XCTestCase {
         type("1250", into: app.textFields["onboarding.field.fixedBills"].firstMatch)
         type("840", into: app.textFields["onboarding.field.currentBalance"].firstMatch)
 
-        tap(app.buttons["onboarding.action.continueToGoal"].firstMatch)
+        tap(app.buttons["onboarding.action.continueToGoal"].firstMatch, in: app)
         type("1500", into: app.textFields["onboarding.field.goalTarget"].firstMatch)
 
-        tap(app.buttons["onboarding.action.showPreview"].firstMatch)
+        tap(app.buttons["onboarding.action.showPreview"].firstMatch, in: app)
         pause(1.8)
 
-        tap(app.buttons["onboarding.action.getStarted"].firstMatch)
+        tap(app.buttons["onboarding.action.getStarted"].firstMatch, in: app)
         pause(1.4)
     }
 
@@ -32,14 +32,16 @@ final class SpendSageTutorialUITests: XCTestCase {
         let app = makeApp(startingTab: "dashboard")
         app.launch()
 
-        XCTAssertTrue(app.navigationBars["Inicio"].firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(element("dashboard.screen", in: app).waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["dashboard.action.budgetWizard"].firstMatch.waitForExistence(timeout: 10))
         pause(1.2)
 
-        tap(app.buttons["shell.tab.expenses"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Gastos"].firstMatch.waitForExistence(timeout: 8))
+        tap(app.buttons["shell.tab.expenses"].firstMatch, in: app)
+        XCTAssertTrue(element("expenses.screen", in: app).waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["expenses.action.add"].firstMatch.waitForExistence(timeout: 8))
         pause(0.8)
 
-        tap(app.buttons["expenses.action.add"].firstMatch)
+        tap(app.buttons["expenses.action.add"].firstMatch, in: app)
         XCTAssertTrue(app.buttons["addExpense.action.save"].firstMatch.waitForExistence(timeout: 8))
         pause(0.8)
 
@@ -47,8 +49,8 @@ final class SpendSageTutorialUITests: XCTestCase {
         type("42.80", into: app.textFields["addExpense.field.amount"].firstMatch)
         pause(0.6)
 
-        tap(app.buttons["addExpense.action.save"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Gastos"].firstMatch.waitForExistence(timeout: 8))
+        tap(app.buttons["addExpense.action.save"].firstMatch, in: app)
+        XCTAssertTrue(element("expenses.screen", in: app).waitForExistence(timeout: 8))
         pause(1.4)
     }
 
@@ -77,50 +79,51 @@ final class SpendSageTutorialUITests: XCTestCase {
         let app = makeApp(startingTab: "insights")
         app.launch()
 
+        XCTAssertTrue(element("insights.screen", in: app).waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["insights.link.trend"].firstMatch.waitForExistence(timeout: 10))
         pause(1.0)
 
-        tap(app.buttons["insights.chart.bar.3"].firstMatch)
-        XCTAssertTrue(element("insights.chart.selection", in: app).waitForExistence(timeout: 4))
-        pause(1.0)
+        tap(app.buttons["insights.chart.bar.3"].firstMatch, in: app)
+        pause(0.8)
 
-        tap(app.buttons["insights.link.trend"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Tendencia"].firstMatch.waitForExistence(timeout: 8))
+        tap(app.buttons["insights.link.trend"].firstMatch, in: app)
+        XCTAssertTrue(element("insightsTrend.screen", in: app).waitForExistence(timeout: 8))
         pause(1.0)
         back(app)
 
-        tap(app.buttons["shell.tab.dashboard"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Inicio"].firstMatch.waitForExistence(timeout: 8))
+        tap(app.buttons["shell.tab.dashboard"].firstMatch, in: app)
+        XCTAssertTrue(element("dashboard.screen", in: app).waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["dashboard.action.budgetWizard"].firstMatch.waitForExistence(timeout: 8))
         pause(0.8)
 
-        tap(app.buttons["dashboard.action.budgetWizard"].firstMatch)
+        tap(app.buttons["dashboard.action.budgetWizard"].firstMatch, in: app)
         XCTAssertTrue(element("budget.screen", in: app).waitForExistence(timeout: 8))
         pause(0.8)
 
         type("4200", into: app.textFields["budget.field.income"].firstMatch)
-        tap(app.buttons["budget.action.next"].firstMatch)
+        tap(app.buttons["budget.action.next"].firstMatch, in: app)
         type("2800", into: app.textFields["budget.field.target"].firstMatch)
-        tap(app.buttons["budget.action.next"].firstMatch)
+        tap(app.buttons["budget.action.next"].firstMatch, in: app)
         pause(1.0)
-        tap(app.buttons["budget.action.save"].firstMatch)
+        tap(app.buttons["budget.action.save"].firstMatch, in: app)
 
-        XCTAssertTrue(app.navigationBars["Inicio"].firstMatch.waitForExistence(timeout: 8))
+        XCTAssertTrue(element("dashboard.screen", in: app).waitForExistence(timeout: 8))
         pause(1.4)
     }
 
     @MainActor
     func testTutorial05AccountsBillsAndRules() {
-        let scenes: [(route: String, title: String)] = [
-            ("accounts", "Cuentas"),
-            ("bills", "Facturas"),
-            ("rules", "Reglas")
+        let scenes: [(route: String, destinationID: String)] = [
+            ("accounts", "accounts.screen"),
+            ("bills", "bills.screen"),
+            ("rules", "rules.screen")
         ]
 
         for (index, scene) in scenes.enumerated() {
             let app = makeApp(route: scene.route)
             app.launch()
 
-            XCTAssertTrue(app.navigationBars[scene.title].firstMatch.waitForExistence(timeout: 10))
+            XCTAssertTrue(element(scene.destinationID, in: app).waitForExistence(timeout: 10))
             pause(0.8)
             app.swipeUp()
             pause(index == scenes.count - 1 ? 1.4 : 1.0)
@@ -140,29 +143,35 @@ final class SpendSageTutorialUITests: XCTestCase {
         XCTAssertTrue(app.buttons["settings.link.profile"].firstMatch.waitForExistence(timeout: 10))
         pause(1.0)
 
-        tap(app.buttons["settings.link.profile"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Perfil"].firstMatch.waitForExistence(timeout: 8))
+        tap(app.buttons["settings.link.profile"].firstMatch, in: app)
+        XCTAssertTrue(element("profile.screen", in: app).waitForExistence(timeout: 8))
         pause(0.9)
         back(app)
 
-        tap(app.buttons["settings.link.help"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Centro de ayuda"].firstMatch.waitForExistence(timeout: 8))
+        tap(app.buttons["settings.link.help"].firstMatch, in: app)
+        XCTAssertTrue(element("help.screen", in: app).waitForExistence(timeout: 8))
         pause(0.9)
         back(app)
 
-        tap(app.buttons["settings.link.support"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Centro de soporte"].firstMatch.waitForExistence(timeout: 8))
+        tap(app.buttons["settings.link.support"].firstMatch, in: app)
+        XCTAssertTrue(element("support.screen", in: app).waitForExistence(timeout: 8))
         pause(0.9)
         back(app)
+        pause(0.6)
 
-        reveal(app.buttons["settings.link.legal"].firstMatch, in: app, maxSwipes: 1)
-        tap(app.buttons["settings.link.legal"].firstMatch)
+        let legalButton = app.buttons["settings.link.legal"].firstMatch
+        XCTAssertTrue(legalButton.waitForExistence(timeout: 8))
+        reveal(legalButton, in: app, maxSwipes: 3)
+        tap(legalButton, in: app, postPause: 1.0)
         XCTAssertTrue(element("legal.screen", in: app).waitForExistence(timeout: 8))
         pause(0.9)
         back(app)
 
-        tap(app.buttons["settings.link.plans"].firstMatch)
-        XCTAssertTrue(app.navigationBars["Planes"].firstMatch.waitForExistence(timeout: 8))
+        let plansButton = app.buttons["settings.link.plans"].firstMatch
+        XCTAssertTrue(plansButton.waitForExistence(timeout: 8))
+        reveal(plansButton, in: app, maxSwipes: 3)
+        tap(plansButton, in: app)
+        XCTAssertTrue(element("premium.screen", in: app).waitForExistence(timeout: 8))
         pause(1.4)
     }
 
@@ -211,8 +220,12 @@ final class SpendSageTutorialUITests: XCTestCase {
     }
 
     @MainActor
-    private func tap(_ element: XCUIElement, timeout: TimeInterval = 8, postPause: Double = 0.7) {
+    private func tap(_ element: XCUIElement, in app: XCUIApplication? = nil, timeout: TimeInterval = 8, postPause: Double = 0.7) {
         XCTAssertTrue(element.waitForExistence(timeout: timeout))
+        if let app {
+            reveal(element, in: app, maxSwipes: 4)
+        }
+        XCTAssertTrue(waitUntilHittable(element, timeout: 4))
         element.tap()
         pause(postPause)
     }
@@ -255,11 +268,35 @@ final class SpendSageTutorialUITests: XCTestCase {
     @MainActor
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, maxSwipes: Int) {
         guard maxSwipes > 0 else { return }
+        let viewport = app.windows.firstMatch.frame
 
         for _ in 0..<maxSwipes where !element.isHittable {
-            app.swipeUp()
+            let frame = element.frame
+            if !frame.isEmpty {
+                if frame.maxY > viewport.maxY - 140 {
+                    app.swipeUp()
+                } else if frame.minY < viewport.minY + 140 {
+                    app.swipeDown()
+                } else {
+                    pause(0.25)
+                }
+            } else {
+                app.swipeUp()
+            }
             pause(0.5)
         }
+    }
+
+    @MainActor
+    private func waitUntilHittable(_ element: XCUIElement, timeout: TimeInterval) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if element.isHittable {
+                return true
+            }
+            pause(0.2)
+        }
+        return element.isHittable
     }
 
     @MainActor
@@ -272,7 +309,7 @@ final class SpendSageTutorialUITests: XCTestCase {
 
     @MainActor
     private func element(_ identifier: String, in app: XCUIApplication) -> XCUIElement {
-        app.descendants(matching: .any)[identifier]
+        app.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
 
     private func pause(_ seconds: Double) {

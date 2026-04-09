@@ -100,56 +100,74 @@ final class LivePushRegistrationService: PushRegistrationServicing {
     private func waitForRegistration() async throws -> String {
         try await withCheckedThrowingContinuation { continuation in
             let center = NotificationCenter.default
-            var continuationResolved = false
-            var successObserver: NSObjectProtocol?
-            var failureObserver: NSObjectProtocol?
+            let state = PushRegistrationWaitState(center: center, continuation: continuation)
 
-            func resolve(_ result: Result<String, Error>) {
-                guard !continuationResolved else { return }
-                continuationResolved = true
-                if let successObserver {
-                    center.removeObserver(successObserver)
-                }
-                if let failureObserver {
-                    center.removeObserver(failureObserver)
-                }
-                switch result {
-                case let .success(token):
-                    continuation.resume(returning: token)
-                case let .failure(error):
-                    continuation.resume(throwing: error)
-                }
-            }
-
-            successObserver = center.addObserver(
+            state.successObserver = center.addObserver(
                 forName: .spendsageDidRegisterForRemoteNotifications,
                 object: nil,
                 queue: .main
             ) { notification in
                 let token = notification.userInfo?[PushRegistrationNotificationKeys.token] as? String ?? ""
-                if token.isEmpty {
-                    resolve(.failure(PushRegistrationError.registrationFailed("No se recibió un token APNs válido.")))
-                    return
+                Task { @MainActor in
+                    if token.isEmpty {
+                        state.resolve(.failure(PushRegistrationError.registrationFailed("No se recibió un token APNs válido.")))
+                        return
+                    }
+                    state.resolve(.success(token))
                 }
-                resolve(.success(token))
             }
 
-            failureObserver = center.addObserver(
+            state.failureObserver = center.addObserver(
                 forName: .spendsageDidFailRemoteNotificationRegistration,
                 object: nil,
                 queue: .main
             ) { notification in
                 let message = notification.userInfo?[PushRegistrationNotificationKeys.error] as? String
                     ?? "Falló el registro APNs."
-                resolve(.failure(PushRegistrationError.registrationFailed(message)))
+                Task { @MainActor in
+                    state.resolve(.failure(PushRegistrationError.registrationFailed(message)))
+                }
             }
 
             UIApplication.shared.registerForRemoteNotifications()
 
-            Task { @MainActor in
+            state.timeoutTask = Task { @MainActor in
                 try? await Task.sleep(for: .seconds(15))
-                resolve(.failure(PushRegistrationError.registrationTimedOut))
+                state.resolve(.failure(PushRegistrationError.registrationTimedOut))
             }
+        }
+    }
+}
+
+@MainActor
+private final class PushRegistrationWaitState {
+    let center: NotificationCenter
+    let continuation: CheckedContinuation<String, Error>
+    var continuationResolved = false
+    var successObserver: NSObjectProtocol?
+    var failureObserver: NSObjectProtocol?
+    var timeoutTask: Task<Void, Never>?
+
+    init(center: NotificationCenter, continuation: CheckedContinuation<String, Error>) {
+        self.center = center
+        self.continuation = continuation
+    }
+
+    func resolve(_ result: Result<String, Error>) {
+        guard !continuationResolved else { return }
+        continuationResolved = true
+        timeoutTask?.cancel()
+        if let successObserver {
+            center.removeObserver(successObserver)
+        }
+        if let failureObserver {
+            center.removeObserver(failureObserver)
+        }
+        switch result {
+        case let .success(token):
+            continuation.resume(returning: token)
+        case let .failure(error):
+            continuation.resume(throwing: error)
         }
     }
 }

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct BudgetWizardView: View {
     private enum WizardStep: Int, CaseIterable {
@@ -95,20 +96,17 @@ struct BudgetWizardView: View {
                     progressCard
                     stepCard
                     summaryCard
-
-                    if let note {
-                        Text(note)
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(.red)
-                            .padding(.horizontal, 4)
-                    }
                 }
                 .padding(24)
             }
+            .scrollDismissesKeyboard(.interactively)
             .accessibilityIdentifier("budget.screen")
             .background(BrandTheme.canvas)
             .navigationTitle("Presupuesto")
             .navigationBarTitleDisplayMode(.inline)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                stepActionBar
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cerrar") {
@@ -122,9 +120,21 @@ struct BudgetWizardView: View {
                     }
                     .accessibilityIdentifier("budget.action.guide")
                 }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Listo") {
+                        dismissKeyboard()
+                    }
+                }
             }
             .sheet(isPresented: $isPresentingGuide) {
                 GuideSheet(guide: GuideLibrary.guide(.budgetWizard))
+            }
+        }
+        .overlay(alignment: .topLeading) {
+            ZStack(alignment: .topLeading) {
+                AccessibilityProbe(identifier: "budget.screen")
+                AccessibilityProbe(identifier: "budgetWizard.presented")
             }
         }
         .onAppear {
@@ -191,6 +201,28 @@ struct BudgetWizardView: View {
         }
     }
 
+    private var stepActionBar: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let note {
+                Text(note)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.red)
+            }
+
+            stepControls(
+                primaryTitle: step == .review ? "Guardar presupuesto local" : (step == .income ? "Siguiente" : "Revisar"),
+                isFinal: step == .review
+            )
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 12)
+        .background(BrandTheme.background.opacity(0.96))
+        .overlay(alignment: .top) {
+            Divider()
+        }
+    }
+
     @ViewBuilder
     private var stepCard: some View {
         switch step {
@@ -214,8 +246,6 @@ struct BudgetWizardView: View {
                             systemImage: "leaf.fill"
                         )
                     }
-
-                    stepControls(primaryTitle: "Siguiente")
                 }
             }
         case .target:
@@ -243,8 +273,6 @@ struct BudgetWizardView: View {
                             systemImage: "shield.lefthalf.filled"
                         )
                     }
-
-                    stepControls(primaryTitle: "Revisar")
                 }
             }
         case .review:
@@ -289,8 +317,6 @@ struct BudgetWizardView: View {
                         title: "Puedes cambiarlo después",
                         detail: "El asistente es una ayuda de configuración, no un candado único. Puedes abrirlo otra vez desde Ajustes cuando el mes cambie."
                     )
-
-                    stepControls(primaryTitle: "Guardar presupuesto local", isFinal: true)
                 }
             }
         }
@@ -378,5 +404,9 @@ struct BudgetWizardView: View {
 
         note = nil
         await viewModel.saveBudget(monthlyIncome: incomeValue, monthlyBudget: budgetValue)
+    }
+
+    private func dismissKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }

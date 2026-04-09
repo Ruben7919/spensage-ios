@@ -144,6 +144,10 @@ struct FinanceReceiptScanToolView: View {
         ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_DISABLE_AUTO_CAMERA"] == nil
     }
 
+    private var showsStepActionBar: Bool {
+        currentStep == .autofill || currentStep == .review
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
@@ -173,11 +177,20 @@ struct FinanceReceiptScanToolView: View {
                 stepContent
             }
             .padding(24)
+            .padding(.bottom, showsStepActionBar ? 110 : 24)
         }
         .accessibilityIdentifier("scan.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "scan.screen")
+        }
         .background(FinanceScreenBackground())
         .navigationTitle("Escaneo de recibos")
         .navigationBarTitleDisplayMode(.inline)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if showsStepActionBar {
+                stepActionBar
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -501,22 +514,6 @@ struct FinanceReceiptScanToolView: View {
                             .font(.footnote)
                             .foregroundStyle(.red)
                     }
-
-                    HStack(spacing: 12) {
-                        Button("Atrás") {
-                            transitionToStep(.capture)
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
-                        .accessibilityIdentifier("scan.action.backToCapture")
-
-                        Button("Revisar gasto") {
-                            goToReview()
-                        }
-                        .buttonStyle(PrimaryCTAStyle())
-                        .disabled(!canSave || isAnalyzingReceipt)
-                        .opacity((canSave && !isAnalyzingReceipt) ? 1 : 0.7)
-                        .accessibilityIdentifier("scan.action.review")
-                    }
                 }
             }
 
@@ -594,28 +591,6 @@ struct FinanceReceiptScanToolView: View {
                     Text("Lo que guardes aquí se queda en este dispositivo. Nada se comparte ni se sincroniza todavía.")
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
-
-                    HStack(spacing: 12) {
-                        Button("Atrás") {
-                            transitionToStep(.autofill)
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
-                        .accessibilityIdentifier("scan.action.backToAutofill")
-
-                        Button {
-                            Task { await saveDraft() }
-                        } label: {
-                            ReceiptActionLabel(
-                                title: isSavingDraft ? "Guardando localmente..." : "Guardar gasto",
-                                systemImage: isSavingDraft ? "hourglass" : "tray.and.arrow.down.fill",
-                                style: .primary
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(!canSave)
-                        .opacity(canSave ? 1 : 0.7)
-                        .accessibilityIdentifier("scan.action.save")
-                    }
                 }
             }
 
@@ -634,6 +609,63 @@ struct FinanceReceiptScanToolView: View {
                     }
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var stepActionBar: some View {
+        VStack(spacing: 0) {
+            Divider()
+
+            HStack(spacing: 12) {
+                switch currentStep {
+                case .capture:
+                    EmptyView()
+
+                case .autofill:
+                    Button("Atrás") {
+                        transitionToStep(.capture)
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .accessibilityIdentifier("scan.action.backToCapture")
+
+                    Button("Revisar gasto") {
+                        goToReview()
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+                    .disabled(!canSave || isAnalyzingReceipt)
+                    .opacity((canSave && !isAnalyzingReceipt) ? 1 : 0.7)
+                    .accessibilityIdentifier("scan.action.review")
+
+                case .review:
+                    Button("Atrás") {
+                        transitionToStep(.autofill)
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .accessibilityIdentifier("scan.action.backToAutofill")
+
+                    Button {
+                        Task { await saveDraft() }
+                    } label: {
+                        Label(
+                            isSavingDraft ? "Guardando localmente..." : "Guardar gasto",
+                            systemImage: isSavingDraft ? "hourglass" : "tray.and.arrow.down.fill"
+                        )
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+                    .disabled(!canSave)
+                    .opacity(canSave ? 1 : 0.7)
+                    .accessibilityIdentifier("scan.action.save")
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
+            .background(
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .overlay(BrandTheme.canvas.opacity(0.9))
+            )
         }
     }
 

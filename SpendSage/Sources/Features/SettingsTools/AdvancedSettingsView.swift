@@ -45,6 +45,10 @@ struct AdvancedSettingsView: View {
         .background(alignment: .top) {
             BrandBackdropView()
         }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "advanced.screen")
+        }
+        .accessibilityIdentifier("advanced.screen")
         .navigationTitle("Avanzado")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isPresentingGuide) {

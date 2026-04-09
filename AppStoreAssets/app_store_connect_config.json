@@ -68,13 +68,13 @@
     }
   },
   "build": {
-    "id": "578d54d2-918e-4ad4-bd1d-6f5cb352065f",
+    "id": "",
     "betaLocalizations": {
       "en-US": {
-        "whatsNew": "Build 22 adds authenticated finance sync, family shared spaces and invites, native StoreKit subscriptions, verified physical iPhone push delivery, and first-party reliability telemetry while continuing to polish charts, settings, and the refreshed iPhone UI."
+        "whatsNew": "Build 25 closes the beta QA pass with cleaner settings, automatic permission prompts, simpler receipt scanning, stronger navigation stability, authenticated sync and family spaces, native StoreKit subscriptions, verified iPhone push delivery, and first-party reliability telemetry."
       },
       "es-MX": {
-        "whatsNew": "La build 22 añade sync financiero autenticado, espacios familiares compartidos con invites, suscripciones nativas con StoreKit, push físico validado en iPhone y telemetría first-party de estabilidad, mientras sigue puliendo la UI renovada, gráficas y ajustes."
+        "whatsNew": "La build 25 cierra el pase de QA de beta con ajustes más simples, permisos automáticos al inicio, escaneo de recibos más fluido, navegación más estable, sync autenticado con espacios familiares, suscripciones nativas con StoreKit, push validado en iPhone y telemetría first-party de estabilidad."
       }
     }
   },

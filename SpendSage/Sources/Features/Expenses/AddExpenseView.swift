@@ -61,15 +61,7 @@ struct AddExpenseView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    FinanceToolsHeaderCard(
-                        eyebrow: "Captura rápida",
-                        title: "Agregar gasto",
-                        summary: "Registra a mano, pega un correo de compra o deja lista una suscripción recurrente sin salir de la misma pantalla.",
-                        systemImage: "plus.circle.fill",
-                        character: .manchas,
-                        expression: .happy,
-                        sceneKey: "guide_02_log_expense_manchas"
-                    )
+                    quickCaptureCard
 
                     entrySourceCard
                     expenseFormCard
@@ -82,27 +74,18 @@ struct AddExpenseView: View {
                         previewCard
                     }
 
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                    }
-
-                    Button("Guardar gasto") {
-                        Task { await saveExpense() }
-                    }
-                    .buttonStyle(PrimaryCTAStyle())
-                    .disabled(!canSave)
-                    .opacity(canSave ? 1 : 0.6)
-                    .accessibilityIdentifier("addExpense.action.save")
                 }
                 .padding(20)
                 .padding(.bottom, 24)
             }
+            .scrollDismissesKeyboard(.interactively)
             .accessibilityIdentifier("addExpense.screen")
             .background(FinanceScreenBackground())
             .navigationTitle("Agregar gasto")
             .navigationBarTitleDisplayMode(.inline)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                saveActionBar
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancelar") {
@@ -110,10 +93,22 @@ struct AddExpenseView: View {
                     }
                     .accessibilityIdentifier("addExpense.action.cancel")
                 }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Listo") {
+                        dismissKeyboard()
+                    }
+                }
             }
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+        .overlay(alignment: .topLeading) {
+            ZStack(alignment: .topLeading) {
+                AccessibilityProbe(identifier: "addExpense.screen")
+                AccessibilityProbe(identifier: "addExpense.presented")
+            }
+        }
         .onAppear {
             errorMessage = nil
         }
@@ -124,6 +119,67 @@ struct AddExpenseView: View {
             if newValue != .subscriptions {
                 isRecurringSubscription = false
             }
+        }
+    }
+
+    private var quickCaptureCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top, spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(BrandTheme.accent.opacity(0.2))
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(BrandTheme.primary)
+                    }
+                    .frame(width: 52, height: 52)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Agregar gasto")
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text("Captura rápido una compra manual, pega un correo o deja una suscripción lista en la misma pantalla.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+
+                BrandFeatureRow(
+                    systemImage: "sparkles",
+                    title: "Entrada directa",
+                    detail: "Los campos principales quedan arriba para registrar el gasto sin vueltas."
+                )
+            }
+        }
+    }
+
+    private var saveActionBar: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.red)
+            }
+
+            Button("Guardar gasto") {
+                Task { await saveExpense() }
+            }
+            .buttonStyle(PrimaryCTAStyle())
+            .disabled(!canSave)
+            .opacity(canSave ? 1 : 0.6)
+            .accessibilityIdentifier("addExpense.action.save")
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 12)
+        .background(BrandTheme.background.opacity(0.96))
+        .overlay(alignment: .top) {
+            Divider()
         }
     }
 
@@ -570,5 +626,9 @@ struct AddExpenseView: View {
             recurringPlan: recurringPlan
         )
         await viewModel.addExpense(draft)
+    }
+
+    private func dismissKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }

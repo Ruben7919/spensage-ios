@@ -55,7 +55,11 @@ bash scripts/app_store/archive_and_upload.sh external
 ## Sync App Store Connect metadata
 
 ```bash
-python3 scripts/app_store/app_store_connect_iris_sync.py --transport cookies --all
+bash scripts/app_store/archive_and_upload.sh external
+```
+
+```bash
+python3 scripts/app_store/testflight_promote.py --version 25 --wait
 ```
 
 ```bash
@@ -66,13 +70,7 @@ python3 scripts/app_store/app_store_connect_iris_sync.py --transport cookies --a
 python3 scripts/app_store/app_store_connect_screenshots_sync.py --locales es-ES,en-US
 ```
 
-The metadata sync now covers App Store icon linkage through the selected build, age rating, beta app text, beta build "what's new", pricing/localizations, review notes, review screenshots, product availability, and tax categories.
-
-```bash
-python3 scripts/app_store/testflight_promote.py --version 22 --wait
-```
-
-The promotion script now persists the current App Store Connect build id, refreshes beta build "What's New", associates the build with the external TestFlight group, and treats internal distribution as automatic for App Store eligible builds.
+Run the archive/upload first, then promote the matching build, and only then sync metadata that depends on the selected App Store Connect build id. The metadata sync covers App Store icon linkage through the promoted build, age rating, beta app text, beta build "what's new", pricing/localizations, review notes, review screenshots, product availability, and tax categories.
 
 ## Run tests
 

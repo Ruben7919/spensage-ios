@@ -258,6 +258,7 @@ struct FinanceAccountsToolView: View {
             .padding(24)
         }
         .background(FinanceScreenBackground())
+        .accessibilityIdentifier("accounts.screen")
         .navigationTitle("Accounts")
         .navigationBarTitleDisplayMode(.inline)
         .task {

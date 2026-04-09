@@ -325,9 +325,13 @@ struct SupportCenterView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
+        .accessibilityIdentifier("support.screen")
         .background(BrandTheme.canvas)
         .background(alignment: .top) {
             BrandBackdropView()
+        }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "support.screen")
         }
         .overlay(alignment: .bottom) {
             if copiedState {

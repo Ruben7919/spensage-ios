@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from app_store_connect_iris_sync import CookieIrisClient, load_config, upsert_beta_build_localizations, upsert_version_build
+from app_store_connect_iris_sync import ChromeIrisClient, CookieIrisClient, load_config, upsert_beta_build_localizations, upsert_version_build
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -99,10 +99,19 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--version", required=True, help="Build number to promote, for example 22.")
     parser.add_argument("--wait", action="store_true", help="Wait until App Store Connect marks the build VALID.")
+    parser.add_argument(
+        "--transport",
+        choices=["cookies", "chrome"],
+        default="cookies",
+        help="Use App Store Connect session cookies from Chrome or the active App Store Connect Chrome tab.",
+    )
     args = parser.parse_args()
 
     config = load_config()
-    client = CookieIrisClient(config["appId"])
+    if args.transport == "chrome":
+        client = ChromeIrisClient(config["appId"])
+    else:
+        client = CookieIrisClient(config["appId"])
     if args.wait:
         build = wait_for_build_ready(client, config["appId"], args.version)
     else:

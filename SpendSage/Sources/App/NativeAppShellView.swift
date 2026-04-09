@@ -1,26 +1,32 @@
 import SwiftUI
-import UIKit
 
 struct NativeAppShellView: View {
     @ObservedObject var viewModel: AppViewModel
 
     private let leadingTabs: [AppViewModel.AppTab] = [.dashboard, .expenses]
     private let trailingTabs: [AppViewModel.AppTab] = [.insights, .settings]
-    @Namespace private var shellSelectionAnimation
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        GeometryReader { proxy in
+            let deviceBottomInset = proxy.safeAreaInsets.bottom
+            let bottomNavigationContentPadding = max(deviceBottomInset - 14, 2)
+            let bottomNavigationInset = ShellBarMetrics.backgroundHeight + bottomNavigationContentPadding + 12
+
             currentTabContent
                 .tint(BrandTheme.primary)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .environment(\.shellBottomInset, bottomNavigationInset)
-                .id(viewModel.selectedTab)
-
-            bottomNavigation
-                .zIndex(10)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    bottomNavigation(
+                        deviceBottomInset: deviceBottomInset,
+                        bottomNavigationContentPadding: bottomNavigationContentPadding
+                    )
+                }
+            .background(BrandTheme.background.ignoresSafeArea())
+            .overlay(alignment: .topLeading) {
+                AccessibilityProbe(identifier: "shell.current.\(viewModel.selectedTab.rawValue)")
+            }
         }
-        .ignoresSafeArea(edges: .bottom)
-        .background(BrandTheme.background.ignoresSafeArea())
         .sheet(item: $viewModel.activeSheet) { sheet in
             switch sheet {
             case .addExpense:
@@ -67,7 +73,7 @@ struct NativeAppShellView: View {
         }
     }
 
-    private var bottomNavigation: some View {
+    private func bottomNavigation(deviceBottomInset: CGFloat, bottomNavigationContentPadding: CGFloat) -> some View {
         ZStack(alignment: .bottom) {
             ShellNavigationBackground(bottomInset: deviceBottomInset)
 
@@ -75,8 +81,7 @@ struct NativeAppShellView: View {
                 ForEach(leadingTabs) { tab in
                     ShellNavigationButton(
                         tab: tab,
-                        isSelected: viewModel.selectedTab == tab,
-                        selectionAnimation: shellSelectionAnimation
+                        isSelected: viewModel.selectedTab == tab
                     ) {
                         select(tab)
                     }
@@ -89,8 +94,7 @@ struct NativeAppShellView: View {
                 ForEach(trailingTabs) { tab in
                     ShellNavigationButton(
                         tab: tab,
-                        isSelected: viewModel.selectedTab == tab,
-                        selectionAnimation: shellSelectionAnimation
+                        isSelected: viewModel.selectedTab == tab
                     ) {
                         select(tab)
                     }
@@ -104,9 +108,7 @@ struct NativeAppShellView: View {
     }
 
     private func select(_ tab: AppViewModel.AppTab) {
-        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-            viewModel.selectedTab = tab
-        }
+        viewModel.selectedTab = tab
     }
 
     private func navigationShell<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -115,22 +117,6 @@ struct NativeAppShellView: View {
                 .toolbarBackground(.visible, for: .navigationBar)
                 .toolbarBackground(BrandTheme.background.opacity(0.92), for: .navigationBar)
         }
-    }
-
-    private var deviceBottomInset: CGFloat {
-        UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first(where: \.isKeyWindow)?
-            .safeAreaInsets.bottom ?? 0
-    }
-
-    private var bottomNavigationContentPadding: CGFloat {
-        max(deviceBottomInset - 14, 2)
-    }
-
-    private var bottomNavigationInset: CGFloat {
-        ShellBarMetrics.backgroundHeight + bottomNavigationContentPadding + 12
     }
 }
 
@@ -152,7 +138,6 @@ extension EnvironmentValues {
 private struct ShellNavigationButton: View {
     let tab: AppViewModel.AppTab
     let isSelected: Bool
-    let selectionAnimation: Namespace.ID
     let action: () -> Void
 
     var body: some View {
@@ -170,6 +155,7 @@ private struct ShellNavigationButton: View {
             .foregroundStyle(isSelected ? BrandTheme.primary : BrandTheme.muted)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
+            .contentShape(Rectangle())
             .background {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -187,7 +173,6 @@ private struct ShellNavigationButton: View {
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
                                 .stroke(BrandTheme.line.opacity(0.85), lineWidth: 1)
                         )
-                        .matchedGeometryEffect(id: "shell-selection", in: selectionAnimation)
                 }
             }
         }
@@ -235,6 +220,7 @@ private struct ReceiptScanDockButton: View {
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(isSelected ? BrandTheme.primary : BrandTheme.ink)
             }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)

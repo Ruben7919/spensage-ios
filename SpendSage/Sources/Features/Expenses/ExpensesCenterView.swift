@@ -65,8 +65,6 @@ struct ExpensesCenterView: View {
 
                 if let state = currentState {
                     snapshotCard(for: state)
-                    recentLedgerCard
-                    toolsDisclosureCard
                     if !categoryBreakdown.isEmpty {
                         ExperienceDisclosureCard(
                             title: "Más detalle",
@@ -84,12 +82,18 @@ struct ExpensesCenterView: View {
                 } else {
                     loadingCard
                 }
+
+                recentLedgerCard
+                toolsDisclosureCard
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
             .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .accessibilityIdentifier("expenses.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "expenses.screen")
+        }
         .background(
             ZStack {
                 BrandTheme.canvas
@@ -365,6 +369,12 @@ struct ExpensesCenterView: View {
 
     private var toolsHubContent: some View {
         VStack(alignment: .leading, spacing: 16) {
+            Button("Abrir asistente de presupuesto") {
+                viewModel.presentBudgetWizard()
+            }
+            .buttonStyle(SecondaryCTAStyle())
+            .accessibilityIdentifier("expenses.action.budgetWizard")
+
             Button {
                 viewModel.startScanFlow()
             } label: {
@@ -420,12 +430,6 @@ struct ExpensesCenterView: View {
                 )
             }
             .accessibilityIdentifier("expenses.tool.rules")
-
-            Button("Abrir asistente de presupuesto") {
-                viewModel.presentBudgetWizard()
-            }
-            .buttonStyle(SecondaryCTAStyle())
-            .accessibilityIdentifier("expenses.action.budgetWizard")
         }
     }
 

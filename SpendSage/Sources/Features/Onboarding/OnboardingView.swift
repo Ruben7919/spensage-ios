@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct OnboardingView: View {
     let onContinue: () -> Void
@@ -45,7 +46,9 @@ struct OnboardingView: View {
                 currentStepCard
             }
             .padding(24)
+            .padding(.bottom, 120)
         }
+        .scrollDismissesKeyboard(.interactively)
         .accessibilityIdentifier("onboarding.screen")
         .background(
             ZStack {
@@ -54,9 +57,19 @@ struct OnboardingView: View {
             }
             .ignoresSafeArea()
         )
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            footerActions
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 languagePicker
+            }
+
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") {
+                    dismissKeyboard()
+                }
             }
         }
     }
@@ -154,13 +167,6 @@ struct OnboardingView: View {
                     title: "Simple start",
                     detail: "You do not need a full financial setup yet. Just the basics for the first useful result."
                 )
-
-                Button("Continue to goal") {
-                    step = .goal
-                }
-                .buttonStyle(PrimaryCTAStyle())
-                .disabled(!canAdvanceToGoal)
-                .accessibilityIdentifier("onboarding.action.continueToGoal")
             }
         }
     }
@@ -227,21 +233,6 @@ struct OnboardingView: View {
                     }
                     .pickerStyle(.segmented)
                 }
-
-                HStack(spacing: 12) {
-                    Button("Back") {
-                        step = .basics
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
-                    .accessibilityIdentifier("onboarding.action.backToBasics")
-
-                    Button("Show preview") {
-                        step = .preview
-                    }
-                    .buttonStyle(PrimaryCTAStyle())
-                    .disabled(snapshot == nil)
-                    .accessibilityIdentifier("onboarding.action.showPreview")
-                }
             }
         }
     }
@@ -300,22 +291,6 @@ struct OnboardingView: View {
                             }
                         }
                     }
-
-                    HStack(spacing: 12) {
-                        Button("Back") {
-                            step = .goal
-                        }
-                        .buttonStyle(SecondaryCTAStyle())
-                        .accessibilityIdentifier("onboarding.action.backToGoal")
-
-                        Button {
-                            onContinue()
-                        } label: {
-                            Label("Get started", systemImage: "arrow.right.circle.fill")
-                        }
-                        .buttonStyle(PrimaryCTAStyle())
-                        .accessibilityIdentifier("onboarding.action.getStarted")
-                    }
                 } else {
                     emptyPreviewCard
                 }
@@ -369,6 +344,69 @@ struct OnboardingView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var footerActions: some View {
+        VStack(spacing: 0) {
+            Divider()
+                .background(BrandTheme.line.opacity(0.65))
+
+            HStack(spacing: 12) {
+                switch step {
+                case .basics:
+                    Button("Continue to goal") {
+                        dismissKeyboard()
+                        step = .goal
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+                    .disabled(!canAdvanceToGoal)
+                    .accessibilityIdentifier("onboarding.action.continueToGoal")
+
+                case .goal:
+                    Button("Back") {
+                        dismissKeyboard()
+                        step = .basics
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .accessibilityIdentifier("onboarding.action.backToBasics")
+
+                    Button("Show preview") {
+                        dismissKeyboard()
+                        step = .preview
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+                    .disabled(snapshot == nil)
+                    .accessibilityIdentifier("onboarding.action.showPreview")
+
+                case .preview:
+                    Button("Back") {
+                        dismissKeyboard()
+                        step = .goal
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
+                    .accessibilityIdentifier("onboarding.action.backToGoal")
+
+                    Button {
+                        dismissKeyboard()
+                        onContinue()
+                    } label: {
+                        Label("Get started", systemImage: "arrow.right.circle.fill")
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+                    .disabled(snapshot == nil)
+                    .accessibilityIdentifier("onboarding.action.getStarted")
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
+            .background(
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .overlay(BrandTheme.canvas.opacity(0.88))
+            )
+        }
     }
 
     private var canAdvanceToGoal: Bool {
@@ -554,6 +592,10 @@ struct OnboardingView: View {
         default:
             return "onboarding.field.unknown"
         }
+    }
+
+    private func dismissKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 

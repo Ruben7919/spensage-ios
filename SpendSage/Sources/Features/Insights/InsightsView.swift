@@ -209,6 +209,9 @@ struct InsightsView: View {
             .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .accessibilityIdentifier("insights.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "insights.screen")
+        }
         .background(
             ZStack {
                 BrandTheme.canvas
@@ -394,6 +397,9 @@ struct InsightsView: View {
                             title: AppLocalization.localized("%@ seleccionado", arguments: selectedChartPoint.label),
                             detail: formattedChartValue(selectedChartPoint.value)
                         )
+                        .overlay(alignment: .topLeading) {
+                            AccessibilityProbe(identifier: "insights.chart.selection")
+                        }
                         .accessibilityElement(children: .combine)
                         .accessibilityIdentifier("insights.chart.selection")
                         .accessibilityValue(formattedChartValue(selectedChartPoint.value))
@@ -403,6 +409,9 @@ struct InsightsView: View {
                             title: "Toca una barra",
                             detail: "El valor exacto aparece aquí cuando presionas un bloque."
                         )
+                        .overlay(alignment: .topLeading) {
+                            AccessibilityProbe(identifier: "insights.chart.prompt")
+                        }
                         .accessibilityElement(children: .combine)
                         .accessibilityIdentifier("insights.chart.prompt")
                     }
@@ -469,9 +478,9 @@ struct InsightsView: View {
                                             } label: {
                                                 Color.clear
                                                     .contentShape(Rectangle())
+                                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                                             }
                                             .buttonStyle(.plain)
-                                            .accessibilityIdentifier("insights.chart.bar.\(point.index)")
                                             .accessibilityLabel(point.label)
                                             .accessibilityValue(formattedChartValue(point.value))
                                         }
@@ -481,6 +490,40 @@ struct InsightsView: View {
                                 }
                             }
                         }
+                    }
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(selectedSeries) { point in
+                                Button {
+                                    selectedChartIndex = point.index
+                                } label: {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(point.label)
+                                            .font(.caption.weight(.semibold))
+                                        Text(formattedChartValue(point.value))
+                                            .font(.caption2)
+                                            .foregroundStyle(BrandTheme.muted)
+                                    }
+                                    .frame(minWidth: 72, alignment: .leading)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 10)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .fill(selectedChartIndex == point.index ? BrandTheme.accent.opacity(0.22) : BrandTheme.surfaceTint)
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .stroke(selectedChartIndex == point.index ? BrandTheme.primary.opacity(0.35) : BrandTheme.line.opacity(0.75), lineWidth: 1)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityIdentifier("insights.chart.bar.\(point.index)")
+                                .accessibilityLabel(point.label)
+                                .accessibilityValue(formattedChartValue(point.value))
+                            }
+                        }
+                        .padding(.top, 4)
                     }
 
                     NavigationLink {
@@ -1127,6 +1170,10 @@ private struct InsightsTrendDetailView: View {
             }
             .ignoresSafeArea()
         )
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "insightsTrend.screen")
+        }
+        .accessibilityIdentifier("insightsTrend.screen")
         .navigationTitle("Tendencia")
         .navigationBarTitleDisplayMode(.inline)
     }

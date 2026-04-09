@@ -44,6 +44,9 @@ struct DashboardView: View {
             .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .accessibilityIdentifier("dashboard.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "dashboard.screen")
+        }
         .background(FinanceScreenBackground())
         .navigationTitle("Inicio")
         .navigationBarTitleDisplayMode(.inline)

@@ -45,6 +45,9 @@ struct SettingsView: View {
             .padding(.bottom, shellBottomInset > 0 ? 12 : 40)
         }
         .accessibilityIdentifier("settings.screen")
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "settings.screen")
+        }
         .background(FinanceScreenBackground())
         .sheet(isPresented: $showingGuideReplay) {
             GuideSheet(guide: GuideLibrary.guide(.dashboard))
@@ -360,6 +363,10 @@ private struct SettingsPreferencesView: View {
         .background(alignment: .top) {
             BrandBackdropView()
         }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "settingsPreferences.screen")
+        }
+        .accessibilityIdentifier("settingsPreferences.screen")
         .navigationTitle("Apariencia y región")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -564,6 +571,10 @@ private struct SettingsNotificationsView: View {
         .background(alignment: .top) {
             BrandBackdropView()
         }
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "settingsNotifications.screen")
+        }
+        .accessibilityIdentifier("settingsNotifications.screen")
         .task {
             await viewModel.refreshPushRegistrationState()
             await viewModel.refreshCalendarSyncState()
