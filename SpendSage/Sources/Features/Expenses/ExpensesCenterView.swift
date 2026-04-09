@@ -62,6 +62,9 @@ struct ExpensesCenterView: View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
                 headerCard
+                if !viewModel.hasProAccess {
+                    freeLimitsCard
+                }
 
                 if let state = currentState {
                     snapshotCard(for: state)
@@ -76,7 +79,7 @@ struct ExpensesCenterView: View {
                         }
                     }
 
-                    if case .guest = viewModel.session {
+                    if viewModel.shouldShowSponsorSurfaces {
                         sponsorCard
                     }
                 } else {
@@ -294,15 +297,47 @@ struct ExpensesCenterView: View {
         }
     }
 
+    private var freeLimitsCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "leaf.fill")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(BrandTheme.primary)
+                        .frame(width: 42, height: 42)
+                        .background(BrandTheme.accent.opacity(0.18), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Gratis para empezar")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+                        Text(viewModel.freeLimitsSummary.appLocalized)
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                NavigationLink {
+                    PremiumView(viewModel: viewModel)
+                } label: {
+                    Label("Ver Pro y Family", systemImage: "sparkles")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(SecondaryCTAStyle())
+            }
+        }
+    }
+
     private var sponsorCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Modo gratis con patrocinio")
+                        Text("Modo gratis")
                             .font(.headline)
                             .foregroundStyle(BrandTheme.ink)
-                        Text("Esta superficie patrocinada se mantiene visible en modo gratis, entre las herramientas de captura y el libro reciente, para sostener la experiencia y dejar clara la mejora futura.")
+                        Text("Algunas superficies de recomendación pueden aparecer mientras sigues en Gratis. Pro y Family mantienen la experiencia limpia y desbloquean las herramientas avanzadas.")
                             .font(.subheadline)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
@@ -375,61 +410,94 @@ struct ExpensesCenterView: View {
             .buttonStyle(SecondaryCTAStyle())
             .accessibilityIdentifier("expenses.action.budgetWizard")
 
-            Button {
-                viewModel.startScanFlow()
-            } label: {
-                FinanceToolRowLabel(
-                    title: "Escanear recibos",
-                    summary: "Convierte una foto del recibo en un borrador que puedes revisar antes de guardar.",
-                    systemImage: "camera.viewfinder"
-                )
+            if viewModel.canUseReceiptScan {
+                Button {
+                    viewModel.startScanFlow()
+                } label: {
+                    FinanceToolRowLabel(
+                        title: "Escanear recibos",
+                        summary: "Convierte una foto del recibo en un borrador que puedes revisar antes de guardar.",
+                        systemImage: "camera.viewfinder"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("expenses.tool.scan")
+            } else {
+                NavigationLink {
+                    PremiumView(viewModel: viewModel)
+                } label: {
+                    FinanceToolRowLabel(
+                        title: "Escanear recibos",
+                        summary: "Tu límite de escaneo se agotó este mes. Plus local sube el límite; Pro suma sync.",
+                        systemImage: "lock.fill"
+                    )
+                }
+                .accessibilityIdentifier("expenses.tool.scan")
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("expenses.tool.scan")
 
-            NavigationLink {
-                FinanceCsvImportToolView(viewModel: viewModel)
-            } label: {
-                FinanceToolRowLabel(
-                    title: "Importar CSV",
-                    summary: "Trae varios gastos cuando ya tienes una exportación en hoja de cálculo.",
-                    systemImage: "square.and.arrow.down.on.square.fill"
-                )
-            }
+            premiumToolLink(
+                title: "Importar CSV",
+                summary: "Trae varios gastos cuando ya tienes una exportación en hoja de cálculo.",
+                lockedSummary: "Pro desbloquea importaciones masivas y evita que Gratis se vuelva una herramienta pesada.",
+                systemImage: "square.and.arrow.down.on.square.fill",
+                destination: FinanceCsvImportToolView(viewModel: viewModel),
+                isUnlocked: viewModel.canUseAdvancedFinanceTools
+            )
             .accessibilityIdentifier("expenses.tool.csv")
 
-            NavigationLink {
-                FinanceAccountsToolView(viewModel: viewModel)
-            } label: {
-                FinanceToolRowLabel(
-                    title: "Cuentas",
-                    summary: "Revisa efectivo, tarjetas y saldos manuales en un solo lugar.",
-                    systemImage: "wallet.pass.fill"
-                )
-            }
+            premiumToolLink(
+                title: "Cuentas",
+                summary: "Revisa efectivo, tarjetas y saldos manuales en un solo lugar.",
+                lockedSummary: "Pro desbloquea cuentas para organizar saldos, tarjetas y efectivo.",
+                systemImage: "wallet.pass.fill",
+                destination: FinanceAccountsToolView(viewModel: viewModel),
+                isUnlocked: viewModel.canUseAdvancedFinanceTools
+            )
             .accessibilityIdentifier("expenses.tool.accounts")
 
-            NavigationLink {
-                FinanceBillsToolView(viewModel: viewModel)
-            } label: {
-                FinanceToolRowLabel(
-                    title: "Facturas",
-                    summary: "Sigue pagos recurrentes y vencimientos sin saturar la pantalla principal.",
-                    systemImage: "calendar.badge.clock"
-                )
-            }
+            premiumToolLink(
+                title: "Facturas",
+                summary: "Sigue pagos recurrentes y vencimientos sin saturar la pantalla principal.",
+                lockedSummary: "Plus local desbloquea facturas y recordatorios en este iPhone.",
+                systemImage: "calendar.badge.clock",
+                destination: FinanceBillsToolView(viewModel: viewModel),
+                isUnlocked: viewModel.canUseRecurringBillTools
+            )
             .accessibilityIdentifier("expenses.tool.bills")
 
-            NavigationLink {
-                FinanceRulesToolView(viewModel: viewModel)
-            } label: {
-                FinanceToolRowLabel(
-                    title: "Reglas",
-                    summary: "Guarda reglas por comercio para que los gastos repetidos se organicen automáticamente.",
-                    systemImage: "slider.horizontal.3"
-                )
-            }
+            premiumToolLink(
+                title: "Reglas",
+                summary: "Guarda reglas por comercio para que los gastos repetidos se organicen automáticamente.",
+                lockedSummary: "Pro desbloquea reglas para automatizar categorías repetidas.",
+                systemImage: "slider.horizontal.3",
+                destination: FinanceRulesToolView(viewModel: viewModel),
+                isUnlocked: viewModel.canUseAdvancedFinanceTools
+            )
             .accessibilityIdentifier("expenses.tool.rules")
+        }
+    }
+
+    @ViewBuilder
+    private func premiumToolLink<Destination: View>(
+        title: String,
+        summary: String,
+        lockedSummary: String,
+        systemImage: String,
+        destination: Destination,
+        isUnlocked: Bool
+    ) -> some View {
+        if isUnlocked {
+            NavigationLink {
+                destination
+            } label: {
+                FinanceToolRowLabel(title: title, summary: summary, systemImage: systemImage)
+            }
+        } else {
+            NavigationLink {
+                PremiumView(viewModel: viewModel)
+            } label: {
+                FinanceToolRowLabel(title: title, summary: lockedSummary, systemImage: "lock.fill")
+            }
         }
     }
 

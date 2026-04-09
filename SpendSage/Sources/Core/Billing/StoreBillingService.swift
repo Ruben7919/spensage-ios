@@ -1,6 +1,81 @@
 import Foundation
 import StoreKit
 
+enum LaunchMonetizationCatalog {
+    struct PlanCard: Equatable {
+        let planKey: StorePlanKey
+        let priceLabel: String
+        let summary: String
+        let features: [String]
+        let isHighlighted: Bool
+    }
+
+    static let freeMonthlyExpenseLimit = 60
+    static let freeReceiptScanLimit = 5
+    static let localPlusMonthlyExpenseLimit = 150
+    static let localPlusReceiptScanLimit = 25
+    static let familyMaxMembers = 5
+
+    static let planCards: [PlanCard] = [
+        PlanCard(
+            planKey: .freeLocal,
+            priceLabel: "$0",
+            summary: "Para probar SpendSage sin pagar.",
+            features: [
+                "Hasta \(freeMonthlyExpenseLimit) gastos manuales al mes",
+                "\(freeReceiptScanLimit) escaneos de prueba al mes",
+                "Sin sync ni herramientas avanzadas"
+            ],
+            isHighlighted: false
+        ),
+        PlanCard(
+            planKey: .removeAds,
+            priceLabel: "$14.99 pago único",
+            summary: "Una compra única para ampliar el uso local sin suscripción.",
+            features: [
+                "Quita superficies patrocinadas",
+                "Hasta \(localPlusMonthlyExpenseLimit) gastos y \(localPlusReceiptScanLimit) escaneos al mes",
+                "Facturas y recordatorios locales",
+                "No desbloquea sync, CSV, reglas ni Family"
+            ],
+            isHighlighted: false
+        ),
+        PlanCard(
+            planKey: .pro,
+            priceLabel: "$5.99/mes o $39.99/año",
+            summary: "Para usar SpendSage como herramienta financiera diaria.",
+            features: [
+                "Respaldo y sync entre dispositivos",
+                "Escaneo de recibos, CSV, cuentas, facturas, reglas e insights"
+            ],
+            isHighlighted: true
+        ),
+        PlanCard(
+            planKey: .family,
+            priceLabel: "$9.99/mes o $69.99/año",
+            summary: "Para manejar el presupuesto del hogar sin duplicar cuentas.",
+            features: [
+                "Todo lo incluido en Pro",
+                "Hasta \(familyMaxMembers) miembros con espacios compartidos e invitaciones"
+            ],
+            isHighlighted: false
+        )
+    ]
+
+    static func displayName(for planKey: StorePlanKey) -> String {
+        switch planKey {
+        case .freeLocal:
+            return "Gratis"
+        case .removeAds:
+            return "Plus local"
+        case .pro:
+            return "Pro"
+        case .family:
+            return "Familia"
+        }
+    }
+}
+
 enum StorePlanKey: String, Equatable {
     case freeLocal
     case removeAds
@@ -8,16 +83,7 @@ enum StorePlanKey: String, Equatable {
     case family
 
     var displayName: String {
-        switch self {
-        case .freeLocal:
-            return "Local gratis"
-        case .removeAds:
-            return "Quitar anuncios"
-        case .pro:
-            return "Pro"
-        case .family:
-            return "Familia"
-        }
+        LaunchMonetizationCatalog.displayName(for: self)
     }
 }
 

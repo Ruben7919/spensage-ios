@@ -171,11 +171,17 @@ final class AppViewModel: ObservableObject {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: onboardingKey)
         self.selectedTab = .dashboard
         applyDebugLaunchOverrides()
+        updateFinanceCloudAccess()
         self.telemetryService.start()
     }
 
     var authConfiguration: AuthConfiguration {
         authService.configuration
+    }
+
+    private func updateFinanceCloudAccess() {
+        guard let financeStore = financeStore as? FinanceCloudAccessControlling else { return }
+        financeStore.cloudSyncEnabled = canUseCloudFinanceSync
     }
 
     var backendConfiguration: BackendConfiguration? {
@@ -187,7 +193,143 @@ final class AppViewModel: ObservableObject {
     }
 
     var storeEntitlements: StoreEntitlementSnapshot {
-        storeBillingState.entitlements
+        debugStoreEntitlementOverride ?? storeBillingState.entitlements
+    }
+
+    private var debugStoreEntitlementOverride: StoreEntitlementSnapshot? {
+        guard let planOverride = ProcessInfo.processInfo.environment["SPENDSAGE_DEBUG_PLAN"]?.lowercased() else {
+            return nil
+        }
+
+        let planKey: StorePlanKey?
+        switch planOverride {
+        case "pro", "personal":
+            planKey = .pro
+        case "family":
+            planKey = .family
+        case "remove_ads", "removeads":
+            planKey = .removeAds
+        case "free", "gratis":
+            planKey = nil
+        default:
+            return nil
+        }
+
+        return StoreEntitlementSnapshot(
+            activeProductIDs: planKey.map { ["debug.\($0.rawValue)"] } ?? [],
+            activePlanKey: planKey,
+            hasRemoveAds: planKey == .removeAds || planKey == .pro || planKey == .family
+        )
+    }
+
+    var hasProAccess: Bool {
+        let cloudPlan = cloudEntitlements?.planId.lowercased()
+        if cloudPlan == "personal" || cloudPlan == "pro" || cloudPlan == "family" || cloudPlan == "enterprise" {
+            return true
+        }
+
+        switch storeEntitlements.activePlanKey {
+        case .pro, .family:
+            return true
+        case .freeLocal, .removeAds, .none:
+            return false
+        }
+    }
+
+    var hasFamilyAccess: Bool {
+        let cloudPlan = cloudEntitlements?.planId.lowercased()
+        let cloudFeatures = Set((cloudEntitlements?.features ?? []).map { $0.lowercased() })
+        if cloudPlan == "family" || cloudPlan == "enterprise" || cloudFeatures.contains("family_owner") {
+            return true
+        }
+        return storeEntitlements.activePlanKey == .family
+    }
+
+    var hasRemoveAdsAccess: Bool {
+        let cloudFeatures = Set((cloudEntitlements?.features ?? []).map { $0.lowercased() })
+        return hasProAccess || storeEntitlements.hasRemoveAds || cloudFeatures.contains("remove_ads")
+    }
+
+    var hasLocalPlusAccess: Bool {
+        let cloudFeatures = Set((cloudEntitlements?.features ?? []).map { $0.lowercased() })
+        return hasProAccess || storeEntitlements.activePlanKey == .removeAds || cloudFeatures.contains("remove_ads")
+    }
+
+    var shouldShowSponsorSurfaces: Bool {
+        !hasRemoveAdsAccess
+    }
+
+    var freeMonthlyExpenseLimit: Int {
+        hasLocalPlusAccess && !hasProAccess
+            ? LaunchMonetizationCatalog.localPlusMonthlyExpenseLimit
+            : LaunchMonetizationCatalog.freeMonthlyExpenseLimit
+    }
+
+    var freeReceiptScanLimit: Int {
+        hasLocalPlusAccess && !hasProAccess
+            ? LaunchMonetizationCatalog.localPlusReceiptScanLimit
+            : LaunchMonetizationCatalog.freeReceiptScanLimit
+    }
+
+    var freeMonthlyExpenseCount: Int {
+        guard let expenses = ledger?.expenses else { return 0 }
+        let calendar = Calendar.autoupdatingCurrent
+        return expenses.filter { calendar.isDate($0.date, equalTo: .now, toGranularity: .month) }.count
+    }
+
+    var freeReceiptScanCount: Int {
+        guard let expenses = ledger?.expenses else { return 0 }
+        let calendar = Calendar.autoupdatingCurrent
+        return expenses.filter { expense in
+            expense.source == .receiptScan
+                && calendar.isDate(expense.date, equalTo: .now, toGranularity: .month)
+        }.count
+    }
+
+    var freeMonthlyExpenseRemaining: Int {
+        max(0, freeMonthlyExpenseLimit - freeMonthlyExpenseCount)
+    }
+
+    var freeReceiptScanRemaining: Int {
+        max(0, freeReceiptScanLimit - freeReceiptScanCount)
+    }
+
+    var canAddFreeExpense: Bool {
+        hasProAccess || freeMonthlyExpenseRemaining > 0
+    }
+
+    var canUseReceiptScan: Bool {
+        hasProAccess || freeReceiptScanRemaining > 0
+    }
+
+    var canUseAdvancedFinanceTools: Bool {
+        hasProAccess
+    }
+
+    var canUseRecurringBillTools: Bool {
+        hasProAccess || hasLocalPlusAccess
+    }
+
+    var canUseCloudFinanceSync: Bool {
+        hasProAccess || currentSpace?.isPersonalSpace == false || familySharingModel?.mode == "family"
+    }
+
+    var freeLimitsSummary: String {
+        if hasProAccess {
+            return "Pro activo: herramientas y sincronización desbloqueadas."
+        }
+        if hasLocalPlusAccess {
+            return AppLocalization.localized(
+                "Plus local incluye %d gastos este mes, %d escaneos y facturas locales.",
+                arguments: freeMonthlyExpenseRemaining,
+                freeReceiptScanRemaining
+            )
+        }
+        return AppLocalization.localized(
+            "Gratis incluye %d gastos este mes y %d escaneos de prueba restantes.",
+            arguments: freeMonthlyExpenseRemaining,
+            freeReceiptScanRemaining
+        )
     }
 
     var subscriptionManagementURL: URL? {
@@ -477,6 +619,7 @@ final class AppViewModel: ObservableObject {
         backendStatusUpdatedAt = nil
         storeBillingUpdatedAt = nil
         storeBillingState = StoreBillingState()
+        updateFinanceCloudAccess()
         PushRegistrationPersistence.clearUploadMarker()
     }
 
@@ -546,6 +689,7 @@ final class AppViewModel: ObservableObject {
             backendStatusError = error.localizedDescription
         }
 
+        updateFinanceCloudAccess()
         await refreshPushRegistrationState()
         await syncCachedPushRegistrationIfNeeded()
     }
@@ -580,6 +724,7 @@ final class AppViewModel: ObservableObject {
         storeBillingState.isLoading = false
         storeBillingUpdatedAt = .now
         syncPersistedPremiumState(with: loadedEntitlements)
+        updateFinanceCloudAccess()
 
         if !errors.isEmpty {
             storeBillingState.lastError = errors.joined(separator: "\n")
@@ -714,6 +859,12 @@ final class AppViewModel: ObservableObject {
     }
 
     func syncBillsToCalendar(showNotice: Bool = true) async {
+        guard canUseRecurringBillTools else {
+            if showNotice {
+                notice = "Los recordatorios de facturas están en Plus local, Pro y Family."
+            }
+            return
+        }
         guard let ledger else {
             if showNotice {
                 notice = "Todavía no hay un libro cargado para sincronizar facturas."
@@ -755,6 +906,7 @@ final class AppViewModel: ObservableObject {
 
     func chooseFreeLocalPlan() {
         syncPersistedPremiumState(with: .empty)
+        updateFinanceCloudAccess()
         notice = "El plan gratis sigue activo."
     }
 
@@ -764,6 +916,7 @@ final class AppViewModel: ObservableObject {
         storeBillingUpdatedAt = .now
         storeBillingState.lastError = nil
         syncPersistedPremiumState(with: entitlements)
+        updateFinanceCloudAccess()
     }
 
     private func syncPersistedPremiumState(with entitlements: StoreEntitlementSnapshot) {
@@ -1004,6 +1157,7 @@ final class AppViewModel: ObservableObject {
             lastCreatedInvite = nil
             sharingStatusError = nil
             isRefreshingSharing = false
+            updateFinanceCloudAccess()
             return
         }
 
@@ -1038,6 +1192,7 @@ final class AppViewModel: ObservableObject {
                 spaceMembers = []
                 currentSpaceMember = nil
                 sharingStatusError = nil
+                updateFinanceCloudAccess()
                 return
             }
 
@@ -1061,6 +1216,7 @@ final class AppViewModel: ObservableObject {
         } catch {
             sharingStatusError = error.localizedDescription
         }
+        updateFinanceCloudAccess()
     }
 
     func selectSpace(_ spaceID: String) async {
@@ -1269,11 +1425,46 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    private func requireProAccess(for featureName: String) -> Bool {
+        guard !hasProAccess else { return true }
+        notice = AppLocalization.localized("%@ es parte de Pro. Puedes seguir con gastos manuales en Gratis o actualizar cuando quieras más.", arguments: featureName)
+        return false
+    }
+
+    private func requireLocalPlusAccess(for featureName: String) -> Bool {
+        guard canUseRecurringBillTools else {
+            notice = AppLocalization.localized("%@ está en Plus local, Pro y Family.", arguments: featureName)
+            return false
+        }
+        return true
+    }
+
+    private func canSaveExpenseDraft(_ draft: ExpenseDraft) -> Bool {
+        if draft.source == .receiptScan, !canUseReceiptScan {
+            notice = AppLocalization.localized(
+                "Ya usaste los %d escaneos de este mes. Plus local sube el límite; Pro además desbloquea sincronización.",
+                arguments: freeReceiptScanLimit
+            )
+            return false
+        }
+
+        if !hasProAccess && freeMonthlyExpenseRemaining <= 0 {
+            notice = AppLocalization.localized(
+                "Llegaste al límite de %d gastos este mes. Plus local sube el límite; Pro además desbloquea respaldo entre dispositivos.",
+                arguments: freeMonthlyExpenseLimit
+            )
+            return false
+        }
+
+        return true
+    }
+
     func addExpense(_ draft: ExpenseDraft) async {
         guard draft.isValid else {
             notice = "Agrega un comercio y un monto positivo.".appLocalized
             return
         }
+        guard canSaveExpenseDraft(draft) else { return }
 
         await financeStore.saveExpense(draft, for: session, spaceID: currentSpaceID)
         await telemetryService.track(
@@ -1334,6 +1525,7 @@ final class AppViewModel: ObservableObject {
             notice = "Add an account name before saving.".appLocalized
             return
         }
+        guard requireProAccess(for: "Cuentas") else { return }
 
         await financeStore.saveAccount(draft, for: session, spaceID: currentSpaceID)
         notice = "Account saved locally on this device.".appLocalized
@@ -1345,6 +1537,7 @@ final class AppViewModel: ObservableObject {
             notice = "Add an account name before saving.".appLocalized
             return
         }
+        guard requireProAccess(for: "Cuentas") else { return }
 
         await financeStore.updateAccount(accountID, draft: draft, for: session, spaceID: currentSpaceID)
         notice = "Account updated for this space.".appLocalized
@@ -1352,12 +1545,14 @@ final class AppViewModel: ObservableObject {
     }
 
     func deleteAccount(_ accountID: UUID) async {
+        guard requireProAccess(for: "Cuentas") else { return }
         await financeStore.deleteAccount(accountID, for: session, spaceID: currentSpaceID)
         notice = "Account removed from your local ledger.".appLocalized
         await refreshDashboard()
     }
 
     func setPrimaryAccount(_ accountID: UUID) async {
+        guard requireProAccess(for: "Cuentas") else { return }
         await financeStore.setPrimaryAccount(accountID, for: session, spaceID: currentSpaceID)
         notice = "Primary account updated locally on this device.".appLocalized
         await refreshDashboard()
@@ -1368,6 +1563,7 @@ final class AppViewModel: ObservableObject {
             notice = "Add a bill title, amount, and due day.".appLocalized
             return
         }
+        guard requireLocalPlusAccess(for: "Facturas recurrentes") else { return }
 
         await financeStore.saveBill(draft, for: session, spaceID: currentSpaceID)
         notice = "Recurring bill saved locally on this device.".appLocalized
@@ -1380,6 +1576,7 @@ final class AppViewModel: ObservableObject {
             notice = "Add a bill title, amount, and due day.".appLocalized
             return
         }
+        guard requireLocalPlusAccess(for: "Facturas recurrentes") else { return }
 
         await financeStore.updateBill(billID, draft: draft, for: session, spaceID: currentSpaceID)
         notice = "Recurring bill updated for this space.".appLocalized
@@ -1388,6 +1585,7 @@ final class AppViewModel: ObservableObject {
     }
 
     func deleteBill(_ billID: UUID) async {
+        guard requireLocalPlusAccess(for: "Facturas recurrentes") else { return }
         await financeStore.deleteBill(billID, for: session, spaceID: currentSpaceID)
         notice = "Recurring bill removed from your local ledger.".appLocalized
         await syncBillsToCalendarIfAuthorized()
@@ -1395,6 +1593,7 @@ final class AppViewModel: ObservableObject {
     }
 
     func toggleBillAutopay(_ billID: UUID) async {
+        guard requireLocalPlusAccess(for: "Facturas recurrentes") else { return }
         await financeStore.toggleBillAutopay(billID, for: session, spaceID: currentSpaceID)
         notice = "Bill autopay updated locally on this device.".appLocalized
         await syncBillsToCalendarIfAuthorized()
@@ -1406,6 +1605,7 @@ final class AppViewModel: ObservableObject {
             notice = "Agrega una palabra clave del comercio antes de guardar una regla.".appLocalized
             return
         }
+        guard requireProAccess(for: "Reglas automáticas") else { return }
 
         await financeStore.saveRule(draft, for: session, spaceID: currentSpaceID)
         notice = "Rule saved locally on this device.".appLocalized
@@ -1417,6 +1617,7 @@ final class AppViewModel: ObservableObject {
             notice = "Agrega una palabra clave del comercio antes de guardar una regla.".appLocalized
             return
         }
+        guard requireProAccess(for: "Reglas automáticas") else { return }
 
         await financeStore.updateRule(ruleID, draft: draft, for: session, spaceID: currentSpaceID)
         notice = "Rule updated for this space.".appLocalized
@@ -1424,18 +1625,21 @@ final class AppViewModel: ObservableObject {
     }
 
     func deleteRule(_ ruleID: UUID) async {
+        guard requireProAccess(for: "Reglas automáticas") else { return }
         await financeStore.deleteRule(ruleID, for: session, spaceID: currentSpaceID)
         notice = "Rule removed from your local ledger.".appLocalized
         await refreshDashboard()
     }
 
     func toggleRuleEnabled(_ ruleID: UUID) async {
+        guard requireProAccess(for: "Reglas automáticas") else { return }
         await financeStore.toggleRuleEnabled(ruleID, for: session, spaceID: currentSpaceID)
         notice = "Rule activity updated locally on this device.".appLocalized
         await refreshDashboard()
     }
 
     func payBill(_ billID: UUID) async {
+        guard requireLocalPlusAccess(for: "Facturas recurrentes") else { return }
         await financeStore.markBillPaid(billID, for: session, spaceID: currentSpaceID)
         notice = "Bill payment saved to your local ledger.".appLocalized
         await syncBillsToCalendarIfAuthorized()
@@ -1447,6 +1651,7 @@ final class AppViewModel: ObservableObject {
             notice = "No hay gastos listos para importar.".appLocalized
             return
         }
+        guard requireProAccess(for: "Importar CSV") else { return }
 
         await financeStore.importExpenses(drafts, for: session, spaceID: currentSpaceID)
         notice = AppLocalization.localized("%d expenses imported into your local ledger.", arguments: drafts.count)
@@ -1712,6 +1917,28 @@ final class AppViewModel: ObservableObject {
             default:
                 break
             }
+        }
+
+        if let planOverride = environment["SPENDSAGE_DEBUG_PLAN"]?.lowercased() {
+            let planKey: StorePlanKey?
+            switch planOverride {
+            case "pro", "personal":
+                planKey = .pro
+            case "family":
+                planKey = .family
+            case "remove_ads", "removeads":
+                planKey = .removeAds
+            case "free", "gratis":
+                planKey = nil
+            default:
+                planKey = nil
+            }
+
+            storeBillingState.entitlements = StoreEntitlementSnapshot(
+                activeProductIDs: planKey.map { ["debug.\($0.rawValue)"] } ?? [],
+                activePlanKey: planKey,
+                hasRemoveAds: planKey == .removeAds || planKey == .pro || planKey == .family
+            )
         }
 
         if let screenOverride = environment["SPENDSAGE_DEBUG_SCREEN"]?.lowercased() {

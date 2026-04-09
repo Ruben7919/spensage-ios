@@ -86,6 +86,7 @@ struct SyncedFinanceStoreTests {
             cloudClient: cloud,
             pullInterval: 0
         )
+        store.cloudSyncEnabled = true
 
         let merged = await store.loadLedger(for: session, spaceID: nil)
         let hasRemoteExpense = merged.expenses.contains { expense in
@@ -98,6 +99,70 @@ struct SyncedFinanceStoreTests {
         #expect(merged.expenses.count == 2)
         #expect(hasRemoteExpense)
         #expect(hasLocalExpense)
+    }
+
+    @Test
+    func syncedFinanceStoreSkipsCloudWhenAccessIsDisabled() async {
+        let defaults = makeDefaults()
+        let localStore = LocalFinanceStore(defaults: defaults, seedLedger: .emptyTestLedger)
+        let session = SessionState.signedIn(email: "free@spendsage.ai", provider: "Email")
+
+        var localLedger = LocalFinanceLedger.emptyTestLedger
+        localLedger.appendExpense(
+            ExpenseDraft(
+                merchant: "Free Local Coffee",
+                amount: 4,
+                category: .coffee,
+                date: referenceDate(offsetDays: -1)
+            ),
+            date: referenceDate(offsetDays: -1)
+        )
+        localStore.saveLedger(localLedger, for: session, spaceID: nil)
+
+        let cloud = MockCloudFinanceClient(
+            snapshots: [
+                CloudFinanceSnapshot(
+                    spaceID: "space-free",
+                    role: "owner",
+                    pulledAt: referenceDate(),
+                    monthlyIncome: 9999,
+                    monthlyBudget: 9999,
+                    profile: .default,
+                    expenses: [
+                        CloudExpenseMirror(
+                            cloudID: "exp-should-not-load",
+                            merchant: "Remote Locked",
+                            category: .home,
+                            amount: 999,
+                            date: referenceDate(),
+                            locationLabel: nil,
+                            note: nil,
+                            source: .manual
+                        )
+                    ],
+                    accounts: [],
+                    bills: [],
+                    rules: []
+                )
+            ]
+        )
+
+        let store = SyncedFinanceStore(
+            localStore: localStore,
+            authService: MockSyncedStoreAuthService(),
+            backendConfiguration: BackendConfiguration.make(
+                apiBaseURL: "https://api.spendsage.ai/dev/",
+                environmentName: "dev"
+            ),
+            cloudClient: cloud,
+            pullInterval: 0
+        )
+
+        let loaded = await store.loadLedger(for: session, spaceID: nil)
+
+        #expect(loaded.expenses.map(\.merchant) == ["Free Local Coffee"])
+        #expect(loaded.monthlyIncome == 0)
+        #expect(cloud.createdExpenses.isEmpty)
     }
 
     @Test
@@ -185,6 +250,7 @@ struct SyncedFinanceStoreTests {
             cloudClient: cloud,
             pullInterval: 0
         )
+        store.cloudSyncEnabled = true
 
         let synced = await store.loadLedger(for: session, spaceID: nil)
         let firstExpenseCloudID = synced.expenses.first?.cloudID

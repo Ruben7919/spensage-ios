@@ -135,11 +135,11 @@ Recommended resulting rating for the current implementation: `4+`
 
 Configured store pricing source of truth:
 
-- `spendsage.remove_ads`: `USD 7.99`
-- `spendsage.pro.monthly`: `USD 4.99`
-- `spendsage.pro.annual`: `USD 29.99`
-- `spendsage.family.monthly`: `USD 7.99`
-- `spendsage.family.annual`: `USD 49.99`
+- `spendsage.remove_ads`: `USD 14.99`
+- `spendsage.pro.monthly`: `USD 5.99`
+- `spendsage.pro.annual`: `USD 39.99`
+- `spendsage.family.monthly`: `USD 9.99`
+- `spendsage.family.annual`: `USD 69.99`
 
 Current App Store Connect sync state:
 
@@ -148,8 +148,9 @@ Current App Store Connect sync state:
 - Global territory pricing is now applied for all five monetization SKUs, which was the missing piece keeping the four auto-renewable subscriptions out of reviewable state.
 - `spendsage.pro.monthly`, `spendsage.pro.annual`, `spendsage.family.monthly`, `spendsage.family.annual`, and `spendsage.remove_ads` are now `READY_TO_SUBMIT`.
 - Version `1.0` in App Store Connect now includes all five monetization components in the `Compras dentro de la app y suscripciones` section.
-- Build `1.0 (22)` was uploaded on 2026-04-08, promoted to the configured external TestFlight group, and is now `WAITING_FOR_REVIEW` for external beta review.
-- Internal testers receive the same App Store eligible build automatically once processed; the App Store Connect API does not require a separate internal-group attachment for this build type.
+- Build `1.0 (28)` was uploaded on 2026-04-09 and App Store Connect accepted the package for processing.
+- Automatic TestFlight group promotion is pending a fresh App Store Connect session or Chrome `Permitir JavaScript para eventos de Apple`; the cookie transport returned `401` and the Chrome transport was blocked by AppleScript JavaScript permissions.
+- Internal testers receive the same App Store eligible build automatically once processed; the App Store Connect API does not require a separate internal-group attachment for this build type when the build is attached through the current external beta flow.
 - Re-apply from the authenticated Chrome session before each external-beta upload.
 
 ## Submission Positioning

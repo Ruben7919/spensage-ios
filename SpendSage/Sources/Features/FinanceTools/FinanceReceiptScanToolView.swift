@@ -131,7 +131,7 @@ struct FinanceReceiptScanToolView: View {
     }
 
     private var showsStepActionBar: Bool {
-        currentStep == .autofill || currentStep == .review
+        viewModel.canUseReceiptScan && (currentStep == .autofill || currentStep == .review)
     }
 
     var body: some View {
@@ -153,14 +153,18 @@ struct FinanceReceiptScanToolView: View {
                     FinanceNoticeCard(message: notice)
                 }
 
-                if currentStep == .capture && showCaptureFallback {
-                    captureQuickStartCard
-                }
+                if viewModel.canUseReceiptScan {
+                    if currentStep == .capture && showCaptureFallback {
+                        captureQuickStartCard
+                    }
 
-                if shouldShowStatusCard {
-                    wizardStatusCard
+                    if shouldShowStatusCard {
+                        wizardStatusCard
+                    }
+                    stepContent
+                } else {
+                    receiptScanGateCard
                 }
-                stepContent
             }
             .padding(24)
             .padding(.bottom, (showsStepActionBar ? 110 : 24) + shellBottomInset)
@@ -194,6 +198,7 @@ struct FinanceReceiptScanToolView: View {
             }
         }
         .task(id: viewModel.scanFlowID) {
+            guard viewModel.canUseReceiptScan else { return }
             applyDebugLaunchStateIfNeeded()
             await triggerAutomaticCameraIfNeeded()
         }
@@ -271,6 +276,38 @@ struct FinanceReceiptScanToolView: View {
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private var receiptScanGateCard: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                CompactSectionHeader(
+                    title: "Escaneo Plus",
+                    detail: AppLocalization.localized(
+                        "Ya usaste tus %d escaneos de este mes. Puedes seguir manualmente, subir el límite con Plus local o desbloquear sync con Pro.",
+                        arguments: viewModel.freeReceiptScanLimit
+                    )
+                )
+
+                HStack(spacing: 12) {
+                    NavigationLink {
+                        PremiumView(viewModel: viewModel)
+                    } label: {
+                        Label("Ver planes", systemImage: "sparkles")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(PrimaryCTAStyle())
+
+                    Button {
+                        viewModel.startManualExpenseFlow()
+                    } label: {
+                        Label("Manual", systemImage: "square.and.pencil")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(SecondaryCTAStyle())
                 }
             }
         }

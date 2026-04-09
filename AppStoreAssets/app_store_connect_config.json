@@ -98,16 +98,16 @@
       "spendsage.remove_ads": {
         "resourceId": "6761744084",
         "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/iaps/6761744084",
-        "priceUsd": "7.99",
-        "reviewNote": "Remove Ads non-consumable for authenticated users. Review can verify product visibility and purchase presentation from the Premium screen after sign in.",
+        "priceUsd": "14.99",
+        "reviewNote": "Plus Local non-consumable for authenticated users. It removes sponsor cards, raises local starter limits, and unlocks local recurring bills without unlocking Pro sync, CSV, rules, accounts, or Family.",
         "localizations": {
           "en-US": {
-            "name": "SpendSage Remove Ads",
-            "description": "Remove sponsor cards and keep SpendSage focused."
+            "name": "SpendSage Local Plus",
+            "description": "More local scans, bills, and no sponsor cards."
           },
           "es-ES": {
-            "name": "SpendSage Quitar anuncios",
-            "description": "Quita anuncios y deja SpendSage más limpio."
+            "name": "SpendSage Plus local",
+            "description": "Más escaneos locales, facturas y sin anuncios."
           }
         }
       }
@@ -127,55 +127,55 @@
         "spendsage.pro.monthly": {
           "resourceId": "6761743645",
           "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscriptions/6761743645",
-          "priceUsd": "4.99",
+          "priceUsd": "5.99",
           "reviewNote": "Monthly Pro unlock for authenticated users. Premium purchase surfaces live in the iPhone app. Review can validate product display and purchase flow from the Premium screen after sign in.",
           "localizations": {
             "en-US": {
               "name": "SpendSage Pro Monthly",
-              "description": "Cloud sync, scans, insights, and exports"
+              "description": "Backup, scans, insights, and exports"
             },
             "es-ES": {
               "name": "SpendSage Pro mensual",
-              "description": "Sync cloud, recibos con IA y sin anuncios"
+              "description": "Respaldo, recibos, insights y sin anuncios"
             }
           }
         },
         "spendsage.pro.annual": {
           "resourceId": "6761744051",
           "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscriptions/6761744051",
-          "priceUsd": "29.99",
+          "priceUsd": "39.99",
           "reviewNote": "Annual Pro unlock for authenticated users. Premium purchase surfaces live in the iPhone app. Review can validate product display and purchase flow from the Premium screen after sign in.",
           "localizations": {
             "en-US": {
               "name": "SpendSage Pro Annual",
-              "description": "Full Pro plan billed yearly with cloud sync"
+              "description": "Full Pro plan billed yearly with backup and sync"
             },
             "es-ES": {
               "name": "SpendSage Pro anual",
-              "description": "Plan Pro anual con sync cloud y recibos IA"
+              "description": "Plan Pro anual con respaldo, sync y recibos"
             }
           }
         },
         "spendsage.family.monthly": {
           "resourceId": "6761744151",
           "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscriptions/6761744151",
-          "priceUsd": "7.99",
+          "priceUsd": "9.99",
           "reviewNote": "Monthly Family unlock for authenticated users. Shared spaces and invite flows are now available in the beta after sign in, and review can validate product availability and purchase presentation from the Premium screen.",
           "localizations": {
             "en-US": {
               "name": "SpendSage Family Monthly",
-              "description": "Shared spaces, invites, cloud sync, and no ads"
+              "description": "Shared household spaces, invites, sync, and no ads"
             },
             "es-ES": {
               "name": "SpendSage Family mensual",
-              "description": "Espacios compartidos, invites y sync cloud"
+              "description": "Espacios del hogar, invites, sync y sin anuncios"
             }
           }
         },
         "spendsage.family.annual": {
           "resourceId": "6761744152",
           "detailUrl": "https://appstoreconnect.apple.com/apps/6761512773/distribution/subscriptions/6761744152",
-          "priceUsd": "49.99",
+          "priceUsd": "69.99",
           "reviewNote": "Annual Family unlock for authenticated users. Shared spaces and invite flows are now available in the beta after sign in, and review can validate product availability and purchase presentation from the Premium screen.",
           "localizations": {
             "en-US": {

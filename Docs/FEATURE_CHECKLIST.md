@@ -73,7 +73,7 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 
 - [x] Premium screen aligned with current reality instead of fake live billing claims
 - [x] Premium removed from the main tab bar and reduced to a cleaner plan-first surface
-- [ ] Entitlement model documented for `Free`, `Premium`, and `Family`
+- [x] Entitlement model documented for `Free`, `Pro`, and `Family`
 - [x] StoreKit integration
 - [>] RevenueCat integration
 - [x] Real restore/manage subscription flows
@@ -176,3 +176,4 @@ Ship a B2C iOS app that feels simple, powerful, trustworthy, and ready for backe
 - 2026-04-05: Legal documentation was updated with the declared current operator identity: `Ruben Lazaro`, `RUC 0924829179001`, `Samanes 4 Mz 408 Villa 130112`.
 - 2026-04-05: Prepared the external release package with App Store metadata, App Privacy mapping, iPhone 6.9 screenshots with blurred data and mascot-side compositions, plus staged public-site legal/support content for `spendsage.ai` and `legal.spendsage.ai`.
 - 2026-04-07: Reworked the App Store Connect automation to use the logged-in Chrome session directly, synced `en-US` + `es-ES` metadata, updated App Review contact details, and uploaded the current 6-shot iPhone screenshot pack to both locales.
+- 2026-04-09: Uploaded TestFlight build `1.0 (28)` successfully after the pricing/source-of-truth pass, SES invite tagging, backend redeploy, public smoke, unit tests, and simulator build/test pass. Automatic TestFlight group promotion still needs a fresh App Store Connect session or Chrome AppleScript JavaScript permission.

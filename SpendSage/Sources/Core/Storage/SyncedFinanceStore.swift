@@ -6,10 +6,16 @@ protocol FinanceCloudDebugControlling {
 }
 
 @MainActor
-final class SyncedFinanceStore: FinanceDashboardStoring, FinanceCloudDebugControlling {
+protocol FinanceCloudAccessControlling: AnyObject {
+    var cloudSyncEnabled: Bool { get set }
+}
+
+@MainActor
+final class SyncedFinanceStore: FinanceDashboardStoring, FinanceCloudDebugControlling, FinanceCloudAccessControlling {
     private let localStore: LocalFinanceStore
     private let cloudClient: CloudFinanceSyncing
     private let pullInterval: TimeInterval
+    var cloudSyncEnabled = false
 
     init(
         localStore: LocalFinanceStore = LocalFinanceStore(),
@@ -32,7 +38,7 @@ final class SyncedFinanceStore: FinanceDashboardStoring, FinanceCloudDebugContro
 
     func loadLedger(for session: SessionState, spaceID: String?) async -> LocalFinanceLedger {
         var ledger = localStore.currentLedger(for: session, spaceID: spaceID)
-        guard session.isAuthenticated, cloudClient.isConfigured else {
+        guard session.isAuthenticated, cloudClient.isConfigured, cloudSyncEnabled else {
             return ledger
         }
 
@@ -176,6 +182,7 @@ final class SyncedFinanceStore: FinanceDashboardStoring, FinanceCloudDebugContro
         var ledger = localStore.currentLedger(for: session, spaceID: spaceID)
         ledger.toggleRuleEnabled(ruleID)
         if session.isAuthenticated,
+           cloudSyncEnabled,
            let rule = ledger.rules.first(where: { $0.id == ruleID }),
            let cloudID = rule.cloudID,
            let updated = try? await cloudClient.updateRule(
@@ -241,7 +248,7 @@ final class SyncedFinanceStore: FinanceDashboardStoring, FinanceCloudDebugContro
         spaceID: String?,
         ledger: LocalFinanceLedger
     ) async -> LocalFinanceLedger {
-        guard session.isAuthenticated, cloudClient.isConfigured else {
+        guard session.isAuthenticated, cloudClient.isConfigured, cloudSyncEnabled else {
             return ledger
         }
 
@@ -257,7 +264,7 @@ final class SyncedFinanceStore: FinanceDashboardStoring, FinanceCloudDebugContro
     }
 
     private func persistNativeProfileIfNeeded(for session: SessionState, ledger: LocalFinanceLedger) async -> LocalFinanceLedger {
-        guard session.isAuthenticated, cloudClient.isConfigured else {
+        guard session.isAuthenticated, cloudClient.isConfigured, cloudSyncEnabled else {
             return ledger
         }
         do {

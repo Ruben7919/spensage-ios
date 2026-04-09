@@ -61,7 +61,7 @@ struct PremiumView: View {
 
                     Text(
                         viewModel.session.isAuthenticated
-                            ? "Elige el nivel que quieres activar después. Si necesitas ayuda con pagos o restauración, la encuentras más abajo."
+                            ? "Gratis sirve para empezar. Pro desbloquea automatización y respaldo; Family suma el hogar completo."
                             : "Compara planes primero. Luego inicia sesión si quieres que tus compras y restauración queden ligadas a tu cuenta."
                     )
                         .font(.subheadline)
@@ -83,7 +83,7 @@ struct PremiumView: View {
             VStack(alignment: .leading, spacing: 14) {
                 CompactSectionHeader(
                     title: "Planes",
-                    detail: "Compara los niveles primero. Abre facturación solo si necesitas restaurar o revisar enlaces legales."
+                    detail: "El plan anual es el mejor valor si vas en serio con tu presupuesto."
                 )
 
                 VStack(spacing: 12) {
@@ -374,7 +374,7 @@ private enum PremiumStatus: String {
     var billingSourceLabel: String {
         switch self {
         case .free: return "Estado del plan".appLocalized
-        case .trialing, .active, .expired: return "Vista previa de Store".appLocalized
+        case .trialing, .active, .expired: return "Estado de App Store".appLocalized
         }
     }
 
@@ -409,52 +409,16 @@ private struct PremiumPlan: Identifiable, Equatable, CaseIterable {
     let features: [String]
     let isHighlighted: Bool
 
-    static let allCases: [PremiumPlan] = [
+    static let allCases: [PremiumPlan] = LaunchMonetizationCatalog.planCards.map { plan in
         PremiumPlan(
-            id: .freeLocal,
-            name: "Gratis",
-            priceLabel: "$0",
-            summary: "La base gratuita.",
-            features: [
-                "Presupuesto y registro de gastos",
-                "Ideal para empezar sin pagar"
-            ],
-            isHighlighted: false
-        ),
-        PremiumPlan(
-            id: .removeAds,
-            name: "Quitar anuncios",
-            priceLabel: "$7.99 pago único",
-            summary: "Una compra única para usar la app sin anuncios.",
-            features: [
-                "Quita las superficies patrocinadas",
-                "Mantiene la experiencia más limpia"
-            ],
-            isHighlighted: false
-        ),
-        PremiumPlan(
-            id: .pro,
-            name: "Pro",
-            priceLabel: "$4.99/mes o $29.99/año",
-            summary: "Más automatización, más claridad y respaldo en la nube.",
-            features: [
-                "Sincronización en la nube y restauración entre dispositivos",
-                "Escaneo inteligente de recibos y análisis más profundos"
-            ],
-            isHighlighted: true
-        ),
-        PremiumPlan(
-            id: .family,
-            name: "Familia",
-            priceLabel: "$7.99/mes o $49.99/año",
-            summary: "Un plan compartido para el hogar.",
-            features: [
-                "Todo lo incluido en Pro",
-                "Espacio y metas compartidas del hogar"
-            ],
-            isHighlighted: false
+            id: ID(rawValue: plan.planKey.rawValue) ?? .freeLocal,
+            name: plan.planKey.displayName,
+            priceLabel: plan.priceLabel,
+            summary: plan.summary,
+            features: plan.features,
+            isHighlighted: plan.isHighlighted
         )
-    ]
+    }
 }
 
 private struct PremiumPlanCard: View {

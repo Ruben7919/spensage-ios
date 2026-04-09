@@ -268,6 +268,7 @@ final class SpendSageUITests: XCTestCase {
     @MainActor
     private func assertExpensesToolRoute(triggerID: String, destinationElementID: String) {
         let app = makeApp(startingTab: "expenses")
+        app.launchEnvironment["SPENDSAGE_DEBUG_PLAN"] = "pro"
         app.launch()
 
         prepareExpensesTools(in: app, targetID: triggerID)

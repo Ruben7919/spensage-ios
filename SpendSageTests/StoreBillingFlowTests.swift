@@ -257,7 +257,8 @@ private final class MockStoreBackendService: BackendServicing {
                 acceptedAt: nil
             ),
             deepLink: "spendsage://invite/INVITE-1",
-            webLink: nil
+            webLink: nil,
+            emailDelivery: nil
         )
     }
 

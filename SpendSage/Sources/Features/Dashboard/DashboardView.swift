@@ -17,6 +17,7 @@ struct DashboardView: View {
                     heroCard(growth: growth, state: state)
                     missionSummaryCard(growth: growth)
                     todayCard(for: state, growth: growth)
+                    paceCard(for: state, growth: growth)
                     strategyCard(growth: growth)
                     recentSpendCard(for: state)
 
@@ -239,6 +240,50 @@ struct DashboardView: View {
         }
     }
 
+    private func paceCard(for state: FinanceDashboardState, growth: DashboardGrowthSnapshot) -> some View {
+        let daily = safeToSpendDay(for: state)
+        let weekly = safeToSpendWeek(for: state)
+        let remaining = state.budgetSnapshot.remaining
+        let statusText: String
+
+        if remaining < 0 {
+            statusText = "Pausa gastos no esenciales y registra solo lo importante hasta cerrar el mes."
+        } else if state.utilizationRatio >= 0.85 {
+            statusText = "Vas justo. Mantén compras pequeñas en espera y revisa el próximo gasto antes de pagarlo."
+        } else {
+            statusText = "Tu ritmo sigue manejable. Usa este número como guía rápida antes de comprar."
+        }
+
+        return GuidedSectionCard(
+            title: "Ritmo de ahorro",
+            summary: "Un solo número para decidir rápido sin abrir reportes: cuánto puedes usar sin romper tu plan.",
+            character: .tikki,
+            expression: growth.riskState == .urgent ? .warning : .happy,
+            systemImage: "speedometer"
+        ) {
+            BrandFeatureRow(
+                systemImage: "sun.max.fill",
+                title: "Hoy puedes usar",
+                detail: daily.formatted(.currency(code: currencyCode))
+            )
+
+            BrandFeatureRow(
+                systemImage: "calendar.badge.clock",
+                title: "Semana segura",
+                detail: weekly.formatted(.currency(code: currencyCode))
+            )
+
+            BrandFeatureRow(
+                systemImage: "sparkles",
+                title: "Movimiento recomendado",
+                detail: statusText
+            )
+
+            ProgressView(value: min(max(state.utilizationRatio, 0), 1))
+                .tint(growth.riskState == .urgent ? BrandTheme.warning : BrandTheme.primary)
+        }
+    }
+
     private func missionSummaryCard(growth: DashboardGrowthSnapshot) -> some View {
         GuidedSectionCard(
             title: "Tablero de misiones",
@@ -426,6 +471,10 @@ struct DashboardView: View {
         let daysLeft = max(state.remainingDaysInMonth, 1)
         let perDay = decimalDivide(remaining, by: daysLeft)
         return max(0, perDay * Decimal(7))
+    }
+
+    private func safeToSpendDay(for state: FinanceDashboardState) -> Decimal {
+        max(0, decimalDivide(state.budgetSnapshot.remaining, by: max(state.remainingDaysInMonth, 1)))
     }
 
     private func decimalDivide(_ value: Decimal, by divisor: Int) -> Decimal {
