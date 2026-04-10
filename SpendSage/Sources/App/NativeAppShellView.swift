@@ -5,13 +5,14 @@ struct NativeAppShellView: View {
 
     private let leadingTabs: [AppViewModel.AppTab] = [.dashboard, .expenses]
     private let trailingTabs: [AppViewModel.AppTab] = [.insights, .settings]
+    private let contentBottomInset: CGFloat = 112
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .bottom) {
             currentTabContent
                 .tint(BrandTheme.primary)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .environment(\.shellBottomInset, 0)
+                .environment(\.shellBottomInset, contentBottomInset)
 
             bottomNavigation
         }
@@ -67,13 +68,6 @@ struct NativeAppShellView: View {
 
     private var bottomNavigation: some View {
         VStack(spacing: 0) {
-            LinearGradient(
-                colors: [BrandTheme.shadow.opacity(0.08), .clear],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 12)
-
             HStack(alignment: .bottom, spacing: 14) {
                 ForEach(leadingTabs) { tab in
                     ShellNavigationButton(
@@ -98,15 +92,15 @@ struct NativeAppShellView: View {
                 }
             }
             .padding(.horizontal, 18)
-            .padding(.top, 8)
-            .padding(.bottom, 10)
+            .padding(.top, 2)
+            .padding(.bottom, 12)
         }
         .background(
             TopRoundedRectangle(cornerRadius: 30)
                 .fill(.ultraThinMaterial)
                 .overlay(
                     TopRoundedRectangle(cornerRadius: 30)
-                        .fill(BrandTheme.surface.opacity(0.26))
+                        .fill(BrandTheme.surface.opacity(0.86))
                 )
                 .overlay(alignment: .top) {
                     Rectangle()
@@ -123,9 +117,11 @@ struct NativeAppShellView: View {
                     TopRoundedRectangle(cornerRadius: 30)
                         .stroke(BrandTheme.line.opacity(0.22), lineWidth: 0.8)
                 )
-                .shadow(color: BrandTheme.shadow.opacity(0.04), radius: 10, x: 0, y: -1)
+                .shadow(color: BrandTheme.shadow.opacity(0.14), radius: 16, x: 0, y: -4)
                 .ignoresSafeArea(edges: .bottom)
         )
+        .ignoresSafeArea(edges: .bottom)
+        .offset(y: 20)
     }
 
     private func select(_ tab: AppViewModel.AppTab) {

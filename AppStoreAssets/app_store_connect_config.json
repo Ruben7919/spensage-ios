@@ -68,13 +68,13 @@
     }
   },
   "build": {
-    "id": "da3f142f-348b-4ebc-a282-0371c7cbf419",
+    "id": "3e8076cf-e7b3-4122-b3ee-988b584e4bc5",
     "betaLocalizations": {
       "en-US": {
-        "whatsNew": "Build 27 refines the beta UX with the restored bottom tab bar, cleaner mission and plan language, SES-backed family invite emails, simpler receipt scanning, smoother family-sharing surfaces, and the latest authenticated cloud readiness fixes."
+        "whatsNew": "Build 29 refines the beta UX with the restored bottom tab bar, cleaner mission and plan language, SES-backed family invite emails, simpler receipt scanning, smoother family-sharing surfaces, and the latest authenticated cloud readiness fixes."
       },
       "es-MX": {
-        "whatsNew": "La build 27 pule la UX de beta con el tab bar inferior restaurado, lenguaje más claro de misiones y planes, invitaciones family por SES, escaneo de recibos más simple y los últimos ajustes de sync autenticado."
+        "whatsNew": "La build 29 pule la UX de beta con el tab bar inferior restaurado, lenguaje más claro de misiones y planes, invitaciones family por SES, escaneo de recibos más simple y los últimos ajustes de sync autenticado."
       }
     }
   },

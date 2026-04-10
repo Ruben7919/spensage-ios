@@ -148,9 +148,8 @@ Current App Store Connect sync state:
 - Global territory pricing is now applied for all five monetization SKUs, which was the missing piece keeping the four auto-renewable subscriptions out of reviewable state.
 - `spendsage.pro.monthly`, `spendsage.pro.annual`, `spendsage.family.monthly`, `spendsage.family.annual`, and `spendsage.remove_ads` are now `READY_TO_SUBMIT`.
 - Version `1.0` in App Store Connect now includes all five monetization components in the `Compras dentro de la app y suscripciones` section.
-- Build `1.0 (28)` was uploaded on 2026-04-09 and App Store Connect accepted the package for processing.
-- Automatic TestFlight group promotion is pending a fresh App Store Connect session or Chrome `Permitir JavaScript para eventos de Apple`; the cookie transport returned `401` and the Chrome transport was blocked by AppleScript JavaScript permissions.
-- Internal testers receive the same App Store eligible build automatically once processed; the App Store Connect API does not require a separate internal-group attachment for this build type when the build is attached through the current external beta flow.
+- Build `1.0 (29)` was uploaded on 2026-04-09, processed as `VALID`, attached to the configured external TestFlight group, and is now `APPROVED` for external beta testing.
+- Internal testers receive the same App Store eligible build automatically once processed; App Store Connect rejected a separate internal-group attachment for this App Store eligible build type, so the automation records it as `automatic`.
 - Re-apply from the authenticated Chrome session before each external-beta upload.
 
 ## Submission Positioning
