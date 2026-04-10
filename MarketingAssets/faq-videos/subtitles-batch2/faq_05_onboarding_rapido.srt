@@ -5,7 +5,7 @@ ya perdio al usuario.
 
 2
 00:00:02,000 --> 00:00:05,000
-En SpendSage empiezas con ingreso,
+En MichiFinanzas empiezas con ingreso,
 gastos fijos y una meta simple.
 
 3

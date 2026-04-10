@@ -26,21 +26,21 @@ El loop v1 se enfoca en tres acciones:
 ### Logro compartido
 
 ```text
-Hoy avancé un poco con mis gastos en SpendSage. Si también quieres ordenar tu mes sin complicarte, pruébala aquí:
+Hoy avancé un poco con mis gastos en MichiFinanzas. Si también quieres ordenar tu mes sin complicarte, pruébala aquí:
 {link}
 ```
 
 ### Invitación directa
 
 ```text
-Estoy probando SpendSage para registrar gastos, escanear recibos y entender el mes más fácil. Creo que te puede servir:
+Estoy probando MichiFinanzas para registrar gastos, escanear recibos y entender el mes más fácil. Creo que te puede servir:
 {link}
 ```
 
 ### Beta/TestFlight
 
 ```text
-Estoy probando la beta de SpendSage. Es una app para registrar gastos, escanear recibos y ver tu progreso sin sentirlo pesado:
+Estoy probando la beta de MichiFinanzas. Es una app para registrar gastos, escanear recibos y ver tu progreso sin sentirlo pesado:
 {link}
 ```
 
@@ -49,7 +49,7 @@ Estoy probando la beta de SpendSage. Es una app para registrar gastos, escanear 
 Base para links sociales:
 
 ```text
-https://spendsage.ai/?utm_source={platform}&utm_medium=referral&utm_campaign=spendsage_sprint3_referral&utm_content={share_surface}&ref={code}
+https://michifinanzas.com/?utm_source={platform}&utm_medium=referral&utm_campaign=michifinanzas_sprint3_referral&utm_content={share_surface}&ref={code}
 ```
 
 Valores recomendados para `utm_content`:
@@ -97,7 +97,7 @@ Superficies aprobadas para diseño futuro:
 
 - celebration popup: `Compartir mi logro`;
 - settings: `Invita a un amigo`;
-- premium: `Comparte SpendSage`;
+- premium: `Comparte MichiFinanzas`;
 - post-onboarding: `Enviar a alguien que lo necesita`.
 
 Evitar popups agresivos en cold start o antes de que el usuario haya visto valor real.

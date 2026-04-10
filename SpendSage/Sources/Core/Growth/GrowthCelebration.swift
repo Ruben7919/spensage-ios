@@ -52,7 +52,7 @@ enum GrowthCelebrationBuilder {
                     rewardXP: nil,
                     reachedLevel: current.level,
                     shareText: AppLocalization.localized(
-                        "Acabo de subir al %@ en SpendSage. Vamos por el siguiente paso.",
+                        "Acabo de subir al %@ en MichiFinanzas. Vamos por el siguiente paso.",
                         arguments: "nivel \(current.level)"
                     )
                 )
@@ -77,7 +77,7 @@ enum GrowthCelebrationBuilder {
                     rewardXP: nil,
                     reachedLevel: nil,
                     shareText: AppLocalization.localized(
-                        "Desbloqueé el badge \"%@\" en SpendSage. Cada hábito limpio hace más fuerte mi plan de ahorro.",
+                        "Desbloqueé el badge \"%@\" en MichiFinanzas. Cada hábito limpio hace más fuerte mi plan de ahorro.",
                         arguments: trophy.title
                     )
                 )
@@ -106,7 +106,7 @@ enum GrowthCelebrationBuilder {
                     rewardXP: mission.rewardXP,
                     reachedLevel: nil,
                     shareText: AppLocalization.localized(
-                        "Completé la misión \"%@\" en SpendSage. Voy sumando disciplina y ahorro un paso a la vez.",
+                        "Completé la misión \"%@\" en MichiFinanzas. Voy sumando disciplina y ahorro un paso a la vez.",
                         arguments: mission.title
                     )
                 )

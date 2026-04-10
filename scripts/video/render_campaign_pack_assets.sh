@@ -147,7 +147,7 @@ render_thumbnail() {
 
 render_playlist_cover() {
     local input="$GUIDES_DIR/guide_17_landing_hero_team_v2.png"
-    local output="$OUTPUT_DIR/playlist_cover_spendsage_en_7_pasos.png"
+    local output="$OUTPUT_DIR/playlist_cover_michifinanzas_en_7_pasos.png"
     local tmpdir
     local kicker_file
     local title_line_one_file
@@ -163,7 +163,7 @@ render_playlist_cover() {
     subtitle_file="$tmpdir/subtitle.txt"
 
     printf '%s' 'Serie tutorial' > "$kicker_file"
-    printf '%s' 'SpendSage' > "$title_line_one_file"
+    printf '%s' 'MichiFinanzas' > "$title_line_one_file"
     printf '%s' 'en 7 pasos' > "$title_line_two_file"
     printf '%s' 'Aprende la app rapido y sin enredarte' > "$subtitle_file"
 

@@ -6,7 +6,7 @@
 "Confirm account" = "Confirmar cuenta";
 "Reset password" = "Restablecer contraseña";
 "New password" = "Nueva contraseña";
-"SpendSage" = "SpendSage";
+"SpendSage" = "MichiFinanzas";
 "See your first safe-to-spend result fast" = "Ve tu primer resultado de gasto seguro en poco tiempo";
 "Add income, fixed bills, and one goal. The result flips in place like a first-win card, and current balance stays optional." = "Agrega ingresos, gastos fijos y una meta. El resultado aparece al instante como una tarjeta de primer logro, y el saldo actual sigue siendo opcional.";
 "First win in under a minute" = "Primer logro en menos de un minuto";
@@ -615,7 +615,7 @@
 "Apple and Google open the secure cloud login and bring you back into the app." = "Apple y Google abren el acceso seguro en la nube y te devuelven a la app.";
 "Apple and Google will activate as soon as the account provider is connected." = "Apple y Google se activarán en cuanto el proveedor de cuenta esté conectado.";
 "Reset your password" = "Restablece tu contraseña";
-"Use your email or a trusted provider and get back into SpendSage in one step." = "Usa tu correo o un proveedor confiable y vuelve a SpendSage en un solo paso.";
+"Use your email or a trusted provider and get back into SpendSage in one step." = "Usa tu correo o un proveedor confiable y vuelve a MichiFinanzas en un solo paso.";
 "Create the cloud account that will keep your profile, plan, and future sync connected." = "Crea la cuenta en la nube que mantendrá conectados tu perfil, tu plan y la futura sincronización.";
 "Paste the code from your email and finish the account setup." = "Pega el código de tu correo y termina la configuración de la cuenta.";
 "Request a reset code and keep the recovery path short." = "Solicita un código de restablecimiento y mantén corta la ruta de recuperación.";
@@ -751,7 +751,7 @@
 "Move from guidance into action with support and legal paths that match the connected account experience." = "Pasa de la guía a la acción con rutas de soporte y legales que encajan con la experiencia de cuenta conectada.";
 "Create a packet, copy diagnostics, and open an email draft." = "Crea un paquete, copia diagnósticos y abre un borrador de correo.";
 "Review privacy, terms, and public support links." = "Revisa privacidad, términos y enlaces públicos de soporte.";
-"SpendSage support request" = "Solicitud de soporte SpendSage";
+"SpendSage support request" = "Solicitud de soporte MichiFinanzas";
 "Manchas packages the issue clearly, Tikki frames the fastest fix, and Ludo keeps the troubleshooting route readable." = "Manchas empaqueta el problema con claridad, Tikki enfoca la corrección más rápida y Ludo mantiene legible la ruta de diagnóstico.";
 "Fast fix" = "Arreglo rápido";
 "Helps you frame the issue in one clear step." = "Te ayuda a enmarcar el problema en un paso claro.";
@@ -770,7 +770,7 @@
 "What happened?" = "¿Qué pasó?";
 "Include what you expected, what you saw instead, and any recent step that might help reproduce it." = "Incluye lo que esperabas, lo que viste en su lugar y cualquier paso reciente que ayude a reproducirlo.";
 "Include local diagnostics" = "Incluir diagnósticos locales";
-"SpendSage Support Packet" = "Paquete de soporte de SpendSage";
+"SpendSage Support Packet" = "Paquete de soporte de MichiFinanzas";
 "Open support email draft" = "Abrir borrador de correo de soporte";
 "Open the public privacy, terms, and support pages if you need a policy or contact reference." = "Abre las páginas públicas de privacidad, términos y soporte si necesitas una política o una referencia de contacto.";
 "Packet preview" = "Vista previa del paquete";
@@ -1047,7 +1047,7 @@
 "Higher-value upsell for active households" = "Upsell de mayor valor para hogares activos";
 "Recommended" = "Recomendado";
 "How should I start with my account?" = "¿Cómo debería empezar con mi cuenta?";
-"Create or sign in to your SpendSage account first, then set your budget and first goal so the app can personalize the next step." = "Primero crea o inicia sesión en tu cuenta de SpendSage, luego define tu presupuesto y tu primera meta para que la app pueda personalizar el siguiente paso.";
+"Create or sign in to your SpendSage account first, then set your budget and first goal so the app can personalize the next step." = "Primero crea o inicia sesión en tu cuenta de MichiFinanzas, luego define tu presupuesto y tu primera meta para que la app pueda personalizar el siguiente paso.";
 "What does the budget wizard actually change?" = "¿Qué cambia realmente el asistente de presupuesto?";
 "It saves your monthly income and monthly budget locally. Dashboard and Insights then use those values to calculate remaining safe budget, utilization, and pacing." = "Guarda localmente tus ingresos mensuales y tu presupuesto mensual. Luego Dashboard e Insights usan esos valores para calcular presupuesto seguro restante, utilización y ritmo.";
 "Why are some advanced tools unavailable here?" = "¿Por qué algunas herramientas avanzadas no están disponibles aquí?";
@@ -1095,7 +1095,7 @@
 "Create my account" = "Crear mi cuenta";
 "Welcome back" = "Bienvenido de nuevo";
 "Reset your access" = "Restablece tu acceso";
-"Keep it simple: use your email, Apple, or Google and get back into SpendSage in one step." = "Hazlo simple: usa tu correo, Apple o Google y vuelve a SpendSage en un solo paso.";
+"Keep it simple: use your email, Apple, or Google and get back into SpendSage in one step." = "Hazlo simple: usa tu correo, Apple o Google y vuelve a MichiFinanzas en un solo paso.";
 "Create the cloud account that will keep your plan, profile, and future sync connected." = "Crea la cuenta en la nube que mantendrá conectado tu plan, perfil y futura sincronización.";
 "Paste the code from your email and finish the account setup." = "Pega el código que llegó a tu correo y termina la configuración de la cuenta.";
 "Request a reset code and keep the recovery path short." = "Solicita un código de restablecimiento y mantén corto el camino de recuperación.";
@@ -1167,7 +1167,7 @@
 "Updating" = "Actualizando";
 "6-digit code" = "Código de 6 dígitos";
 "At least 8 characters" = "Al menos 8 caracteres";
-"Create your SpendSage account" = "Crea tu cuenta de SpendSage";
+"Create your SpendSage account" = "Crea tu cuenta de MichiFinanzas";
 "Confirm your account" = "Confirma tu cuenta";
 "Tikki" = "Tikki";
 "Ludo" = "Ludo";
@@ -1341,8 +1341,8 @@
 "Simple CSV template with merchant, amount, category, date, and note columns. Headers are %@, so the first row can stay readable when you paste or preview a file." = "Plantilla CSV simple con columnas de comercio, monto, categoría, fecha y nota. Los encabezados están %@, así la primera fila se mantiene legible cuando pegas o previsualizas un archivo.";
 "Skipped" = "Omitidas";
 "Skipped lines" = "Líneas omitidas";
-"SpendSage local summary" = "Resumen local de SpendSage";
-"SpendSage support packet" = "Paquete de soporte de SpendSage";
+"SpendSage local summary" = "Resumen local de MichiFinanzas";
+"SpendSage support packet" = "Paquete de soporte de MichiFinanzas";
 "Spent: %@" = "Gastado: %@";
 "Start with the monthly income that actually lands in your hands so the rest of the plan stays honest." = "Empieza con el ingreso mensual que realmente llega a tus manos para que el resto del plan siga siendo honesto.";
 "Step 1 · Monthly income" = "Paso 1 · Ingreso mensual";
@@ -1413,7 +1413,7 @@
 "Keep your plan, progress, and history synced with one account." = "Mantén tu plan, progreso e historial sincronizados con una sola cuenta.";
 "Smart local capture" = "Captura local inteligente";
 "Scan a receipt, let on-device OCR prefill the draft, then review and save." = "Escanea un recibo, deja que el OCR en el dispositivo complete el borrador y luego revísalo antes de guardar.";
-"Use the document scanner or import a receipt photo. SpendSage reads the text on-device and prepares a clean draft for review." = "Usa el escáner de documentos o importa una foto del recibo. SpendSage lee el texto en el dispositivo y prepara un borrador limpio para revisar.";
+"Use the document scanner or import a receipt photo. SpendSage reads the text on-device and prepares a clean draft for review." = "Usa el escáner de documentos o importa una foto del recibo. MichiFinanzas lee el texto en el dispositivo y prepara un borrador limpio para revisar.";
 "Detected" = "Detectado";
 "Working" = "Procesando";
 "Idle" = "En espera";
@@ -1422,17 +1422,17 @@
 "Vision OCR" = "OCR local";
 "The image stays on the device in this build. OCR helps prefill merchant, total, and date so you spend less time typing." = "La imagen se queda en el dispositivo en esta build. El OCR ayuda a completar comercio, total y fecha para que escribas menos.";
 "Receipt suggestions" = "Sugerencias del recibo";
-"SpendSage found values on-device and already applied the safest ones to the draft below." = "SpendSage encontró valores en el dispositivo y ya aplicó los más seguros al borrador de abajo.";
+"SpendSage found values on-device and already applied the safest ones to the draft below." = "MichiFinanzas encontró valores en el dispositivo y ya aplicó los más seguros al borrador de abajo.";
 "Blend receipt OCR, remembered merchants, and local rules so most drafts need only a quick review." = "Combina OCR de recibos, comercios recordados y reglas locales para que la mayoría de los borradores solo necesiten una revisión rápida.";
 "Check the autofill, fix anything that looks off, and save the clean expense to your ledger." = "Revisa el autocompletado, corrige lo que no se vea bien y guarda el gasto limpio en tu libro.";
 "Save expense" = "Guardar gasto";
 "Document scan is not available on this device." = "El escaneo de documentos no está disponible en este dispositivo.";
 "Prefilled on device from the receipt scan." = "Completado en el dispositivo a partir del escaneo del recibo.";
 "Start with the document scanner or a photo from your library. You can also skip the image and build the draft manually." = "Empieza con el escáner de documentos o una foto de tu biblioteca. También puedes omitir la imagen y crear el borrador manualmente.";
-"The receipt is attached and SpendSage can suggest the core fields. Review the draft before you save the expense." = "El recibo ya está adjunto y SpendSage puede sugerir los campos clave. Revisa el borrador antes de guardar el gasto.";
+"The receipt is attached and SpendSage can suggest the core fields. Review the draft before you save the expense." = "El recibo ya está adjunto y MichiFinanzas puede sugerir los campos clave. Revisa el borrador antes de guardar el gasto.";
 "The draft is being stored on this device. No cloud service is involved in this flow." = "El borrador se está guardando en este dispositivo. Ningún servicio en la nube participa en este flujo.";
 "Reading receipt" = "Leyendo recibo";
-"SpendSage is using on-device OCR to detect the merchant, total, and date before you review the draft." = "SpendSage está usando OCR en el dispositivo para detectar comercio, total y fecha antes de que revises el borrador.";
+"SpendSage is using on-device OCR to detect the merchant, total, and date before you review the draft." = "MichiFinanzas está usando OCR en el dispositivo para detectar comercio, total y fecha antes de que revises el borrador.";
 "We could not read text from this image." = "No pudimos leer texto de esta imagen.";
 "Apple and Google open the secure cloud login and bring you back into the app." = "Apple y Google abren el acceso seguro en la nube y te devuelven a la app.";
 "Apple and Google will activate as soon as the account provider is connected." = "Apple y Google se activarán en cuanto el proveedor de cuentas esté conectado.";
@@ -1441,7 +1441,7 @@
 "Scan again" = "Escanear de nuevo";
 "On-device text scan" = "Lectura local del recibo";
 "On-device OCR suggests the core fields, but the final edit is always yours before anything reaches the ledger." = "El OCR en el dispositivo sugiere los campos clave, pero la edición final siempre es tuya antes de que algo llegue al libro.";
-"Use the document scanner or import a receipt photo. SpendSage reads the text on-device and prepares a cleaner draft for review." = "Usa el escáner de documentos o importa una foto del recibo. SpendSage lee el texto en el dispositivo y prepara un borrador más limpio para revisar.";
+"Use the document scanner or import a receipt photo. SpendSage reads the text on-device and prepares a cleaner draft for review." = "Usa el escáner de documentos o importa una foto del recibo. MichiFinanzas lee el texto en el dispositivo y prepara un borrador más limpio para revisar.";
 "Groceries" = "Supermercado";
 "Dining" = "Comidas";
 "Transport" = "Transporte";

@@ -70,9 +70,9 @@ final class PreviewAuthService: AuthServicing {
         try await Task.sleep(for: .milliseconds(180))
         lastProfileSeed = AuthProfileSeed(
             fullName: nil,
-            email: "\(provider.rawValue.lowercased())@spendsage.ai"
+            email: "\(provider.rawValue.lowercased())@michifinanzas.local"
         )
-        let session = SessionState.signedIn(email: "\(provider.rawValue.lowercased())@spendsage.ai", provider: provider.rawValue)
+        let session = SessionState.signedIn(email: "\(provider.rawValue.lowercased())@michifinanzas.local", provider: provider.rawValue)
         if AuthSessionPreferences.rememberDeviceEnabled() {
             rememberedSession = session
         }

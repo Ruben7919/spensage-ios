@@ -1,4 +1,4 @@
-# SpendSage App Icon Prompt
+# MichiFinanzas App Icon Prompt
 
 Last updated: 2026-04-05
 
@@ -19,13 +19,13 @@ Recommended composition:
 ## Primary Prompt
 
 ```text
-Design a premium iOS app icon for SpendSage using only Manchas, the black-and-white mascot cat. Manchas should appear in a peeking pose inspired by a cat looking over a line or ledge, with the face and paws reading immediately at tiny sizes. Make Manchas much larger than in the current icon and keep the character faithful to the existing SpendSage art style: rounded chibi proportions, glossy eyes, clean linework, soft blush, green bow, and polished shading. The background should feel cute, premium, and memorable with teal, mint, cream, and warm gold accents, soft glow, rounded shapes, and subtle decorative details. No other mascots, no text, no dashboard panels, no clutter, and no object that competes with Manchas as the focal point. Compose it as a clean square iOS icon with safe margins and strong silhouette clarity.
+Design a premium iOS app icon for MichiFinanzas using only Manchas, the black-and-white mascot cat. Manchas should appear in a peeking pose inspired by a cat looking over a line or ledge, with the face and paws reading immediately at tiny sizes. Make Manchas much larger than in the current icon and keep the character faithful to the existing MichiFinanzas art style: rounded chibi proportions, glossy eyes, clean linework, soft blush, green bow, and polished shading. The background should feel cute, premium, and memorable with teal, mint, cream, and warm gold accents, soft glow, rounded shapes, and subtle decorative details. No other mascots, no text, no dashboard panels, no clutter, and no object that competes with Manchas as the focal point. Compose it as a clean square iOS icon with safe margins and strong silhouette clarity.
 ```
 
 ## Alternate Prompt
 
 ```text
-Design a premium iOS app icon for SpendSage with Manchas as the only visible mascot. Use a playful peeking composition where Manchas rises over a soft ledge with paws visible and the face occupying most of the icon. Keep the art highly detailed but still clean and readable for App Store scale. Use a cute premium background with airy gradients, subtle sparkles, rounded framing, and gentle teal, mint, cream, and soft gold lighting. The result should feel warm, expensive, and unmistakably SpendSage, not generic, childish, or busy. No text, no extra mascots, no heavy finance props, and no miniature dashboard UI.
+Design a premium iOS app icon for MichiFinanzas with Manchas as the only visible mascot. Use a playful peeking composition where Manchas rises over a soft ledge with paws visible and the face occupying most of the icon. Keep the art highly detailed but still clean and readable for App Store scale. Use a cute premium background with airy gradients, subtle sparkles, rounded framing, and gentle teal, mint, cream, and soft gold lighting. The result should feel warm, expensive, and unmistakably MichiFinanzas, not generic, childish, or busy. No text, no extra mascots, no heavy finance props, and no miniature dashboard UI.
 ```
 
 ## Negative Constraints

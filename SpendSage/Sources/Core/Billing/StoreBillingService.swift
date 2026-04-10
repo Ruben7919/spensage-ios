@@ -20,7 +20,7 @@ enum LaunchMonetizationCatalog {
         PlanCard(
             planKey: .freeLocal,
             priceLabel: "$0",
-            summary: "Para probar SpendSage sin pagar.",
+            summary: "Para probar MichiFinanzas sin pagar.",
             features: [
                 "Hasta \(freeMonthlyExpenseLimit) gastos manuales al mes",
                 "\(freeReceiptScanLimit) escaneos de prueba al mes",
@@ -43,7 +43,7 @@ enum LaunchMonetizationCatalog {
         PlanCard(
             planKey: .pro,
             priceLabel: "$5.99/mes o $39.99/año",
-            summary: "Para usar SpendSage como herramienta financiera diaria.",
+            summary: "Para usar MichiFinanzas como herramienta financiera diaria.",
             features: [
                 "Respaldo y sync entre dispositivos",
                 "Escaneo de recibos, CSV, cuentas, facturas, reglas e insights"

@@ -33,6 +33,19 @@ else
   export_options="$BUILD_DIR/ExportOptions-TestFlight-External.plist"
 fi
 
+auth_args=()
+if [[ -n "${ASC_KEY_PATH:-}" || -n "${ASC_KEY_ID:-}" || -n "${ASC_ISSUER_ID:-}" ]]; then
+  if [[ -z "${ASC_KEY_PATH:-}" || -z "${ASC_KEY_ID:-}" || -z "${ASC_ISSUER_ID:-}" ]]; then
+    echo "ASC_KEY_PATH, ASC_KEY_ID, and ASC_ISSUER_ID must all be set when using App Store Connect API auth." >&2
+    exit 1
+  fi
+  auth_args=(
+    -authenticationKeyPath "$ASC_KEY_PATH"
+    -authenticationKeyID "$ASC_KEY_ID"
+    -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+  )
+fi
+
 mkdir -p "$BUILD_DIR"
 rm -rf "$archive_path" "$export_path"
 
@@ -46,14 +59,16 @@ xcodebuild \
   -destination "generic/platform=iOS" \
   -allowProvisioningUpdates \
   archive \
-  -archivePath "$archive_path"
+  -archivePath "$archive_path" \
+  "${auth_args[@]}"
 
 xcodebuild \
   -exportArchive \
   -allowProvisioningUpdates \
   -archivePath "$archive_path" \
   -exportPath "$export_path" \
-  -exportOptionsPlist "$export_options"
+  -exportOptionsPlist "$export_options" \
+  "${auth_args[@]}"
 
 cat <<EOF
 Upload submitted:

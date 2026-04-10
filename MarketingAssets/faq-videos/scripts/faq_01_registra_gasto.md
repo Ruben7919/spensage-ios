@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Mostrar que SpendSage permite abrir captura rápida sin ruido visual.
+Mostrar que MichiFinanzas permite abrir captura rápida sin ruido visual.
 
 ## Hook
 
@@ -19,7 +19,7 @@ Mostrar que SpendSage permite abrir captura rápida sin ruido visual.
 
 ## Voiceover
 
-"Cuando compras algo, no quieres perder tiempo navegando. En SpendSage abres el gasto, llenas lo esencial y sigues con tu día."
+"Cuando compras algo, no quieres perder tiempo navegando. En MichiFinanzas abres el gasto, llenas lo esencial y sigues con tu día."
 
 ## Subtítulo principal
 

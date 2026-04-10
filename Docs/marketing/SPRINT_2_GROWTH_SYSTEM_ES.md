@@ -1,4 +1,4 @@
-# SpendSage Sprint 2 Growth System
+# MichiFinanzas Sprint 2 Growth System
 
 Última actualización: 2026-04-09
 

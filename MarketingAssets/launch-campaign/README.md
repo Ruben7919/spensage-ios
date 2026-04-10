@@ -1,4 +1,4 @@
-# SpendSage Launch Campaign Assets
+# MichiFinanzas Launch Campaign Assets
 
 Assets de lanzamiento generados localmente para social y video.
 
@@ -15,7 +15,7 @@ Assets de lanzamiento generados localmente para social y video.
 - Previews de video: `/Users/rubenlazaro/Projects/spensage-ios/MarketingAssets/launch-campaign/render-previews`
 - Posters sociales: `/Users/rubenlazaro/Projects/spensage-ios/MarketingAssets/launch-campaign/posters`
 - Previews de posters: `/Users/rubenlazaro/Projects/spensage-ios/MarketingAssets/launch-campaign/poster-previews`
-- Copy editorial: `/Users/rubenlazaro/Projects/spensage-ios/Docs/video/LAUNCH_PACK_SPENSAGE_ES.md`
+- Copy editorial: `/Users/rubenlazaro/Projects/spensage-ios/Docs/video/LAUNCH_PACK_MICHIFINANZAS_ES.md`
 
 ## Comandos
 

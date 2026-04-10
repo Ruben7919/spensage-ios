@@ -277,7 +277,7 @@ def build_shot(spec: ShotSpec) -> Image.Image:
     quote_font = font(FONT_HEAVY, 35)
     draw.multiline_text(
         (946, 2140),
-        "SpendSage\nte ayuda\nsin sentirse\ncomo una hoja\nde cálculo.",
+        "MichiFinanzas\nte ayuda\nsin sentirse\ncomo una hoja\nde cálculo.",
         font=quote_font,
         fill=(40, 64, 78),
         spacing=6,

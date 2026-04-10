@@ -50,14 +50,14 @@ enum PreviewFinanceData {
             AccountRecord(
                 id: UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa") ?? UUID(),
                 name: "Main Checking",
-                institution: "SpendSage Bank",
+                institution: "MichiFinanzas Bank",
                 balance: 1_840.60,
                 kind: .checking
             ),
             AccountRecord(
                 id: UUID(uuidString: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb") ?? UUID(),
                 name: "Rainy Day Savings",
-                institution: "SpendSage Bank",
+                institution: "MichiFinanzas Bank",
                 balance: 4_920.15,
                 kind: .savings
             )
@@ -98,7 +98,7 @@ enum PreviewFinanceData {
         ],
         profile: ProfileRecord(
             fullName: "Ruben",
-            householdName: "Hogar SpendSage",
+            householdName: "Hogar MichiFinanzas",
             email: "rubenl97m@gmail.com",
             countryCode: "US",
             marketingOptIn: true

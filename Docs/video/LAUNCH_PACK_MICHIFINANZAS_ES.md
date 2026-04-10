@@ -1,4 +1,4 @@
-# SpendSage Launch Pack
+# MichiFinanzas Launch Pack
 
 Última actualización: 2026-04-08
 
@@ -11,7 +11,7 @@
 
 ## Mensaje madre
 
-SpendSage te ayuda a registrar, entender y ordenar tu dinero con menos fricción. La app no intenta sonar fría ni financiera en exceso. Habla como una herramienta que acompaña, simplifica y te da control real en el día a día.
+MichiFinanzas te ayuda a registrar, entender y ordenar tu dinero con menos fricción. La app no intenta sonar fría ni financiera en exceso. Habla como una herramienta que acompaña, simplifica y te da control real en el día a día.
 
 ## Pilares de comunicación
 
@@ -25,14 +25,14 @@ SpendSage te ayuda a registrar, entender y ordenar tu dinero con menos fricción
 
 ### YouTube Shorts
 
-- `Ordenar tu dinero no tiene que sentirse pesado. SpendSage te ayuda a registrar, entender y decidir con más calma.`
+- `Ordenar tu dinero no tiene que sentirse pesado. MichiFinanzas te ayuda a registrar, entender y decidir con más calma.`
 - `Si abrir una app financiera te abruma, aquí empiezas con lo esencial y ves claridad desde el primer momento.`
-- `Del gasto rápido al dato útil. Así se siente usar SpendSage cuando quieres control sin complicarte.`
+- `Del gasto rápido al dato útil. Así se siente usar MichiFinanzas cuando quieres control sin complicarte.`
 
 ### Instagram Reels
 
-- `Menos fricción. Más claridad. SpendSage te acompaña para que tus finanzas no se sientan como otra tarea pendiente.`
-- `Tu dinero merece orden, pero también calma. Así es SpendSage en el uso real.`
+- `Menos fricción. Más claridad. MichiFinanzas te acompaña para que tus finanzas no se sientan como otra tarea pendiente.`
+- `Tu dinero merece orden, pero también calma. Así es MichiFinanzas en el uso real.`
 - `Registrar, revisar, entender y seguir. Ese es el flujo que hace que sí quieras volver a abrir la app.`
 
 ### TikTok
@@ -43,7 +43,7 @@ SpendSage te ayuda a registrar, entender y ordenar tu dinero con menos fricción
 
 ### Instagram Feed
 
-- `SpendSage está pensada para que ordenar tu dinero se sienta claro, rápido y mucho menos pesado.`
+- `MichiFinanzas está pensada para que ordenar tu dinero se sienta claro, rápido y mucho menos pesado.`
 - `No se trata de ver datos por verlos. Se trata de entender qué está pasando y qué puedes hacer después.`
 - `Una app financiera útil es la que te da control sin hacerte sentir torpe.`
 
@@ -81,7 +81,7 @@ SpendSage te ayuda a registrar, entender y ordenar tu dinero con menos fricción
 6. `Una app financiera que también te orienta cuando tienes dudas.`
 7. `El momento en que desbloqueas un logro y lo compartes al instante.`
 8. `Tu flujo ideal de uso: abrir, registrar, revisar, seguir.`
-9. `Lo que SpendSage hace por ti en 20 segundos que normalmente te toma mucho más.`
+9. `Lo que MichiFinanzas hace por ti en 20 segundos que normalmente te toma mucho más.`
 10. `Por qué una experiencia financiera amigable cambia la forma en que sí vuelves a usar la app.`
 
 ## Mini calendario de lanzamiento, 7 días
@@ -149,7 +149,7 @@ SpendSage te ayuda a registrar, entender y ordenar tu dinero con menos fricción
 
 ## Copys base para reutilizar
 
-- `SpendSage te acompaña a entender tu dinero sin complicarte.`
+- `MichiFinanzas te acompaña a entender tu dinero sin complicarte.`
 - `Menos fricción, más claridad, más calma para decidir.`
 - `Una app financiera que se siente útil desde el primer uso.`
 - `Tu progreso también merece celebrarse.`

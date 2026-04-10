@@ -7,10 +7,15 @@ settings:
   base:
     PRODUCT_NAME: SpendSage
     SWIFT_VERSION: "6.0"
-    CURRENT_PROJECT_VERSION: 29
+    CURRENT_PROJECT_VERSION: 31
     MARKETING_VERSION: 1.0
     DEVELOPMENT_TEAM: YU855NB22W
     CODE_SIGN_STYLE: Automatic
+    COMPRESS_PNG_FILES: NO
+    ENABLE_ON_DEMAND_RESOURCES: NO
+    ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: NO
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS: NO
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
 targets:
   SpendSage:
     type: application
@@ -22,7 +27,7 @@ targets:
     info:
       path: SpendSage/Info.plist
       properties:
-        CFBundleDisplayName: SpendSage AI
+        CFBundleDisplayName: MichiFinanzas
         CFBundleIconName: AppIcon
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
@@ -33,8 +38,8 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         NSCameraUsageDescription: Scan receipts and capture supporting images.
         NSCalendarsUsageDescription: Create optional due-date reminders for your recurring bills.
-        NSFaceIDUsageDescription: Unlock your saved SpendSage account quickly and securely.
-        NSLocationWhenInUseUsageDescription: Tag an expense with your current place only when you ask SpendSage to do it.
+        NSFaceIDUsageDescription: Unlock your saved MichiFinanzas account quickly and securely.
+        NSLocationWhenInUseUsageDescription: Tag an expense with your current place only when you ask MichiFinanzas to do it.
         NSPhotoLibraryUsageDescription: Import receipts and supporting images.
         NSPhotoLibraryAddUsageDescription: Save exported images and documents.
         CFBundleURLTypes:
@@ -57,10 +62,13 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.spendsage.ai
         GENERATE_INFOPLIST_FILE: false
         INFOPLIST_FILE: SpendSage/Info.plist
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        INFOPLIST_KEY_CFBundleIconName: AppIcon
+        ENABLE_ON_DEMAND_RESOURCES: NO
+        ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: NO
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS: NO
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_ENTITLEMENTS: SpendSage/SpendSage.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       configs:
         Debug:
           APS_ENVIRONMENT: development

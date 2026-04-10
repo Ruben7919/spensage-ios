@@ -275,7 +275,7 @@ private struct GrowthCelebrationShareCard: View {
                 HStack {
                     BrandBadge(text: celebration.kind.badgeLabel, systemImage: "sparkles")
                     Spacer()
-                    Text("SpendSage")
+                    Text("MichiFinanzas")
                         .font(.system(size: 44, weight: .black, design: .rounded))
                         .foregroundStyle(BrandTheme.ink)
                 }

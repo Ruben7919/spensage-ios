@@ -29,7 +29,7 @@ struct BrandGalleryView: View {
                 FinanceToolsHeaderCard(
                     eyebrow: "Sistema de marca",
                     title: "Galería de marca",
-                    summary: "Una vista interna de paleta, mascotas, guías, badges e iconos para auditar que el lenguaje visual de SpendSage siga consistente.",
+                    summary: "Una vista interna de paleta, mascotas, guías, badges e iconos para auditar que el lenguaje visual de MichiFinanzas siga consistente.",
                     systemImage: "swatchpalette.fill",
                     character: .tikki,
                     expression: .proud,

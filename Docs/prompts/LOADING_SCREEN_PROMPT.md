@@ -1,4 +1,4 @@
-# SpendSage Loading Screen Prompt
+# MichiFinanzas Loading Screen Prompt
 
 Last updated: 2026-04-05
 
@@ -9,7 +9,7 @@ Create dedicated loading artwork that feels cute, premium, and obviously in moti
 ## Primary Prompt
 
 ```text
-Create a premium loading illustration for SpendSage, a cute but powerful savings app. Show Tikki, Ludo, and Manchas together in a bright mobile-first scene where the yarn balls feel plush, layered, and believable, with visible wrapped strands, soft fiber texture, gentle shadowing, and thread tails. The composition should leave clear room for a loading indicator and app name overlay. Use a polished teal, mint, cream, and soft gold palette with rounded shapes, soft glow, and strong silhouette readability. The mood should feel welcoming, cozy, and trustworthy. No text embedded in the art. No dashboard UI, no enterprise visual language, no clutter.
+Create a premium loading illustration for MichiFinanzas, a cute but powerful savings app. Show Tikki, Ludo, and Manchas together in a bright mobile-first scene where the yarn balls feel plush, layered, and believable, with visible wrapped strands, soft fiber texture, gentle shadowing, and thread tails. The composition should leave clear room for a loading indicator and app name overlay. Use a polished teal, mint, cream, and soft gold palette with rounded shapes, soft glow, and strong silhouette readability. The mood should feel welcoming, cozy, and trustworthy. No text embedded in the art. No dashboard UI, no enterprise visual language, no clutter.
 ```
 
 ## Negative Constraints

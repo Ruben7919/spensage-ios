@@ -45,13 +45,13 @@ enum BillCalendarAuthorizationState: Equatable {
     var summary: String {
         switch self {
         case .notDetermined:
-            return "SpendSage puede crear recordatorios de facturas en tu calendario si tú lo autorizas."
+            return "MichiFinanzas puede crear recordatorios de facturas en tu calendario si tú lo autorizas."
         case .denied:
             return "El permiso de calendario está denegado en este iPhone."
         case .restricted:
             return "El calendario está restringido por el sistema o por controles del dispositivo."
         case .granted:
-            return "SpendSage puede crear o actualizar recordatorios de facturas en tu calendario."
+            return "MichiFinanzas puede crear o actualizar recordatorios de facturas en tu calendario."
         }
     }
 }
@@ -132,11 +132,11 @@ final class LiveBillCalendarSyncService: BillCalendarSyncServicing {
             let dueDate = ledger.dueDate(for: bill)
             let event = mapping[identifier].flatMap(store.event(withIdentifier:)) ?? EKEvent(eventStore: store)
             event.calendar = calendar
-            event.title = "\(bill.title) · SpendSage"
+            event.title = "\(bill.title) · MichiFinanzas"
             event.startDate = Calendar.autoupdatingCurrent.startOfDay(for: dueDate)
             event.endDate = Calendar.autoupdatingCurrent.date(byAdding: .day, value: 1, to: event.startDate) ?? event.startDate
             event.isAllDay = true
-            event.notes = "Bill reminder generated from SpendSage."
+            event.notes = "Bill reminder generated from MichiFinanzas."
             event.alarms = [EKAlarm(relativeOffset: -60 * 60 * 24)]
             event.recurrenceRules = [recurrenceRule(for: bill)]
             try store.save(event, span: .futureEvents)

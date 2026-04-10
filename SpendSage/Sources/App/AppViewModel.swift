@@ -501,7 +501,7 @@ final class AppViewModel: ObservableObject {
         if shouldRequireBiometricUnlock {
             isRestoringRememberedSession = true
             let unlocked = await BiometricUnlockService.authenticate(
-                reason: "Desbloquea SpendSage para abrir tu cuenta guardada."
+                reason: "Desbloquea MichiFinanzas para abrir tu cuenta guardada."
             )
             if !unlocked {
                 isRestoringRememberedSession = false
@@ -947,7 +947,7 @@ final class AppViewModel: ObservableObject {
         entitlements: StoreEntitlementSnapshot
     ) -> String {
         if StoreProductID(rawValue: productID)?.planKey == .removeAds {
-            return "Compra completada. SpendSage queda sin anuncios en este Apple ID."
+            return "Compra completada. MichiFinanzas queda sin anuncios en este Apple ID."
         }
 
         return AppLocalization.localized(
@@ -1068,7 +1068,7 @@ final class AppViewModel: ObservableObject {
                 provider: "apns",
                 token: token,
                 apnsEnvironment: apnsEnvironment,
-                title: "SpendSage test",
+                title: "MichiFinanzas test",
                 body: "Si ves este aviso, APNs y SNS quedaron enlazados para este iPhone."
             )
             _ = try await backendService.sendTestPush(idToken: idToken, request: request)
@@ -1386,7 +1386,7 @@ final class AppViewModel: ObservableObject {
         }
 
         guard session.isAuthenticated else {
-            notice = "Inicia sesión para abrir este atajo de SpendSage."
+            notice = "Inicia sesión para abrir este atajo de MichiFinanzas."
             return
         }
 
@@ -1952,7 +1952,7 @@ final class AppViewModel: ObservableObject {
             case "app", "shell":
                 hasCompletedOnboarding = true
                 if !session.isAuthenticated {
-                    session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
+                    session = .signedIn(email: "preview@michifinanzas.local", provider: "Preview")
                 }
             default:
                 break
@@ -1963,7 +1963,7 @@ final class AppViewModel: ObservableObject {
            let tab = AppTab(rawValue: tabOverride) {
             hasCompletedOnboarding = true
             if !session.isAuthenticated {
-                session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
+                session = .signedIn(email: "preview@michifinanzas.local", provider: "Preview")
             }
             selectedTab = tab
         }
@@ -1972,7 +1972,7 @@ final class AppViewModel: ObservableObject {
            let route = DebugRoute(rawValue: routeOverride) {
             hasCompletedOnboarding = true
             if !session.isAuthenticated {
-                session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
+                session = .signedIn(email: "preview@michifinanzas.local", provider: "Preview")
             }
             selectedTab = .settings
             debugRoute = route
@@ -1987,14 +1987,14 @@ final class AppViewModel: ObservableObject {
             case "add_expense", "expense":
                 hasCompletedOnboarding = true
                 if !session.isAuthenticated {
-                    session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
+                    session = .signedIn(email: "preview@michifinanzas.local", provider: "Preview")
                 }
                 selectedTab = .expenses
                 activeSheet = .addExpense
             case "budget":
                 hasCompletedOnboarding = true
                 if !session.isAuthenticated {
-                    session = .signedIn(email: "preview@spendsage.ai", provider: "Preview")
+                    session = .signedIn(email: "preview@michifinanzas.local", provider: "Preview")
                 }
                 selectedTab = .settings
                 activeSheet = .budgetWizard
@@ -2022,7 +2022,7 @@ final class AppViewModel: ObservableObject {
                 systemImage: "bolt.fill",
                 rewardXP: nil,
                 reachedLevel: 6,
-                shareText: "Subí al nivel 6 en SpendSage."
+                shareText: "Subí al nivel 6 en MichiFinanzas."
             )
         case "mission":
             return GrowthCelebration(
@@ -2035,7 +2035,7 @@ final class AppViewModel: ObservableObject {
                 systemImage: "checkmark.circle.fill",
                 rewardXP: 80,
                 reachedLevel: nil,
-                shareText: "Completé una misión en SpendSage."
+                shareText: "Completé una misión en MichiFinanzas."
             )
         case "trophy", "badge":
             return GrowthCelebration(
@@ -2048,7 +2048,7 @@ final class AppViewModel: ObservableObject {
                 systemImage: "sparkles",
                 rewardXP: nil,
                 reachedLevel: nil,
-                shareText: "Desbloqueé un badge en SpendSage."
+                shareText: "Desbloqueé un badge en MichiFinanzas."
             )
         default:
             return nil

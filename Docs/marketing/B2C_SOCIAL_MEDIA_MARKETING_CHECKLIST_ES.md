@@ -1,4 +1,4 @@
-# SpendSage B2C Social Media + Marketing Checklist
+# MichiFinanzas B2C Social Media + Marketing Checklist
 
 Ultima actualizacion: 2026-04-09
 

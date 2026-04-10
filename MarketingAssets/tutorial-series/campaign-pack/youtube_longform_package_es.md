@@ -1,49 +1,49 @@
-# SpendSage YouTube Longform Package
+# MichiFinanzas YouTube Longform Package
 
 Ultima actualizacion: 2026-04-09
 
 ## 1. Descripcion larga del canal / serie
 
-`Si quieres ordenar tus gastos sin complicarte, esta serie te ensena SpendSage con flujos reales: registrar compras, escanear recibos, entender analisis, crear presupuesto, organizar cuentas, resolver dudas y compartir logros. Todo explicado rapido, visual y sin tono corporativo. Empieza por el tutorial 1 y sigue la serie completa.`
+`Si quieres ordenar tus gastos sin complicarte, esta serie te ensena MichiFinanzas con flujos reales: registrar compras, escanear recibos, entender analisis, crear presupuesto, organizar cuentas, resolver dudas y compartir logros. Todo explicado rapido, visual y sin tono corporativo. Empieza por el tutorial 1 y sigue la serie completa.`
 
 ## 2. Descripcion larga para playlist
 
-Titulo sugerido: `SpendSage en 7 pasos | aprende la app rapido`
+Titulo sugerido: `MichiFinanzas en 7 pasos | aprende la app rapido`
 
 Descripcion sugerida:
 
-`Esta playlist te muestra SpendSage con acciones reales dentro de la app. Aqui vas a ver onboarding, registro de gastos, escaneo de recibos, analisis, presupuesto, cuentas, ayuda y celebraciones compartibles. La idea es simple: que aprendas a usar la app sin enredarte y que descubras rapido las funciones que mas te ahorran tiempo.
+`Esta playlist te muestra MichiFinanzas con acciones reales dentro de la app. Aqui vas a ver onboarding, registro de gastos, escaneo de recibos, analisis, presupuesto, cuentas, ayuda y celebraciones compartibles. La idea es simple: que aprendas a usar la app sin enredarte y que descubras rapido las funciones que mas te ahorran tiempo.
 
 Empieza por el tutorial 1 si recien llegas.
 
-Descarga SpendSage:
+Descarga MichiFinanzas:
 https://apps.apple.com/app/id6761512773
 
 Soporte y acceso beta:
-support@spendsage.ai
-https://spendsage.ai/support`
+ruben.lazaro@clitecser.com
+https://michifinanzas.com/support`
 
 ## 3. Plantilla de descripcion larga por video
 
-`En este tutorial de SpendSage te muestro [TEMA] con un flujo real dentro de la app. Si quieres usar mejor tus gastos, recibos y presupuesto sin perder tiempo, este video te deja el paso claro.
+`En este tutorial de MichiFinanzas te muestro [TEMA] con un flujo real dentro de la app. Si quieres usar mejor tus gastos, recibos y presupuesto sin perder tiempo, este video te deja el paso claro.
 
-Descarga SpendSage:
+Descarga MichiFinanzas:
 https://apps.apple.com/app/id6761512773
 
 Serie completa:
-https://spendsage.ai/?utm_source=youtube&utm_medium=playlist&utm_campaign=spendsage_en_7_pasos
+https://michifinanzas.com/?utm_source=youtube&utm_medium=playlist&utm_campaign=michifinanzas_en_7_pasos
 
 Soporte y beta:
-support@spendsage.ai
-https://spendsage.ai/support
+ruben.lazaro@clitecser.com
+https://michifinanzas.com/support
 
-#SpendSage #FinanzasPersonales #ControlDeGastos`
+#MichiFinanzas #FinanzasPersonales #ControlDeGastos`
 
 ## 4. Comentarios fijados finales
 
 ### Tutorial 1
 
-`Si recien llegas a SpendSage, empieza aqui. El siguiente paso es registrar tu primer gasto: ve al tutorial 2.`
+`Si recien llegas a MichiFinanzas, empieza aqui. El siguiente paso es registrar tu primer gasto: ve al tutorial 2.`
 
 ### Tutorial 2
 

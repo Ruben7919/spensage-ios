@@ -215,7 +215,7 @@ struct AddExpenseView: View {
                     }
                     .buttonStyle(.borderedProminent)
 
-                    Text("SpendSage intenta detectar comercio, monto, fecha y categoría desde el texto pegado. Tú siempre puedes corregirlo antes de guardar.")
+                    Text("MichiFinanzas intenta detectar comercio, monto, fecha y categoría desde el texto pegado. Tú siempre puedes corregirlo antes de guardar.")
                         .font(.footnote)
                         .foregroundStyle(BrandTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)

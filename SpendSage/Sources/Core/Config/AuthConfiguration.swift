@@ -82,7 +82,7 @@ struct AuthConfiguration: Equatable {
 
     static let preview = AuthConfiguration(
         mode: .localPreview,
-        appName: "SpendSage",
+        appName: "MichiFinanzas",
         allowsGuestAccess: false,
         emailPasswordEnabled: true,
         minimumPasswordLength: 8,
@@ -122,7 +122,7 @@ struct AuthConfiguration: Equatable {
 
         return AuthConfiguration(
             mode: .hostedUI,
-            appName: "SpendSage AI",
+            appName: "MichiFinanzas",
             allowsGuestAccess: false,
             emailPasswordEnabled: true,
             minimumPasswordLength: 8,
@@ -138,8 +138,8 @@ struct AuthConfiguration: Equatable {
                 signUpPath: "/signup",
                 tokenPath: "/oauth2/token"
             ),
-            previewEmailDomain: "spendsage.ai",
-            localPreviewFootnote: "Sign in with your SpendSage account to keep your plan, profile, and restore path together.",
+            previewEmailDomain: "michifinanzas.local",
+            localPreviewFootnote: "Sign in with your MichiFinanzas account to keep your plan, profile, and restore path together.",
             hostedUIFootnote: "Apple and Google sign in use Cognito Hosted UI with a secure browser session."
         )
     }

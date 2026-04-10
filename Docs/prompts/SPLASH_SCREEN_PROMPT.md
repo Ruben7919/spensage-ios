@@ -1,4 +1,4 @@
-# SpendSage Splash Screen Prompt
+# MichiFinanzas Splash Screen Prompt
 
 Last updated: 2026-04-04
 
@@ -9,13 +9,13 @@ Create a cute, polished splash illustration for the in-app startup experience. U
 ## Primary Prompt
 
 ```text
-Create a premium splash screen illustration for SpendSage, a cute but powerful mobile savings app. Show the three mascot characters together: Tikki, Ludo, and Manchas. They should appear as a friendly team inside a soft, magical savings world with a bright teal, mint, cream, and soft gold palette. The background should feel warm, airy, and playful, with subtle glow, floating sparkles, and rounded decorative shapes. Include light savings cues such as coins, a piggy bank, wallet charm, yarn balls, or soft mission-board style props, but keep the composition uncluttered and mobile-first. The tone should feel adorable, polished, and trustworthy, not childish or chaotic. This is for a startup splash, so the scene should have strong central focus, clear silhouette, and room for a logo or loading animation overlay. No text embedded in the artwork. No dashboard UI, no realistic banking screens, no enterprise style.
+Create a premium splash screen illustration for MichiFinanzas, a cute but powerful mobile savings app. Show the three mascot characters together: Tikki, Ludo, and Manchas. They should appear as a friendly team inside a soft, magical savings world with a bright teal, mint, cream, and soft gold palette. The background should feel warm, airy, and playful, with subtle glow, floating sparkles, and rounded decorative shapes. Include light savings cues such as coins, a piggy bank, wallet charm, yarn balls, or soft mission-board style props, but keep the composition uncluttered and mobile-first. The tone should feel adorable, polished, and trustworthy, not childish or chaotic. This is for a startup splash, so the scene should have strong central focus, clear silhouette, and room for a logo or loading animation overlay. No text embedded in the artwork. No dashboard UI, no realistic banking screens, no enterprise style.
 ```
 
 ## Alternate Prompt
 
 ```text
-Create a cute startup splash scene for SpendSage with Tikki, Ludo, and Manchas gathered around a playful savings mission. The setting should feel cozy and magical, with yarn balls, coins, and tiny savings props that suggest progress, habit-building, and money wins. Use soft gradients, premium illustration polish, bright teal and cream tones, warm gold highlights, and a clean central composition for mobile. Keep it charming, optimistic, and high quality, with clear negative space for a loading indicator.
+Create a cute startup splash scene for MichiFinanzas with Tikki, Ludo, and Manchas gathered around a playful savings mission. The setting should feel cozy and magical, with yarn balls, coins, and tiny savings props that suggest progress, habit-building, and money wins. Use soft gradients, premium illustration polish, bright teal and cream tones, warm gold highlights, and a clean central composition for mobile. Keep it charming, optimistic, and high quality, with clear negative space for a loading indicator.
 ```
 
 ## Negative Constraints

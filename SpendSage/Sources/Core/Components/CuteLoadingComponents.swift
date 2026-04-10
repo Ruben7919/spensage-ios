@@ -309,7 +309,7 @@ struct LaunchExperienceView: View {
                 }
                 .padding(.horizontal, 28)
 
-                Text("SpendSage")
+                Text("MichiFinanzas")
                     .font(.system(size: 34, weight: .black, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 

@@ -22,7 +22,7 @@ struct HelpCenterView: View {
         HelpTopic(
             id: "setupFamily",
             title: "¿Cómo debería empezar con mi cuenta?",
-            detail: "Crea o inicia sesión en tu cuenta de SpendSage primero, luego define tu presupuesto y tu primera meta para que la app pueda personalizar el siguiente paso.",
+            detail: "Crea o inicia sesión en tu cuenta de MichiFinanzas primero, luego define tu presupuesto y tu primera meta para que la app pueda personalizar el siguiente paso.",
             systemImage: "iphone.gen3"
         ),
         HelpTopic(

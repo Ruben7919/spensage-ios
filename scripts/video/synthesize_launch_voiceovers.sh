@@ -8,6 +8,7 @@ VOICEOVER_DIR="$ROOT/MarketingAssets/launch-campaign/voiceovers"
 TMP_DIR="$VOICEOVER_DIR/raw-aiff"
 FFMPEG_FULL_BIN="/opt/homebrew/opt/ffmpeg-full/bin/ffmpeg"
 FFMPEG_BIN="${FFMPEG_BIN:-$([ -x "$FFMPEG_FULL_BIN" ] && echo "$FFMPEG_FULL_BIN" || command -v ffmpeg)}"
+AFCONVERT_BIN="${AFCONVERT_BIN:-$(command -v afconvert)}"
 VOICE_NAME="${VOICE_NAME:-Paulina}"
 VOICE_RATE="${VOICE_RATE:-186}"
 
@@ -26,7 +27,7 @@ EOF
 
 assert_dependencies() {
     command -v say >/dev/null 2>&1 || { echo "say is required." >&2; exit 1; }
-    [[ -n "$FFMPEG_BIN" && -x "$FFMPEG_BIN" ]] || { echo "ffmpeg is required." >&2; exit 1; }
+    [[ -n "$AFCONVERT_BIN" && -x "$AFCONVERT_BIN" ]] || { echo "afconvert is required." >&2; exit 1; }
     mkdir -p "$VOICEOVER_DIR" "$TMP_DIR"
 }
 
@@ -41,14 +42,8 @@ synthesize_clip() {
 
     say -v "$voice_name" -r "$VOICE_RATE" -f "$input" -o "$tmp_aiff"
 
-    "$FFMPEG_BIN" -y \
-        -i "$tmp_aiff" \
-        -af "silenceremove=start_periods=1:start_silence=0:start_threshold=-48dB:stop_periods=-1:stop_silence=0.18:stop_threshold=-48dB,highpass=f=120,lowpass=f=7600,dynaudnorm=f=120:g=11" \
-        -ar 48000 \
-        -ac 1 \
-        -c:a aac \
-        -b:a 160k \
-        "$output"
+    rm -f "$output"
+    "$AFCONVERT_BIN" "$tmp_aiff" -o "$output" -f m4af -d aac
 
     echo "Generated $output"
 }

@@ -1,4 +1,4 @@
-# SpendSage Video FAQ Kit
+# MichiFinanzas Video FAQ Kit
 
 Última actualización: 2026-04-08
 

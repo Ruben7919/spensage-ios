@@ -19,7 +19,7 @@ Mostrar que la pantalla inicial da contexto real desde el primer segundo y no es
 
 ## Voiceover
 
-"Abres SpendSage y de una ves tu semana, tu racha y cuanto le queda al mes. Ese contexto hace que si quieras volver manana."
+"Abres MichiFinanzas y de una ves tu semana, tu racha y cuanto le queda al mes. Ese contexto hace que si quieras volver manana."
 
 ## Subtitulo principal
 

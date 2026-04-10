@@ -159,10 +159,10 @@ final class HostedUIAuthService: NSObject, AuthServicing {
 
         let profileSeed = Self.profileSeed(
             fromIDToken: tokenResponse.idToken,
-            fallbackEmail: loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
+            fallbackEmail: loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@michifinanzas.local"
         )
         lastProfileSeed = profileSeed
-        let email = profileSeed.preferredEmail ?? loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@spendsage.ai"
+        let email = profileSeed.preferredEmail ?? loginHint ?? "\(provider?.rawValue.lowercased() ?? "user")@michifinanzas.local"
         let providerLabel = provider?.rawValue ?? "Email"
         activeIDToken = tokenResponse.idToken
         persistRememberedSession(email: email, provider: providerLabel, refreshToken: tokenResponse.refreshToken)

@@ -1,10 +1,10 @@
-# SpendSage Campaign Pack
+# MichiFinanzas Campaign Pack
 
 Ultima actualizacion: 2026-04-09
 
 ## Objetivo
 
-Convertir la serie tutorial de SpendSage en una campana organica lista para YouTube Shorts, Instagram Reels y TikTok, manteniendo un tono cercano, agil y cero corporativo.
+Convertir la serie tutorial de MichiFinanzas en una campana organica lista para YouTube Shorts, Instagram Reels y TikTok, manteniendo un tono cercano, agil y cero corporativo.
 
 ## Publico
 
@@ -14,7 +14,7 @@ Convertir la serie tutorial de SpendSage en una campana organica lista para YouT
 
 ## Mensaje madre
 
-`SpendSage te ayuda a entender tu dinero sin hacerte perder tiempo.`
+`MichiFinanzas te ayuda a entender tu dinero sin hacerte perder tiempo.`
 
 ## Angulos de contenido
 
@@ -44,15 +44,15 @@ Convertir la serie tutorial de SpendSage en una campana organica lista para YouT
 
 ## Serie sugerida
 
-- Nombre de serie: `SpendSage en 7 pasos`
+- Nombre de serie: `MichiFinanzas en 7 pasos`
 - Linea de apoyo: `Aprende la app rapido, sin enredarte`
 
 ## Playlist YouTube
 
-- Titulo: `SpendSage en 7 pasos: usa mejor la app desde hoy`
+- Titulo: `MichiFinanzas en 7 pasos: usa mejor la app desde hoy`
 - Descripcion:
 
-`Esta serie te ensena SpendSage con flujos reales dentro de la app: onboarding, registro de gastos, escaneo, analisis, presupuesto, cuentas, ayuda y logros compartibles. Si quieres aprender rapido y usar mejor la app, empieza por el tutorial 1 y sigue la serie completa.`
+`Esta serie te ensena MichiFinanzas con flujos reales dentro de la app: onboarding, registro de gastos, escaneo, analisis, presupuesto, cuentas, ayuda y logros compartibles. Si quieres aprender rapido y usar mejor la app, empieza por el tutorial 1 y sigue la serie completa.`
 
 ## CTA de serie
 

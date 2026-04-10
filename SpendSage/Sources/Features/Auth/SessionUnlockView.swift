@@ -25,7 +25,7 @@ struct SessionUnlockView: View {
 
                             Text(
                                 AppLocalization.localized(
-                                    "Abre SpendSage con %@ o el código del dispositivo y sigue donde te quedaste.",
+                                    "Abre MichiFinanzas con %@ o el código del dispositivo y sigue donde te quedaste.",
                                     arguments: biometricKind.displayName
                                 )
                             )

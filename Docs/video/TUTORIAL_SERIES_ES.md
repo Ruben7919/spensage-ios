@@ -1,4 +1,4 @@
-# SpendSage Tutorial Series
+# MichiFinanzas Tutorial Series
 
 Última actualización: 2026-04-08
 
@@ -32,14 +32,14 @@ Serie de tutoriales live para YouTube, Shorts, Reels y soporte social. Cada piez
 
 ## Títulos sugeridos
 
-- Cómo empezar en SpendSage y sacar tu primer número útil
+- Cómo empezar en MichiFinanzas y sacar tu primer número útil
 - Cómo registrar un gasto rápido sin romper tu flujo
 - Cómo escanear un recibo y guardarlo sin perder control
 - Cómo leer tu análisis y armar un presupuesto usable
-- Cómo ordenar cuentas, facturas y reglas en SpendSage
+- Cómo ordenar cuentas, facturas y reglas en MichiFinanzas
 - Cómo encontrar ayuda, soporte y planes dentro de la app
 - Cómo compartir un logro cuando tu dinero ya va mejor
 
 ## Descripción base para YouTube
 
-SpendSage está hecha para que entiendas tu dinero sin una app pesada. En esta serie te muestro cada flujo importante paso a paso, con acciones reales dentro de la app: onboarding, gastos, escaneo, análisis, presupuesto, cuentas, facturas, reglas, ayuda y logros. Guarda la playlist y vuelve cuando quieras configurar la siguiente parte.
+MichiFinanzas está hecha para que entiendas tu dinero sin una app pesada. En esta serie te muestro cada flujo importante paso a paso, con acciones reales dentro de la app: onboarding, gastos, escaneo, análisis, presupuesto, cuentas, facturas, reglas, ayuda y logros. Guarda la playlist y vuelve cuando quieras configurar la siguiente parte.

@@ -190,7 +190,7 @@ struct AuthView: View {
                     systemImage: "sparkles"
                 )
 
-                Text("SpendSage")
+                Text("MichiFinanzas")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(BrandTheme.primary)
                     .textCase(.uppercase)

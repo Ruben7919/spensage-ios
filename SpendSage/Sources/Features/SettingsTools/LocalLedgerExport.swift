@@ -1,9 +1,9 @@
 import Foundation
 
 enum PublicLegalLinks {
-    static let privacy = URL(string: "https://legal.spendsage.ai/privacy")!
-    static let support = URL(string: "https://legal.spendsage.ai/support")!
-    static let terms = URL(string: "https://legal.spendsage.ai/terms")!
+    static let privacy = URL(string: "https://michifinanzas.com/privacy")!
+    static let support = URL(string: "https://michifinanzas.com/support")!
+    static let terms = URL(string: "https://michifinanzas.com/terms")!
 }
 
 private struct LocalExportPayload: Encodable {
@@ -42,7 +42,7 @@ enum LocalLedgerExportComposer {
         let lastUpdated = viewModel.ledger?.updatedAt.formatted(date: .abbreviated, time: .shortened) ?? "Not yet saved".appLocalized
 
         var lines = [
-            "SpendSage local summary".appLocalized,
+            "MichiFinanzas local summary".appLocalized,
             AppLocalization.localized("Exported: %@", arguments: Date.now.formatted(date: .abbreviated, time: .shortened)),
             AppLocalization.localized("Session: %@", arguments: sessionMode),
             AppLocalization.localized("Profile: %@ · %@", arguments: profile.fullName, profile.householdName),
@@ -114,7 +114,7 @@ enum LocalLedgerExportComposer {
     ) -> String {
         let trimmedDetail = detail.trimmingCharacters(in: .whitespacesAndNewlines)
         var sections = [
-            "SpendSage support packet".appLocalized,
+            "MichiFinanzas support packet".appLocalized,
             AppLocalization.localized("Issue type: %@", arguments: issueType),
             AppLocalization.localized("Subject: %@", arguments: subject.trimmingCharacters(in: .whitespacesAndNewlines)),
             "",

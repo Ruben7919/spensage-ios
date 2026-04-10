@@ -401,7 +401,7 @@ private struct SettingsNotificationsView: View {
                     SettingsSummaryHeader(
                         badge: "Permisos simples",
                         title: "Avisos y permisos",
-                        summary: "SpendSage hereda el comportamiento del iPhone. Aquí solo revisas si el dispositivo está listo y, si hace falta, abres Ajustes del sistema.",
+                        summary: "MichiFinanzas hereda el comportamiento del iPhone. Aquí solo revisas si el dispositivo está listo y, si hace falta, abres Ajustes del sistema.",
                         character: .manchas,
                         expression: .happy
                     )
@@ -422,7 +422,7 @@ private struct SettingsNotificationsView: View {
                         BrandFeatureRow(
                             systemImage: "moon.zzz.fill",
                             title: "Silencio y concentración",
-                            detail: "SpendSage respeta el modo silencio y los modos de concentración del iPhone automáticamente. No hace falta configurar nada aquí."
+                            detail: "MichiFinanzas respeta el modo silencio y los modos de concentración del iPhone automáticamente. No hace falta configurar nada aquí."
                         )
 
                         if let lastUploadedAt = viewModel.pushRegistrationStatus.lastUploadedAt, viewModel.session.isAuthenticated {
@@ -502,7 +502,7 @@ private struct SettingsNotificationsView: View {
                             .buttonStyle(SecondaryCTAStyle())
                         }
 
-                        Text("SpendSage pide calendario y ubicación al iniciar si todavía no los aprobaste. El calendario se usa para facturas y la ubicación solo mientras la app está abierta para etiquetar un gasto.")
+                        Text("MichiFinanzas pide calendario y ubicación al iniciar si todavía no los aprobaste. El calendario se usa para facturas y la ubicación solo mientras la app está abierta para etiquetar un gasto.")
                             .font(.footnote)
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
@@ -597,7 +597,7 @@ private extension PushAuthorizationState {
         case .denied:
             return "Las notificaciones están bloqueadas en Ajustes del sistema."
         case .notDetermined:
-            return "SpendSage te pedirá permiso cuando abras la app con tu cuenta."
+            return "MichiFinanzas te pedirá permiso cuando abras la app con tu cuenta."
         }
     }
 

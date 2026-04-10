@@ -1,4 +1,4 @@
-# SpendSage External App Store Metadata
+# MichiFinanzas External App Store Metadata
 
 Last updated: 2026-04-08
 
@@ -25,7 +25,7 @@ These URLs respond today from the live backend. Replace them with branded produc
 
 ## Product Identity
 
-- App name: `SpendSage AI`
+- App name: `MichiFinanzas AI`
 - Subtitle: `Gastos, recibos y presupuesto fácil`
 - Primary category: `Finance`
 - Secondary category: `Productivity`
@@ -46,11 +46,11 @@ gastos,ahorro,presupuesto,recibos,finanzas,scanner,control,metas,budget,expense
 ## Full Description
 
 ```text
-SpendSage te ayuda a registrar gastos, escanear recibos y cuidar tu presupuesto sin sentir que estás administrando una hoja de cálculo.
+MichiFinanzas te ayuda a registrar gastos, escanear recibos y cuidar tu presupuesto sin sentir que estás administrando una hoja de cálculo.
 
 Registra compras rápido, revisa el mes con claridad y usa el escaneo de recibos para crear un borrador editable antes de guardar. La experiencia está pensada para sentirse simple desde el primer minuto, pero lo bastante útil para darte contexto real sobre cómo vas este mes.
 
-Con SpendSage puedes:
+Con MichiFinanzas puedes:
 
 - registrar gastos manualmente en segundos;
 - escanear recibos con ayuda local en el dispositivo;
@@ -61,7 +61,7 @@ Con SpendSage puedes:
 - invitar miembros del hogar a un espacio familiar compartido;
 - seguir tu progreso con niveles, rachas, badges y celebraciones compartibles.
 
-SpendSage está diseñado para iPhone con una experiencia mobile-first, una UI clara y personajes que acompañan el progreso sin volver la app pesada o confusa.
+MichiFinanzas está diseñado para iPhone con una experiencia mobile-first, una UI clara y personajes que acompañan el progreso sin volver la app pesada o confusa.
 
 Privacidad primero:
 
@@ -74,7 +74,7 @@ Privacidad primero:
 - el escaneo de recibos usa procesamiento local asistido y requiere revisión del usuario;
 - diagnósticos de estabilidad y eventos de producto se recogen first-party, sin SDKs analíticos de terceros.
 
-SpendSage es una app de apoyo para finanzas personales. No es un banco ni reemplaza asesoría financiera, legal o tributaria profesional.
+MichiFinanzas es una app de apoyo para finanzas personales. No es un banco ni reemplaza asesoría financiera, legal o tributaria profesional.
 ```
 
 ## What’s New for Version 1.0
@@ -86,7 +86,7 @@ Pulimos la experiencia de iPhone con sync autenticado, espacios familiares compa
 ## App Review Notes
 
 ```text
-SpendSage es una app de finanzas personales local-first para iPhone.
+MichiFinanzas es una app de finanzas personales local-first para iPhone.
 
 Puntos importantes para revisión:
 1. La build actual no usa anuncios, tracking entre apps ni geolocalización en background.
@@ -104,7 +104,7 @@ Puntos importantes para revisión:
 These fields are required in App Store Connect but still need live values before final submission if they aren't already configured in the account:
 
 - Contact name: `Ruben Lazaro`
-- Contact email: `support@spendsage.ai`
+- Contact email: `ruben.lazaro@clitecser.com`
 - Contact phone: `+593969686491`
 
 ## Age Rating Guidance
@@ -128,25 +128,25 @@ Recommended resulting rating for the current implementation: `4+`
 - Price: `Free`
 - Monetization state for current external submission:
   - StoreKit 2 native purchase / restore wiring now exists in the iOS app.
-  - App Store Connect products now exist for `spendsage.pro.monthly`, `spendsage.pro.annual`, `spendsage.family.monthly`, `spendsage.family.annual`, and `spendsage.remove_ads`.
+  - App Store Connect products now exist for `michifinanzas.pro.monthly`, `michifinanzas.pro.annual`, `michifinanzas.family.monthly`, `michifinanzas.family.annual`, and `michifinanzas.remove_ads`.
   - The current Release/TestFlight target still points to the authenticated `dev` backend, so treat this as external beta guidance, not public-launch guidance.
   - Store review copy should describe authenticated sync and shared spaces conservatively as beta functionality, not as a public-launch guarantee.
   - RevenueCat or App Store Server backend reconciliation is still optional future work; current beta validation is native StoreKit-first.
 
 Configured store pricing source of truth:
 
-- `spendsage.remove_ads`: `USD 14.99`
-- `spendsage.pro.monthly`: `USD 5.99`
-- `spendsage.pro.annual`: `USD 39.99`
-- `spendsage.family.monthly`: `USD 9.99`
-- `spendsage.family.annual`: `USD 69.99`
+- `michifinanzas.remove_ads`: `USD 14.99`
+- `michifinanzas.pro.monthly`: `USD 5.99`
+- `michifinanzas.pro.annual`: `USD 39.99`
+- `michifinanzas.family.monthly`: `USD 9.99`
+- `michifinanzas.family.annual`: `USD 69.99`
 
 Current App Store Connect sync state:
 
 - The local source of truth is ready and updated for authenticated sync, family spaces, push, and first-party reliability telemetry.
 - The 2026-04-08 authenticated sync did update app/version/beta metadata from the current source of truth.
 - Global territory pricing is now applied for all five monetization SKUs, which was the missing piece keeping the four auto-renewable subscriptions out of reviewable state.
-- `spendsage.pro.monthly`, `spendsage.pro.annual`, `spendsage.family.monthly`, `spendsage.family.annual`, and `spendsage.remove_ads` are now `READY_TO_SUBMIT`.
+- `michifinanzas.pro.monthly`, `michifinanzas.pro.annual`, `michifinanzas.family.monthly`, `michifinanzas.family.annual`, and `michifinanzas.remove_ads` are now `READY_TO_SUBMIT`.
 - Version `1.0` in App Store Connect now includes all five monetization components in the `Compras dentro de la app y suscripciones` section.
 - Build `1.0 (29)` was uploaded on 2026-04-09, processed as `VALID`, attached to the configured external TestFlight group, and is now `APPROVED` for external beta testing.
 - Internal testers receive the same App Store eligible build automatically once processed; App Store Connect rejected a separate internal-group attachment for this App Store eligible build type, so the automation records it as `automatic`.

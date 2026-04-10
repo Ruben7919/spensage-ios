@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>SpendSage AI</string>
+	<string>MichiFinanzas</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconName</key>
@@ -42,9 +42,9 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Create optional due-date reminders for your recurring bills.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Unlock your saved SpendSage account quickly and securely.</string>
+	<string>Unlock your saved MichiFinanzas account quickly and securely.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Tag an expense with your current place only when you ask SpendSage to do it.</string>
+	<string>Tag an expense with your current place only when you ask MichiFinanzas to do it.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Save exported images and documents.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

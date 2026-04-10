@@ -6,7 +6,7 @@ Objetivo: probar 5 ángulos B2C antes de escalar presupuesto. Esta tanda no busc
 
 - Presupuesto inicial: bajo, 3 a 5 días por tanda.
 - Optimización inicial: click o landing view si no hay suficiente volumen de install.
-- UTM base: `utm_campaign=spendsage_sprint2_paid_test`.
+- UTM base: `utm_campaign=michifinanzas_sprint2_paid_test`.
 - Variable principal: `utm_content` por ángulo creativo.
 - No escalar un anuncio solo por views; priorizar CTR, install rate y activation rate.
 
@@ -22,11 +22,11 @@ Hook:
 
 Caption:
 
-`Cuando todo está suelto, empezar pequeño ayuda. Guarda una compra real y deja que SpendSage te ayude a ver el primer paso.`
+`Cuando todo está suelto, empezar pequeño ayuda. Guarda una compra real y deja que MichiFinanzas te ayude a ver el primer paso.`
 
 CTA:
 
-`Probar SpendSage`
+`Probar MichiFinanzas`
 
 UTM:
 
@@ -42,7 +42,7 @@ Hook:
 
 Caption:
 
-`Escanear rápido está bien, pero revisar antes de guardar está mejor. SpendSage mantiene el control en tus manos.`
+`Escanear rápido está bien, pero revisar antes de guardar está mejor. MichiFinanzas mantiene el control en tus manos.`
 
 CTA:
 
@@ -82,7 +82,7 @@ Hook:
 
 Caption:
 
-`Un hábito financiero no nace perfecto. Si avanzaste hoy, SpendSage te lo muestra y te deja compartirlo si quieres.`
+`Un hábito financiero no nace perfecto. Si avanzaste hoy, MichiFinanzas te lo muestra y te deja compartirlo si quieres.`
 
 CTA:
 

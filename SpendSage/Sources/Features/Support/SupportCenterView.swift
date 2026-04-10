@@ -62,7 +62,7 @@ struct SupportCenterView: View {
 
     @State private var issueType: SupportIssueType = .bug
     @State private var priority: SupportPriority = .medium
-    @State private var subject = "Solicitud de soporte de SpendSage"
+    @State private var subject = "Solicitud de soporte de MichiFinanzas"
     @State private var detail = ""
     @State private var includeDiagnostics = true
     @State private var copiedState = false
@@ -225,7 +225,7 @@ struct SupportCenterView: View {
                             }
                             .buttonStyle(SecondaryCTAStyle())
 
-                            ShareLink(item: supportPacket, preview: SharePreview("Paquete de soporte de SpendSage")) {
+                            ShareLink(item: supportPacket, preview: SharePreview("Paquete de soporte de MichiFinanzas")) {
                                 Text("Compartir paquete")
                             }
                             .buttonStyle(PrimaryCTAStyle())
@@ -390,7 +390,7 @@ struct SupportCenterView: View {
     private var mailtoURL: URL? {
         let encodedSubject = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let encodedBody = supportPacket.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        return URL(string: "mailto:support@spendsage.ai?subject=\(encodedSubject)&body=\(encodedBody)")
+        return URL(string: "mailto:ruben.lazaro@clitecser.com?subject=\(encodedSubject)&body=\(encodedBody)")
     }
 
     private func showCopiedToast() {
@@ -405,7 +405,7 @@ struct SupportCenterView: View {
         let packet = RecentSupportPacket(
             issueType: issueType,
             priority: priority,
-            subject: subject.isEmpty ? "Solicitud de soporte de SpendSage" : subject,
+            subject: subject.isEmpty ? "Solicitud de soporte de MichiFinanzas" : subject,
             includeDiagnostics: includeDiagnostics
         )
         recentPackets.insert(packet, at: 0)

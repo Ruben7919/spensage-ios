@@ -18,7 +18,7 @@ Segmento: usuario con `onboarding_completed` y sin `expense_saved`.
 
 Push:
 
-`Empieza simple: guarda una compra real y deja que SpendSage ordene el primer paso contigo.`
+`Empieza simple: guarda una compra real y deja que MichiFinanzas ordene el primer paso contigo.`
 
 CTA app:
 
@@ -82,7 +82,7 @@ Asunto:
 
 Body:
 
-`SpendSage está pensado para que empieces pequeño: registra un gasto real, revisa cómo queda y sigue cuando tengas tiempo. No tienes que organizar todo tu mes hoy.`
+`MichiFinanzas está pensado para que empieces pequeño: registra un gasto real, revisa cómo queda y sigue cuando tengas tiempo. No tienes que organizar todo tu mes hoy.`
 
 CTA:
 
@@ -96,7 +96,7 @@ Asunto:
 
 Body:
 
-`Si tienes un recibo a mano, úsalo como prueba rápida. SpendSage puede ayudarte a leerlo, pero tú revisas antes de guardar. La idea es avanzar con control.`
+`Si tienes un recibo a mano, úsalo como prueba rápida. MichiFinanzas puede ayudarte a leerlo, pero tú revisas antes de guardar. La idea es avanzar con control.`
 
 CTA:
 
@@ -110,7 +110,7 @@ Asunto:
 
 Body:
 
-`Cuando ya tienes algunos gastos guardados, el presupuesto se vuelve más útil. Define un marco mensual y deja que SpendSage te ayude a leer el resto con más calma.`
+`Cuando ya tienes algunos gastos guardados, el presupuesto se vuelve más útil. Define un marco mensual y deja que MichiFinanzas te ayude a leer el resto con más calma.`
 
 CTA:
 

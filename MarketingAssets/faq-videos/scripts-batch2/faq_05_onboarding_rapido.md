@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Mostrar que el primer arranque en SpendSage se siente guiado, corto y sin friccion.
+Mostrar que el primer arranque en MichiFinanzas se siente guiado, corto y sin friccion.
 
 ## Hook
 
@@ -19,7 +19,7 @@ Mostrar que el primer arranque en SpendSage se siente guiado, corto y sin fricci
 
 ## Voiceover
 
-"Empiezas con lo basico: tu ingreso, tus gastos fijos y una meta simple. En SpendSage el arranque no se siente tecnico, se siente guiado."
+"Empiezas con lo basico: tu ingreso, tus gastos fijos y una meta simple. En MichiFinanzas el arranque no se siente tecnico, se siente guiado."
 
 ## Subtitulo principal
 

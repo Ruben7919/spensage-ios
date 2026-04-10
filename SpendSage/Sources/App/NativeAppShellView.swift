@@ -5,7 +5,7 @@ struct NativeAppShellView: View {
 
     private let leadingTabs: [AppViewModel.AppTab] = [.dashboard, .expenses]
     private let trailingTabs: [AppViewModel.AppTab] = [.insights, .settings]
-    private let contentBottomInset: CGFloat = 112
+    private let contentBottomInset: CGFloat = 96
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -92,8 +92,8 @@ struct NativeAppShellView: View {
                 }
             }
             .padding(.horizontal, 18)
-            .padding(.top, 2)
-            .padding(.bottom, 12)
+            .padding(.top, -5)
+            .padding(.bottom, 5)
         }
         .background(
             TopRoundedRectangle(cornerRadius: 30)
@@ -117,7 +117,7 @@ struct NativeAppShellView: View {
                     TopRoundedRectangle(cornerRadius: 30)
                         .stroke(BrandTheme.line.opacity(0.22), lineWidth: 0.8)
                 )
-                .shadow(color: BrandTheme.shadow.opacity(0.14), radius: 16, x: 0, y: -4)
+                .shadow(color: BrandTheme.shadow.opacity(0.14), radius: 14, x: 0, y: -3)
                 .ignoresSafeArea(edges: .bottom)
         )
         .ignoresSafeArea(edges: .bottom)
@@ -155,10 +155,10 @@ private struct ShellNavigationButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 6) {
+            VStack(spacing: 5) {
                 Image(systemName: tab.systemImage)
-                    .font(.system(size: 18, weight: .semibold))
-                    .frame(width: 38, height: 38)
+                    .font(.system(size: 16.5, weight: .semibold))
+                    .frame(width: 34, height: 34)
                     .background(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
                             .fill(isSelected ? BrandTheme.accent.opacity(0.26) : Color.clear)
@@ -170,8 +170,8 @@ private struct ShellNavigationButton: View {
             }
             .foregroundStyle(isSelected ? BrandTheme.primary : BrandTheme.muted)
             .frame(maxWidth: .infinity)
-            .padding(.top, 8)
-            .padding(.bottom, 2)
+            .padding(.top, 5)
+            .padding(.bottom, 1)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -185,20 +185,20 @@ private struct ReceiptScanDockButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 ZStack {
                     Circle()
                         .fill(BrandTheme.heroGlowGradient)
                     Image(systemName: "camera.viewfinder")
-                        .font(.system(size: 21, weight: .bold))
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(Color.white)
                 }
-                .frame(width: 58, height: 58)
+                .frame(width: 51, height: 51)
                 .overlay(
                     Circle()
                         .stroke(Color.white.opacity(0.75), lineWidth: isSelected ? 2 : 0)
                 )
-                .shadow(color: BrandTheme.shadow.opacity(0.2), radius: 16, x: 0, y: 10)
+                .shadow(color: BrandTheme.shadow.opacity(0.18), radius: 13, x: 0, y: 8)
 
                 Text("Escanear")
                     .font(.caption.weight(.bold))

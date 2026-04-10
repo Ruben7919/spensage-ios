@@ -4,7 +4,7 @@
 
 ## Objetivo
 
-Conseguir piezas creator-style para validar qué lenguaje mueve a usuarios B2C de 20 a 30 años a probar SpendSage.
+Conseguir piezas creator-style para validar qué lenguaje mueve a usuarios B2C de 20 a 30 años a probar MichiFinanzas.
 
 El tono debe sonar humano, simple y cero corporativo. La promesa no es “domina tus finanzas”; es “empieza a ver tu mes sin pelear con otra app”.
 
@@ -29,7 +29,7 @@ El tono debe sonar humano, simple y cero corporativo. La promesa no es “domina
 ## DM Inicial
 
 ```text
-Hey {nombre}, estoy preparando una beta de SpendSage, una app iPhone para registrar gastos, escanear recibos y entender el mes sin hacerlo pesado.
+Hey {nombre}, estoy preparando una beta de MichiFinanzas, una app iPhone para registrar gastos, escanear recibos y entender el mes sin hacerlo pesado.
 
 Tu forma de explicar cosas simples encaja bastante con el tipo de contenido que queremos: real, rápido y útil.
 
@@ -53,7 +53,7 @@ Asunto: UGC para app iPhone de gastos simples
 
 Hola {nombre},
 
-Soy Ruben, fundador de SpendSage. Estamos preparando contenido para una app iPhone de gastos, recibos y presupuesto pensada para usuarios que quieren ordenar su mes sin sentirse juzgados.
+Soy Ruben, fundador de MichiFinanzas. Estamos preparando contenido para una app iPhone de gastos, recibos y presupuesto pensada para usuarios que quieren ordenar su mes sin sentirse juzgados.
 
 Me interesa colaborar contigo en 1 a 3 piezas UGC cortas para Reels/TikTok/Shorts. El estilo buscado es natural: pantalla del teléfono, voz cercana, un problema real y una acción simple.
 
@@ -76,7 +76,7 @@ Hook: `No necesito organizar toda mi vida hoy. Solo guardar este gasto.`
 
 Acciones: abrir app, registrar compra, ver gasto guardado.
 
-CTA: `Si quieres empezar simple, prueba SpendSage.`
+CTA: `Si quieres empezar simple, prueba MichiFinanzas.`
 
 ### Ángulo 2: recibo sin drama
 
@@ -116,7 +116,7 @@ CTA: `Celebra el hábito, no la perfección.`
 UTM base:
 
 ```text
-utm_source={creator_handle}&utm_medium=ugc&utm_campaign=spendsage_sprint3_ugc&utm_content={angle_id}
+utm_source={creator_handle}&utm_medium=ugc&utm_campaign=michifinanzas_sprint3_ugc&utm_content={angle_id}
 ```
 
 IDs de contenido:

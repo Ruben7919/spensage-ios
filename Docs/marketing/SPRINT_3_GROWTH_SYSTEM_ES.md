@@ -1,4 +1,4 @@
-# SpendSage Sprint 3 Growth System
+# MichiFinanzas Sprint 3 Growth System
 
 Última actualización: 2026-04-09
 

@@ -40,7 +40,7 @@ def apply_version_localization(app_id: str, locale: str, payload: dict, review: 
     for field_name in ("promotionalText", "description", "keywords", "supportUrl", "marketingUrl"):
         set_field(field_name, payload[field_name])
     set_field("versionString", "1.0")
-    set_field("copyright", "2026 SpendSage AI")
+    set_field("copyright", "2026 MichiFinanzas")
     if review:
         for key in ("contactFirstName", "contactLastName", "contactPhone", "contactEmail", "notes"):
             if key in review and str(review[key]).strip():

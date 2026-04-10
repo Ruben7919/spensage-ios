@@ -162,7 +162,7 @@ struct AdvancedSettingsView: View {
                     }
                     .buttonStyle(SecondaryCTAStyle())
 
-                    ShareLink(item: exportBody, preview: SharePreview("Exportación local de SpendSage")) {
+                    ShareLink(item: exportBody, preview: SharePreview("Exportación local de MichiFinanzas")) {
                         Text("Compartir exportación")
                     }
                     .buttonStyle(PrimaryCTAStyle())

@@ -76,7 +76,7 @@ video_config() {
     SEGMENTS=()
     case "$1" in
         launch_01_main_story)
-            HOOK_LINE_ONE='Llega SpendSage'
+            HOOK_LINE_ONE='Llega MichiFinanzas'
             HOOK_LINE_TWO='menos friccion, mas calma'
             CTA_TEXT='Registra, escanea, entiende y comparte tu avance'
             VOICE_FILE="$VOICEOVER_DIR/launch_01_main_story.m4a"
@@ -121,7 +121,7 @@ poster_config() {
             PHONE_Y='252'
             TOP_BOX_Y='44'
             TOP_BOX_H='144'
-            HOOK_LINE_ONE='Ya salio SpendSage'
+            HOOK_LINE_ONE='Ya salio MichiFinanzas'
             HOOK_LINE_TWO='orden con mas calma'
             SUPPORT_LINE_ONE='Registra, escanea y entiende con una app'
             SUPPORT_LINE_TWO='que se siente mas clara desde el primer uso.'
@@ -138,7 +138,7 @@ poster_config() {
             TOP_BOX_H='126'
             HOOK_LINE_ONE='Ordena tu dinero'
             HOOK_LINE_TWO='sin pelear con la app'
-            SUPPORT_LINE_ONE='SpendSage te ayuda a registrar y volver'
+            SUPPORT_LINE_ONE='MichiFinanzas te ayuda a registrar y volver'
             SUPPORT_LINE_TWO='sin sentir que abriste otra tarea pesada.'
             CTA_TEXT='Lanzamiento social / post cuadrado'
             ;;
@@ -319,7 +319,7 @@ poster_config() {
             HOOK_LINE_ONE='Gastos en'
             HOOK_LINE_TWO='la cabeza?'
             SUPPORT_LINE_ONE='Empieza con una compra real.'
-            SUPPORT_LINE_TWO='SpendSage te ayuda a ordenar el primer paso.'
+            SUPPORT_LINE_TWO='MichiFinanzas te ayuda a ordenar el primer paso.'
             CTA_TEXT='Paid test 01 / caos a claridad'
             ;;
         paid_story_02_escaneo_control)
@@ -469,7 +469,7 @@ render_video_clip() {
     filter_complex+="drawtext=fontfile='${FONT_DISPLAY}':textfile='${hook_one_file}':reload=1:fontcolor=white:fontsize=52:shadowcolor=0x081214@0.44:shadowx=0:shadowy=4:x=50:y=54,"
     filter_complex+="drawtext=fontfile='${FONT_DISPLAY}':textfile='${hook_two_file}':reload=1:fontcolor=white:fontsize=52:shadowcolor=0x081214@0.44:shadowx=0:shadowy=4:x=50:y=104,"
     filter_complex+="drawbox=x=846:y=54:w=168:h=44:color=${SURFACE_COLOR}@0.34:t=fill,"
-    filter_complex+="drawtext=fontfile='${FONT_BODY}':text='SpendSage':fontcolor=${ACCENT_COLOR}:fontsize=22:x=874:y=64,"
+    filter_complex+="drawtext=fontfile='${FONT_BODY}':text='MichiFinanzas':fontcolor=${ACCENT_COLOR}:fontsize=22:x=846:y=64,"
 
     local timing
     local timing_index=1
@@ -582,7 +582,7 @@ drawbox=x=30:y=$((${TOP_BOX_Y}+14)):w=6:h=92:color=${ACCENT_COLOR}@0.96:t=fill,\
 drawtext=fontfile='${FONT_DISPLAY}':textfile='${hook_one_file}':reload=1:fontcolor=white:fontsize=50:shadowcolor=0x081214@0.44:shadowx=0:shadowy=4:x=52:y=$((${TOP_BOX_Y}+16)),\
 drawtext=fontfile='${FONT_DISPLAY}':textfile='${hook_two_file}':reload=1:fontcolor=white:fontsize=50:shadowcolor=0x081214@0.44:shadowx=0:shadowy=4:x=52:y=$((${TOP_BOX_Y}+68)),\
 drawbox=x=$((${OUTPUT_WIDTH}-214)):y=$((${TOP_BOX_Y}+14)):w=170:h=40:color=${SURFACE_COLOR}@0.34:t=fill,\
-drawtext=fontfile='${FONT_BODY}':text='SpendSage':fontcolor=${ACCENT_COLOR}:fontsize=22:x=$((${OUTPUT_WIDTH}-188)):y=$((${TOP_BOX_Y}+22)),\
+drawtext=fontfile='${FONT_BODY}':text='MichiFinanzas':fontcolor=${ACCENT_COLOR}:fontsize=22:x=$((${OUTPUT_WIDTH}-228)):y=$((${TOP_BOX_Y}+22)),\
 drawbox=x=104:y=${support_box_y}:w=$((${OUTPUT_WIDTH}-208)):h=${support_box_h}:color=${SURFACE_COLOR}@0.40:t=fill,\
 drawtext=fontfile='${FONT_BODY}':textfile='${support_one_file}':reload=1:fontcolor=white:fontsize=30:shadowcolor=0x081214@0.40:shadowx=0:shadowy=3:x=(w-text_w)/2:y=${support_line_one_y},\
 drawtext=fontfile='${FONT_BODY}':textfile='${support_two_file}':reload=1:fontcolor=white:fontsize=30:shadowcolor=0x081214@0.40:shadowx=0:shadowy=3:x=(w-text_w)/2:y=${support_line_two_y},\

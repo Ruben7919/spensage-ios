@@ -5,7 +5,7 @@ Escanéalo y revísalo.
 
 2
 00:00:02,000 --> 00:00:06,000
-SpendSage te arma un borrador
+MichiFinanzas te arma un borrador
 para que no empieces desde cero.
 
 3

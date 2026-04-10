@@ -351,7 +351,7 @@ struct FinanceReceiptScanToolView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         CompactSectionHeader(
                             title: "Recibo listo",
-                            detail: "Cuando la captura termina, SpendSage llena el borrador editable para que solo confirmes y guardes."
+                            detail: "Cuando la captura termina, MichiFinanzas llena el borrador editable para que solo confirmes y guardes."
                         )
 
                         ReceiptImagePreviewCard(
@@ -437,7 +437,7 @@ struct FinanceReceiptScanToolView: View {
                                 : "No hay foto adjunta, así que este paso es manual. Completa lo esencial y continúa.")
                             : (prefersCompactGuidance
                                 ? "Revisa comercio, monto y fecha antes de pasar al guardado."
-                                : "SpendSage ya leyó la foto y llenó una primera versión de comercio, total y fecha. Corrige lo que veas raro antes de revisar.")
+                                : "MichiFinanzas ya leyó la foto y llenó una primera versión de comercio, total y fecha. Corrige lo que veas raro antes de revisar.")
                     )
 
                     if capturedImage != nil || isLoadingPhoto {
@@ -455,7 +455,7 @@ struct FinanceReceiptScanToolView: View {
                             systemImage: "text.viewfinder",
                             tint: BrandTheme.primary,
                             title: "Leyendo el recibo",
-                            summary: "SpendSage está leyendo la foto en el dispositivo y completará los campos con las coincidencias más seguras."
+                            summary: "MichiFinanzas está leyendo la foto en el dispositivo y completará los campos con las coincidencias más seguras."
                         )
                     } else if let receiptAnalysis, receiptAnalysis.hasDetectedValues {
                         receiptCallout(
@@ -729,7 +729,7 @@ struct FinanceReceiptScanToolView: View {
             BrandFeatureRow(
                 systemImage: "square.and.pencil",
                 title: "Tú confirmas el borrador",
-                detail: "SpendSage completa sugerencias en el dispositivo, pero nada se guarda hasta que tú lo confirmes."
+                detail: "MichiFinanzas completa sugerencias en el dispositivo, pero nada se guarda hasta que tú lo confirmes."
             )
         }
     }
@@ -1396,7 +1396,7 @@ private struct ReceiptScanStatusDescriptor {
 
     static let analyzing = ReceiptScanStatusDescriptor(
         title: "Leyendo recibo".appLocalized,
-        summary: "SpendSage está leyendo la foto en el dispositivo para detectar comercio, total y fecha antes de que revises el borrador.".appLocalized,
+        summary: "MichiFinanzas está leyendo la foto en el dispositivo para detectar comercio, total y fecha antes de que revises el borrador.".appLocalized,
         systemImage: "text.viewfinder",
         tint: BrandTheme.primary
     )

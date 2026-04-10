@@ -41,7 +41,7 @@ Al usar esta build, usted reconoce que:
 - los flujos pueden cambiar entre builds;
 - el arte, copy, planes y navegación pueden ajustarse con rapidez;
 - el feedback puede utilizarse para mejorar la aplicación;
-- las capturas, grabaciones o errores reportados pueden ser revisados por el equipo que opera SpendSage.
+- las capturas, grabaciones o errores reportados pueden ser revisados por el equipo que opera MichiFinanzas.
 
 ## 6. No uso crítico
 
@@ -57,7 +57,7 @@ Las funciones, precios, estados de plan, nomenclatura de personajes, políticas 
 
 ## 9. Operador actual declarado
 
-Para esta línea beta actual, SpendSage declara como titular y operador a:
+Para esta línea beta actual, MichiFinanzas declara como titular y operador a:
 
 - `Ruben Lazaro`
 - RUC: `0924829179001`

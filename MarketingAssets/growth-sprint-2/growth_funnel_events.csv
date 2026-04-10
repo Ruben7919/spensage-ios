@@ -1,14 +1,14 @@
 stage,event_name,source,status,owner,note
 Awareness,platform_impression,YouTube/Reels/TikTok/paid,external,Marketing,Pull from platform analytics by creative id and UTM content.
-Traffic,utm_click,spendsage.ai analytics or link tracker,planned,Marketing,Use utm_source utm_medium utm_campaign utm_content.
-Account,auth_account_created,SpendSage telemetry,live,Product,Already tracked by AppViewModel.
-Account,auth_signed_in,SpendSage telemetry,live,Product,Already tracked by AppViewModel with provider.
-Activation,onboarding_completed,SpendSage telemetry,live,Product,Already tracked by AppViewModel.
-Activation,expense_saved,SpendSage telemetry,live,Product,Sprint 2 event; no exact amount or merchant sent.
-Activation,receipt_scan_expense_saved,SpendSage telemetry,live,Product,Sprint 2 event for scan value proof.
-Activation,budget_saved,SpendSage telemetry,live,Product,Sprint 2 event for planning intent.
-Monetization,billing_purchase_succeeded,SpendSage telemetry,live,Product,Already tracked by AppViewModel with productId.
-Monetization,billing_restore_completed,SpendSage telemetry,live,Product,Already tracked by AppViewModel with active plan.
-Retention,push_registered,SpendSage telemetry,live,Product,Already tracked after APNs registration.
-Collaboration,sharing_invite_created,SpendSage telemetry,live,Product,Already tracked by family sharing flow.
-Collaboration,sharing_invite_accepted,SpendSage telemetry,live,Product,Already tracked by family sharing flow.
+Traffic,utm_click,michifinanzas.com analytics or link tracker,planned,Marketing,Use utm_source utm_medium utm_campaign utm_content.
+Account,auth_account_created,MichiFinanzas telemetry,live,Product,Already tracked by AppViewModel.
+Account,auth_signed_in,MichiFinanzas telemetry,live,Product,Already tracked by AppViewModel with provider.
+Activation,onboarding_completed,MichiFinanzas telemetry,live,Product,Already tracked by AppViewModel.
+Activation,expense_saved,MichiFinanzas telemetry,live,Product,Sprint 2 event; no exact amount or merchant sent.
+Activation,receipt_scan_expense_saved,MichiFinanzas telemetry,live,Product,Sprint 2 event for scan value proof.
+Activation,budget_saved,MichiFinanzas telemetry,live,Product,Sprint 2 event for planning intent.
+Monetization,billing_purchase_succeeded,MichiFinanzas telemetry,live,Product,Already tracked by AppViewModel with productId.
+Monetization,billing_restore_completed,MichiFinanzas telemetry,live,Product,Already tracked by AppViewModel with active plan.
+Retention,push_registered,MichiFinanzas telemetry,live,Product,Already tracked after APNs registration.
+Collaboration,sharing_invite_created,MichiFinanzas telemetry,live,Product,Already tracked by family sharing flow.
+Collaboration,sharing_invite_accepted,MichiFinanzas telemetry,live,Product,Already tracked by family sharing flow.

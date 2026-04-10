@@ -23,13 +23,13 @@ enum ExpenseLocationAuthorizationStatus: Equatable {
     var summary: String {
         switch self {
         case .notDetermined:
-            return "SpendSage puede usar tu ubicación actual solo cuando tú quieras etiquetar un gasto."
+            return "MichiFinanzas puede usar tu ubicación actual solo cuando tú quieras etiquetar un gasto."
         case .denied:
             return "La ubicación está denegada en este iPhone."
         case .restricted:
             return "La ubicación está restringida por el sistema o por controles del dispositivo."
         case .granted:
-            return "SpendSage puede usar tu ubicación actual mientras la app está abierta para etiquetar un gasto."
+            return "MichiFinanzas puede usar tu ubicación actual mientras la app está abierta para etiquetar un gasto."
         }
     }
 }
