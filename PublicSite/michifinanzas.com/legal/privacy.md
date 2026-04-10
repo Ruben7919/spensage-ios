@@ -1,22 +1,22 @@
-# Política de Privacidad de SpendSage
+# Política de Privacidad de MichiFinanzas
 
 Última actualización: 2026-04-05
 
 ## 1. Alcance
 
-Esta Política de Privacidad describe cómo SpendSage recopila, utiliza, conserva y divulga información cuando usted utiliza la aplicación móvil SpendSage, sus funciones locales, sus flujos de soporte y cualquier documento o enlace público integrado en la aplicación.
+Esta Política de Privacidad describe cómo MichiFinanzas recopila, utiliza, conserva y divulga información cuando usted utiliza la aplicación móvil MichiFinanzas, sus funciones locales, sus flujos de soporte y cualquier documento o enlace público integrado en la aplicación.
 
 Esta política aplica a la versión nativa de iOS actualmente distribuida en canales internos o beta, incluyendo builds de TestFlight, salvo que un documento específico indique expresamente otra cosa.
 
 ## 2. Responsable del tratamiento
 
-Para fines de esta política, "SpendSage", "nosotros", "nuestro" o "la aplicación" se refiere a su titular y operador actual:
+Para fines de esta política, "MichiFinanzas", "nosotros", "nuestro" o "la aplicación" se refiere a su titular y operador actual:
 
 - Titular y operador: `Ruben Lazaro`
 - RUC: `0924829179001`
 - Domicilio declarado: `Samanes 4 Mz 408 Villa 130112`
 
-Si en una versión futura SpendSage pasa a ser operada por una sociedad, afiliada o vehículo distinto, esta política deberá actualizarse antes o al momento en que ese cambio produzca efectos materiales para el usuario.
+Si en una versión futura MichiFinanzas pasa a ser operada por una sociedad, afiliada o vehículo distinto, esta política deberá actualizarse antes o al momento en que ese cambio produzca efectos materiales para el usuario.
 
 ## 3. Categorías de información que podemos tratar
 
@@ -104,7 +104,7 @@ Cuando una ley aplicable exija base jurídica para el tratamiento, podremos trat
 
 ## 6. Procesamiento local y estado actual del producto
 
-La build actual de SpendSage es predominantemente local-first. Eso significa que, salvo que usted elija compartir información, la mayor parte de sus datos permanece en el dispositivo.
+La build actual de MichiFinanzas es predominantemente local-first. Eso significa que, salvo que usted elija compartir información, la mayor parte de sus datos permanece en el dispositivo.
 
 En esta versión, y salvo que se indique expresamente lo contrario:
 
@@ -146,7 +146,7 @@ Usted también es responsable de proteger su dispositivo, su acceso al sistema y
 
 ## 10. Menores de edad
 
-SpendSage no está dirigida a menores de 13 años, ni a una edad inferior si la ley local establece un umbral mayor para el tratamiento válido de datos personales. No recopilamos deliberadamente información personal de menores en violación de la ley aplicable.
+MichiFinanzas no está dirigida a menores de 13 años, ni a una edad inferior si la ley local establece un umbral mayor para el tratamiento válido de datos personales. No recopilamos deliberadamente información personal de menores en violación de la ley aplicable.
 
 Si usted considera que un menor nos ha proporcionado información en forma incompatible con esta política, debe contactarnos para que podamos evaluar el caso.
 
@@ -171,7 +171,7 @@ Podemos modificar esta Política de Privacidad para reflejar cambios del product
 
 ## 14. Contacto
 
-Para solicitudes de soporte o privacidad relacionadas con SpendSage, puede utilizar el canal publicado en la aplicación o en el listado correspondiente de App Store/TestFlight. A efectos de identificación del operador actual, los datos declarados son:
+Para solicitudes de soporte o privacidad relacionadas con MichiFinanzas, puede utilizar el canal publicado en la aplicación o en el listado correspondiente de App Store/TestFlight. A efectos de identificación del operador actual, los datos declarados son:
 
 - Responsable: `Ruben Lazaro`
 - RUC: `0924829179001`

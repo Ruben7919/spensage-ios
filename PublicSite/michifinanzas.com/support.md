@@ -4,11 +4,11 @@
 
 ## 1. Objeto
 
-Este documento explica cómo funciona el canal de soporte de SpendSage y cómo debe utilizarse la información generada por la aplicación cuando usted solicita ayuda.
+Este documento explica cómo funciona el canal de soporte de MichiFinanzas y cómo debe utilizarse la información generada por la aplicación cuando usted solicita ayuda.
 
 ## 2. Canal de soporte
 
-SpendSage puede ofrecer un flujo de soporte dentro de la aplicación que le permite:
+MichiFinanzas puede ofrecer un flujo de soporte dentro de la aplicación que le permite:
 
 - describir una incidencia;
 - clasificar su prioridad y tipo;
@@ -28,7 +28,7 @@ El paquete de soporte se genera localmente en el dispositivo. Según la configur
 
 ## 4. Envío de información
 
-SpendSage no remite automáticamente el paquete a soporte. La información se comparte solo cuando usted:
+MichiFinanzas no remite automáticamente el paquete a soporte. La información se comparte solo cuando usted:
 
 - copia el contenido;
 - usa una hoja del sistema para compartirlo;
@@ -46,7 +46,7 @@ No envíe información que no sea necesaria para el soporte, incluyendo:
 
 ## 6. Alcance del soporte
 
-El soporte de SpendSage está orientado a:
+El soporte de MichiFinanzas está orientado a:
 
 - errores de la aplicación;
 - incidencias de navegación o UX;
@@ -62,7 +62,7 @@ Si detecta un comportamiento que pueda afectar la seguridad del producto, indiqu
 
 ## 8. Tiempos de respuesta
 
-Salvo que se indique expresamente lo contrario, SpendSage no garantiza tiempos de respuesta, niveles de servicio ni disponibilidad continua del canal de soporte, especialmente durante fases beta o internas.
+Salvo que se indique expresamente lo contrario, MichiFinanzas no garantiza tiempos de respuesta, niveles de servicio ni disponibilidad continua del canal de soporte, especialmente durante fases beta o internas.
 
 ## 9. Idioma y calidad de la solicitud
 
@@ -76,9 +76,9 @@ Las solicitudes claras, concretas y reproducibles permiten una mejor revisión. 
 
 ## 10. Contacto
 
-Use el correo o enlace público de soporte publicado por SpendSage en la aplicación, en la documentación pública o en el listado correspondiente de App Store/TestFlight.
+Use el correo o enlace público de soporte publicado por MichiFinanzas en la aplicación, en la documentación pública o en el listado correspondiente de App Store/TestFlight.
 
-Titular y operador actual de SpendSage:
+Titular y operador actual de MichiFinanzas:
 
 - `Ruben Lazaro`
 - RUC: `0924829179001`

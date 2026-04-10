@@ -1,6 +1,10 @@
-# spensage-ios
+# michifinanzas-ios
 
-Native iOS codebase for SpendSage.
+Native iOS codebase for MichiFinanzas.
+
+The public product name is MichiFinanzas. Some technical identifiers still use
+`SpendSage` or `spendsage` intentionally to preserve App Store, Cognito,
+StoreKit, and installed TestFlight compatibility.
 
 This repo starts as a SwiftUI, local-first migration track that runs in parallel with the existing Ionic + Capacitor app. The goal is to move the highest-impact B2C flows to native iOS without blocking the current production app.
 
@@ -76,7 +80,7 @@ Run the archive/upload first, then promote the matching build, and only then syn
 
 ```bash
 DEVICE_ID=$(xcrun simctl list devices available | grep 'iPhone' | head -n 1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
-xcodebuild test -project SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=$DEVICE_ID" -derivedDataPath /tmp/spensage-ios-dd CODE_SIGNING_ALLOWED=NO
+xcodebuild test -project SpendSage.xcodeproj -scheme SpendSage -destination "platform=iOS Simulator,id=$DEVICE_ID" -derivedDataPath /tmp/michifinanzas-ios-dd CODE_SIGNING_ALLOWED=NO
 ```
 
 ## Current implementation notes

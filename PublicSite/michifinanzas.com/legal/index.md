@@ -1,6 +1,6 @@
-# SpendSage Legal Center
+# MichiFinanzas Legal Center
 
-Dominio legal público previsto: `https://legal.spendsage.ai`
+Dominio legal publico previsto: `https://michifinanzas.com/legal`
 
 ## Documentos
 

@@ -1,12 +1,12 @@
-# Términos de Uso de SpendSage
+# Términos de Uso de MichiFinanzas
 
 Última actualización: 2026-04-05
 
 ## 1. Aceptación
 
-Al descargar, acceder o utilizar SpendSage, usted acepta estos Términos de Uso. Si no está de acuerdo con ellos, no debe utilizar la aplicación.
+Al descargar, acceder o utilizar MichiFinanzas, usted acepta estos Términos de Uso. Si no está de acuerdo con ellos, no debe utilizar la aplicación.
 
-Para fines de identificación del operador actual de la aplicación, SpendSage es operada por:
+Para fines de identificación del operador actual de la aplicación, MichiFinanzas es operada por:
 
 - `Ruben Lazaro`
 - RUC: `0924829179001`
@@ -14,7 +14,7 @@ Para fines de identificación del operador actual de la aplicación, SpendSage e
 
 ## 2. Naturaleza del servicio
 
-SpendSage es una aplicación de apoyo para registro financiero personal, organización presupuestaria, lectura asistida de recibos, visualización de métricas y acompañamiento conductual. SpendSage:
+MichiFinanzas es una aplicación de apoyo para registro financiero personal, organización presupuestaria, lectura asistida de recibos, visualización de métricas y acompañamiento conductual. MichiFinanzas:
 
 - no es un banco;
 - no es una entidad de pago;
@@ -27,11 +27,11 @@ Toda decisión financiera sigue siendo responsabilidad exclusiva del usuario.
 
 Usted declara que tiene capacidad legal suficiente para aceptar estos términos y usar la aplicación conforme a la ley aplicable.
 
-Usted se compromete a utilizar SpendSage únicamente para fines lícitos y personales o internos, salvo autorización expresa distinta.
+Usted se compromete a utilizar MichiFinanzas únicamente para fines lícitos y personales o internos, salvo autorización expresa distinta.
 
 ## 4. Cuenta y acceso
 
-Algunas versiones o superficies de SpendSage pueden requerir o promover el uso de una cuenta. Otras funciones pueden operar localmente en el dispositivo.
+Algunas versiones o superficies de MichiFinanzas pueden requerir o promover el uso de una cuenta. Otras funciones pueden operar localmente en el dispositivo.
 
 Usted es responsable de:
 
@@ -52,7 +52,7 @@ El uso de builds beta es bajo su propio criterio y riesgo.
 
 ## 6. Licencia limitada
 
-Sujeto a su cumplimiento de estos términos, se le concede una licencia limitada, revocable, no exclusiva, no sublicenciable e intransferible para usar SpendSage en dispositivos que usted posea o controle, conforme a las reglas de Apple y a la ley aplicable.
+Sujeto a su cumplimiento de estos términos, se le concede una licencia limitada, revocable, no exclusiva, no sublicenciable e intransferible para usar MichiFinanzas en dispositivos que usted posea o controle, conforme a las reglas de Apple y a la ley aplicable.
 
 No se le concede ningún derecho de propiedad intelectual sobre la aplicación, salvo el derecho limitado de uso aquí descrito.
 
@@ -65,13 +65,13 @@ Usted no debe, salvo en la medida permitida por la ley:
 - vulnerar medidas de seguridad, límites técnicos o mecanismos de acceso;
 - usar la aplicación para actividades fraudulentas, abusivas, ilícitas o engañosas;
 - introducir contenido malicioso, automatización abusiva o tráfico que degrade el servicio;
-- usar SpendSage para explotar o perfilar a terceros sin base legal adecuada.
+- usar MichiFinanzas para explotar o perfilar a terceros sin base legal adecuada.
 
 ## 8. Datos, contenido y exactitud
 
-Usted es responsable del contenido que introduce en SpendSage, incluyendo gastos, notas, cuentas, facturas, reglas, nombres, correos, imágenes y descripciones de soporte.
+Usted es responsable del contenido que introduce en MichiFinanzas, incluyendo gastos, notas, cuentas, facturas, reglas, nombres, correos, imágenes y descripciones de soporte.
 
-SpendSage puede generar sugerencias, clasificaciones o resultados asistidos, incluyendo OCR o resúmenes. Esas salidas pueden contener errores, omisiones, coincidencias inexactas o inferencias incompletas. Usted debe revisar el contenido antes de confiar en él o actuar en consecuencia.
+MichiFinanzas puede generar sugerencias, clasificaciones o resultados asistidos, incluyendo OCR o resúmenes. Esas salidas pueden contener errores, omisiones, coincidencias inexactas o inferencias incompletas. Usted debe revisar el contenido antes de confiar en él o actuar en consecuencia.
 
 ## 9. Escaneo, OCR, automatización y recomendaciones
 
@@ -100,7 +100,7 @@ Ciertas referencias a planes familiares, colaboración o sincronización compart
 
 ## 12. Enlaces y servicios de terceros
 
-SpendSage puede incluir enlaces o integraciones hacia:
+MichiFinanzas puede incluir enlaces o integraciones hacia:
 
 - App Store o servicios de Apple;
 - proveedores de autenticación;
@@ -112,15 +112,15 @@ No controlamos de forma plena los servicios de terceros y no somos responsables 
 
 ## 13. Propiedad intelectual
 
-La aplicación, sus personajes, diseño, arte, texto, marcas, interfaz, documentación y materiales relacionados pertenecen a SpendSage o a sus licenciantes y están protegidos por leyes de propiedad intelectual.
+La aplicación, sus personajes, diseño, arte, texto, marcas, interfaz, documentación y materiales relacionados pertenecen a MichiFinanzas o a sus licenciantes y están protegidos por leyes de propiedad intelectual.
 
 ## 14. Exención de garantías
 
-En la máxima medida permitida por la ley, SpendSage se proporciona "tal cual" y "según disponibilidad", sin garantías expresas o implícitas, incluyendo garantías de comerciabilidad, idoneidad para un propósito particular, no infracción, exactitud, disponibilidad continua o ausencia de errores.
+En la máxima medida permitida por la ley, MichiFinanzas se proporciona "tal cual" y "según disponibilidad", sin garantías expresas o implícitas, incluyendo garantías de comerciabilidad, idoneidad para un propósito particular, no infracción, exactitud, disponibilidad continua o ausencia de errores.
 
 ## 15. Limitación de responsabilidad
 
-En la máxima medida permitida por la ley, SpendSage y sus operadores, afiliados, licenciantes o colaboradores no serán responsables por daños indirectos, incidentales, especiales, ejemplares, punitivos o consecuenciales, ni por pérdida de beneficios, ahorros, datos, reputación o uso, derivados de:
+En la máxima medida permitida por la ley, MichiFinanzas y sus operadores, afiliados, licenciantes o colaboradores no serán responsables por daños indirectos, incidentales, especiales, ejemplares, punitivos o consecuenciales, ni por pérdida de beneficios, ahorros, datos, reputación o uso, derivados de:
 
 - el uso o imposibilidad de uso de la aplicación;
 - errores, sugerencias inexactas u omisiones;
@@ -132,7 +132,7 @@ Nada en estos términos limita derechos irrenunciables del consumidor ni respons
 
 ## 16. Indemnización
 
-Usted acepta defender, indemnizar y mantener indemne a SpendSage y sus operadores frente a reclamaciones, pérdidas, daños, responsabilidades y costes razonables derivados de:
+Usted acepta defender, indemnizar y mantener indemne a MichiFinanzas y sus operadores frente a reclamaciones, pérdidas, daños, responsabilidades y costes razonables derivados de:
 
 - su uso indebido de la aplicación;
 - su incumplimiento de estos términos;
@@ -140,7 +140,7 @@ Usted acepta defender, indemnizar y mantener indemne a SpendSage y sus operadore
 
 ## 17. Suspensión o terminación
 
-Podemos suspender, limitar o terminar el acceso a SpendSage, total o parcialmente, cuando:
+Podemos suspender, limitar o terminar el acceso a MichiFinanzas, total o parcialmente, cuando:
 
 - exista incumplimiento de estos términos;
 - haya riesgo para la seguridad, integridad o legalidad del servicio;
@@ -156,7 +156,7 @@ Podemos modificar estos términos para reflejar cambios legales, técnicos, come
 
 ## 20. Contacto
 
-Para consultas legales, de soporte o del servicio, utilice los canales publicados por SpendSage en la aplicación, en la documentación pública o en el listado correspondiente de App Store/TestFlight.
+Para consultas legales, de soporte o del servicio, utilice los canales publicados por MichiFinanzas en la aplicación, en la documentación pública o en el listado correspondiente de App Store/TestFlight.
 
 Datos de identificación del operador actual:
 
