@@ -66,7 +66,6 @@
 		2ED129A277D926B9FDBD2E9C /* manchas_excited_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = D287721E4041278C7BEC945F /* manchas_excited_holiday_v2.png */; };
 		2EEDC13EE0959F9789EA5EE9 /* guide_26_loading_yarn_team_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 77338DCA49A69EB2F0830792 /* guide_26_loading_yarn_team_v2.png */; };
 		2EF57DD843EF3DBA36CAD944 /* tikki_warning_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C11096C36EB41143E917DAE /* tikki_warning_new_year_v2.png */; };
-		2F2DE60F50F261C22C698206 /* AppIcon83.5x83.5@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2D2AD82781F78FBE0ADA2D6F /* AppIcon83.5x83.5@2x.png */; };
 		2F5F3AA9ADEB442D45DA3886 /* tikki_angry_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = F16CA60ECBB38428C4E22675 /* tikki_angry_holiday_v2.png */; };
 		2FD59560B9E1ABF05696C002 /* guide_26_loading_yarn_team_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 791FFA28FB4A7DCEC0E53C5F /* guide_26_loading_yarn_team_holiday_v2.png */; };
 		2FFD079A72FD94E189C8E4C1 /* manchas_angry_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2B08E5FEE8C6CC46FCB6CD05 /* manchas_angry_new_year_v2.png */; };
@@ -99,7 +98,6 @@
 		4789A71066DD585FC5A04765 /* mei_happy_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FA881B86A8394020CA7660B /* mei_happy_holiday_v2.png */; };
 		495B528157686616775F3666 /* manchas_thinking_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = F8E13AFF5CEBA7D22F139610 /* manchas_thinking_halloween_v2.png */; };
 		4AC59ECC6C5FAC2BE9B27D48 /* badge_receipt_scan_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = B7B1538715687F2EE6552CA7 /* badge_receipt_scan_v2.png */; };
-		4B0F12352185B18BF10D1861 /* AppIcon76x76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 18129420E3860B4D4EEDB13D /* AppIcon76x76@2x.png */; };
 		4B1BF8D9648EEE77F912483F /* NotificationSoundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14BA60D1C091765CBA2F2607 /* NotificationSoundService.swift */; };
 		4B89F5098AFBB0013BC38248 /* mei_sad_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4765188D2B63ACD157DE31F9 /* mei_sad_holiday_v2.png */; };
 		4C03C37B3AF9BD27DC87A4E6 /* badge_safe_to_spend_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FD463CBF88A570CC373ACAF /* badge_safe_to_spend_v2.png */; };
@@ -110,7 +108,6 @@
 		50AEC237E5E34476C82988A0 /* mei_sleepy_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 76FC7B2653C650C7FEA35567 /* mei_sleepy_new_year_v2.png */; };
 		5154AF9E6F213923B5C3A85F /* BrandAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE2F76BDDB3352DE57B540F /* BrandAssets.swift */; };
 		51FAC1B085057384E851296F /* guide_11_budget_wizard_steps_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 4EC8FC03BF043A01412B0A19 /* guide_11_budget_wizard_steps_mei_v2.png */; };
-		5239AC2A9E4D13316E774164 /* AppIcon1024x1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 9E1327A542A64D3D47748558 /* AppIcon1024x1024.png */; };
 		52978F026A957FCC3741603E /* ResetPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED414330125E63F549BE0AC /* ResetPasswordView.swift */; };
 		53065CF5C33BAAA443268B77 /* tikki_sad_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1314F088E8DD0FD3B2E97201 /* tikki_sad_halloween_v2.png */; };
 		53326A1648AC3A7FD899300F /* badge_questline_monthly_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 97159ED4214285E5D0121413 /* badge_questline_monthly_v2.png */; };
@@ -210,7 +207,6 @@
 		9530C8BBEF430A2B30F885CC /* badge_goals_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 381690D6AA9297592598EC3A /* badge_goals_v2.png */; };
 		970786DA41BB24AC236F80E0 /* badge_recovery_mode_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BF97127EEC9ABE5F58F3976 /* badge_recovery_mode_v2.png */; };
 		98C41737F7E240D39122F33B /* ProfileCompletionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE57325664004CBCF267818B /* ProfileCompletionTests.swift */; };
-		9AE9CC012C30D01E0915C25C /* AppIcon60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BA5B4215CE27FE44EE0CED9 /* AppIcon60x60@2x.png */; };
 		9BF510400E05D1A4B72ECA8A /* BrandGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89985226F3D7B000843752AB /* BrandGalleryView.swift */; };
 		9C0618AEBF3310C881D2F0AA /* badge_weekly_decision_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 98A12E850C7A5E616CC20C87 /* badge_weekly_decision_v2.png */; };
 		9D3CD4F9F0A4319BF2F050F1 /* AuthSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679F2DB952FBB586D6057598 /* AuthSupport.swift */; };
@@ -321,7 +317,6 @@
 		EB6DF32594016F90A8BCD728 /* guide_23_rules_automation_ludo_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 80E8DA0C08C679AF223D73F9 /* guide_23_rules_automation_ludo_v2.png */; };
 		EC9FE9E3AF1E789DD8C2FBCD /* FlowStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D12FFE285DD4830D2F7B3D2 /* FlowStack.swift */; };
 		ECB63BFF8235833AC79E2A56 /* app_icon_dark_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C65D3EB1639597D338721CE9 /* app_icon_dark_v2.png */; };
-		EDD6FE7B2A60377A4BA214AA /* icon-any-1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 588F15A7FB63F6A64CBBDBE0 /* icon-any-1024.png */; };
 		EE2DED50C8FA63D1078ABF45 /* tikki_sad_holiday_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5FE05076DA06EBD7A3C87D6F /* tikki_sad_holiday_v2.png */; };
 		EFB80607FFE8A85982F8C7B0 /* SharedSpacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF11253584DE5D717D5E99B /* SharedSpacesView.swift */; };
 		F041F9A2211E2F6A273FFD2D /* badge_trial_starter_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 68A962C994F5DE5697471F65 /* badge_trial_starter_v2.png */; };
@@ -333,7 +328,6 @@
 		F6AE0A61C32FE8A8903427BD /* app_icon_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 82ADAB0479FD13EC5143AED3 /* app_icon_v2.png */; };
 		F6B4536F6F60E2EB56759A8B /* guide_18_landing_trust_shield_mei_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 2033E37D418EDB7A5CB1ED5F /* guide_18_landing_trust_shield_mei_v2.png */; };
 		F6D4F13256E68E49F659F817 /* ReceiptVisionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1238852B64244DC049D08D /* ReceiptVisionServiceTests.swift */; };
-		F926A503CF4A658A3A907085 /* AppIcon60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8126DD29C8C46D0F47A856BB /* AppIcon60x60@3x.png */; };
 		FB19B404E1F4529356C0489D /* wordmark_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C48A2C6F56D93D7DCF485CA /* wordmark_v2.png */; };
 		FB297532ABD7E8F06B21C06E /* manchas_sad_new_year_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = 74947FA8850AFB9B9AD5F316 /* manchas_sad_new_year_v2.png */; };
 		FB4E7F01265C1CCFAE111550 /* manchas_angry_halloween_v2.png in Resources */ = {isa = PBXBuildFile; fileRef = C1400D082E041A8F2962474B /* manchas_angry_halloween_v2.png */; };
@@ -400,7 +394,6 @@
 		14BA60D1C091765CBA2F2607 /* NotificationSoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSoundService.swift; sourceTree = "<group>"; };
 		14DE46438A81527031C777CF /* tikki_thinking_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_thinking_new_year_v2.png; sourceTree = "<group>"; };
 		17BB41FBBB25D087C86ECE68 /* guide_21_profile_identity_ludo_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_21_profile_identity_ludo_v2.png; sourceTree = "<group>"; };
-		18129420E3860B4D4EEDB13D /* AppIcon76x76@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon76x76@2x.png"; sourceTree = "<group>"; };
 		18B3F2E4B71BEFD0ABB5AD15 /* tikki_sleepy_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_sleepy_holiday_v2.png; sourceTree = "<group>"; };
 		19D129F26CE378A5B66A57DC /* LegalCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalCenterView.swift; sourceTree = "<group>"; };
 		1AE2F76BDDB3352DE57B540F /* BrandAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssets.swift; sourceTree = "<group>"; };
@@ -425,7 +418,6 @@
 		2BEBFB561CBC56A30162DE15 /* mei_thinking_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_thinking_new_year_v2.png; sourceTree = "<group>"; };
 		2CD0F272F0D88EAFAB0295E5 /* mei_happy_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_happy_new_year_v2.png; sourceTree = "<group>"; };
 		2CF11253584DE5D717D5E99B /* SharedSpacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSpacesView.swift; sourceTree = "<group>"; };
-		2D2AD82781F78FBE0ADA2D6F /* AppIcon83.5x83.5@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon83.5x83.5@2x.png"; sourceTree = "<group>"; };
 		2E576E70A3793EB758F39D52 /* tikki_confused_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_confused_v2.png; sourceTree = "<group>"; };
 		2EAA70C86EF69DD1AC280342 /* BrandAssetImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandAssetImage.swift; sourceTree = "<group>"; };
 		2EAC577FEBD606518745FCD4 /* badge_event_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_event_halloween_v2.png; sourceTree = "<group>"; };
@@ -473,7 +465,6 @@
 		547CF4009AD9B3E267126A56 /* mei_shocked_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mei_shocked_halloween_v2.png; sourceTree = "<group>"; };
 		54B4C2EA2A96E843D0264B1F /* acc_wallet_card_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = acc_wallet_card_v2.png; sourceTree = "<group>"; };
 		563791726C0CE53039C0BB69 /* manchas_confused_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_confused_halloween_v2.png; sourceTree = "<group>"; };
-		588F15A7FB63F6A64CBBDBE0 /* icon-any-1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-any-1024.png"; sourceTree = "<group>"; };
 		5896BF0CB4D72415C844C6AE /* tikki_warning_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_warning_halloween_v2.png; sourceTree = "<group>"; };
 		58BE17AAE62A791805824415 /* tikki_happy_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_happy_halloween_v2.png; sourceTree = "<group>"; };
 		597263E2F2D715427D1A22F3 /* manchas_thinking_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_thinking_new_year_v2.png; sourceTree = "<group>"; };
@@ -510,7 +501,6 @@
 		6A9982B86366FB3726844DFC /* manchas_proud_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_proud_holiday_v2.png; sourceTree = "<group>"; };
 		6B055C9992516D0D19E5F7C9 /* tikki_sad_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_sad_new_year_v2.png; sourceTree = "<group>"; };
 		6B22377117E5CA77415496A0 /* manchas_love_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_love_holiday_v2.png; sourceTree = "<group>"; };
-		6BA5B4215CE27FE44EE0CED9 /* AppIcon60x60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon60x60@2x.png"; sourceTree = "<group>"; };
 		6C683E92B3AC851970F0F8F6 /* badge_debt_slayer_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_debt_slayer_v2.png; sourceTree = "<group>"; };
 		6CD5456D851E00E542F1EA16 /* tikki_happy_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tikki_happy_v2.png; sourceTree = "<group>"; };
 		6D34F0CB2B678B65728E704E /* guide_16_family_mission_board_team_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_16_family_mission_board_team_v2.png; sourceTree = "<group>"; };
@@ -534,7 +524,6 @@
 		7F2934138AE36700A47D2D0E /* BETA_NOTICE_AND_DISCLOSURES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BETA_NOTICE_AND_DISCLOSURES.md; sourceTree = "<group>"; };
 		7FD463CBF88A570CC373ACAF /* badge_safe_to_spend_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_safe_to_spend_v2.png; sourceTree = "<group>"; };
 		80E8DA0C08C679AF223D73F9 /* guide_23_rules_automation_ludo_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_23_rules_automation_ludo_v2.png; sourceTree = "<group>"; };
-		8126DD29C8C46D0F47A856BB /* AppIcon60x60@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon60x60@3x.png"; sourceTree = "<group>"; };
 		816A9A7F99699404E0C20D7B /* GrowthCelebration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthCelebration.swift; sourceTree = "<group>"; };
 		81AC3F0BFEAB1120D31917A5 /* badge_event_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_event_holiday_v2.png; sourceTree = "<group>"; };
 		8208B2A457D6AAFADFE86068 /* SpendSageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendSageTests.swift; sourceTree = "<group>"; };
@@ -583,7 +572,6 @@
 		9D0C1A2BE8999CC797CEA6DE /* guide_08_daily_checkin_manchas_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_08_daily_checkin_manchas_v2.png; sourceTree = "<group>"; };
 		9D3AEF1794D4F1F9FB3A5132 /* GrowthSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthSnapshot.swift; sourceTree = "<group>"; };
 		9D9BCA64733EC6CE96C506C4 /* guide_32_manchas_holiday_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_32_manchas_holiday_v2.png; sourceTree = "<group>"; };
-		9E1327A542A64D3D47748558 /* AppIcon1024x1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AppIcon1024x1024.png; sourceTree = "<group>"; };
 		9EDED15B0C199A58FA02C31F /* manchas_neutral_halloween_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_neutral_halloween_v2.png; sourceTree = "<group>"; };
 		9FBC5889CBCCFDF8175100DF /* manchas_confused_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = manchas_confused_v2.png; sourceTree = "<group>"; };
 		9FEA7B6A4069CE3587DA4D82 /* guide_35_manchas_new_year_v2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = guide_35_manchas_new_year_v2.png; sourceTree = "<group>"; };
@@ -1391,13 +1379,7 @@
 		EE59D1387E7C148E1E644E1B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6BA5B4215CE27FE44EE0CED9 /* AppIcon60x60@2x.png */,
-				8126DD29C8C46D0F47A856BB /* AppIcon60x60@3x.png */,
-				18129420E3860B4D4EEDB13D /* AppIcon76x76@2x.png */,
-				2D2AD82781F78FBE0ADA2D6F /* AppIcon83.5x83.5@2x.png */,
-				9E1327A542A64D3D47748558 /* AppIcon1024x1024.png */,
 				9AE8903B75C047C59E5F634A /* Assets.xcassets */,
-				588F15A7FB63F6A64CBBDBE0 /* icon-any-1024.png */,
 				6921A66E622A020378A8781E /* InfoPlist.strings */,
 				4C99B87AC3D4FD5B02CB8C6A /* Localizable.strings */,
 				FE163B10627FB89DA27DC692 /* PrivacyInfo.xcprivacy */,
@@ -1534,11 +1516,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5239AC2A9E4D13316E774164 /* AppIcon1024x1024.png in Resources */,
-				9AE9CC012C30D01E0915C25C /* AppIcon60x60@2x.png in Resources */,
-				F926A503CF4A658A3A907085 /* AppIcon60x60@3x.png in Resources */,
-				4B0F12352185B18BF10D1861 /* AppIcon76x76@2x.png in Resources */,
-				2F2DE60F50F261C22C698206 /* AppIcon83.5x83.5@2x.png in Resources */,
 				0F9A89ECA591CED5D86EF16B /* Assets.xcassets in Resources */,
 				D4AC84409117247C82C3CD14 /* BETA_NOTICE_AND_DISCLOSURES.md in Resources */,
 				D5A63F5297E1DC9294373C18 /* InfoPlist.strings in Resources */,
@@ -1633,7 +1610,6 @@
 				68417BA864BE0EE7615B556B /* guide_33_tikki_new_year_v2.png in Resources */,
 				F3C4D8078E2E977CBE6D947C /* guide_34_mei_new_year_v2.png in Resources */,
 				9E531590736D862735AD57D5 /* guide_35_manchas_new_year_v2.png in Resources */,
-				EDD6FE7B2A60377A4BA214AA /* icon-any-1024.png in Resources */,
 				C7774AF9FCA3292049521C41 /* logo_mark_rosette_v2.png in Resources */,
 				FB4E7F01265C1CCFAE111550 /* manchas_angry_halloween_v2.png in Resources */,
 				9DBADA5C4B4EA17C2AA15D28 /* manchas_angry_holiday_v2.png in Resources */,
