@@ -44,6 +44,7 @@ struct SettingsView: View {
             .padding(.top, 20)
             .padding(.bottom, shellBottomInset + 18)
         }
+        .scrollBounceBehavior(.basedOnSize, axes: .vertical)
         .accessibilityIdentifier("settings.screen")
         .overlay(alignment: .topLeading) {
             AccessibilityProbe(identifier: "settings.screen")
@@ -51,6 +52,35 @@ struct SettingsView: View {
         .background(FinanceScreenBackground())
         .sheet(isPresented: $showingGuideReplay) {
             GuideSheet(guide: GuideLibrary.guide(.dashboard))
+        }
+        .navigationDestination(
+            item: Binding(
+                get: { viewModel.requestedSettingsRoute },
+                set: { route in
+                    if route == nil {
+                        viewModel.clearRequestedSettingsRoute()
+                    }
+                }
+            )
+        ) { route in
+            switch route {
+            case .advanced:
+                AdvancedSettingsView(viewModel: viewModel)
+            case .notifications:
+                SettingsNotificationsView(viewModel: viewModel)
+            case .preferences:
+                SettingsPreferencesView()
+            case .premium:
+                PremiumView(viewModel: viewModel)
+            case .profileAccountDetails:
+                ProfileAccountDetailsView(
+                    viewModel: viewModel,
+                    draft: viewModel.profile,
+                    deviceLabel: UIDevice.current.localizedModel
+                )
+            case .sharedSpaces:
+                SharedSpacesView(viewModel: viewModel)
+            }
         }
         .onChange(of: rememberDeviceEnabled) { _, newValue in
             viewModel.updateRememberDevicePreference(enabled: newValue)
@@ -208,7 +238,7 @@ struct SettingsView: View {
                     SharedSpacesView(viewModel: viewModel)
                 } label: {
                     SettingsNavigationRow(
-                        title: "Spaces y familia",
+                        title: "Espacios y familia",
                         summary: "Selecciona espacios, invita miembros y administra el plan compartido.",
                         systemImage: "person.3.fill"
                     )
@@ -287,18 +317,34 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                 }
 
-                HStack(spacing: 12) {
-                    Button("Volver a mostrar guías") {
-                        GuideProgressStore.resetAll()
-                        showingGuideReplay = true
-                    }
-                    .buttonStyle(SecondaryCTAStyle())
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 12) {
+                        Button("Volver a mostrar guías") {
+                            GuideProgressStore.resetAll()
+                            showingGuideReplay = true
+                        }
+                        .buttonStyle(SecondaryCTAStyle())
 
-                    Button("Cerrar sesión") {
-                        Task { await viewModel.signOut() }
+                        Button("Cerrar sesión") {
+                            Task { await viewModel.signOut() }
+                        }
+                        .buttonStyle(SecondaryCTAStyle())
+                        .foregroundStyle(.red)
                     }
-                    .buttonStyle(SecondaryCTAStyle())
-                    .foregroundStyle(.red)
+
+                    VStack(spacing: 12) {
+                        Button("Volver a mostrar guías") {
+                            GuideProgressStore.resetAll()
+                            showingGuideReplay = true
+                        }
+                        .buttonStyle(SecondaryCTAStyle())
+
+                        Button("Cerrar sesión") {
+                            Task { await viewModel.signOut() }
+                        }
+                        .buttonStyle(SecondaryCTAStyle())
+                        .foregroundStyle(.red)
+                    }
                 }
             }
         }
@@ -309,6 +355,7 @@ private struct SettingsPreferencesView: View {
     @AppStorage("native.settings.language") private var language = "auto"
     @AppStorage(AppCurrencyFormat.defaultsKey) private var currency = AppCurrencyFormat.defaultCode
     @AppStorage("native.settings.theme") private var theme = "finance"
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -358,7 +405,9 @@ private struct SettingsPreferencesView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
+            .padding(.bottom, shellBottomInset + 18)
         }
+        .scrollBounceBehavior(.basedOnSize, axes: .vertical)
         .background(BrandTheme.canvas)
         .background(alignment: .top) {
             BrandBackdropView()
@@ -375,6 +424,7 @@ private struct SettingsPreferencesView: View {
 private struct SettingsNotificationsView: View {
     @ObservedObject var viewModel: AppViewModel
     @Environment(\.openURL) private var openURL
+    @Environment(\.shellBottomInset) private var shellBottomInset
 
     private var internalTestingEnabled: Bool {
         BuildConfiguration.internalTestingEnabled()
@@ -482,11 +532,18 @@ private struct SettingsNotificationsView: View {
                         )
 
                         if viewModel.calendarSyncStatus.authorization == .granted {
-                            Button("Sincronizar facturas ahora") {
-                                Task { await viewModel.syncBillsToCalendar() }
+                            Text("Las facturas se sincronizan solas cuando cambias recordatorios o vuelves a abrir la app. Usa la acción manual solo si quieres forzar una reparación del calendario.")
+                                .font(.footnote)
+                                .foregroundStyle(BrandTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            if !viewModel.bills.isEmpty {
+                                Button(viewModel.calendarSyncStatus.lastSyncedAt == nil ? "Crear recordatorios ahora" : "Actualizar recordatorios ahora") {
+                                    Task { await viewModel.syncBillsToCalendar() }
+                                }
+                                .buttonStyle(SecondaryCTAStyle())
+                                .disabled(viewModel.calendarSyncStatus.isSyncing)
                             }
-                            .buttonStyle(PrimaryCTAStyle())
-                            .disabled(viewModel.calendarSyncStatus.isSyncing)
                         } else if shouldOfferPermissionRetry {
                             Button("Volver a pedir permisos") {
                                 Task { await viewModel.bootstrapEssentialPermissionsIfNeeded(force: true) }
@@ -566,7 +623,9 @@ private struct SettingsNotificationsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
+            .padding(.bottom, shellBottomInset + 18)
         }
+        .scrollBounceBehavior(.basedOnSize, axes: .vertical)
         .background(BrandTheme.canvas)
         .background(alignment: .top) {
             BrandBackdropView()

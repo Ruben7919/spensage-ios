@@ -166,11 +166,11 @@ struct BrandBadge: View {
             Text(text.appLocalized)
                 .font(.caption.weight(.semibold))
                 .lineLimit(1)
+                .minimumScaleFactor(0.82)
         }
         .foregroundStyle(BrandTheme.primary)
         .padding(.horizontal, 14)
         .padding(.vertical, 9)
-        .fixedSize(horizontal: true, vertical: false)
         .background(
             Capsule(style: .continuous)
                 .fill(BrandTheme.surface.opacity(0.82))
@@ -193,10 +193,17 @@ struct BrandCardHeader<Accessory: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .center, spacing: 14) {
-                BrandBadge(text: badgeText.appLocalized, systemImage: badgeSystemImage)
-                Spacer(minLength: 12)
-                accessory
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center, spacing: 14) {
+                    BrandBadge(text: badgeText.appLocalized, systemImage: badgeSystemImage)
+                    Spacer(minLength: 12)
+                    accessory
+                }
+
+                VStack(alignment: .leading, spacing: 12) {
+                    BrandBadge(text: badgeText.appLocalized, systemImage: badgeSystemImage)
+                    accessory
+                }
             }
 
             Text(title.appLocalized)
@@ -229,6 +236,7 @@ struct MascotAvatarView: View {
             )
             .aspectRatio(contentMode: .fit)
             .padding(size * 0.14)
+            .clipShape(Circle())
         }
         .frame(width: size, height: size)
         .overlay(
@@ -361,6 +369,7 @@ struct StoryTag: View {
             Text(text.appLocalized)
                 .font(.caption.weight(.semibold))
                 .lineLimit(1)
+                .minimumScaleFactor(0.82)
         }
         .foregroundStyle(BrandTheme.primary)
         .padding(.horizontal, 12)

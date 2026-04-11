@@ -23,8 +23,13 @@ struct SharedSpacesView: View {
             .padding(.top, 20)
             .padding(.bottom, shellBottomInset + 18)
         }
+        .scrollBounceBehavior(.basedOnSize, axes: .vertical)
+        .overlay(alignment: .topLeading) {
+            AccessibilityProbe(identifier: "sharedSpaces.screen")
+        }
+        .accessibilityIdentifier("sharedSpaces.screen")
         .background(FinanceScreenBackground())
-        .navigationTitle("Spaces")
+        .navigationTitle("Espacios")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if let pending = viewModel.pendingInviteCode, acceptCode.isEmpty {
@@ -34,16 +39,83 @@ struct SharedSpacesView: View {
         }
     }
 
+    static func sharedInviteURL(for invite: CreateInviteResult) -> URL? {
+        if let url = canonicalInviteURL(code: invite.invite.code) {
+            return url
+        }
+        if let url = canonicalInviteURL(from: invite.webLink) {
+            return url
+        }
+        if let url = canonicalInviteURL(from: invite.deepLink) {
+            return url
+        }
+        return URL(string: invite.deepLink)
+    }
+
+    private static func canonicalInviteURL(code: String) -> URL? {
+        let trimmedCode = code.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedCode.isEmpty,
+              let encodedCode = trimmedCode.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+            return nil
+        }
+
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "michifinanzas.com"
+        components.path = "/invite/\(encodedCode)"
+        components.queryItems = [URLQueryItem(name: "code", value: trimmedCode)]
+        return components.url
+    }
+
+    private static func canonicalInviteURL(from rawLink: String?) -> URL? {
+        guard let code = inviteCode(from: rawLink) else { return nil }
+        return canonicalInviteURL(code: code)
+    }
+
+    private static func inviteCode(from rawLink: String?) -> String? {
+        guard let rawLink,
+              let url = URL(string: rawLink),
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return nil
+        }
+
+        if let queryCode = components.queryItems?
+            .first(where: { $0.name.lowercased() == "code" })?
+            .value?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+           !queryCode.isEmpty {
+            return queryCode
+        }
+
+        let pathSegments = url.pathComponents
+            .filter { $0 != "/" }
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        if let inviteIndex = pathSegments.firstIndex(where: { $0.lowercased() == "invite" }),
+           pathSegments.indices.contains(inviteIndex + 1) {
+            let pathCode = pathSegments[inviteIndex + 1]
+            return pathCode.isEmpty ? nil : pathCode
+        }
+
+        if components.host?.lowercased() == "invite" {
+            let trimmedPath = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            return trimmedPath.isEmpty ? nil : trimmedPath
+        }
+
+        return nil
+    }
+
     private var headerCard: some View {
         SurfaceCard {
             VStack(alignment: .leading, spacing: 16) {
                 BrandBadge(text: "Plan familiar", systemImage: "person.3.fill")
 
-                Text("Spaces y familia")
+                Text("Espacios y familia")
                     .font(.system(size: 30, weight: .black, design: .rounded))
                     .foregroundStyle(BrandTheme.ink)
 
-                Text("Invita a tu hogar y comparte el presupuesto sin códigos raros ni pasos extra.")
+                Text("Invita a tu hogar con un enlace inteligente y comparte el presupuesto sin pasos manuales.")
                     .font(.subheadline)
                     .foregroundStyle(BrandTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -127,11 +199,11 @@ struct SharedSpacesView: View {
                     .background(BrandTheme.surface)
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
-                Text("La persona recibirá un enlace para unirse. Si ya tiene cuenta, la invitación aparecerá al iniciar sesión con ese correo.")
+                Text("Creamos un enlace inteligente: si ya tiene la app la abrirá, si no la tiene irá a instalarla, y si todavía no entra a su cuenta podrá iniciar sesión o crearla para terminar la invitación.")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(BrandTheme.muted)
 
-                Button("Enviar invitación") {
+                Button("Crear invitación") {
                     Task {
                         await viewModel.createFamilyInvite(
                             recipientEmail: inviteEmail,
@@ -154,9 +226,9 @@ struct SharedSpacesView: View {
                             .foregroundStyle(BrandTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
 
-                        if let url = URL(string: invite.deepLink) {
+                        if let url = inviteShareURL(for: invite) {
                             ShareLink(item: url) {
-                                Label("Compartir invitación", systemImage: "square.and.arrow.up")
+                                Label("Compartir enlace familiar", systemImage: "square.and.arrow.up")
                             }
                             .buttonStyle(SecondaryCTAStyle())
                         }
@@ -174,6 +246,11 @@ struct SharedSpacesView: View {
                     .foregroundStyle(BrandTheme.ink)
 
                 if !acceptCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text("Si esta es la cuenta invitada, intentaremos unirla automáticamente a la familia. Si no coincide, cambia de cuenta y vuelve a abrir la invitación.")
+                        .font(.footnote)
+                        .foregroundStyle(BrandTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+
                     Button("Unirme a la familia") {
                         Task { await viewModel.acceptInvite(code: acceptCode) }
                     }
@@ -192,6 +269,10 @@ struct SharedSpacesView: View {
                 }
             }
         }
+    }
+
+    private func inviteShareURL(for invite: CreateInviteResult) -> URL? {
+        Self.sharedInviteURL(for: invite)
     }
 
     private var membersCard: some View {
@@ -247,7 +328,7 @@ struct SharedSpacesView: View {
 
                 if !viewModel.spaceInvites.isEmpty {
                     Divider()
-                    Text("Invites activos")
+                    Text("Invitaciones activas")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(BrandTheme.ink)
 
@@ -329,11 +410,11 @@ struct SharedSpacesView: View {
     private func planLabel(_ raw: String) -> String {
         switch raw.lowercased() {
         case "family":
-            return "Family"
+            return "Familia"
         case "personal", "pro":
             return "Pro"
         case "enterprise":
-            return "Enterprise"
+            return "Empresa"
         default:
             return "Gratis"
         }
@@ -368,9 +449,9 @@ struct SharedSpacesView: View {
         case .sent:
             return "Le enviamos un correo. Si ya tiene cuenta, solo debe entrar con ese email; si no, puede crear una cuenta y quedará unido a tu familia."
         case .failed:
-            return "No pudimos enviar el correo automáticamente. Comparte este enlace de respaldo por Mensajes, WhatsApp o Mail."
+            return "No pudimos enviar el correo automáticamente. Comparte este enlace por Mensajes, WhatsApp o Mail."
         case .disabled, .none:
-            return "Comparte este enlace por Mensajes, WhatsApp o Mail. La app unirá a la persona correcta cuando entre con ese correo."
+            return "Comparte este enlace por Mensajes, WhatsApp o Mail. Cuando la persona correcta entre con su cuenta, la app intentará completar la unión."
         }
     }
 

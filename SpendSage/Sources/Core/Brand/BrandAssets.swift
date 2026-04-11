@@ -359,8 +359,9 @@ final class BrandAssetCatalog {
         guard let url = url(for: source), let image = UIImage(contentsOfFile: url.path) else {
             return nil
         }
-        imageCache.setObject(image, forKey: cacheKey)
-        return image
+        let processedImage = processedImageIfNeeded(image, for: source)
+        imageCache.setObject(processedImage, forKey: cacheKey)
+        return processedImage
     }
 
     func url(for source: BrandAssetSource?) -> URL? {
@@ -414,5 +415,169 @@ final class BrandAssetCatalog {
         }
 
         return fallbackManifest
+    }
+
+    private func processedImageIfNeeded(_ image: UIImage, for source: BrandAssetSource) -> UIImage {
+        guard let cgImage = image.cgImage else {
+            return image
+        }
+
+        switch source.category {
+        case .badges:
+            guard Self.shouldMaskBadgeBackground(in: cgImage),
+                  let masked = cgImage.copy(maskingColorComponents: [235, 255, 235, 255, 235, 255]) else {
+                return image
+            }
+            return UIImage(cgImage: masked, scale: image.scale, orientation: image.imageOrientation)
+        case .characters:
+            guard let masked = Self.maskBorderNearWhiteBackground(in: cgImage) else {
+                return image
+            }
+            return UIImage(cgImage: masked, scale: image.scale, orientation: image.imageOrientation)
+        default:
+            return image
+        }
+    }
+
+    private static func cgImageHasAlpha(_ cgImage: CGImage) -> Bool {
+        switch cgImage.alphaInfo {
+        case .alphaOnly, .first, .last, .premultipliedFirst, .premultipliedLast:
+            return true
+        case .none, .noneSkipFirst, .noneSkipLast:
+            return false
+        @unknown default:
+            return true
+        }
+    }
+
+    private static func shouldMaskBadgeBackground(in cgImage: CGImage) -> Bool {
+        if !cgImageHasAlpha(cgImage) {
+            return true
+        }
+        return cornersAreNearWhite(in: cgImage)
+    }
+
+    private static func maskBorderNearWhiteBackground(in cgImage: CGImage) -> CGImage? {
+        guard cornersAreNearWhite(in: cgImage) else { return nil }
+
+        let width = cgImage.width
+        let height = cgImage.height
+        guard width > 0, height > 0 else { return nil }
+
+        let bytesPerPixel = 4
+        let bytesPerRow = width * bytesPerPixel
+        let bitsPerComponent = 8
+        var pixels = [UInt8](repeating: 0, count: width * height * bytesPerPixel)
+
+        guard let context = CGContext(
+            data: &pixels,
+            width: width,
+            height: height,
+            bitsPerComponent: bitsPerComponent,
+            bytesPerRow: bytesPerRow,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else {
+            return nil
+        }
+
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+
+        func offset(forX x: Int, y: Int) -> Int {
+            (y * width + x) * bytesPerPixel
+        }
+
+        func isNearWhiteBackground(_ offset: Int) -> Bool {
+            let r = pixels[offset]
+            let g = pixels[offset + 1]
+            let b = pixels[offset + 2]
+            let a = pixels[offset + 3]
+            return a > 220 && r > 235 && g > 235 && b > 235
+        }
+
+        var queue: [(x: Int, y: Int)] = []
+        queue.reserveCapacity((width + height) * 2)
+        var visited = [Bool](repeating: false, count: width * height)
+
+        func enqueueIfNeeded(x: Int, y: Int) {
+            guard x >= 0, x < width, y >= 0, y < height else { return }
+            let index = y * width + x
+            guard !visited[index] else { return }
+            let pixelOffset = offset(forX: x, y: y)
+            guard isNearWhiteBackground(pixelOffset) else { return }
+            visited[index] = true
+            queue.append((x, y))
+        }
+
+        for x in 0..<width {
+            enqueueIfNeeded(x: x, y: 0)
+            enqueueIfNeeded(x: x, y: height - 1)
+        }
+
+        if height > 2 {
+            for y in 1..<(height - 1) {
+                enqueueIfNeeded(x: 0, y: y)
+                enqueueIfNeeded(x: width - 1, y: y)
+            }
+        }
+
+        guard !queue.isEmpty else { return nil }
+
+        var queueIndex = 0
+        while queueIndex < queue.count {
+            let point = queue[queueIndex]
+            queueIndex += 1
+
+            let pixelOffset = offset(forX: point.x, y: point.y)
+            pixels[pixelOffset + 3] = 0
+
+            enqueueIfNeeded(x: point.x - 1, y: point.y)
+            enqueueIfNeeded(x: point.x + 1, y: point.y)
+            enqueueIfNeeded(x: point.x, y: point.y - 1)
+            enqueueIfNeeded(x: point.x, y: point.y + 1)
+        }
+
+        return context.makeImage()
+    }
+
+    private static func cornersAreNearWhite(in cgImage: CGImage) -> Bool {
+        guard let dataProvider = cgImage.dataProvider,
+              let data = dataProvider.data,
+              let bytes = CFDataGetBytePtr(data) else {
+            return false
+        }
+
+        let width = cgImage.width
+        let height = cgImage.height
+        let bitsPerPixel = cgImage.bitsPerPixel
+        let bytesPerPixel = max(bitsPerPixel / 8, 4)
+        let bytesPerRow = cgImage.bytesPerRow
+
+        func pixel(atX x: Int, y: Int) -> (r: UInt8, g: UInt8, b: UInt8, a: UInt8)? {
+            guard x >= 0, x < width, y >= 0, y < height else { return nil }
+            let offset = y * bytesPerRow + x * bytesPerPixel
+            guard offset + 3 < CFDataGetLength(data) else { return nil }
+            let alphaInfo = cgImage.alphaInfo
+            switch alphaInfo {
+            case .premultipliedFirst, .first, .noneSkipFirst:
+                return (bytes[offset + 1], bytes[offset + 2], bytes[offset + 3], bytes[offset])
+            default:
+                return (bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3])
+            }
+        }
+
+        let samplePoints = [
+            (x: 0, y: 0),
+            (x: max(width - 1, 0), y: 0),
+            (x: 0, y: max(height - 1, 0)),
+            (x: max(width - 1, 0), y: max(height - 1, 0))
+        ]
+
+        return samplePoints.allSatisfy { point in
+            guard let pixel = pixel(atX: point.x, y: point.y) else { return false }
+            let isOpaqueEnough = pixel.a > 220 || pixel.a == 0
+            let isNearWhite = pixel.r > 235 && pixel.g > 235 && pixel.b > 235
+            return isOpaqueEnough && isNearWhite
+        }
     }
 }

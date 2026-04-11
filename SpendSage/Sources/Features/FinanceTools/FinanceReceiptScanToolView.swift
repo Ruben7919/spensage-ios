@@ -166,9 +166,11 @@ struct FinanceReceiptScanToolView: View {
                     receiptScanGateCard
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
-            .padding(.bottom, (showsStepActionBar ? 110 : 24) + shellBottomInset)
+            .padding(.bottom, (showsStepActionBar ? 96 : 24) + shellBottomInset)
         }
+        .scrollBounceBehavior(.basedOnSize, axes: .vertical)
         .accessibilityIdentifier("scan.screen")
         .overlay(alignment: .topLeading) {
             AccessibilityProbe(identifier: "scan.screen")
@@ -680,7 +682,7 @@ struct FinanceReceiptScanToolView: View {
             }
             .padding(.horizontal, 24)
             .padding(.top, 16)
-            .padding(.bottom, 20)
+            .padding(.bottom, shellBottomInset + 12)
             .background(
                 Rectangle()
                     .fill(.ultraThinMaterial)
@@ -690,30 +692,55 @@ struct FinanceReceiptScanToolView: View {
     }
 
     private var photoTipsCard: some View {
-        Group {
-            if prefersCompactGuidance {
-                ExperienceDisclosureCard(
-                    title: "Consejos para la foto",
-                    summary: "Ábrelos solo si el OCR falla o si la captura sale dudosa.",
-                    character: .mei,
-                    expression: .thinking
-                ) {
-                    photoTipsContent
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top, spacing: 14) {
+                    MascotAvatarView(character: .mei, expression: .thinking, size: 54)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Consejos para la foto")
+                            .font(.headline)
+                            .foregroundStyle(BrandTheme.ink)
+
+                        Text(prefersCompactGuidance
+                            ? "Mei te muestra la postura, la luz y el encuadre cuando quieras una ayuda visual rápida."
+                            : "Antes de capturar, usa esta mini guía para que el OCR llegue más limpio al borrador.")
+                            .font(.subheadline)
+                            .foregroundStyle(BrandTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Button {
+                        isPresentingGuide = true
+                    } label: {
+                        Label("Guía", systemImage: "questionmark.circle")
+                            .labelStyle(.iconOnly)
+                            .font(.title3.weight(.semibold))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(BrandTheme.primary)
                 }
-            } else {
-                SurfaceCard {
-                    photoTipsContent
+
+                BrandScenePanel(
+                    sceneKey: "guide_05_scan_receipt_mei",
+                    fallbackSystemImage: "camera.viewfinder",
+                    height: prefersCompactGuidance ? 152 : 176
+                )
+
+                photoTipsContent
+
+                Button("Abrir guía visual") {
+                    isPresentingGuide = true
                 }
+                .buttonStyle(SecondaryCTAStyle())
             }
         }
     }
 
     private var photoTipsContent: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Consejos para la foto")
-                .font(.headline)
-                .foregroundStyle(BrandTheme.ink)
-
             BrandFeatureRow(
                 systemImage: "sun.max.fill",
                 title: "Usa luz pareja",
@@ -1035,12 +1062,46 @@ struct FinanceReceiptScanToolView: View {
             merchant = "Blue Bottle Coffee"
             amount = "8.75"
             category = .coffee
-            date = .now
+            date = debugFixtureReceiptDate
             note = "Local-first receipt draft from an in-store purchase.".appLocalized
         }
         resetDraftLocks()
         clearTransientState()
         transitionToStep(.autofill)
+    }
+
+    private func loadSampleReceiptFixture(step: ReceiptWizardStep) {
+        let receiptDate = debugFixtureReceiptDate
+        let analysis = ReceiptScanAnalysis(
+            recognizedText: [
+                "TIA",
+                "Fecha 2026-04-07",
+                "TOTAL 4.99"
+            ].joined(separator: "\n"),
+            merchant: "TIA",
+            amount: Decimal(string: "4.99"),
+            date: receiptDate,
+            category: .groceries
+        )
+
+        capturedImage = debugReceiptFixtureImage()
+        captureSource = .photos
+        captureDate = receiptDate
+        receiptAnalysis = analysis
+        isAnalyzingReceipt = false
+
+        applySystemDraftMutation {
+            merchant = analysis.merchant ?? ""
+            amount = analysis.amount?.formatted(.number.precision(.fractionLength(2))) ?? ""
+            category = analysis.category ?? .groceries
+            date = analysis.date ?? receiptDate
+            note = "Prefilled on device from the receipt scan.".appLocalized
+        }
+
+        resetDraftLocks()
+        clearTransientState()
+        showCaptureFallback = false
+        currentStep = step
     }
 
     private func applyDebugLaunchStateIfNeeded() {
@@ -1054,6 +1115,10 @@ struct FinanceReceiptScanToolView: View {
         case "review":
             loadSampleDraft()
             currentStep = .review
+        case "autofill_fixture", "fixture":
+            loadSampleReceiptFixture(step: .autofill)
+        case "review_fixture", "fixture_review":
+            loadSampleReceiptFixture(step: .review)
         default:
             break
         }
@@ -1280,6 +1345,46 @@ struct FinanceReceiptScanToolView: View {
     private func resetDraftLocks() {
         isCategoryLockedByUser = false
         isDateLockedByUser = false
+    }
+
+    private var debugFixtureReceiptDate: Date {
+        let calendar = Calendar(identifier: .gregorian)
+        return calendar.date(from: DateComponents(year: 2026, month: 4, day: 7, hour: 9, minute: 45)) ?? .now
+    }
+
+    private func debugReceiptFixtureImage() -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 900, height: 1500))
+        return renderer.image { context in
+            let bounds = CGRect(origin: .zero, size: CGSize(width: 900, height: 1500))
+
+            UIColor(red: 0.95, green: 0.97, blue: 1.0, alpha: 1).setFill()
+            context.fill(bounds)
+
+            let paperRect = bounds.insetBy(dx: 80, dy: 90)
+            UIColor.white.setFill()
+            UIBezierPath(roundedRect: paperRect, cornerRadius: 36).fill()
+
+            let header = [
+                NSAttributedString.Key.font: UIFont.monospacedSystemFont(ofSize: 46, weight: .bold),
+                NSAttributedString.Key.foregroundColor: UIColor.black
+            ]
+            let body = [
+                NSAttributedString.Key.font: UIFont.monospacedSystemFont(ofSize: 34, weight: .regular),
+                NSAttributedString.Key.foregroundColor: UIColor.darkGray
+            ]
+
+            NSString(string: "TIA").draw(at: CGPoint(x: 150, y: 150), withAttributes: header)
+            NSString(string: "Fecha: 2026-04-07 09:45").draw(at: CGPoint(x: 150, y: 260), withAttributes: body)
+            NSString(string: "TOTAL   $4.99").draw(at: CGPoint(x: 150, y: 360), withAttributes: body)
+            NSString(string: "Compra en tienda").draw(at: CGPoint(x: 150, y: 460), withAttributes: body)
+
+            UIColor.systemTeal.setStroke()
+            let accent = UIBezierPath()
+            accent.lineWidth = 10
+            accent.move(to: CGPoint(x: 150, y: 570))
+            accent.addLine(to: CGPoint(x: 730, y: 570))
+            accent.stroke()
+        }
     }
 }
 
