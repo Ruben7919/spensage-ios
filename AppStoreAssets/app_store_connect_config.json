@@ -68,13 +68,13 @@
     }
   },
   "build": {
-    "id": "3e8076cf-e7b3-4122-b3ee-988b584e4bc5",
+    "id": "f3ae5298-a583-40e9-841b-d7983ea8f329",
     "betaLocalizations": {
       "en-US": {
-        "whatsNew": "Build 31 refines the MichiFinanzas beta with the restored bottom tab bar, cleaner mission and plan language, SES-backed family invite emails, simpler receipt scanning, smoother family-sharing surfaces, and the latest authenticated cloud readiness fixes."
+        "whatsNew": "Build 34 fixes the family invite link fallback on the MichiFinanzas web landing, improves scan guidance with a more visual receipt capture guide, softens the calendar sync CTA into a manual repair action, and cleans up character rendering in key finance cards."
       },
       "es-MX": {
-        "whatsNew": "La build 31 pule la beta de MichiFinanzas con el tab bar inferior restaurado, lenguaje más claro de misiones y planes, invitaciones family por SES, escaneo de recibos más simple y los últimos ajustes de sync autenticado."
+        "whatsNew": "La build 34 corrige el fallback del link de invitación familiar en el landing web de MichiFinanzas, mejora la guía de escaneo con una ayuda visual para capturar recibos, baja el CTA de sync de calendario a una acción manual de reparación y limpia el render de personajes en tarjetas financieras clave."
       }
     }
   },
